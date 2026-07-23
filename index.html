@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kacida Bersatu PWA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { background-color: #012218; color: #f8fafc; font-family: 'Inter', sans-serif; }
+    
+    .card-3d {
+      background: linear-gradient(145deg, #053b2e 0%, #02241b 100%);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .chat-bubble-linear {
+      background: linear-gradient(135deg, #04382c 0%, #02241b 100%);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .chat-bubble-ai {
+      background: linear-gradient(135deg, #0f4c3a 0%, #062d22 100%);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+    }
+
+    .active-nav-tab {
+      background-color: #10b981;
+      color: #012218;
+      font-weight: bold;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+    }
+
+    @keyframes floatRocket {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+    .animate-rocket { animation: floatRocket 3s ease-in-out infinite; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #059669; border-radius: 4px; }
+  </style>
+</head>
+<body class="pb-24 max-w-md mx-auto min-h-screen relative shadow-2xl overflow-x-hidden">
+
+  <!-- ================= 1. FULLSCREEN SPLASH SCREEN ================= -->
+  <div id="splashScreen" class="fixed inset-0 z-50 bg-[#012218] flex flex-col items-center justify-center p-6 space-y-6 transition-opacity duration-500">
+    <div class="relative w-44 h-44 flex items-center justify-center bg-emerald-950/80 rounded-full border-4 border-emerald-500/60 shadow-2xl p-4">
+      <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ=s1000" 
+           alt="Kacida Logo" class="w-full h-full object-contain animate-pulse">
+    </div>
+    <div class="text-center space-y-1">
+      <h1 class="text-2xl font-black tracking-widest text-white">KACIDA BERSATU</h1>
+      <p class="text-xs text-emerald-400 font-semibold tracking-wider uppercase">Operational Super-App</p>
+    </div>
+    <div class="flex items-center space-x-2 text-emerald-400 text-xs font-medium pt-8">
+      <i class="fa-solid fa-spinner animate-spin"></i>
+      <span>Memuat sistem...</span>
+    </div>
+  </div>
+
+  <!-- ================= 2. LOGIN NIK SCREEN / OVERLAY ================= -->
+  <div id="loginOverlay" class="fixed inset-0 z-40 bg-[#012218]/95 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="card-3d w-full max-w-sm rounded-3xl p-6 space-y-5 border-2 border-emerald-500/50">
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-900/80 border border-emerald-500 flex items-center justify-center text-emerald-300 text-2xl shadow-lg">
+          <i class="fa-solid fa-id-card"></i>
+        </div>
+        <h2 class="text-lg font-black text-white">Login Member Kacida</h2>
+        <p class="text-xs text-emerald-300">Masukkan Nomor Induk Karyawan (NIK) untuk mengakses aplikasi</p>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[10px] text-emerald-300 font-bold uppercase mb-1">NIK Karyawan</label>
+          <input id="inputNikLogin" type="text" placeholder="Contoh: 12836" 
+                 class="w-full bg-emerald-950 text-white font-bold text-center text-sm px-4 py-3 rounded-xl border border-emerald-700 focus:outline-none focus:border-emerald-400">
+        </div>
+
+        <div id="loginErrorMsg" class="hidden p-3 rounded-xl bg-red-950/90 border border-red-500/80 text-red-200 text-xs text-center font-semibold leading-relaxed">
+          Akses Ditolak / NIK Tidak Terdaftar / Anda Tidak Berhak Akses Aplikasi Ini
+        </div>
+
+        <button onclick="submitNikLogin()" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-emerald-950 font-black py-3 rounded-xl shadow-lg transition-transform active:scale-95">
+          MASUK APLIKASI <i class="fa-solid fa-arrow-right-to-bracket ml-1"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= KACIDA CUSTOM TOAST NOTIFICATION ================= -->
+  <div id="kacidaToast" class="fixed top-4 inset-x-4 max-w-xs mx-auto z-50 card-3d bg-emerald-900 border border-amber-400 p-3 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300 opacity-0 pointer-events-none -translate-y-5">
+    <div id="toastIcon" class="text-amber-400 text-xl"><i class="fa-solid fa-circle-check"></i></div>
+    <div class="flex-1">
+      <h4 id="toastTitle" class="text-xs font-bold text-white">Notifikasi</h4>
+      <p id="toastMessage" class="text-[10px] text-emerald-200">Pesan sukses</p>
+    </div>
+  </div>
+
+  <!-- ================= HEADER BAR ================= -->
+  <header class="sticky top-0 z-30 card-3d px-3.5 py-3 flex items-center justify-between border-b border-emerald-800/60 rounded-b-2xl">
+    <div class="flex items-center space-x-2">
+      <button onclick="toggleSettingsDrawer()" class="bg-emerald-900/80 p-2 rounded-xl text-emerald-400 border border-emerald-700/50">
+        <i class="fa-solid fa-sliders text-base"></i>
+      </button>
+      <div class="flex items-center space-x-1.5">
+        <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-emerald-950 shadow-md">
+          <i class="fa-solid fa-gem text-white"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-xs text-white tracking-wide">Kacida Bersatu</h1>
+          <p id="userTokoHeader" class="text-[9px] text-emerald-300 font-medium">Detecting Store...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ICON DISKET (DATA SALES POPUP) + AVATAR -->
+    <div class="flex items-center space-x-2">
+      <button onclick="toggleSalesModal()" class="relative bg-amber-500/20 hover:bg-amber-500/30 p-2 rounded-xl border border-amber-400/60 text-amber-300 shadow-lg active:scale-95 transition-all">
+        <i class="fa-solid fa-floppy-disk text-base animate-pulse"></i>
+        <span class="absolute -top-1 -right-1 bg-amber-400 text-emerald-950 text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">!</span>
+      </button>
+
+      <div class="relative bg-emerald-950 p-2 rounded-full border border-emerald-800">
+        <i class="fa-solid fa-bell text-emerald-300 text-sm"></i>
+        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">3</span>
+      </div>
+
+      <img id="userAvatar" src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ=s1000" 
+           class="w-9 h-9 rounded-full border-2 border-emerald-400 object-cover shadow-lg">
+    </div>
+  </header>
+
+  <!-- ================= MODAL SETTINGS (INSTALL PWA & NOTIFIKASI) ================= -->
+  <div id="settingsDrawer" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="card-3d w-full max-w-sm rounded-2xl border-2 border-emerald-500/60 p-4 space-y-4 relative">
+      <div class="flex justify-between items-center border-b border-emerald-800 pb-2">
+        <h3 class="text-xs font-bold text-white flex items-center"><i class="fa-solid fa-gear text-amber-400 mr-2"></i> Pengaturan Aplikasi</h3>
+        <button onclick="toggleSettingsDrawer()" class="text-emerald-400 bg-emerald-950 p-1.5 rounded-full"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-2.5">
+        <button id="btnInstallPwa" onclick="triggerPwaInstall()" class="w-full bg-emerald-900/90 hover:bg-emerald-800 text-white border border-emerald-600 p-3 rounded-xl flex items-center justify-between text-xs font-bold">
+          <span class="flex items-center"><i class="fa-solid fa-download text-amber-400 text-base mr-2.5"></i> Install Aplikasi PWA</span>
+          <i class="fa-solid fa-chevron-right text-emerald-400"></i>
+        </button>
+
+        <button onclick="requestNotificationAccess()" class="w-full bg-emerald-900/90 hover:bg-emerald-800 text-white border border-emerald-600 p-3 rounded-xl flex items-center justify-between text-xs font-bold">
+          <span class="flex items-center"><i class="fa-solid fa-bell text-amber-400 text-base mr-2.5"></i> Aktifkan Notifikasi Push</span>
+          <i class="fa-solid fa-toggle-on text-emerald-400 text-lg"></i>
+        </button>
+
+        <button onclick="userLogout()" class="w-full bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-700/80 p-3 rounded-xl flex items-center justify-center text-xs font-bold mt-4">
+          <i class="fa-solid fa-right-from-bracket mr-2"></i> Keluar / Ganti NIK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DATA SALES (DISKET HEADER) ================= -->
+  <div id="salesDataModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
+    <div class="card-3d w-full max-w-sm rounded-2xl border-2 border-emerald-500/60 p-4 space-y-3 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="toggleSalesModal()" class="absolute top-3 right-3 text-emerald-400 bg-emerald-950 p-1.5 rounded-full border border-emerald-700">
+        <i class="fa-solid fa-xmark text-base"></i>
+      </button>
+
+      <div class="border-b border-emerald-800 pb-2 pr-6">
+        <div class="flex justify-between items-center">
+          <span id="modalTokoTitle" class="text-xs font-black text-amber-300">📍 2J16 - CARINGIN KULON</span>
+          <span id="modalRankTitle" class="text-[10px] font-bold bg-amber-500 text-emerald-950 px-2 py-0.5 rounded-full">🏆 RANK #2</span>
+        </div>
+        <p id="modalLastUpdate" class="text-[9px] text-emerald-300 mt-1">📅 Update Terakhir: 15 MARET 2026 (Hari ke-15 Aktif)</p>
+      </div>
+
+      <div class="bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-800/80 space-y-1">
+        <p class="text-[10px] font-bold text-emerald-300 flex justify-between">
+          <span>💰 SALES HARIAN</span>
+          <span id="modalGrowthHarian" class="text-emerald-400">+7.0% 🟢</span>
+        </p>
+        <div class="text-xs space-y-0.5">
+          <div class="flex justify-between text-white"><span>2026 :</span><span id="modalSales2026" class="font-bold">Rp 17.007.857</span></div>
+          <div class="flex justify-between text-emerald-300/80"><span>2025 :</span><span id="modalSales2025">Rp 15.890.000</span></div>
+        </div>
+      </div>
+
+      <div class="bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-800/80 space-y-1">
+        <p class="text-[10px] font-bold text-emerald-300 flex justify-between">
+          <span>📊 MTD SALES & AVERAGE</span>
+          <span id="modalMtdGrowth" class="text-emerald-400">+3.9% 🟢</span>
+        </p>
+        <div class="text-xs space-y-1">
+          <div class="flex justify-between text-white"><span>MTD Sales 2026 :</span><span id="modalMtd2026" class="font-bold">Rp 226.238.450</span></div>
+          <div class="flex justify-between text-emerald-300/80"><span>MTD Sales 2025 :</span><span id="modalMtd2025">Rp 217.743.230</span></div>
+          <div class="flex justify-between text-amber-300 pt-1 border-t border-emerald-800/60 font-bold">
+            <span>⚡ SPD 2026 (Rata-rata/Hari) :</span><span id="modalSpd">Rp 15.082.563</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-800/80 space-y-1.5">
+        <p class="text-[10px] font-bold text-emerald-300">🎯 IKT TOKO (Tab: IKT)</p>
+        <div class="grid grid-cols-3 gap-1 text-center text-[9px]">
+          <div class="bg-emerald-900/60 p-1.5 rounded border border-emerald-700/50">
+            <p class="text-emerald-400 font-bold">ACV NET SALES</p>
+            <p id="modalAcvNetSales" class="font-black text-white text-xs mt-0.5">71.1%</p>
+          </div>
+          <div class="bg-emerald-900/60 p-1.5 rounded border border-emerald-700/50">
+            <p class="text-emerald-400 font-bold">ACV PROFIT</p>
+            <p id="modalAcvProfit" class="font-black text-red-400 text-xs mt-0.5">-2.3%</p>
+          </div>
+          <div class="bg-emerald-900/60 p-1.5 rounded border border-emerald-700/50">
+            <p class="text-emerald-400 font-bold">ACV GM%</p>
+            <p id="modalAcvGm" class="font-black text-emerald-300 text-xs mt-0.5">100.9%</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-800/80 space-y-1">
+        <div class="flex justify-between items-center">
+          <span class="text-[10px] font-bold text-amber-300">🚀 PENAWARAN LANGSUNG</span>
+          <span id="modalPlStatus" class="text-[9px] text-emerald-400 font-bold">SANGAT BAIK 🟢</span>
+        </div>
+        <p class="text-[10px] text-white">Point Dashboard: <span id="modalPlPoint" class="font-bold text-amber-300">108.83%</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PAGE 1: BERANDA ================= -->
+  <main id="pageBeranda" class="p-3.5 space-y-4">
+    
+    <!-- Hero Banner User -->
+    <div class="card-3d rounded-2xl p-4 relative overflow-hidden bg-gradient-to-r from-emerald-900 via-emerald-950 to-emerald-900 border border-emerald-500/40">
+      <div class="w-2/3 space-y-1 z-10 relative">
+        <p class="text-[11px] text-emerald-300 font-medium">Selamat datang kembali,</p>
+        <h2 id="userNameGreet" class="text-lg font-black text-white tracking-wide">Team Kacida! 👋</h2>
+        <span class="inline-flex items-center px-2.5 py-1 bg-emerald-950/80 text-emerald-300 text-[10px] rounded-full border border-emerald-500/40 font-semibold shadow mt-1">
+          ⭐ Performa hari ini: <span class="text-amber-400 font-bold ml-1">Sangat Baik! 🔥</span>
+        </span>
+      </div>
+      <div class="absolute -right-2 -bottom-2 w-32 h-32 opacity-90 pointer-events-none">
+        <img src="https://cdni.iconscout.com/illustration/premium/thumb/team-success-4438808-3684812.png" 
+             onerror="this.style.display='none'" class="w-full h-full object-contain">
+      </div>
+    </div>
+
+    <!-- CAROUSEL GOOGLE DRIVE IMAGES (RATIO KONVERSI TANPA TERPOTONG) -->
+    <div class="card-3d rounded-2xl p-2 relative bg-emerald-950/90 border border-emerald-700/60 overflow-hidden">
+      <div class="relative h-44 w-full flex items-center justify-center bg-black/40 rounded-xl overflow-hidden">
+        <img id="carouselImgDisplay" src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ=s1000" 
+             class="max-h-full max-w-full object-contain transition-all duration-500">
+      </div>
+      <div class="flex justify-between items-center px-2 pt-2 text-[10px] text-emerald-300">
+        <button onclick="prevCarousel()" class="bg-emerald-900 p-1 rounded-md text-amber-300"><i class="fa-solid fa-chevron-left"></i> Prev</button>
+        <span id="carouselCounter" class="font-bold text-white">1 / 1</span>
+        <button onclick="nextCarousel()" class="bg-emerald-900 p-1 rounded-md text-amber-300">Next <i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-5 gap-1.5 text-center text-[10px]">
+      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
+        <p id="taskCountVal" class="font-bold text-white text-xs">0/12</p>
+        <p class="text-emerald-300 text-[8px]">Tugas</p>
+      </div>
+      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
+        <p class="font-bold text-white text-xs">5</p>
+        <p class="text-emerald-300 text-[8px]">Info</p>
+      </div>
+      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
+        <p class="font-bold text-white text-xs">3</p>
+        <p class="text-emerald-300 text-[8px]">Notif</p>
+      </div>
+      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
+        <p id="userPoin" class="font-bold text-amber-300 text-xs">0</p>
+        <p class="text-emerald-300 text-[8px]">Point</p>
+      </div>
+      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
+        <p id="userRank" class="font-bold text-white text-xs"># -</p>
+        <p class="text-emerald-300 text-[8px]">Rank Area</p>
+      </div>
+    </div>
+
+    <!-- DINAMIS MENU UTAMA DARI SPREADSHEET -->
+    <div class="card-3d rounded-2xl p-4 space-y-3 relative overflow-hidden">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-bold text-emerald-200 flex items-center">
+          <i class="fa-solid fa-shapes text-amber-400 mr-1.5"></i> Menu Utama
+        </h3>
+      </div>
+      <div id="gridMenuUtama" class="grid grid-cols-4 gap-2.5 text-center text-[10px] z-10 relative">
+        <p class="col-span-4 text-emerald-400 py-2"><i class="fa-solid fa-spinner animate-spin"></i> Memuat Menu Utama...</p>
+      </div>
+    </div>
+
+    <!-- DINAMIS MENU LAINNYA DARI SPREADSHEET -->
+    <div class="card-3d rounded-2xl p-4 space-y-3 relative">
+      <h3 class="text-xs font-bold text-emerald-200 flex items-center">
+        <i class="fa-solid fa-layer-group text-emerald-400 mr-1.5"></i> Menu Lainnya
+      </h3>
+      <div id="gridMenuLainnya" class="grid grid-cols-4 gap-2.5 text-center text-[10px]">
+        <p class="col-span-4 text-emerald-400 py-2"><i class="fa-solid fa-spinner animate-spin"></i> Memuat Menu Lainnya...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= PAGE 2: CHAT INTERNAL & KACIDA AI ================= -->
+  <main id="pageChat" class="p-3.5 space-y-3 hidden">
+    <div class="card-3d p-3 rounded-2xl bg-gradient-to-r from-emerald-900 via-emerald-950 to-emerald-900 border border-amber-400/40 flex justify-between items-center">
+      <div class="flex items-center space-x-2.5">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-300 text-lg shadow-md">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div>
+          <h2 class="font-black text-xs text-white flex items-center">
+            Kacida AI Assistant <span class="bg-amber-400 text-emerald-950 text-[8px] px-1.5 py-0.2 rounded font-bold ml-1.5">ONLINE</span>
+          </h2>
+          <p class="text-[10px] text-emerald-300">Tanyakan data toko, sales, & arahan operasional</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="chatContainer" class="space-y-2.5 h-[360px] overflow-y-auto pr-1">
+      <p class="text-center text-emerald-400 text-xs py-8"><i class="fa-solid fa-spinner animate-spin mr-1"></i> Memuat percakapan...</p>
+    </div>
+
+    <div class="card-3d p-2 rounded-2xl flex items-center space-x-2 border border-emerald-700/60">
+      <button id="toggleAiBtn" onclick="toggleAiMode()" class="px-2.5 py-1.5 bg-emerald-950 rounded-xl border border-emerald-700 text-[10px] text-emerald-300 font-bold flex items-center space-x-1">
+        <i class="fa-solid fa-robot text-amber-400"></i>
+        <span id="aiLabel">Semua</span>
+      </button>
+      <input id="chatInputText" type="text" placeholder="Tulis pesan atau tanya Kacida AI..." 
+             class="flex-1 bg-emerald-950/80 text-white text-xs px-3 py-2 rounded-xl border border-emerald-800/80 focus:outline-none focus:border-emerald-400">
+      <button onclick="sendChatMessage()" class="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 w-9 h-9 rounded-xl flex items-center justify-center font-bold shadow-md">
+        <i class="fa-solid fa-paper-plane text-xs"></i>
+      </button>
+    </div>
+  </main>
+
+  <!-- ================= PAGE 3: LEADERBOARD ================= -->
+  <main id="pageLeaderboard" class="p-3.5 space-y-4 hidden">
+    <div class="card-3d p-4 rounded-2xl text-center space-y-1">
+      <i class="fa-solid fa-trophy text-amber-400 text-3xl"></i>
+      <h2 class="font-black text-lg text-white">Peringkat Member</h2>
+      <p class="text-[11px] text-emerald-300">Kumpulkan poin harian dengan aktif menyelesaikan misi operasional!</p>
+    </div>
+
+    <div class="card-3d rounded-2xl p-3 space-y-2">
+      <div id="leaderboardList" class="space-y-2 text-xs">
+        <p class="text-center text-emerald-400 py-4"><i class="fa-solid fa-spinner animate-spin"></i> Memuat klasemen...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= PAGE 4: PROFIL & BAGAN ORGANISASI ================= -->
+  <main id="pageProfil" class="p-3.5 space-y-4 hidden">
+    <div class="card-3d p-4 rounded-2xl text-center space-y-2">
+      <img id="profileCardImg" src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ=s1000" class="w-20 h-20 rounded-full mx-auto border-4 border-emerald-400 object-cover shadow-xl">
+      <h3 id="profileName" class="font-bold text-base text-white">-</h3>
+      <p id="profileRole" class="text-xs text-emerald-300">-</p>
+      <span id="profileStore" class="inline-block px-3 py-0.5 bg-emerald-950 text-emerald-400 text-[10px] rounded-full border border-emerald-800">-</span>
+    </div>
+
+    <div class="card-3d p-4 rounded-2xl space-y-2 text-xs">
+      <h3 class="font-bold text-emerald-300 border-b border-emerald-800 pb-2"><i class="fa-solid fa-sitemap mr-1.5"></i> Bagan Organisasi Area</h3>
+      <div class="space-y-1.5">
+        <div class="bg-emerald-950/80 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">OGM Area</p><p id="ogmName" class="font-semibold text-white">-</p></div>
+        <div class="ml-2 bg-emerald-950/60 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">Branch Manager</p><p id="bmName" class="font-semibold text-white">-</p></div>
+        <div class="ml-4 bg-emerald-950/60 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">Deputy Branch Manager</p><p id="dbmName" class="font-semibold text-white">-</p></div>
+        <div class="ml-6 bg-emerald-950/60 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">Area Manager</p><p id="amName" class="font-semibold text-white">-</p></div>
+        <div class="ml-8 bg-emerald-950/60 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">Area Coordinator</p><p id="acName" class="font-semibold text-white">-</p></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= BOTTOM NAVIGATION BAR ================= -->
+  <nav class="fixed bottom-0 inset-x-0 max-w-md mx-auto z-30 card-3d bg-emerald-950/95 border-t border-emerald-800/80 px-2 py-2 flex justify-between items-center rounded-t-2xl">
+    <button onclick="switchTab('Beranda')" id="tabBeranda" class="flex-1 text-center py-1 rounded-xl text-emerald-300 active-nav-tab">
+      <i class="fa-solid fa-house block text-base mb-0.5"></i>
+      <span class="text-[8px]">Beranda</span>
+    </button>
+    <button onclick="switchTab('Chat')" id="tabChat" class="flex-1 text-center py-1 rounded-xl text-emerald-300">
+      <i class="fa-solid fa-comment-dots block text-base mb-0.5"></i>
+      <span class="text-[8px]">Chat</span>
+    </button>
+
+    <div class="-mt-7 relative px-1">
+      <button onclick="executeMenuTask('Aksi Cepat Roket', 10)" class="bg-gradient-to-r from-emerald-400 to-emerald-500 text-emerald-950 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center border-2 border-emerald-100 hover:scale-105 transition-transform">
+        <i class="fa-solid fa-rocket text-xl"></i>
+      </button>
+      <span class="block text-center text-[8px] text-emerald-300 font-bold mt-0.5">Aksi Cepat</span>
+    </div>
+
+    <button onclick="switchTab('Leaderboard')" id="tabLeaderboard" class="flex-1 text-center py-1 rounded-xl text-emerald-300">
+      <i class="fa-solid fa-trophy block text-base mb-0.5"></i>
+      <span class="text-[8px]">Leaderboard</span>
+    </button>
+    <button onclick="switchTab('Profil')" id="tabProfil" class="flex-1 text-center py-1 rounded-xl text-emerald-300">
+      <i class="fa-solid fa-user block text-base mb-0.5"></i>
+      <span class="text-[8px]">Profil</span>
+    </button>
+  </nav>
+
+  <!-- ================= SCRIPT JAVASCRIPT UTAMA ================= -->
+  <script>
+    let currentNik = localStorage.getItem("kacida_nik") || "";
+    let isAiTarget = false;
+    let deferredPrompt = null;
+    let carouselList = [];
+    let carouselIdx = 0;
+
+    // Direct Gas Backend Call
+    function callBackend(payload, callback) {
+      fetch("https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => callback(data))
+      .catch(err => {
+        showKacidaToast("Error", "Gagal menghubungkan ke server.", "error");
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // PWA Install Prompt Listener
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+      });
+
+      // Tampilkan Splash Screen minimal 1.5 detik
+      setTimeout(() => {
+        if (!currentNik) {
+          hideSplashScreen();
+          showLoginOverlay();
+        } else {
+          loadAppDashboard();
+        }
+      }, 1500);
+    });
+
+    function hideSplashScreen() {
+      const splash = document.getElementById('splashScreen');
+      splash.classList.add('opacity-0');
+      setTimeout(() => splash.classList.add('hidden'), 500);
+    }
+
+    function showLoginOverlay() {
+      document.getElementById('loginOverlay').classList.remove('hidden');
+    }
+
+    function submitNikLogin() {
+      const inputNik = document.getElementById('inputNikLogin').value.trim();
+      const errorMsg = document.getElementById('loginErrorMsg');
+
+      if (!inputNik) {
+        errorMsg.innerText = "Mohon isi NIK Anda!";
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
+      callBackend({ action: "loginUser", nik: inputNik }, (res) => {
+        if (res.status === "success") {
+          currentNik = inputNik;
+          localStorage.setItem("kacida_nik", inputNik);
+          document.getElementById('loginOverlay').classList.add('hidden');
+          errorMsg.classList.add('hidden');
+          loadAppDashboard();
+        } else {
+          errorMsg.innerText = res.message || "Akses Ditolak / NIK Tidak Terdaftar / Anda Tidak Berhak Akses Aplikasi Ini";
+          errorMsg.classList.remove('hidden');
+        }
+      });
+    }
+
+    function userLogout() {
+      localStorage.removeItem("kacida_nik");
+      currentNik = "";
+      location.reload();
+    }
+
+    function loadAppDashboard() {
+      callBackend({ action: "getDashboardData", nik: currentNik }, (data) => {
+        hideSplashScreen();
+        if (data.status === "success") {
+          renderDashboardData(data);
+        } else {
+          showLoginOverlay();
+          document.getElementById('loginErrorMsg').innerText = data.message;
+          document.getElementById('loginErrorMsg').classList.remove('hidden');
+        }
+      });
+    }
+
+    function renderDashboardData(data) {
+      const user = data.user;
+      const db = data.dashboard;
+
+      document.getElementById('userTokoHeader').innerText = user.namaTokoLengkap;
+      document.getElementById('userNameGreet').innerText = user.nama + "! 👋";
+      document.getElementById('userAvatar').src = user.fotoProfil;
+
+      // Render Modal Data Sales
+      document.getElementById('modalTokoTitle').innerText = "📍 " + user.namaTokoLengkap;
+      document.getElementById('modalRankTitle').innerText = "🏆 " + db.rankToko;
+      document.getElementById('modalLastUpdate').innerText = "📅 " + db.lastUpdateDate;
+      document.getElementById('modalSales2026').innerText = db.salesHarian2026;
+      document.getElementById('modalSales2025').innerText = db.salesHarian2025;
+      document.getElementById('modalGrowthHarian').innerText = db.growthHarian + " 🟢";
+      document.getElementById('modalMtd2026').innerText = db.mtdSales2026;
+      document.getElementById('modalMtd2025').innerText = db.mtdSales2025;
+      document.getElementById('modalMtdGrowth').innerText = db.mtdGrowth + " 🟢";
+      document.getElementById('modalSpd').innerText = db.spdSales2026;
+
+      document.getElementById('userPoin').innerText = user.poinTotal.toLocaleString("id-ID");
+      document.getElementById('userRank').innerText = user.rankArea;
+      document.getElementById('taskCountVal').innerText = user.tugasSelesai + "/12";
+
+      // Render Drive Carousel
+      if (data.carouselImages && data.carouselImages.length > 0) {
+        carouselList = data.carouselImages;
+        carouselIdx = 0;
+        updateCarouselDisplay();
+      }
+
+      // Render Menu Utama & Menu Lainnya Dinamis dari Spreadsheet Menu_Navigasi
+      renderNavMenus(data.navMenu);
+
+      // Render Profile
+      document.getElementById('profileName').innerText = user.nama;
+      document.getElementById('profileRole').innerText = user.jabatan;
+      document.getElementById('profileStore').innerText = user.namaTokoLengkap;
+      document.getElementById('profileCardImg').src = user.fotoProfil;
+
+      if (user.orgChart) {
+        document.getElementById('ogmName').innerText = user.orgChart.ogm.nama;
+        document.getElementById('bmName').innerText = user.orgChart.bm.nama;
+        document.getElementById('dbmName').innerText = user.orgChart.dbm.nama;
+        document.getElementById('amName').innerText = user.orgChart.am.nama;
+        document.getElementById('acName').innerText = user.orgChart.ac.nama;
+      }
+
+      if (data.leaderboard) renderLeaderboard(data.leaderboard);
+    }
+
+    // Carousel Drive Logic
+    function updateCarouselDisplay() {
+      if (carouselList.length === 0) return;
+      document.getElementById('carouselImgDisplay').src = carouselList[carouselIdx];
+      document.getElementById('carouselCounter').innerText = (carouselIdx + 1) + " / " + carouselList.length;
+    }
+    function prevCarousel() {
+      if (carouselList.length === 0) return;
+      carouselIdx = (carouselIdx - 1 + carouselList.length) % carouselList.length;
+      updateCarouselDisplay();
+    }
+    function nextCarousel() {
+      if (carouselList.length === 0) return;
+      carouselIdx = (carouselIdx + 1) % carouselList.length;
+      updateCarouselDisplay();
+    }
+
+    // Dynamic Navigation Menu Render
+    function renderNavMenus(navMenu) {
+      const gridUtama = document.getElementById('gridMenuUtama');
+      const gridLainnya = document.getElementById('gridMenuLainnya');
+
+      if (navMenu && navMenu.menuUtama && navMenu.menuUtama.length > 0) {
+        let htmlUtama = "";
+        navMenu.menuUtama.forEach(item => {
+          htmlUtama += `
+            <div onclick="executeMenuTask('${item.nama}', ${item.poinReward})" class="p-2 bg-emerald-950/80 rounded-xl border border-emerald-800 hover:border-emerald-400 cursor-pointer">
+              <div class="w-8 h-8 mx-auto rounded-lg bg-emerald-800/60 flex items-center justify-center text-emerald-300 mb-1">
+                <i class="${item.icon} text-sm"></i>
+              </div>
+              <p class="text-emerald-100 leading-tight text-[9px]">${item.nama}</p>
+            </div>
+          `;
+        });
+        gridUtama.innerHTML = htmlUtama;
+      } else {
+        gridUtama.innerHTML = `<p class="col-span-4 text-emerald-400/60 text-[10px]">Menu Utama Belum Diset di Spreadsheet</p>`;
+      }
+
+      if (navMenu && navMenu.menuLainnya && navMenu.menuLainnya.length > 0) {
+        let htmlLainnya = "";
+        navMenu.menuLainnya.forEach(item => {
+          htmlLainnya += `
+            <div onclick="executeMenuTask('${item.nama}', ${item.poinReward})" class="p-2 bg-emerald-950/80 rounded-xl border border-emerald-800 hover:border-emerald-400 cursor-pointer">
+              <div class="w-8 h-8 mx-auto rounded-lg bg-emerald-900/60 flex items-center justify-center text-emerald-300 mb-1">
+                <i class="${item.icon} text-sm"></i>
+              </div>
+              <p class="text-emerald-100 leading-tight text-[9px]">${item.nama}</p>
+            </div>
+          `;
+        });
+        gridLainnya.innerHTML = htmlLainnya;
+      } else {
+        gridLainnya.innerHTML = `<p class="col-span-4 text-emerald-400/60 text-[10px]">Menu Lainnya Belum Diset</p>`;
+      }
+    }
+
+    function executeMenuTask(menuName, poinReward) {
+      showKacidaToast("Misi Dikerjakan!", `Membuka ${menuName} (+${poinReward} Poin)`, "success");
+
+      callBackend({ action: "clickMenuTask", nik: currentNik, menu: menuName, poinReward: poinReward }, (res) => {
+        if (res.status === "success") {
+          document.getElementById('userPoin').innerText = res.totalPoin.toLocaleString("id-ID");
+          let currentTasks = parseInt(document.getElementById('taskCountVal').innerText) || 0;
+          document.getElementById('taskCountVal').innerText = (currentTasks + 1) + "/12";
+        }
+      });
+    }
+
+    // Custom Kacida Toast Notification
+    function showKacidaToast(title, message, type) {
+      const toast = document.getElementById('kacidaToast');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastMessage').innerText = message;
+      
+      toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-5');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-5');
+      }, 3000);
+    }
+
+    function toggleSalesModal() {
+      document.getElementById('salesDataModal').classList.toggle('hidden');
+    }
+
+    function toggleSettingsDrawer() {
+      document.getElementById('settingsDrawer').classList.toggle('hidden');
+    }
+
+    function triggerPwaInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            showKacidaToast("PWA Installed", "Aplikasi berhasil dipasang di layar utama!", "success");
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        showKacidaToast("Informasi PWA", "Aplikasi sudah terpasang atau gunakan opsi 'Add to Home Screen' di browser.", "info");
+      }
+    }
+
+    function requestNotificationAccess() {
+      if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            showKacidaToast("Notifikasi Aktif", "Izin notifikasi Kacida berhasil diaktifkan!", "success");
+          } else {
+            showKacidaToast("Notifikasi Ditolak", "Izin notifikasi tidak diberikan.", "error");
+          }
+        });
+      }
+    }
+
+    // Chat internal & Kacida AI
+    function toggleAiMode() {
+      isAiTarget = !isAiTarget;
+      const label = document.getElementById('aiLabel');
+      const btn = document.getElementById('toggleAiBtn');
+      if (isAiTarget) {
+        label.innerText = "Tanya AI";
+        btn.classList.add('border-amber-400', 'bg-emerald-900');
+      } else {
+        label.innerText = "Semua";
+        btn.classList.remove('border-amber-400', 'bg-emerald-900');
+      }
+    }
+
+    function fetchChatData() {
+      callBackend({ action: "getChat" }, (data) => {
+        if (data.status === "success") renderChatList(data.data);
+      });
+    }
+
+    function renderChatList(messages) {
+      let html = "";
+      if (!messages || messages.length === 0) {
+        html = `<p class="text-center text-emerald-400 text-xs py-8">Belum ada percakapan. Mulai kirim pesan!</p>`;
+      } else {
+        messages.forEach(msg => {
+          let isAi = msg.nik === "AI_001" || msg.nama.indexOf("AI") !== -1;
+          let bubbleStyle = isAi ? "chat-bubble-ai" : "chat-bubble-linear";
+          let badgeRole = isAi ? "bg-amber-400 text-emerald-950 font-black" : "bg-emerald-900/90 text-emerald-300 border border-emerald-700/60";
+
+          html += `
+            <div class="${bubbleStyle} p-2.5 rounded-xl space-y-1">
+              <div class="flex justify-between items-center text-[10px] border-b border-emerald-800/60 pb-1">
+                <div class="flex items-center space-x-1.5">
+                  <span class="font-black text-white text-xs">${msg.nama}</span>
+                  <span class="text-[8px] px-1.5 py-0.2 rounded ${badgeRole}">${msg.jabatan}</span>
+                </div>
+                <span class="text-[8px] text-emerald-400/80">${msg.time}</span>
+              </div>
+              <p class="text-xs text-emerald-100 leading-relaxed pt-0.5">${msg.pesan}</p>
+            </div>
+          `;
+        });
+      }
+      const chatContainer = document.getElementById('chatContainer');
+      chatContainer.innerHTML = html;
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInputText');
+      const val = input.value.trim();
+      if (!val) return;
+      input.value = "";
+
+      callBackend({ action: "sendChat", nik: currentNik, isiPesan: val, isAi: isAiTarget, tujuan: isAiTarget ? "AI" : "ALL" }, () => {
+        fetchChatData();
+      });
+    }
+
+    function renderLeaderboard(list) {
+      let html = "";
+      list.forEach((u) => {
+        let isMe = u.nik === currentNik ? "border-2 border-amber-400" : "";
+        html += `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-emerald-950/80 border border-emerald-800 ${isMe}">
+            <div class="flex items-center space-x-2.5">
+              <span class="font-bold text-amber-400 text-xs w-5 text-center">#${u.rank}</span>
+              <img src="${u.foto}" class="w-8 h-8 rounded-full border border-emerald-400 object-cover">
+              <div>
+                <p class="font-bold text-white text-xs">${u.nama}</p>
+                <p class="text-[9px] text-emerald-300">${u.toko}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-900 text-amber-300 font-bold block">${u.badge}</span>
+              <p class="font-black text-white text-xs mt-0.5">${u.poin.toLocaleString('id-ID')} <span class="text-[9px] text-emerald-400 font-normal">Pts</span></p>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('leaderboardList').innerHTML = html || "<p class='text-center'>Belum ada data klasemen.</p>";
+    }
+
+    function switchTab(tabName) {
+      ['Beranda', 'Leaderboard', 'Chat', 'Profil'].forEach(t => {
+        document.getElementById('page' + t)?.classList.add('hidden');
+        document.getElementById('tab' + t)?.classList.remove('active-nav-tab');
+      });
+      document.getElementById('page' + tabName)?.classList.remove('hidden');
+      document.getElementById('tab' + tabName)?.classList.add('active-nav-tab');
+
+      if (tabName === 'Chat') fetchChatData();
+    }
+  </script>
+</body>
+</html>
