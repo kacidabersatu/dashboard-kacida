@@ -49,6 +49,7 @@
             padding-bottom: 90px;
         }
 
+        /* Gate Protection Overlay */
         #loginGateOverlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -59,16 +60,16 @@
             justify-content: center;
         }
 
-        /* Header Navigation */
+        /* Top Header Navigation */
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 16px;
+            padding: 12px 16px;
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(3, 23, 10, 0.95);
+            background: rgba(3, 23, 10, 0.92);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--card-border);
         }
@@ -79,33 +80,18 @@
             gap: 10px;
         }
 
-        .btn-icon-circle {
+        .btn-hamburger {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid var(--card-border);
             color: #fff;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
-            position: relative;
-        }
-
-        .btn-icon-circle .badge-count {
-            position: absolute;
-            top: -2px; right: -2px;
-            background: #ef4444;
-            color: white;
-            font-size: 0.55rem;
-            font-weight: bold;
-            width: 15px; height: 15px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .brand-title {
@@ -113,17 +99,18 @@
             align-items: center;
             gap: 8px;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 1.05rem;
         }
 
         .brand-icon {
-            width: 28px; height: 28px;
+            width: 30px;
+            height: 30px;
             background: linear-gradient(135deg, #10b981, #052e16);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -133,34 +120,59 @@
             gap: 8px;
         }
 
-        /* Card Pengguna Mini Ringkas di Header */
-        .user-mini-card {
+        .disket-badge {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(34, 197, 94, 0.2));
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(34, 197, 94, 0.12);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            padding: 4px 10px;
-            border-radius: 20px;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .notif-badge {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
         }
 
-        .user-mini-info {
-            display: flex;
-            flex-direction: column;
-            text-align: right;
-            line-height: 1.1;
-        }
-
-        .user-mini-name {
-            font-size: 0.72rem;
-            font-weight: 700;
+        .notif-count {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #ef4444;
             color: #fff;
+            font-size: 0.6rem;
+            font-weight: 700;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--bg-dark);
         }
 
-        .user-mini-role {
-            font-size: 0.6rem;
-            color: var(--text-sub);
+        .user-avatar-3d {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-green);
+            object-fit: cover;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
         }
 
         .container {
@@ -168,7 +180,7 @@
             margin-top: 12px;
         }
 
-        /* Disket Info Bar (Mengambang/Top Bar Utama) */
+        /* Header Disket Bar Tampilan Asli */
         .disket-info-bar {
             background: linear-gradient(135deg, rgba(12, 43, 20, 0.95), rgba(5, 25, 12, 0.95));
             border: 1px solid var(--gold);
@@ -322,6 +334,26 @@
             cursor: pointer;
         }
 
+        .banner-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .dot {
+            width: 6px; height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .dot.active {
+            width: 16px;
+            background: var(--accent-green);
+            border-radius: 10px;
+        }
+
         .metrics-scroll {
             display: flex;
             gap: 10px;
@@ -376,24 +408,40 @@
             gap: 6px;
         }
 
+        .btn-see-all {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: var(--text-sub);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.68rem;
+            text-decoration: none;
+        }
+
         .menu-section-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 20px;
             padding: 16px;
             margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
         }
 
         .menu-grid-5 {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
+            position: relative;
+            z-index: 2;
         }
 
         .menu-grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+            position: relative;
+            z-index: 2;
             margin-top: 10px;
         }
 
@@ -414,9 +462,16 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 6px;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
         }
 
-        .icon-box-3d img { width: 28px; height: 28px; object-fit: contain; }
+        .icon-box-3d:active { transform: scale(0.92); }
+
+        .icon-box-3d img {
+            width: 28px; height: 28px;
+            object-fit: contain;
+        }
 
         .menu-label {
             font-size: 0.62rem;
@@ -425,7 +480,14 @@
             line-height: 1.2;
         }
 
-        /* Bottom Nav */
+        .rocket-deco {
+            position: absolute;
+            right: -15px; bottom: -10px;
+            width: 90px;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
         .bottom-nav {
             position: fixed;
             bottom: 12px; left: 16px; right: 16px;
@@ -438,6 +500,7 @@
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
 
         .nav-item {
@@ -449,6 +512,7 @@
             font-size: 0.65rem;
             cursor: pointer;
             text-decoration: none;
+            position: relative;
         }
 
         .nav-item.active {
@@ -477,16 +541,47 @@
             box-shadow: 0 8px 20px rgba(34, 197, 94, 0.5);
             cursor: pointer;
         }
+
+        /* Badge Unread Chat */
+        .chat-unread-badge {
+            position: absolute;
+            top: -2px; right: -4px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.55rem;
+            font-weight: 800;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 1px solid var(--bg-dark);
+        }
+
+        /* Floating AI Button di Modul Chat */
+        .floating-ai-btn {
+            position: absolute;
+            bottom: 15px; right: 15px;
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
+            cursor: pointer;
+            border: 2px solid #fff;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Lock Gate jika NIK belum terverifikasi -->
     <div id="loginGateOverlay"></div>
 
-    <!-- Header Navigation Awal (Disket, Lonceng & Card Pengguna) -->
+    <!-- Header Navigation -->
     <header class="app-header">
         <div class="header-left">
-            <button class="btn-icon-circle" onclick="toggleMenu()" aria-label="Menu">
+            <button class="btn-hamburger" onclick="toggleMenu()" aria-label="Menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
             <div class="brand-title">
@@ -494,33 +589,23 @@
                 <span>Kacida Bersatu</span>
             </div>
         </div>
-
         <div class="header-right">
-            <!-- Tombol Disket Performa Toko -->
-            <button class="btn-icon-circle" onclick="showPerformaDetail()" title="Data Performa Disket">
-                <i class="fa-solid fa-floppy-disk" style="color: var(--gold);"></i>
-            </button>
-
-            <!-- Tombol Lonceng Notifikasi -->
-            <button class="btn-icon-circle" onclick="showNotifications()" title="Notifikasi">
-                <i class="fa-solid fa-bell"></i>
-                <span class="badge-count">3</span>
-            </button>
-
-            <!-- Card Pengguna Mini di Header -->
-            <div class="user-mini-card" onclick="openAccountActionMenu()">
-                <div class="user-mini-info">
-                    <span class="user-mini-name" id="hdrUserName">Loading...</span>
-                    <span class="user-mini-role" id="hdrUserRole">NIK: -</span>
-                </div>
-                <i class="fa-solid fa-angle-down" style="color: var(--accent-green); font-size: 0.75rem;"></i>
+            <div class="disket-badge" id="btnDisket" onclick="showPerformaDetail()" title="Disket Performa Sales & IKT">
+                <i class="fa-solid fa-floppy-disk"></i>
             </div>
+            
+            <div class="notif-badge" id="btnNotif" onclick="requestNotificationPermission()" title="Notifikasi">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notif-count">3</span>
+            </div>
+
+            <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" alt="Avatar 3D" class="user-avatar-3d" onclick="showUserProfile()">
         </div>
     </header>
 
     <main class="container">
 
-        <!-- Disket Info Bar -->
+        <!-- Header Disket Info Bar Mendatar (Persis Gambar) -->
         <section class="disket-info-bar" onclick="showPerformaDetail()">
             <div class="disket-bar-item">
                 <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
@@ -553,7 +638,7 @@
             <img src="https://img.freepik.com/free-psd/3d-rendering-boy-character_23-2150798150.png" class="hero-3d-illustration" alt="3D Team">
         </section>
 
-        <!-- Banner -->
+        <!-- Carousel Banner -->
         <section class="banner-card">
             <span class="banner-tag" id="lblStoreCode">TOKO KADUDAMPIT 1</span>
             <h2 class="banner-heading">PIC SAPA</h2>
@@ -563,7 +648,15 @@
             </button>
         </section>
 
-        <!-- Metrics Scroll -->
+        <div class="banner-dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <!-- Metrics -->
         <section class="metrics-scroll">
             <div class="metric-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d" alt="Tugas">
@@ -575,6 +668,12 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d" alt="Pengumuman">
                 <span class="metric-title">Pengumuman</span>
                 <span class="metric-value">5 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
+            </div>
+
+            <div class="metric-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d" alt="Notifikasi">
+                <span class="metric-title">Notifikasi</span>
+                <span class="metric-value">3 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
             </div>
 
             <div class="metric-card">
@@ -593,6 +692,7 @@
         <!-- Menu Utama -->
         <div class="section-header">
             <h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3>
+            <a href="#" class="btn-see-all" onclick="navigateMenu('semua-menu')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
         </div>
 
         <section class="menu-section-card">
@@ -633,6 +733,47 @@
                     <span class="menu-label">Monitoring PSM</span>
                 </div>
             </div>
+
+            <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket 3D">
+        </section>
+
+        <!-- Layanan Lainnya -->
+        <div class="section-header">
+            <h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3>
+            <a href="#" class="btn-see-all" onclick="navigateMenu('semua-layanan')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+
+        <section class="menu-section-card" style="padding: 12px;">
+            <div class="menu-grid-4">
+                <div class="menu-3d-item" onclick="navigateMenu('qrcode-cdm')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3409/3409597.png" alt="QR"></div>
+                    <span class="menu-label">QR Code CDM</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('roleplay-mtk')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/4384/4384248.png" alt="Roleplay"></div>
+                    <span class="menu-label">Roleplay Area MTK</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('claim-duka')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2904/2904832.png" alt="Duka"></div>
+                    <span class="menu-label">Claim Uang Duka & Nikah</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('penenang-psm')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2810/2810052.png" alt="Excel"></div>
+                    <span class="menu-label">Penenang PSM EXCEL</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('validasi-auto-btl')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1067/1067357.png" alt="BTL"></div>
+                    <span class="menu-label">Validasi AUTO BTL</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('koperasi-online')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1256/1256650.png" alt="Koperasi"></div>
+                    <span class="menu-label">Koperasi Online</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('asset-online')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2821/2821820.png" alt="Asset"></div>
+                    <span class="menu-label">Asset Online</span>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -643,48 +784,39 @@
             <i class="fa-solid fa-house"></i>
             <span>Beranda</span>
         </a>
+        
+        <!-- Chat Internal dengan Badge Unread -->
         <a href="#" class="nav-item" onclick="openInternalChat()">
             <i class="fa-solid fa-comments"></i>
             <span>Chat</span>
+            <span class="chat-unread-badge" id="unreadBadge">2</span>
         </a>
+        
+        <!-- Central Rocket FAB -->
         <div class="fab-rocket" onclick="navigateMenu('aksi-cepat')">
             <i class="fa-solid fa-rocket"></i>
         </div>
+
         <a href="#" class="nav-item" onclick="openLeaderboardModal()">
             <i class="fa-solid fa-crown"></i>
             <span>Leaderboard</span>
         </a>
-        <!-- Nav Profil Bawah Mengaktifkan View Profil + Bagan Organisasi Area -->
-        <a href="#" class="nav-item" onclick="showUserProfileWithStructure()">
-            <i class="fa-solid fa-user-gear"></i>
+        <a href="#" class="nav-item" onclick="showUserProfile()">
+            <i class="fa-solid fa-user"></i>
             <span>Profil</span>
         </a>
     </nav>
 
     <script>
+        // Web App Link Apps Script Backend
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec";
-
-        const MENU_NAV_LINKS = {
-            'laporan-sementara': 'https://docs.google.com/spreadsheets/d/your-sheet-id-1/edit',
-            'laporan-shift': 'https://forms.gle/your-form-id-2',
-            'jobdesk': 'https://docs.google.com/spreadsheets/d/your-sheet-id-3/edit',
-            'validasi-exp': 'https://forms.gle/your-form-id-4',
-            'tdp-area': 'https://docs.google.com/spreadsheets/d/your-sheet-id-5/edit',
-            'monitoring-ikt': 'https://docs.google.com/spreadsheets/d/your-sheet-id-6/edit',
-            'highlight-sales': 'https://docs.google.com/spreadsheets/d/your-sheet-id-7/edit',
-            'monitoring-psm': 'https://docs.google.com/spreadsheets/d/your-sheet-id-8/edit',
-            'qrcode-cdm': 'https://forms.gle/your-form-id-9',
-            'roleplay-mtk': 'https://docs.google.com/spreadsheets/d/your-sheet-id-10/edit',
-            'claim-duka': 'https://forms.gle/your-form-id-11',
-            'penenang-psm': 'https://docs.google.com/spreadsheets/d/your-sheet-id-12/edit',
-            'pic-sapa': 'https://forms.gle/your-form-id-13'
-        };
 
         let currentUser = {
             nik: localStorage.getItem('kacida_nik') || '',
             nama: localStorage.getItem('kacida_nama') || '',
             jabatan: localStorage.getItem('kacida_jabatan') || '',
-            toko: localStorage.getItem('kacida_toko') || 'TOKO KADUDAMPIT 1'
+            toko: localStorage.getItem('kacida_toko') || 'TOKO KADUDAMPIT 1',
+            poin: 0, rank: '-'
         };
 
         let dataPerformaToko = { sales: "-", ikt: "-", penawaran: "-" };
@@ -693,6 +825,7 @@
             checkAuthGate();
         });
 
+        // Lock App Screen Sampai Login NIK Valid
         function checkAuthGate() {
             if (!currentUser.nik) {
                 document.getElementById('loginGateOverlay').style.display = 'flex';
@@ -714,9 +847,12 @@
                 allowOutsideClick: false,
                 confirmButtonText: 'Masuk Aplikasi',
                 confirmButtonColor: '#22c55e',
-                background: '#0c2b14', color: '#ffffff',
+                background: '#0c2b14',
+                color: '#ffffff',
                 preConfirm: (nik) => {
-                    if (!nik) { Swal.showValidationMessage('NIK Wajib Diisi!'); }
+                    if (!nik) {
+                        Swal.showValidationMessage('NIK Wajib Diisi!');
+                    }
                     return nik;
                 }
             }).then(async (result) => {
@@ -738,189 +874,301 @@
                             localStorage.setItem('kacida_toko', currentUser.toko);
 
                             document.getElementById('loginGateOverlay').style.display = 'none';
+
+                            Swal.fire({
+                                icon: 'success', title: 'Login Berhasil!',
+                                text: `Selamat Datang, ${currentUser.nama}`,
+                                timer: 1500, showConfirmButton: false,
+                                background: '#0c2b14', color: '#ffffff'
+                            });
+
                             updateUIUserInfo();
                             fetchDataPerforma();
                             fetchUserData();
                         } else {
-                            Swal.fire({ icon: 'error', title: 'Login Gagal', text: 'NIK Tidak Terdaftar!', background: '#0c2b14', color: '#ffffff' }).then(() => promptLogin());
+                            Swal.fire({
+                                icon: 'error', title: 'Login Gagal',
+                                text: data.message || 'NIK Tidak Terdaftar!',
+                                background: '#0c2b14', color: '#ffffff'
+                            }).then(() => promptLogin());
                         }
                     } catch (e) {
-                        promptLogin();
+                        Swal.fire({
+                            icon: 'error', title: 'Koneksi Gagal',
+                            text: 'Gagal terhubung ke backend server.',
+                            background: '#0c2b14', color: '#ffffff'
+                        }).then(() => promptLogin());
                     }
                 }
             });
         }
 
         function updateUIUserInfo() {
-            document.getElementById('hdrUserName').innerText = currentUser.nama || 'User Area';
-            document.getElementById('hdrUserRole').innerText = `NIK: ${currentUser.nik}`;
             document.getElementById('lblUserName').innerText = currentUser.nama ? `${currentUser.nama}! 👋` : 'Team Kacida! 👋';
             document.getElementById('lblStoreCode').innerText = currentUser.toko.toUpperCase();
         }
 
-        // Aksi Klik Card Pengguna di Header Atas (Pilihan Ganti NIK / Keluar)
-        function openAccountActionMenu() {
-            Swal.fire({
-                title: '⚙️ Pengaturan Akun',
-                html: `
-                    <div style="text-align:center; padding: 10px 0;">
-                        <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:15px;">
-                            <strong>${currentUser.nama}</strong><br>
-                            NIK: ${currentUser.nik} | ${currentUser.jabatan}
-                        </p>
-                        <button onclick="promptChangeNIK()" style="background:#f59e0b; color:#fff; border:none; padding:10px 16px; border-radius:8px; width:100%; margin-bottom:10px; font-weight:bold; cursor:pointer;">
-                            <i class="fa-solid fa-key"></i> Ganti NIK
-                        </button>
-                        <button onclick="logoutUser()" style="background:#ef4444; color:#fff; border:none; padding:10px 16px; border-radius:8px; width:100%; font-weight:bold; cursor:pointer;">
-                            <i class="fa-solid fa-right-from-bracket"></i> Keluar (Logout)
-                        </button>
-                    </div>
-                `,
-                background: '#0c2b14', color: '#ffffff', showConfirmButton: false
-            });
-        }
-
-        function promptChangeNIK() {
-            Swal.fire({
-                title: '🔄 Ganti NIK',
-                input: 'text',
-                inputPlaceholder: 'Masukkan NIK Baru...',
-                showCancelButton: true,
-                confirmButtonText: 'Ganti & Login',
-                confirmButtonColor: '#f59e0b',
-                background: '#0c2b14', color: '#ffffff'
-            }).then((res) => {
-                if (res.isConfirmed && res.value) {
-                    localStorage.setItem('kacida_nik', res.value);
-                    location.reload();
-                }
-            });
-        }
-
-        // Tampilan Profil di Nav Bar Bawah (Menampilkan Bagan Struktur Organisasi Toko/Area Ditarik dari Spreadsheet)
-        async function showUserProfileWithStructure() {
-            Swal.fire({
-                title: '🎴 Profil & Struktur Toko',
-                html: `
-                    <div style="text-align:left;">
-                        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                            <h3 style="font-size:1.1rem; color:#fff;">${currentUser.nama}</h3>
-                            <p style="color:#94a3b8; font-size:0.75rem; margin-top:2px;">NIK: <strong>${currentUser.nik}</strong> | Jabatan: <strong>${currentUser.jabatan}</strong></p>
-                            <p style="color:#22c55e; font-size:0.8rem; font-weight:bold; margin-top:2px;">${currentUser.toko}</p>
-                        </div>
-                        
-                        <!-- Container Bagan Organisasi Toko (Ditarik Dinamis dari Spreadsheet) -->
-                        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 10px;">
-                            <div style="font-size: 0.75rem; color: #f59e0b; font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 4px;">
-                                <i class="fa-solid fa-sitemap"></i> BAGAN STRUKTUR ORGANISASI
-                            </div>
-                            <div id="structureTreeContainer" style="display: flex; flex-direction: column; gap: 6px; font-size: 0.75rem;">
-                                <div style="text-align:center; color:#94a3b8; font-size:0.7rem;" class="pulse-loading">Mengambil data dari Spreadsheet...</div>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                background: '#0c2b14', color: '#ffffff', confirmButtonText: 'Tutup', confirmButtonColor: '#22c55e'
-            });
-
-            try {
-                const res = await fetch(`${GAS_WEB_APP_URL}?action=getStoreStructure&toko=${encodeURIComponent(currentUser.toko)}`);
-                const result = await res.json();
-                const container = document.getElementById('structureTreeContainer');
-
-                if (result.status === 'success' && result.data && result.data.length > 0) {
-                    let treeHtml = '';
-                    result.data.forEach((member, idx) => {
-                        const isCurrentUser = member.nik === currentUser.nik;
-                        treeHtml += `
-                            <div style="background: ${isCurrentUser ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255, 255, 255, 0.05)'}; padding: 6px 10px; border-radius: 6px; border-left: 3px solid ${isCurrentUser ? '#22c55e' : '#3b82f6'}; display: flex; justify-content: space-between; align-items: center;">
-                                <span><i class="fa-solid fa-user-tie" style="color:${isCurrentUser ? '#22c55e' : '#3b82f6'};"></i> <strong>${member.jabatan}:</strong> ${member.nama}</span>
-                                <span style="font-size: 0.6rem; background: ${isCurrentUser ? '#15803d' : '#1e3a8a'}; color: white; padding: 2px 6px; border-radius: 4px;">${isCurrentUser ? 'Anda' : member.nik}</span>
-                            </div>
-                        `;
-                        if (idx < result.data.length - 1) {
-                            treeHtml += `<div style="text-align: center; font-size: 0.6rem; color: #94a3b8; margin: -4px 0;"><i class="fa-solid fa-arrow-down"></i></div>`;
-                        }
-                    });
-                    container.innerHTML = treeHtml;
-                } else {
-                    container.innerHTML = `<div style="text-align:center; color:#ef4444; font-size:0.7rem;">Gagal memuat bagan organisasi.</div>`;
-                }
-            } catch (e) {
-                document.getElementById('structureTreeContainer').innerHTML = `<div style="text-align:center; color:#94a3b8; font-size:0.7rem;">Gagal terhubung ke Spreadsheet.</div>`;
-            }
-        }
-
-        function navigateMenu(menuKey) {
-            const targetUrl = MENU_NAV_LINKS[menuKey];
-            if (targetUrl) {
-                window.open(targetUrl, '_blank');
-            } else {
-                Swal.fire({
-                    title: menuKey.toUpperCase().replace(/-/g, ' '),
-                    text: 'Fitur terhubung ke Google Spreadsheet.',
-                    icon: 'info',
-                    confirmButtonColor: '#22c55e',
-                    background: '#0c2b14', color: '#ffffff'
-                });
-            }
-        }
-
         async function fetchDataPerforma() {
+            const valSalesEl = document.getElementById('valSales');
+            const valIKTEl = document.getElementById('valIKT');
+            const valPenawaranEl = document.getElementById('valPenawaran');
+
             try {
-                const response = await fetch(`${GAS_WEB_APP_URL}?action=getDataPerformaToko&toko=${encodeURIComponent(currentUser.toko)}`);
+                const response = await fetch(`${GAS_WEB_APP_URL}?action=getDataPerformaToko`);
                 const result = await response.json();
+
                 if (result.status === 'success') {
                     dataPerformaToko.sales = result.data.sales || '100%';
                     dataPerformaToko.ikt = result.data.ikt || 'A';
                     dataPerformaToko.penawaran = result.data.penawaran || '0 Item';
                 }
-                document.getElementById('valSales').innerText = dataPerformaToko.sales;
-                document.getElementById('valIKT').innerText = dataPerformaToko.ikt;
-                document.getElementById('valPenawaran').innerText = dataPerformaToko.penawaran;
+
+                valSalesEl.classList.remove('pulse-loading');
+                valIKTEl.classList.remove('pulse-loading');
+                valPenawaranEl.classList.remove('pulse-loading');
+
+                valSalesEl.innerText = dataPerformaToko.sales;
+                valIKTEl.innerText = dataPerformaToko.ikt;
+                valPenawaranEl.innerText = dataPerformaToko.penawaran;
+
             } catch (error) {
-                document.getElementById('valSales').innerText = "100%";
-                document.getElementById('valIKT').innerText = "A";
-                document.getElementById('valPenawaran').innerText = "OK";
+                valSalesEl.classList.remove('pulse-loading');
+                valIKTEl.classList.remove('pulse-loading');
+                valPenawaranEl.classList.remove('pulse-loading');
+
+                valSalesEl.innerText = "Error";
+                valIKTEl.innerText = "Error";
+                valPenawaranEl.innerText = "Error";
             }
         }
 
         async function fetchUserData() {
+            const valPointsEl = document.getElementById('valPoints');
+            const valRankEl = document.getElementById('valRank');
+
             try {
                 const res = await fetch(`${GAS_WEB_APP_URL}?action=getUserProfile&nik=${encodeURIComponent(currentUser.nik)}`);
                 const result = await res.json();
+
                 if (result.status === 'success') {
-                    document.getElementById('valPoints').innerHTML = `${Number(result.data.poin || 0).toLocaleString('id-ID')} <small style="font-size:0.6rem;">Point</small>`;
-                    document.getElementById('valRank').innerHTML = `#${result.data.rank || '-'} <small style="font-size:0.6rem;">Area</small>`;
+                    currentUser.poin = result.data.poin || 0;
+                    currentUser.rank = result.data.rank || '#-';
+
+                    valPointsEl.classList.remove('pulse-loading');
+                    valRankEl.classList.remove('pulse-loading');
+
+                    valPointsEl.innerHTML = `${Number(currentUser.poin).toLocaleString('id-ID')} <small style="font-size:0.6rem; font-weight:normal;">Point</small>`;
+                    valRankEl.innerHTML = `#${currentUser.rank} <small style="font-size:0.6rem; font-weight:normal;">Area</small>`;
                 }
-            } catch (e) {}
+            } catch (e) {
+                valPointsEl.classList.remove('pulse-loading');
+                valRankEl.classList.remove('pulse-loading');
+                valPointsEl.innerText = '0 Point';
+                valRankEl.innerText = '#- Area';
+            }
+        }
+
+        // Feature Chat Internal Otomatis Membaca Toko Login + Floating AI
+        function openInternalChat() {
+            document.getElementById('unreadBadge').style.display = 'none';
+
+            const userStore = currentUser.toko || 'TOKO SAYA';
+
+            Swal.fire({
+                title: '💬 Kacida Chat Internal',
+                html: `
+                    <div style="position: relative; text-align: left; min-height: 310px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                        <label style="font-size: 0.72rem; color: #94a3b8; font-weight:600;">PILIH SALURAN CHAT:</label>
+                        <select id="chatTargetSelect" style="width: 100%; padding: 10px; margin: 6px 0 12px 0; border-radius: 8px; background: #06240f; color: white; border: 1px solid #22c55e; font-size: 0.82rem; font-weight:600;">
+                            <option value="antar-toko">🏬 Antar Tim Internal (${userStore})</option>
+                            <option value="all-personil">🌐 All Personil & Lintas Toko Area</option>
+                        </select>
+                        
+                        <div id="chatMessagesArea" style="height: 160px; overflow-y: auto; font-size: 0.78rem; background: rgba(0,0,0,0.25); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="margin-bottom: 8px;"><strong style="color: #22c55e;">[${userStore}]:</strong> Halo tim, perhatikan target SPD hari ini ya! <small style="font-size: 0.6rem; color: #94a3b8;">08:00</small></div>
+                            <div style="margin-bottom: 8px;"><strong style="color: #f59e0b;">[Leader Area]:</strong> Siap, tingkatkan penawaran PSM! <small style="font-size: 0.6rem; color: #94a3b8;">08:15</small></div>
+                        </div>
+
+                        <!-- Floating AI Button (Mengapung di dalam menu chat) -->
+                        <div class="floating-ai-btn" onclick="openFloatingAIChat()" title="Tanya AI Kacida">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                    </div>
+                `,
+                input: 'text',
+                inputPlaceholder: 'Tulis pesan internal...',
+                showCancelButton: true,
+                confirmButtonText: 'Kirim Pesan',
+                cancelButtonText: 'Tutup',
+                confirmButtonColor: '#22c55e',
+                background: '#0c2b14',
+                color: '#ffffff'
+            });
+        }
+
+        // Floating AI Assistant Modal
+        function openFloatingAIChat() {
+            Swal.fire({
+                title: '🤖 Kacida AI Assistant',
+                text: 'Silahkan ajukan pertanyaan seputar SOP, IKT, atau Produk Penawaran:',
+                input: 'textarea',
+                inputPlaceholder: 'Tanyakan sesuatu...',
+                showCancelButton: true,
+                confirmButtonText: 'Tanya AI',
+                confirmButtonColor: '#f59e0b',
+                background: '#0c2b14',
+                color: '#ffffff',
+                preConfirm: async (pesan) => {
+                    if (!pesan) {
+                        Swal.showValidationMessage('Pertanyaan tidak boleh kosong!');
+                        return false;
+                    }
+                    Swal.showLoading();
+                    try {
+                        const res = await fetch(`${GAS_WEB_APP_URL}?action=sendChatMessage&nik=${encodeURIComponent(currentUser.nik)}&pesan=${encodeURIComponent(pesan)}`);
+                        return await res.json();
+                    } catch (e) {
+                        Swal.showValidationMessage('Gagal terhubung dengan Server AI.');
+                    }
+                }
+            }).then((res) => {
+                if (res.isConfirmed && res.value) {
+                    Swal.fire({
+                        title: 'Jawaban AI:',
+                        text: res.value.reply || 'Berhasil diproses.',
+                        icon: 'info',
+                        confirmButtonColor: '#22c55e',
+                        background: '#0c2b14', color: '#ffffff'
+                    });
+                }
+            });
         }
 
         function showPerformaDetail() {
             Swal.fire({
-                title: '💾 Data Performa Disket',
+                title: '💾 Performance Hub (Data Toko)',
                 html: `
                     <div style="text-align: left; font-size: 0.85rem; line-height: 1.6;">
                         <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #22c55e;">
-                            <strong style="color: #22c55e;">📊 SALES (SPD)</strong>: ${dataPerformaToko.sales}
+                            <strong style="color: #22c55e;">📊 PERFORMA SALES (SPD)</strong><br>
+                            - Capaian: <strong>${dataPerformaToko.sales}</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #f59e0b;">
-                            <strong style="color: #f59e0b;">🎯 IKT TOKO</strong>: ${dataPerformaToko.ikt}
+                            <strong style="color: #f59e0b;">🎯 INDIKATOR KINERJA TOKO (IKT)</strong><br>
+                            - Status Predikat: <strong>${dataPerformaToko.ikt}</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border-left: 4px solid #ef4444;">
-                            <strong style="color: #ef4444;">🔥 PENAWARAN</strong>: ${dataPerformaToko.penawaran}
+                            <strong style="color: #ef4444;">🔥 PENAWARAN LANGSUNG (PSM)</strong><br>
+                            - Item Aktif: <strong>${dataPerformaToko.penawaran}</strong>
                         </div>
                     </div>
                 `,
-                background: '#0c2b14', color: '#ffffff', confirmButtonText: 'Tutup', confirmButtonColor: '#22c55e'
+                background: '#0c2b14', color: '#ffffff',
+                confirmButtonText: 'Tutup', confirmButtonColor: '#22c55e'
             });
         }
 
-        function showNotifications() {
+        async function openLeaderboardModal() {
+            Swal.fire({ title: 'Memuat Leaderboard...', background: '#0c2b14', color: '#ffffff', didOpen: () => Swal.showLoading() });
+            try {
+                const res = await fetch(`${GAS_WEB_APP_URL}?action=getLeaderboard`);
+                const result = await res.json();
+
+                if (result.status === 'success') {
+                    let htmlList = `<div style="text-align: left; max-height: 300px; overflow-y: auto;">`;
+                    result.data.forEach((u, index) => {
+                        htmlList += `
+                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
+                                <span><strong>#${index + 1}</strong> ${u.nama} (${u.toko})</span>
+                                <span style="color: #f59e0b; font-weight: bold;">${u.poin} Pts</span>
+                            </div>`;
+                    });
+                    htmlList += `</div>`;
+
+                    Swal.fire({
+                        title: '🏆 Leaderboard Area',
+                        html: htmlList,
+                        confirmButtonText: 'Tutup', confirmButtonColor: '#22c55e',
+                        background: '#0c2b14', color: '#ffffff'
+                    });
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal memuat Leaderboard.', background: '#0c2b14', color: '#ffffff' });
+            }
+        }
+
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        Swal.fire({ icon: 'success', title: 'Notifikasi Berhasil Diaktifkan!', background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' });
+                    }
+                });
+            }
+        }
+
+        function navigateMenu(menuName) {
             Swal.fire({
-                title: '🔔 Notifikasi',
-                html: '<div style="font-size:0.8rem; text-align:left;">• 3 Tugas baru belum diselesaikan.<br>• Pembaruan data IKT Toko.<br>• Promo PSM Minggu Ini Aktif.</div>',
-                background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e'
+                title: menuName.toUpperCase().replace(/-/g, ' '),
+                text: 'Membuka modul operasional area...',
+                icon: 'info', confirmButtonColor: '#22c55e',
+                background: '#0c2b14', color: '#ffffff'
+            });
+        }
+
+        // Profil Karyawan Lengkap dengan Bagan Struktur Organisasi
+        function showUserProfile() {
+            const storeName = currentUser.toko || 'TOKO KADUDAMPIT 1';
+            const userName = currentUser.nama || 'User Area';
+            const userRole = currentUser.jabatan || 'Staff';
+
+            Swal.fire({
+                title: 'Profil Karyawan',
+                html: `
+                    <div style="text-align:center;">
+                        <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" style="width:75px; height:75px; border-radius:50%; border:2px solid #22c55e; box-shadow: 0 0 10px rgba(34,197,94,0.4);">
+                        <h3 style="margin-top:8px; font-size:1.1rem; color:#fff;">${userName}</h3>
+                        <p style="color:#94a3b8; font-size:0.8rem; margin-bottom:12px;">${userRole} - <strong style="color:#22c55e;">${storeName}</strong></p>
+                        
+                        <!-- Bagan Struktur Organisasi Toko -->
+                        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 15px; text-align: left;">
+                            <div style="font-size: 0.72rem; color: #f59e0b; font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 4px;">
+                                <i class="fa-solid fa-sitemap"></i> STRUKTUR ORGANISASI TOKO
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.75rem;">
+                                <!-- Node 1: Area Coordinator -->
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 6px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; justify-content: space-between; align-items: center;">
+                                    <span><i class="fa-solid fa-user-tie" style="color:#3b82f6;"></i> <strong>Area Coordinator:</strong> Bp. Hendra</span>
+                                    <span style="font-size: 0.6rem; background: #1e3a8a; padding: 2px 6px; border-radius: 4px;">AC</span>
+                                </div>
+                                
+                                <div style="text-align: center; font-size: 0.6rem; color: #94a3b8; margin: -4px 0;"><i class="fa-solid fa-arrow-down"></i></div>
+
+                                <!-- Node 2: Chief Toko -->
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 6px 10px; border-radius: 6px; border-left: 3px solid #f59e0b; display: flex; justify-content: space-between; align-items: center;">
+                                    <span><i class="fa-solid fa-user-gear" style="color:#f59e0b;"></i> <strong>Kepala Toko (COS):</strong> Ahmad R.</span>
+                                    <span style="font-size: 0.6rem; background: #78350f; padding: 2px 6px; border-radius: 4px;">Pejabat</span>
+                                </div>
+
+                                <div style="text-align: center; font-size: 0.6rem; color: #94a3b8; margin: -4px 0;"><i class="fa-solid fa-arrow-down"></i></div>
+
+                                <!-- Node 3: User Current Position -->
+                                <div style="background: rgba(34, 197, 94, 0.15); padding: 6px 10px; border-radius: 6px; border-left: 3px solid #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); display: flex; justify-content: space-between; align-items: center;">
+                                    <span><i class="fa-solid fa-user-check" style="color:#22c55e;"></i> <strong>${userName}</strong> (${userRole})</span>
+                                    <span style="font-size: 0.6rem; background: #15803d; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold;">Anda</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="logoutUser()" style="background:#ef4444; color:white; border:none; padding:10px 18px; border-radius:10px; font-size: 0.8rem; font-weight:bold; cursor:pointer; width: 100%;">
+                            <i class="fa-solid fa-right-from-bracket"></i> Keluar / Ganti Account
+                        </button>
+                    </div>
+                `,
+                background: '#0c2b14', 
+                color: '#ffffff', 
+                showConfirmButton: false
             });
         }
 
@@ -930,7 +1178,7 @@
         }
 
         function toggleMenu() {
-            Swal.fire({ title: 'Menu', text: 'Sidebar Navigasi.', background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' });
+            Swal.fire({ title: 'Menu Navigasi', text: 'Akses cepat sidebar navigasi.', icon: 'info', confirmButtonColor: '#22c55e', background: '#0c2b14', color: '#ffffff' });
         }
     </script>
 </body>
