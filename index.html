@@ -175,7 +175,7 @@
             margin-top: 12px;
         }
 
-        /* Header Disket Quick Info Bar (Sales, IKT, Penawaran) */
+        /* Header Disket Quick Info Bar */
         .disket-info-bar {
             background: linear-gradient(135deg, rgba(12, 43, 20, 0.95), rgba(5, 25, 12, 0.95));
             border: 1px solid var(--gold);
@@ -213,6 +213,17 @@
             width: 1px;
             height: 28px;
             background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Loading Animation */
+        .pulse-loading {
+            animation: pulse 1.5s infinite ease-in-out;
+            opacity: 0.5;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
         }
 
         /* Hero Welcome & Performance Card */
@@ -586,17 +597,20 @@
         <section class="disket-info-bar" onclick="showPerformaDetail()">
             <div class="disket-bar-item">
                 <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
-                <span class="disket-bar-val" style="color: var(--accent-green);">104.5%</span>
+                <!-- ID valSales ditambahkan untuk narik data JS -->
+                <span class="disket-bar-val pulse-loading" id="valSales" style="color: var(--accent-green);">Memuat...</span>
             </div>
             <div class="disket-divider"></div>
             <div class="disket-bar-item">
                 <span class="disket-bar-label"><i class="fa-solid fa-bullseye" style="color: var(--gold);"></i> IKT Toko</span>
-                <span class="disket-bar-val" style="color: var(--gold);">A (98 Pts)</span>
+                <!-- ID valIKT ditambahkan untuk narik data JS -->
+                <span class="disket-bar-val pulse-loading" id="valIKT" style="color: var(--gold);">Memuat...</span>
             </div>
             <div class="disket-divider"></div>
             <div class="disket-bar-item">
                 <span class="disket-bar-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Penawaran</span>
-                <span class="disket-bar-val" style="color: #ef4444;">12 Item</span>
+                <!-- ID valPenawaran ditambahkan untuk narik data JS -->
+                <span class="disket-bar-val pulse-loading" id="valPenawaran" style="color: #ef4444;">Memuat...</span>
             </div>
             <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
         </section>
@@ -674,7 +688,6 @@
         </div>
 
         <section class="menu-section-card">
-            <!-- Row 1 (5 Items) -->
             <div class="menu-grid-5">
                 <div class="menu-3d-item" onclick="navigateMenu('laporan-sementara')">
                     <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="Laporan"></div>
@@ -698,7 +711,6 @@
                 </div>
             </div>
 
-            <!-- Row 2 (3 Items) -->
             <div class="menu-grid-4">
                 <div class="menu-3d-item" onclick="navigateMenu('monitoring-ikt')">
                     <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3594/3594363.png" alt="IKT"></div>
@@ -714,7 +726,6 @@
                 </div>
             </div>
 
-            <!-- 3D Rocket Decoration Background -->
             <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket 3D">
         </section>
 
@@ -786,68 +797,112 @@
     </nav>
 
     <script>
+        // --- 1. KONFIGURASI PENARIKAN DATA SPREADSHEET (GAS) ---
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec";
-      
+
+        // Variabel global penyimpan data agar bisa diakses oleh SweetAlert (Pop-up)
+        let dataPerformaToko = {
+            sales: "-",
+            ikt: "-",
+            penawaran: "-"
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Cek izin notifikasi saat aplikasi dibuka
             checkNotificationStatusOnLoad();
+            fetchDataPerforma(); // Jalankan penarikan data saat aplikasi dibuka
         });
 
-        // 1. FUNGSI PERMINTAAN IZIN NOTIFIKASI BROWSER
+        // FUNGSI UTAMA PENARIKAN DATA
+        async function fetchDataPerforma() {
+            const valSalesEl = document.getElementById('valSales');
+            const valIKTEl = document.getElementById('valIKT');
+            const valPenawaranEl = document.getElementById('valPenawaran');
+
+            try {
+                // Panggil link script Anda
+                const response = await fetch(GAS_WEB_APP_URL + "?action=getData");
+                const result = await response.json();
+
+                console.log("Data Berhasil Ditarik:", result);
+
+                // --- LOGIKA MENGAMBIL NILAI DARI JSON ---
+                // (Logika ini membaca jika GAS mengirim data array atau object)
+                if (Array.isArray(result)) {
+                    result.forEach(item => {
+                        let nama = (item.nama || item.title || "").toLowerCase();
+                        if (nama.includes('sales')) dataPerformaToko.sales = item.nilai || item.value;
+                        if (nama.includes('ikt')) dataPerformaToko.ikt = item.nilai || item.value;
+                        if (nama.includes('penawaran') || nama.includes('psm')) dataPerformaToko.penawaran = item.nilai || item.value;
+                    });
+                } else {
+                    // Jika data langsung berupa object
+                    dataPerformaToko.sales = result.sales || result.Sales || "100%";
+                    dataPerformaToko.ikt = result.ikt || result.IKT || "A";
+                    dataPerformaToko.penawaran = result.penawaran || result.Penawaran || "0 Item";
+                }
+
+                // Hapus efek loading dan masukkan angka asli ke dalam HTML
+                valSalesEl.classList.remove('pulse-loading');
+                valIKTEl.classList.remove('pulse-loading');
+                valPenawaranEl.classList.remove('pulse-loading');
+
+                valSalesEl.innerText = dataPerformaToko.sales;
+                valIKTEl.innerText = dataPerformaToko.ikt;
+                valPenawaranEl.innerText = dataPerformaToko.penawaran;
+
+            } catch (error) {
+                console.error("Gagal menarik data dari Spreadsheet:", error);
+                
+                // Jika error, hilangkan efek loading dan tampilkan peringatan
+                valSalesEl.classList.remove('pulse-loading');
+                valIKTEl.classList.remove('pulse-loading');
+                valPenawaranEl.classList.remove('pulse-loading');
+
+                valSalesEl.innerText = "Error";
+                valIKTEl.innerText = "Error";
+                valPenawaranEl.innerText = "Error";
+            }
+        }
+
+        // --- 2. FUNGSI PERMINTAAN IZIN NOTIFIKASI BROWSER ---
         function requestNotificationPermission() {
             if (!('Notification' in window)) {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Tidak Didukung',
+                    icon: 'warning', title: 'Tidak Didukung',
                     text: 'Perangkat atau browser Anda belum mendukung notifikasi push.',
-                    confirmButtonColor: '#22c55e',
-                    background: '#0c2b14',
-                    color: '#ffffff'
+                    confirmButtonColor: '#22c55e', background: '#0c2b14', color: '#ffffff'
                 });
                 return;
             }
 
             if (Notification.permission === 'granted') {
                 Swal.fire({
-                    icon: 'info',
-                    title: 'Notifikasi Aktif',
+                    icon: 'info', title: 'Notifikasi Aktif',
                     text: 'Izin notifikasi sudah diaktifkan sebelumnya.',
-                    confirmButtonColor: '#22c55e',
-                    background: '#0c2b14',
-                    color: '#ffffff'
+                    confirmButtonColor: '#22c55e', background: '#0c2b14', color: '#ffffff'
                 });
             } else if (Notification.permission === 'denied') {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Izin Ditolak',
+                    icon: 'error', title: 'Izin Ditolak',
                     text: 'Notifikasi diblokir. Harap izinkan notifikasi melalui setelan browser/HP Anda.',
-                    confirmButtonColor: '#22c55e',
-                    background: '#0c2b14',
-                    color: '#ffffff'
+                    confirmButtonColor: '#22c55e', background: '#0c2b14', color: '#ffffff'
                 });
             } else {
                 Swal.fire({
                     title: 'Izinkan Notifikasi',
                     text: 'Aktifkan notifikasi untuk menerima pembaruan promo, tugas harian, dan peringatan IKT secara real-time.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Izinkan Sekarang',
-                    cancelButtonText: 'Nanti',
-                    confirmButtonColor: '#22c55e',
-                    cancelButtonColor: '#475569',
-                    background: '#0c2b14',
-                    color: '#ffffff'
+                    icon: 'question', showCancelButton: true,
+                    confirmButtonText: 'Izinkan Sekarang', cancelButtonText: 'Nanti',
+                    confirmButtonColor: '#22c55e', cancelButtonColor: '#475569',
+                    background: '#0c2b14', color: '#ffffff'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         Notification.requestPermission().then(permission => {
                             if (permission === 'granted') {
                                 Swal.fire({
-                                    icon: 'success',
-                                    title: 'Notifikasi Berhasil Diaktifkan!',
+                                    icon: 'success', title: 'Notifikasi Berhasil Diaktifkan!',
                                     text: 'Anda siap menerima pemberitahuan operasional.',
-                                    confirmButtonColor: '#22c55e',
-                                    background: '#0c2b14',
-                                    color: '#ffffff'
+                                    confirmButtonColor: '#22c55e', background: '#0c2b14', color: '#ffffff'
                                 });
                             }
                         });
@@ -858,12 +913,11 @@
 
         function checkNotificationStatusOnLoad() {
             if ('Notification' in window && Notification.permission === 'default') {
-                // Berikan opsi pengingat halus jika belum pernah mengizinkan
                 console.log("Status notifikasi: default / belum diizinkan.");
             }
         }
 
-        // 2. FUNGSI DETAIL PERFORMA DISKET (Sales, IKT, Penawaran)
+        // --- 3. FUNGSI DETAIL PERFORMA DISKET YANG SUDAH DINAMIS ---
         function showPerformaDetail() {
             Swal.fire({
                 title: '💾 Performance Hub (Data Toko)',
@@ -871,18 +925,18 @@
                     <div style="text-align: left; font-size: 0.85rem; line-height: 1.6;">
                         <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #22c55e;">
                             <strong style="color: #22c55e;">📊 PERFORMA SALES (SPD)</strong><br>
-                            - Capaian: <strong>104.5%</strong> (Target Terlampaui)<br>
-                            - Growth: <span style="color:#22c55e;">+5.2% YoY</span>
+                            - Capaian: <strong>${dataPerformaToko.sales}</strong><br>
+                            - Status: Diambil dari server
                         </div>
                         <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #f59e0b;">
                             <strong style="color: #f59e0b;">🎯 INDIKATOR KINERJA TOKO (IKT)</strong><br>
-                            - Status Predikat: <strong>Grade A (98 Pts)</strong><br>
-                            - Fokus Perbaikan: Cek Expired Tagging
+                            - Status Predikat: <strong>${dataPerformaToko.ikt}</strong><br>
+                            - Update realtime
                         </div>
                         <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border-left: 4px solid #ef4444;">
                             <strong style="color: #ef4444;">🔥 PENAWARAN LANGSUNG (PSM)</strong><br>
-                            - Item Aktif: <strong>12 Produk Promo</strong><br>
-                            - Top Item: Minyak Goreng & Susu UHT
+                            - Item Aktif: <strong>${dataPerformaToko.penawaran}</strong><br>
+                            - Pantau terus item fokus
                         </div>
                     </div>
                 `,
@@ -893,15 +947,13 @@
             });
         }
 
-        // 3. NAVIGASI UMUM
+        // --- 4. NAVIGASI UMUM ---
         function navigateMenu(menuName) {
             Swal.fire({
                 title: menuName.toUpperCase().replace('-', ' '),
                 text: 'Membuka modul operasional area...',
-                icon: 'info',
-                confirmButtonColor: '#22c55e',
-                background: '#0c2b14',
-                color: '#ffffff'
+                icon: 'info', confirmButtonColor: '#22c55e',
+                background: '#0c2b14', color: '#ffffff'
             });
         }
 
@@ -915,9 +967,7 @@
                         <p style="color:#94a3b8; font-size:0.85rem;">Area Cisaat - Toko Kadudampit 1</p>
                     </div>
                 `,
-                background: '#0c2b14',
-                color: '#ffffff',
-                confirmButtonColor: '#22c55e'
+                background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e'
             });
         }
     </script>
