@@ -1,763 +1,925 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kacida Bersatu PWA</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body { background-color: #012218; color: #f8fafc; font-family: 'Inter', sans-serif; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#03170a">
+    <title>Kacida Bersatu - Dashboard PWA</title>
     
-    .card-3d {
-      background: linear-gradient(145deg, #053b2e 0%, #02241b 100%);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-    }
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    .chat-bubble-linear {
-      background: linear-gradient(135deg, #04382c 0%, #02241b 100%);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
+    <style>
+        :root {
+            --bg-dark: #03170a;
+            --card-bg: rgba(12, 43, 20, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-green: #22c55e;
+            --bright-green: #10b981;
+            --gold: #f59e0b;
+            --text-white: #ffffff;
+            --text-sub: #94a3b8;
+        }
 
-    .chat-bubble-ai {
-      background: linear-gradient(135deg, #0f4c3a 0%, #062d22 100%);
-      border: 1px solid rgba(245, 158, 11, 0.5);
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    .active-nav-tab {
-      background-color: #10b981;
-      color: #012218;
-      font-weight: bold;
-      box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-    }
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(34, 197, 94, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
+            color: var(--text-white);
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
 
-    @keyframes floatRocket {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(3deg); }
-    }
-    .animate-rocket { animation: floatRocket 3s ease-in-out infinite; }
+        /* Top Header Navigation */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(3, 23, 10, 0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+        }
 
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: #059669; border-radius: 4px; }
-  </style>
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-hamburger {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .brand-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #10b981, #052e16);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Disket Icon Header Button */
+        .disket-badge {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(34, 197, 94, 0.2));
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .disket-badge:active {
+            transform: scale(0.92);
+        }
+
+        .notif-badge {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .notif-count {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 700;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--bg-dark);
+        }
+
+        .user-avatar-3d {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-green);
+            object-fit: cover;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+
+        /* Container Layout */
+        .container {
+            padding: 0 16px;
+            margin-top: 12px;
+        }
+
+        /* Header Disket Quick Info Bar (Sales, IKT, Penawaran) */
+        .disket-info-bar {
+            background: linear-gradient(135deg, rgba(12, 43, 20, 0.95), rgba(5, 25, 12, 0.95));
+            border: 1px solid var(--gold);
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+
+        .disket-bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .disket-bar-label {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .disket-bar-val {
+            font-size: 0.85rem;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        .disket-divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Hero Welcome & Performance Card */
+        .hero-card {
+            background: linear-gradient(135deg, #0a3a18 0%, #06240f 100%);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 20px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 65%;
+        }
+
+        .hero-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-top: 4px;
+            line-height: 1.2;
+        }
+
+        .hero-sub {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            margin-top: 6px;
+            line-height: 1.3;
+        }
+
+        .performance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 12px;
+            margin-top: 12px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .hero-3d-illustration {
+            position: absolute;
+            right: -10px;
+            bottom: 0;
+            width: 145px;
+            height: auto;
+            z-index: 1;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+        }
+
+        /* Carousel Banner PIC SAPA */
+        .banner-card {
+            background: linear-gradient(135deg, #fff2e6 0%, #ffe4cc 100%);
+            border-radius: 18px;
+            padding: 16px;
+            color: #1e293b;
+            position: relative;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .banner-tag {
+            background: #fed7aa;
+            color: #c2410c;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .banner-heading {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #dc2626;
+            line-height: 1.1;
+        }
+
+        .banner-subtext {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 2px;
+        }
+
+        .banner-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .banner-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+
+        .dot.active {
+            width: 16px;
+            background: var(--accent-green);
+            border-radius: 10px;
+        }
+
+        /* Horizontal Quick Metrics Bar */
+        .metrics-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            scrollbar-width: none;
+        }
+
+        .metrics-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .metric-card {
+            min-width: 110px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .metric-icon-3d {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 8px;
+        }
+
+        .metric-title {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+        }
+
+        .metric-value {
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+
+        /* Section Title Header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-see-all {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: var(--text-sub);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.68rem;
+            text-decoration: none;
+        }
+
+        /* 3D Menu Grid Box */
+        .menu-section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .menu-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+            margin-top: 10px;
+        }
+
+        .menu-3d-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .icon-box-3d {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 6px;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .icon-box-3d:active {
+            transform: scale(0.92);
+        }
+
+        .icon-box-3d img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .menu-label {
+            font-size: 0.62rem;
+            font-weight: 500;
+            color: var(--text-white);
+            line-height: 1.2;
+        }
+
+        .rocket-deco {
+            position: absolute;
+            right: -15px;
+            bottom: -10px;
+            width: 90px;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        /* Floating Glass Bottom Nav Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 12px;
+            left: 16px;
+            right: 16px;
+            height: 60px;
+            background: rgba(10, 35, 18, 0.90);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 35px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-sub);
+            font-size: 0.65rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            background: var(--accent-green);
+            color: #03170a;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .nav-item.active i {
+            color: #03170a;
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+        }
+
+        /* Floating Action Rocket Button */
+        .fab-rocket {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-top: -28px;
+            border: 4px solid var(--bg-dark);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.5);
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body class="pb-24 max-w-md mx-auto min-h-screen relative shadow-2xl overflow-x-hidden">
+<body>
 
-  <!-- ================= 1. FULLSCREEN SPLASH SCREEN ================= -->
-  <div id="splashScreen" class="fixed inset-0 z-50 bg-[#012218] flex flex-col items-center justify-center p-6 space-y-6 transition-opacity duration-500">
-    <div class="relative w-44 h-44 flex items-center justify-center bg-emerald-950/80 rounded-full border-4 border-emerald-500/60 shadow-2xl p-4">
-      <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ=s1000" 
-           alt="Kacida Logo" class="w-full h-full object-contain animate-pulse">
-    </div>
-    <div class="text-center space-y-1">
-      <h1 class="text-2xl font-black tracking-widest text-white">KACIDA BERSATU</h1>
-      <p class="text-xs text-emerald-400 font-semibold tracking-wider uppercase">Operational Super-App</p>
-    </div>
-    <div class="flex items-center space-x-2 text-emerald-400 text-xs font-medium pt-8">
-      <i class="fa-solid fa-spinner animate-spin"></i>
-      <span>Memuat sistem...</span>
-    </div>
-  </div>
-
-  <!-- ================= 2. LOGIN NIK SCREEN / OVERLAY ================= -->
-  <div id="loginOverlay" class="fixed inset-0 z-40 bg-[#012218]/95 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="card-3d w-full max-w-sm rounded-3xl p-6 space-y-5 border-2 border-emerald-500/50">
-      <div class="text-center space-y-2">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-emerald-900/80 border border-emerald-500 flex items-center justify-center text-emerald-300 text-2xl shadow-lg">
-          <i class="fa-solid fa-id-card"></i>
-        </div>
-        <h2 class="text-lg font-black text-white">Login Member Kacida</h2>
-        <p class="text-xs text-emerald-300">Masukkan Nomor Induk Karyawan (NIK) untuk mengakses aplikasi</p>
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="block text-[10px] text-emerald-300 font-bold uppercase mb-1">NIK Karyawan</label>
-          <input id="inputNikLogin" type="text" placeholder="Contoh: 12836" 
-                 class="w-full bg-emerald-950 text-white font-bold text-center text-sm px-4 py-3 rounded-xl border border-emerald-700 focus:outline-none focus:border-emerald-400">
-        </div>
-
-        <div id="loginErrorMsg" class="hidden p-3 rounded-xl bg-red-950/90 border border-red-500/80 text-red-200 text-xs text-center font-semibold leading-relaxed">
-          Akses Ditolak / NIK Tidak Terdaftar / Anda Tidak Berhak Akses Aplikasi Ini
-        </div>
-
-        <button onclick="submitNikLogin()" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-emerald-950 font-black py-3 rounded-xl shadow-lg transition-transform active:scale-95">
-          MASUK APLIKASI <i class="fa-solid fa-arrow-right-to-bracket ml-1"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= KACIDA CUSTOM TOAST NOTIFICATION ================= -->
-  <div id="kacidaToast" class="fixed top-4 inset-x-4 max-w-xs mx-auto z-50 card-3d bg-emerald-900 border border-amber-400 p-3 rounded-xl shadow-2xl flex items-center space-x-3 transition-all duration-300 opacity-0 pointer-events-none -translate-y-5">
-    <div id="toastIcon" class="text-amber-400 text-xl"><i class="fa-solid fa-circle-check"></i></div>
-    <div class="flex-1">
-      <h4 id="toastTitle" class="text-xs font-bold text-white">Notifikasi</h4>
-      <p id="toastMessage" class="text-[10px] text-emerald-200">Pesan sukses</p>
-    </div>
-  </div>
-
-  <!-- ================= HEADER BAR ================= -->
-  <header class="sticky top-0 z-30 card-3d px-3.5 py-3 flex items-center justify-between border-b border-emerald-800/60 rounded-b-2xl">
-    <div class="flex items-center space-x-2">
-      <button onclick="toggleSettingsDrawer()" class="bg-emerald-900/80 p-2 rounded-xl text-emerald-400 border border-emerald-700/50">
-        <i class="fa-solid fa-sliders text-base"></i>
-      </button>
-      <div class="flex items-center space-x-1.5">
-        <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-emerald-950 shadow-md">
-          <i class="fa-solid fa-gem text-white"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-xs text-white tracking-wide">Kacida Bersatu</h1>
-          <p id="userTokoHeader" class="text-[9px] text-emerald-300 font-medium">Detecting Store...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ICON DISKET (DATA SALES POPUP) + AVATAR -->
-    <div class="flex items-center space-x-2">
-      <button onclick="toggleSalesModal()" class="relative bg-amber-500/20 hover:bg-amber-500/30 p-2 rounded-xl border border-amber-400/60 text-amber-300 shadow-lg active:scale-95 transition-all">
-        <i class="fa-solid fa-floppy-disk text-base animate-pulse"></i>
-        <span class="absolute -top-1 -right-1 bg-amber-400 text-emerald-950 text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-black">!</span>
-      </button>
-
-      <div class="relative bg-emerald-950 p-2 rounded-full border border-emerald-800">
-        <i class="fa-solid fa-bell text-emerald-300 text-sm"></i>
-        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">3</span>
-      </div>
-
-      <img id="userAvatar" src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ=s1000" 
-           class="w-9 h-9 rounded-full border-2 border-emerald-400 object-cover shadow-lg">
-    </div>
-  </header>
-
-  <!-- ================= MODAL SETTINGS (INSTALL PWA & NOTIFIKASI) ================= -->
-  <div id="settingsDrawer" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="card-3d w-full max-w-sm rounded-2xl border-2 border-emerald-500/60 p-4 space-y-4 relative">
-      <div class="flex justify-between items-center border-b border-emerald-800 pb-2">
-        <h3 class="text-xs font-bold text-white flex items-center"><i class="fa-solid fa-gear text-amber-400 mr-2"></i> Pengaturan Aplikasi</h3>
-        <button onclick="toggleSettingsDrawer()" class="text-emerald-400 bg-emerald-950 p-1.5 rounded-full"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <div class="space-y-2.5">
-        <button id="btnInstallPwa" onclick="triggerPwaInstall()" class="w-full bg-emerald-900/90 hover:bg-emerald-800 text-white border border-emerald-600 p-3 rounded-xl flex items-center justify-between text-xs font-bold">
-          <span class="flex items-center"><i class="fa-solid fa-download text-amber-400 text-base mr-2.5"></i> Install Aplikasi PWA</span>
-          <i class="fa-solid fa-chevron-right text-emerald-400"></i>
-        </button>
-
-        <button onclick="requestNotificationAccess()" class="w-full bg-emerald-900/90 hover:bg-emerald-800 text-white border border-emerald-600 p-3 rounded-xl flex items-center justify-between text-xs font-bold">
-          <span class="flex items-center"><i class="fa-solid fa-bell text-amber-400 text-base mr-2.5"></i> Aktifkan Notifikasi Push</span>
-          <i class="fa-solid fa-toggle-on text-emerald-400 text-lg"></i>
-        </button>
-
-        <button onclick="userLogout()" class="w-full bg-red-950/80 hover:bg-red-900 text-red-200 border border-red-700/80 p-3 rounded-xl flex items-center justify-center text-xs font-bold mt-4">
-          <i class="fa-solid fa-right-from-bracket mr-2"></i> Keluar / Ganti NIK
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= MODAL DATA SALES (DISKET HEADER) ================= -->
-  <div id="salesDataModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
-    <div class="card-3d w-full max-w-sm rounded-2xl border-2 border-emerald-500/60 p-4 space-y-3 relative max-h-[90vh] overflow-y-auto">
-      <button onclick="toggleSalesModal()" class="absolute top-3 right-3 text-emerald-400 bg-emerald-950 p-1.5 rounded-full border border-emerald-700">
-        <i class="fa-solid fa-xmark text-base"></i>
-      </button>
-
-      <div class="border-b border-emerald-800 pb-2 pr-6">
-        <div class="flex justify-between items-center">
-          <span id="modalTokoTitle" class="text-xs font-black text-amber-300">📍 2J16 - CARINGIN KULON</span>
-          <span id="modalRankTitle" class="text-[10px] font-bold bg-amber-500 text-emerald-950 px-2 py-0.5 rounded-full">🏆 RANK #2</span>
-        </div>
-        <p id="modalLastUpdate" class="text-[9px] text-emerald-300 mt-1">📅 Update Terakhir: 15 MARET 2026 (Hari ke-15 Aktif)</p>
-      </div>
-
-      <div class="bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-800/80 space-y-1">
-        <p class="text-[10px] font-bold text-emerald-300 flex justify-between">
-          <span>💰 SALES HARIAN</span>
-          <span id="modalGrowthHarian" class="text-emerald-400">+7.0% 🟢</span>
-        </p>
-        <div class="text-xs space-y-0.5">
-          <div class="flex justify-between text-white"><span>2026 :</span><span id="modalSales2026" class="font-bold">Rp 17.007.857</span></div>
-          <div class="flex justify-between text-emerald-300/80"><span>2025 :</span><span id="modalSales2025">Rp 15.890.000</span></div>
-        </div>
-      </div>
-
-      <div class="bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-800/80 space-y-1">
-        <p class="text-[10px] font-bold text-emerald-300 flex justify-between">
-          <span>📊 MTD SALES & AVERAGE</span>
-          <span id="modalMtdGrowth" class="text-emerald-400">+3.9% 🟢</span>
-        </p>
-        <div class="text-xs space-y-1">
-          <div class="flex justify-between text-white"><span>MTD Sales 2026 :</span><span id="modalMtd2026" class="font-bold">Rp 226.238.450</span></div>
-          <div class="flex justify-between text-emerald-300/80"><span>MTD Sales 2025 :</span><span id="modalMtd2025">Rp 217.743.230</span></div>
-          <div class="flex justify-between text-amber-300 pt-1 border-t border-emerald-800/60 font-bold">
-            <span>⚡ SPD 2026 (Rata-rata/Hari) :</span><span id="modalSpd">Rp 15.082.563</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-800/80 space-y-1.5">
-        <p class="text-[10px] font-bold text-emerald-300">🎯 IKT TOKO (Tab: IKT)</p>
-        <div class="grid grid-cols-3 gap-1 text-center text-[9px]">
-          <div class="bg-emerald-900/60 p-1.5 rounded border border-emerald-700/50">
-            <p class="text-emerald-400 font-bold">ACV NET SALES</p>
-            <p id="modalAcvNetSales" class="font-black text-white text-xs mt-0.5">71.1%</p>
-          </div>
-          <div class="bg-emerald-900/60 p-1.5 rounded border border-emerald-700/50">
-            <p class="text-emerald-400 font-bold">ACV PROFIT</p>
-            <p id="modalAcvProfit" class="font-black text-red-400 text-xs mt-0.5">-2.3%</p>
-          </div>
-          <div class="bg-emerald-900/60 p-1.5 rounded border border-emerald-700/50">
-            <p class="text-emerald-400 font-bold">ACV GM%</p>
-            <p id="modalAcvGm" class="font-black text-emerald-300 text-xs mt-0.5">100.9%</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-800/80 space-y-1">
-        <div class="flex justify-between items-center">
-          <span class="text-[10px] font-bold text-amber-300">🚀 PENAWARAN LANGSUNG</span>
-          <span id="modalPlStatus" class="text-[9px] text-emerald-400 font-bold">SANGAT BAIK 🟢</span>
-        </div>
-        <p class="text-[10px] text-white">Point Dashboard: <span id="modalPlPoint" class="font-bold text-amber-300">108.83%</span></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= PAGE 1: BERANDA ================= -->
-  <main id="pageBeranda" class="p-3.5 space-y-4">
-    
-    <!-- Hero Banner User -->
-    <div class="card-3d rounded-2xl p-4 relative overflow-hidden bg-gradient-to-r from-emerald-900 via-emerald-950 to-emerald-900 border border-emerald-500/40">
-      <div class="w-2/3 space-y-1 z-10 relative">
-        <p class="text-[11px] text-emerald-300 font-medium">Selamat datang kembali,</p>
-        <h2 id="userNameGreet" class="text-lg font-black text-white tracking-wide">Team Kacida! 👋</h2>
-        <span class="inline-flex items-center px-2.5 py-1 bg-emerald-950/80 text-emerald-300 text-[10px] rounded-full border border-emerald-500/40 font-semibold shadow mt-1">
-          ⭐ Performa hari ini: <span class="text-amber-400 font-bold ml-1">Sangat Baik! 🔥</span>
-        </span>
-      </div>
-      <div class="absolute -right-2 -bottom-2 w-32 h-32 opacity-90 pointer-events-none">
-        <img src="https://cdni.iconscout.com/illustration/premium/thumb/team-success-4438808-3684812.png" 
-             onerror="this.style.display='none'" class="w-full h-full object-contain">
-      </div>
-    </div>
-
-    <!-- CAROUSEL GOOGLE DRIVE IMAGES (RATIO KONVERSI TANPA TERPOTONG) -->
-    <div class="card-3d rounded-2xl p-2 relative bg-emerald-950/90 border border-emerald-700/60 overflow-hidden">
-      <div class="relative h-44 w-full flex items-center justify-center bg-black/40 rounded-xl overflow-hidden">
-        <img id="carouselImgDisplay" src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ=s1000" 
-             class="max-h-full max-w-full object-contain transition-all duration-500">
-      </div>
-      <div class="flex justify-between items-center px-2 pt-2 text-[10px] text-emerald-300">
-        <button onclick="prevCarousel()" class="bg-emerald-900 p-1 rounded-md text-amber-300"><i class="fa-solid fa-chevron-left"></i> Prev</button>
-        <span id="carouselCounter" class="font-bold text-white">1 / 1</span>
-        <button onclick="nextCarousel()" class="bg-emerald-900 p-1 rounded-md text-amber-300">Next <i class="fa-solid fa-chevron-right"></i></button>
-      </div>
-    </div>
-
-    <!-- Quick Stats Grid -->
-    <div class="grid grid-cols-5 gap-1.5 text-center text-[10px]">
-      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
-        <p id="taskCountVal" class="font-bold text-white text-xs">0/12</p>
-        <p class="text-emerald-300 text-[8px]">Tugas</p>
-      </div>
-      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
-        <p class="font-bold text-white text-xs">5</p>
-        <p class="text-emerald-300 text-[8px]">Info</p>
-      </div>
-      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
-        <p class="font-bold text-white text-xs">3</p>
-        <p class="text-emerald-300 text-[8px]">Notif</p>
-      </div>
-      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
-        <p id="userPoin" class="font-bold text-amber-300 text-xs">0</p>
-        <p class="text-emerald-300 text-[8px]">Point</p>
-      </div>
-      <div class="card-3d p-2 rounded-xl flex flex-col items-center justify-between">
-        <p id="userRank" class="font-bold text-white text-xs"># -</p>
-        <p class="text-emerald-300 text-[8px]">Rank Area</p>
-      </div>
-    </div>
-
-    <!-- DINAMIS MENU UTAMA DARI SPREADSHEET -->
-    <div class="card-3d rounded-2xl p-4 space-y-3 relative overflow-hidden">
-      <div class="flex justify-between items-center">
-        <h3 class="text-xs font-bold text-emerald-200 flex items-center">
-          <i class="fa-solid fa-shapes text-amber-400 mr-1.5"></i> Menu Utama
-        </h3>
-      </div>
-      <div id="gridMenuUtama" class="grid grid-cols-4 gap-2.5 text-center text-[10px] z-10 relative">
-        <p class="col-span-4 text-emerald-400 py-2"><i class="fa-solid fa-spinner animate-spin"></i> Memuat Menu Utama...</p>
-      </div>
-    </div>
-
-    <!-- DINAMIS MENU LAINNYA DARI SPREADSHEET -->
-    <div class="card-3d rounded-2xl p-4 space-y-3 relative">
-      <h3 class="text-xs font-bold text-emerald-200 flex items-center">
-        <i class="fa-solid fa-layer-group text-emerald-400 mr-1.5"></i> Menu Lainnya
-      </h3>
-      <div id="gridMenuLainnya" class="grid grid-cols-4 gap-2.5 text-center text-[10px]">
-        <p class="col-span-4 text-emerald-400 py-2"><i class="fa-solid fa-spinner animate-spin"></i> Memuat Menu Lainnya...</p>
-      </div>
-    </div>
-
-  </main>
-
-  <!-- ================= PAGE 2: CHAT INTERNAL & KACIDA AI ================= -->
-  <main id="pageChat" class="p-3.5 space-y-3 hidden">
-    <div class="card-3d p-3 rounded-2xl bg-gradient-to-r from-emerald-900 via-emerald-950 to-emerald-900 border border-amber-400/40 flex justify-between items-center">
-      <div class="flex items-center space-x-2.5">
-        <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-300 text-lg shadow-md">
-          <i class="fa-solid fa-robot"></i>
-        </div>
-        <div>
-          <h2 class="font-black text-xs text-white flex items-center">
-            Kacida AI Assistant <span class="bg-amber-400 text-emerald-950 text-[8px] px-1.5 py-0.2 rounded font-bold ml-1.5">ONLINE</span>
-          </h2>
-          <p class="text-[10px] text-emerald-300">Tanyakan data toko, sales, & arahan operasional</p>
-        </div>
-      </div>
-    </div>
-
-    <div id="chatContainer" class="space-y-2.5 h-[360px] overflow-y-auto pr-1">
-      <p class="text-center text-emerald-400 text-xs py-8"><i class="fa-solid fa-spinner animate-spin mr-1"></i> Memuat percakapan...</p>
-    </div>
-
-    <div class="card-3d p-2 rounded-2xl flex items-center space-x-2 border border-emerald-700/60">
-      <button id="toggleAiBtn" onclick="toggleAiMode()" class="px-2.5 py-1.5 bg-emerald-950 rounded-xl border border-emerald-700 text-[10px] text-emerald-300 font-bold flex items-center space-x-1">
-        <i class="fa-solid fa-robot text-amber-400"></i>
-        <span id="aiLabel">Semua</span>
-      </button>
-      <input id="chatInputText" type="text" placeholder="Tulis pesan atau tanya Kacida AI..." 
-             class="flex-1 bg-emerald-950/80 text-white text-xs px-3 py-2 rounded-xl border border-emerald-800/80 focus:outline-none focus:border-emerald-400">
-      <button onclick="sendChatMessage()" class="bg-emerald-500 hover:bg-emerald-400 text-emerald-950 w-9 h-9 rounded-xl flex items-center justify-center font-bold shadow-md">
-        <i class="fa-solid fa-paper-plane text-xs"></i>
-      </button>
-    </div>
-  </main>
-
-  <!-- ================= PAGE 3: LEADERBOARD ================= -->
-  <main id="pageLeaderboard" class="p-3.5 space-y-4 hidden">
-    <div class="card-3d p-4 rounded-2xl text-center space-y-1">
-      <i class="fa-solid fa-trophy text-amber-400 text-3xl"></i>
-      <h2 class="font-black text-lg text-white">Peringkat Member</h2>
-      <p class="text-[11px] text-emerald-300">Kumpulkan poin harian dengan aktif menyelesaikan misi operasional!</p>
-    </div>
-
-    <div class="card-3d rounded-2xl p-3 space-y-2">
-      <div id="leaderboardList" class="space-y-2 text-xs">
-        <p class="text-center text-emerald-400 py-4"><i class="fa-solid fa-spinner animate-spin"></i> Memuat klasemen...</p>
-      </div>
-    </div>
-  </main>
-
-  <!-- ================= PAGE 4: PROFIL & BAGAN ORGANISASI ================= -->
-  <main id="pageProfil" class="p-3.5 space-y-4 hidden">
-    <div class="card-3d p-4 rounded-2xl text-center space-y-2">
-      <img id="profileCardImg" src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ=s1000" class="w-20 h-20 rounded-full mx-auto border-4 border-emerald-400 object-cover shadow-xl">
-      <h3 id="profileName" class="font-bold text-base text-white">-</h3>
-      <p id="profileRole" class="text-xs text-emerald-300">-</p>
-      <span id="profileStore" class="inline-block px-3 py-0.5 bg-emerald-950 text-emerald-400 text-[10px] rounded-full border border-emerald-800">-</span>
-    </div>
-
-    <div class="card-3d p-4 rounded-2xl space-y-2 text-xs">
-      <h3 class="font-bold text-emerald-300 border-b border-emerald-800 pb-2"><i class="fa-solid fa-sitemap mr-1.5"></i> Bagan Organisasi Area</h3>
-      <div class="space-y-1.5">
-        <div class="bg-emerald-950/80 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">OGM Area</p><p id="ogmName" class="font-semibold text-white">-</p></div>
-        <div class="ml-2 bg-emerald-950/60 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">Branch Manager</p><p id="bmName" class="font-semibold text-white">-</p></div>
-        <div class="ml-4 bg-emerald-950/60 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">Deputy Branch Manager</p><p id="dbmName" class="font-semibold text-white">-</p></div>
-        <div class="ml-6 bg-emerald-950/60 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">Area Manager</p><p id="amName" class="font-semibold text-white">-</p></div>
-        <div class="ml-8 bg-emerald-950/60 p-2 rounded-xl border border-emerald-800"><p class="text-[9px] text-emerald-400 font-bold">Area Coordinator</p><p id="acName" class="font-semibold text-white">-</p></div>
-      </div>
-    </div>
-  </main>
-
-  <!-- ================= BOTTOM NAVIGATION BAR ================= -->
-  <nav class="fixed bottom-0 inset-x-0 max-w-md mx-auto z-30 card-3d bg-emerald-950/95 border-t border-emerald-800/80 px-2 py-2 flex justify-between items-center rounded-t-2xl">
-    <button onclick="switchTab('Beranda')" id="tabBeranda" class="flex-1 text-center py-1 rounded-xl text-emerald-300 active-nav-tab">
-      <i class="fa-solid fa-house block text-base mb-0.5"></i>
-      <span class="text-[8px]">Beranda</span>
-    </button>
-    <button onclick="switchTab('Chat')" id="tabChat" class="flex-1 text-center py-1 rounded-xl text-emerald-300">
-      <i class="fa-solid fa-comment-dots block text-base mb-0.5"></i>
-      <span class="text-[8px]">Chat</span>
-    </button>
-
-    <div class="-mt-7 relative px-1">
-      <button onclick="executeMenuTask('Aksi Cepat Roket', 10)" class="bg-gradient-to-r from-emerald-400 to-emerald-500 text-emerald-950 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center border-2 border-emerald-100 hover:scale-105 transition-transform">
-        <i class="fa-solid fa-rocket text-xl"></i>
-      </button>
-      <span class="block text-center text-[8px] text-emerald-300 font-bold mt-0.5">Aksi Cepat</span>
-    </div>
-
-    <button onclick="switchTab('Leaderboard')" id="tabLeaderboard" class="flex-1 text-center py-1 rounded-xl text-emerald-300">
-      <i class="fa-solid fa-trophy block text-base mb-0.5"></i>
-      <span class="text-[8px]">Leaderboard</span>
-    </button>
-    <button onclick="switchTab('Profil')" id="tabProfil" class="flex-1 text-center py-1 rounded-xl text-emerald-300">
-      <i class="fa-solid fa-user block text-base mb-0.5"></i>
-      <span class="text-[8px]">Profil</span>
-    </button>
-  </nav>
-
-  <!-- ================= SCRIPT JAVASCRIPT UTAMA ================= -->
-  <script>
-    let currentNik = localStorage.getItem("kacida_nik") || "";
-    let isAiTarget = false;
-    let deferredPrompt = null;
-    let carouselList = [];
-    let carouselIdx = 0;
-
-    // Direct Gas Backend Call
-    function callBackend(payload, callback) {
-      fetch("https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec", {
-        method: "POST",
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => callback(data))
-      .catch(err => {
-        showKacidaToast("Error", "Gagal menghubungkan ke server.", "error");
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      // PWA Install Prompt Listener
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-      });
-
-      // Tampilkan Splash Screen minimal 1.5 detik
-      setTimeout(() => {
-        if (!currentNik) {
-          hideSplashScreen();
-          showLoginOverlay();
-        } else {
-          loadAppDashboard();
-        }
-      }, 1500);
-    });
-
-    function hideSplashScreen() {
-      const splash = document.getElementById('splashScreen');
-      splash.classList.add('opacity-0');
-      setTimeout(() => splash.classList.add('hidden'), 500);
-    }
-
-    function showLoginOverlay() {
-      document.getElementById('loginOverlay').classList.remove('hidden');
-    }
-
-    function submitNikLogin() {
-      const inputNik = document.getElementById('inputNikLogin').value.trim();
-      const errorMsg = document.getElementById('loginErrorMsg');
-
-      if (!inputNik) {
-        errorMsg.innerText = "Mohon isi NIK Anda!";
-        errorMsg.classList.remove('hidden');
-        return;
-      }
-
-      callBackend({ action: "loginUser", nik: inputNik }, (res) => {
-        if (res.status === "success") {
-          currentNik = inputNik;
-          localStorage.setItem("kacida_nik", inputNik);
-          document.getElementById('loginOverlay').classList.add('hidden');
-          errorMsg.classList.add('hidden');
-          loadAppDashboard();
-        } else {
-          errorMsg.innerText = res.message || "Akses Ditolak / NIK Tidak Terdaftar / Anda Tidak Berhak Akses Aplikasi Ini";
-          errorMsg.classList.remove('hidden');
-        }
-      });
-    }
-
-    function userLogout() {
-      localStorage.removeItem("kacida_nik");
-      currentNik = "";
-      location.reload();
-    }
-
-    function loadAppDashboard() {
-      callBackend({ action: "getDashboardData", nik: currentNik }, (data) => {
-        hideSplashScreen();
-        if (data.status === "success") {
-          renderDashboardData(data);
-        } else {
-          showLoginOverlay();
-          document.getElementById('loginErrorMsg').innerText = data.message;
-          document.getElementById('loginErrorMsg').classList.remove('hidden');
-        }
-      });
-    }
-
-    function renderDashboardData(data) {
-      const user = data.user;
-      const db = data.dashboard;
-
-      document.getElementById('userTokoHeader').innerText = user.namaTokoLengkap;
-      document.getElementById('userNameGreet').innerText = user.nama + "! 👋";
-      document.getElementById('userAvatar').src = user.fotoProfil;
-
-      // Render Modal Data Sales
-      document.getElementById('modalTokoTitle').innerText = "📍 " + user.namaTokoLengkap;
-      document.getElementById('modalRankTitle').innerText = "🏆 " + db.rankToko;
-      document.getElementById('modalLastUpdate').innerText = "📅 " + db.lastUpdateDate;
-      document.getElementById('modalSales2026').innerText = db.salesHarian2026;
-      document.getElementById('modalSales2025').innerText = db.salesHarian2025;
-      document.getElementById('modalGrowthHarian').innerText = db.growthHarian + " 🟢";
-      document.getElementById('modalMtd2026').innerText = db.mtdSales2026;
-      document.getElementById('modalMtd2025').innerText = db.mtdSales2025;
-      document.getElementById('modalMtdGrowth').innerText = db.mtdGrowth + " 🟢";
-      document.getElementById('modalSpd').innerText = db.spdSales2026;
-
-      document.getElementById('userPoin').innerText = user.poinTotal.toLocaleString("id-ID");
-      document.getElementById('userRank').innerText = user.rankArea;
-      document.getElementById('taskCountVal').innerText = user.tugasSelesai + "/12";
-
-      // Render Drive Carousel
-      if (data.carouselImages && data.carouselImages.length > 0) {
-        carouselList = data.carouselImages;
-        carouselIdx = 0;
-        updateCarouselDisplay();
-      }
-
-      // Render Menu Utama & Menu Lainnya Dinamis dari Spreadsheet Menu_Navigasi
-      renderNavMenus(data.navMenu);
-
-      // Render Profile
-      document.getElementById('profileName').innerText = user.nama;
-      document.getElementById('profileRole').innerText = user.jabatan;
-      document.getElementById('profileStore').innerText = user.namaTokoLengkap;
-      document.getElementById('profileCardImg').src = user.fotoProfil;
-
-      if (user.orgChart) {
-        document.getElementById('ogmName').innerText = user.orgChart.ogm.nama;
-        document.getElementById('bmName').innerText = user.orgChart.bm.nama;
-        document.getElementById('dbmName').innerText = user.orgChart.dbm.nama;
-        document.getElementById('amName').innerText = user.orgChart.am.nama;
-        document.getElementById('acName').innerText = user.orgChart.ac.nama;
-      }
-
-      if (data.leaderboard) renderLeaderboard(data.leaderboard);
-    }
-
-    // Carousel Drive Logic
-    function updateCarouselDisplay() {
-      if (carouselList.length === 0) return;
-      document.getElementById('carouselImgDisplay').src = carouselList[carouselIdx];
-      document.getElementById('carouselCounter').innerText = (carouselIdx + 1) + " / " + carouselList.length;
-    }
-    function prevCarousel() {
-      if (carouselList.length === 0) return;
-      carouselIdx = (carouselIdx - 1 + carouselList.length) % carouselList.length;
-      updateCarouselDisplay();
-    }
-    function nextCarousel() {
-      if (carouselList.length === 0) return;
-      carouselIdx = (carouselIdx + 1) % carouselList.length;
-      updateCarouselDisplay();
-    }
-
-    // Dynamic Navigation Menu Render
-    function renderNavMenus(navMenu) {
-      const gridUtama = document.getElementById('gridMenuUtama');
-      const gridLainnya = document.getElementById('gridMenuLainnya');
-
-      if (navMenu && navMenu.menuUtama && navMenu.menuUtama.length > 0) {
-        let htmlUtama = "";
-        navMenu.menuUtama.forEach(item => {
-          htmlUtama += `
-            <div onclick="executeMenuTask('${item.nama}', ${item.poinReward})" class="p-2 bg-emerald-950/80 rounded-xl border border-emerald-800 hover:border-emerald-400 cursor-pointer">
-              <div class="w-8 h-8 mx-auto rounded-lg bg-emerald-800/60 flex items-center justify-center text-emerald-300 mb-1">
-                <i class="${item.icon} text-sm"></i>
-              </div>
-              <p class="text-emerald-100 leading-tight text-[9px]">${item.nama}</p>
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="header-left">
+            <button class="btn-hamburger" onclick="toggleMenu()" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="brand-title">
+                <div class="brand-icon"><i class="fa-solid fa-leaf"></i></div>
+                <span>Kacida Bersatu</span>
             </div>
-          `;
-        });
-        gridUtama.innerHTML = htmlUtama;
-      } else {
-        gridUtama.innerHTML = `<p class="col-span-4 text-emerald-400/60 text-[10px]">Menu Utama Belum Diset di Spreadsheet</p>`;
-      }
-
-      if (navMenu && navMenu.menuLainnya && navMenu.menuLainnya.length > 0) {
-        let htmlLainnya = "";
-        navMenu.menuLainnya.forEach(item => {
-          htmlLainnya += `
-            <div onclick="executeMenuTask('${item.nama}', ${item.poinReward})" class="p-2 bg-emerald-950/80 rounded-xl border border-emerald-800 hover:border-emerald-400 cursor-pointer">
-              <div class="w-8 h-8 mx-auto rounded-lg bg-emerald-900/60 flex items-center justify-center text-emerald-300 mb-1">
-                <i class="${item.icon} text-sm"></i>
-              </div>
-              <p class="text-emerald-100 leading-tight text-[9px]">${item.nama}</p>
+        </div>
+        <div class="header-right">
+            <!-- Disket Icon Header Button for Performa Toko -->
+            <div class="disket-badge" id="btnDisket" onclick="showPerformaDetail()" title="Disket Performa Sales & IKT">
+                <i class="fa-solid fa-floppy-disk"></i>
             </div>
-          `;
-        });
-        gridLainnya.innerHTML = htmlLainnya;
-      } else {
-        gridLainnya.innerHTML = `<p class="col-span-4 text-emerald-400/60 text-[10px]">Menu Lainnya Belum Diset</p>`;
-      }
-    }
+            
+            <!-- Notification Bell with Permission Request Logic -->
+            <div class="notif-badge" id="btnNotif" onclick="requestNotificationPermission()" title="Notifikasi">
+                <i class="fa-regular fa-bell"></i>
+                <span class="notif-count">3</span>
+            </div>
 
-    function executeMenuTask(menuName, poinReward) {
-      showKacidaToast("Misi Dikerjakan!", `Membuka ${menuName} (+${poinReward} Poin)`, "success");
+            <!-- 3D Avatar Profile -->
+            <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" alt="Avatar 3D" class="user-avatar-3d" onclick="showUserProfile()">
+        </div>
+    </header>
 
-      callBackend({ action: "clickMenuTask", nik: currentNik, menu: menuName, poinReward: poinReward }, (res) => {
-        if (res.status === "success") {
-          document.getElementById('userPoin').innerText = res.totalPoin.toLocaleString("id-ID");
-          let currentTasks = parseInt(document.getElementById('taskCountVal').innerText) || 0;
-          document.getElementById('taskCountVal').innerText = (currentTasks + 1) + "/12";
-        }
-      });
-    }
+    <main class="container">
 
-    // Custom Kacida Toast Notification
-    function showKacidaToast(title, message, type) {
-      const toast = document.getElementById('kacidaToast');
-      document.getElementById('toastTitle').innerText = title;
-      document.getElementById('toastMessage').innerText = message;
-      
-      toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-5');
-      toast.classList.add('opacity-100', 'translate-y-0');
-
-      setTimeout(() => {
-        toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-5');
-      }, 3000);
-    }
-
-    function toggleSalesModal() {
-      document.getElementById('salesDataModal').classList.toggle('hidden');
-    }
-
-    function toggleSettingsDrawer() {
-      document.getElementById('settingsDrawer').classList.toggle('hidden');
-    }
-
-    function triggerPwaInstall() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            showKacidaToast("PWA Installed", "Aplikasi berhasil dipasang di layar utama!", "success");
-          }
-          deferredPrompt = null;
-        });
-      } else {
-        showKacidaToast("Informasi PWA", "Aplikasi sudah terpasang atau gunakan opsi 'Add to Home Screen' di browser.", "info");
-      }
-    }
-
-    function requestNotificationAccess() {
-      if ('Notification' in window) {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            showKacidaToast("Notifikasi Aktif", "Izin notifikasi Kacida berhasil diaktifkan!", "success");
-          } else {
-            showKacidaToast("Notifikasi Ditolak", "Izin notifikasi tidak diberikan.", "error");
-          }
-        });
-      }
-    }
-
-    // Chat internal & Kacida AI
-    function toggleAiMode() {
-      isAiTarget = !isAiTarget;
-      const label = document.getElementById('aiLabel');
-      const btn = document.getElementById('toggleAiBtn');
-      if (isAiTarget) {
-        label.innerText = "Tanya AI";
-        btn.classList.add('border-amber-400', 'bg-emerald-900');
-      } else {
-        label.innerText = "Semua";
-        btn.classList.remove('border-amber-400', 'bg-emerald-900');
-      }
-    }
-
-    function fetchChatData() {
-      callBackend({ action: "getChat" }, (data) => {
-        if (data.status === "success") renderChatList(data.data);
-      });
-    }
-
-    function renderChatList(messages) {
-      let html = "";
-      if (!messages || messages.length === 0) {
-        html = `<p class="text-center text-emerald-400 text-xs py-8">Belum ada percakapan. Mulai kirim pesan!</p>`;
-      } else {
-        messages.forEach(msg => {
-          let isAi = msg.nik === "AI_001" || msg.nama.indexOf("AI") !== -1;
-          let bubbleStyle = isAi ? "chat-bubble-ai" : "chat-bubble-linear";
-          let badgeRole = isAi ? "bg-amber-400 text-emerald-950 font-black" : "bg-emerald-900/90 text-emerald-300 border border-emerald-700/60";
-
-          html += `
-            <div class="${bubbleStyle} p-2.5 rounded-xl space-y-1">
-              <div class="flex justify-between items-center text-[10px] border-b border-emerald-800/60 pb-1">
-                <div class="flex items-center space-x-1.5">
-                  <span class="font-black text-white text-xs">${msg.nama}</span>
-                  <span class="text-[8px] px-1.5 py-0.2 rounded ${badgeRole}">${msg.jabatan}</span>
+        <!-- Header Disket Info Bar (Performa Sales, IKT, Penawaran Langsung) -->
+        <section class="disket-info-bar" onclick="showPerformaDetail()">
+            <div class="disket-bar-item">
+                <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
+                <span class="disket-bar-val" style="color: var(--accent-green);">104.5%</span>
+            </div>
+            <div class="disket-divider"></div>
+            <div class="disket-bar-item">
+                <span class="disket-bar-label"><i class="fa-solid fa-bullseye" style="color: var(--gold);"></i> IKT Toko</span>
+                <span class="disket-bar-val" style="color: var(--gold);">A (98 Pts)</span>
+            </div>
+            <div class="disket-divider"></div>
+            <div class="disket-bar-item">
+                <span class="disket-bar-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Penawaran</span>
+                <span class="disket-bar-val" style="color: #ef4444;">12 Item</span>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
+        </section>
+        
+        <!-- Hero Card - Performance & Greeting -->
+        <section class="hero-card">
+            <div class="hero-content">
+                <span style="font-size: 0.72rem; color: var(--text-sub);">Selamat datang kembali,</span>
+                <h1 class="hero-title">Team Kacida! 👋</h1>
+                <p class="hero-sub">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
+                <div class="performance-badge">
+                    <i class="fa-solid fa-star" style="color: var(--gold);"></i>
+                    <span>Performa hari ini <strong style="color: var(--accent-green);">Sangat Baik! 🔥</strong></span>
                 </div>
-                <span class="text-[8px] text-emerald-400/80">${msg.time}</span>
-              </div>
-              <p class="text-xs text-emerald-100 leading-relaxed pt-0.5">${msg.pesan}</p>
             </div>
-          `;
+            <!-- 3D Characters Illustration Banner -->
+            <img src="https://img.freepik.com/free-psd/3d-rendering-boy-character_23-2150798150.png" class="hero-3d-illustration" alt="3D Team">
+        </section>
+
+        <!-- Carousel Banner Toko -->
+        <section class="banner-card">
+            <span class="banner-tag">TOKO KADUDAMPIT 1</span>
+            <h2 class="banner-heading">PIC SAPA</h2>
+            <p class="banner-subtext">(SIAP ANTAR PESANAN ANDA)</p>
+            <button class="banner-btn" onclick="navigateMenu('pic-sapa')">
+                Lihat Selengkapnya <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </section>
+
+        <div class="banner-dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <!-- Horizontal Metrics Cards -->
+        <section class="metrics-scroll">
+            <div class="metric-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d" alt="Tugas">
+                <span class="metric-title">Tugas Hari Ini</span>
+                <span class="metric-value">12 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Tugas</small></span>
+            </div>
+
+            <div class="metric-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d" alt="Pengumuman">
+                <span class="metric-title">Pengumuman</span>
+                <span class="metric-value">5 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
+            </div>
+
+            <div class="metric-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d" alt="Notifikasi">
+                <span class="metric-title">Notifikasi</span>
+                <span class="metric-value">3 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
+            </div>
+
+            <div class="metric-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d" alt="Poin">
+                <span class="metric-title">Point Anda</span>
+                <span class="metric-value" style="color: var(--gold);">1.250 <small style="font-size:0.6rem; font-weight:normal;">Point</small></span>
+            </div>
+
+            <div class="metric-card">
+                <img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="metric-icon-3d" alt="Rank">
+                <span class="metric-title">Rank Anda</span>
+                <span class="metric-value" style="color: var(--accent-green);">#7 <small style="font-size:0.6rem; font-weight:normal;">Area</small></span>
+            </div>
+        </section>
+
+        <!-- Menu Utama Section -->
+        <div class="section-header">
+            <h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3>
+            <a href="#" class="btn-see-all" onclick="navigateMenu('semua-menu')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+
+        <section class="menu-section-card">
+            <!-- Row 1 (5 Items) -->
+            <div class="menu-grid-5">
+                <div class="menu-3d-item" onclick="navigateMenu('laporan-sementara')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="Laporan"></div>
+                    <span class="menu-label">Laporan Sementara</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('laporan-shift')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" alt="Shift"></div>
+                    <span class="menu-label">Laporan Akhir Shift</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('jobdesk')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png" alt="Jobdesk"></div>
+                    <span class="menu-label">Jobdesk Harian</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('validasi-exp')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png" alt="Exp"></div>
+                    <span class="menu-label">Validasi Cek Exp</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('tdp-area')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" alt="TDP"></div>
+                    <span class="menu-label">TDP Area</span>
+                </div>
+            </div>
+
+            <!-- Row 2 (3 Items) -->
+            <div class="menu-grid-4">
+                <div class="menu-3d-item" onclick="navigateMenu('monitoring-ikt')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3594/3594363.png" alt="IKT"></div>
+                    <span class="menu-label">Monitoring IKT</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('highlight-sales')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2454/2454271.png" alt="Sales"></div>
+                    <span class="menu-label">Highlight Sales</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('monitoring-psm')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" alt="PSM"></div>
+                    <span class="menu-label">Monitoring PSM</span>
+                </div>
+            </div>
+
+            <!-- 3D Rocket Decoration Background -->
+            <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket 3D">
+        </section>
+
+        <!-- Layanan Lainnya Section -->
+        <div class="section-header">
+            <h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3>
+            <a href="#" class="btn-see-all" onclick="navigateMenu('semua-layanan')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+
+        <section class="menu-section-card" style="padding: 12px;">
+            <div class="menu-grid-4">
+                <div class="menu-3d-item" onclick="navigateMenu('qrcode-cdm')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3409/3409597.png" alt="QR"></div>
+                    <span class="menu-label">QR Code CDM</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('roleplay-mtk')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/4384/4384248.png" alt="Roleplay"></div>
+                    <span class="menu-label">Roleplay Area MTK</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('claim-duka')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2904/2904832.png" alt="Duka"></div>
+                    <span class="menu-label">Claim Uang Duka & Nikah</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('penenang-psm')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2810/2810052.png" alt="Excel"></div>
+                    <span class="menu-label">Penenang PSM EXCEL</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('validasi-auto-btl')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1067/1067357.png" alt="BTL"></div>
+                    <span class="menu-label">Validasi AUTO BTL</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('koperasi-online')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1256/1256650.png" alt="Koperasi"></div>
+                    <span class="menu-label">Koperasi Online</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('asset-online')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2821/2821820.png" alt="Asset"></div>
+                    <span class="menu-label">Asset Online</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating Glass Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <i class="fa-solid fa-house"></i>
+            <span>Beranda</span>
+        </a>
+        <a href="#" class="nav-item" onclick="navigateMenu('chat')">
+            <i class="fa-solid fa-comment-dots"></i>
+            <span>Chat</span>
+        </a>
+        
+        <!-- Central Rocket FAB -->
+        <div class="fab-rocket" onclick="navigateMenu('aksi-cepat')">
+            <i class="fa-solid fa-rocket"></i>
+        </div>
+
+        <a href="#" class="nav-item" onclick="navigateMenu('leaderboard')">
+            <i class="fa-solid fa-crown"></i>
+            <span>Leaderboard</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showUserProfile()">
+            <i class="fa-solid fa-user"></i>
+            <span>Profil</span>
+        </a>
+    </nav>
+
+    <script>
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec";
+      
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cek izin notifikasi saat aplikasi dibuka
+            checkNotificationStatusOnLoad();
         });
-      }
-      const chatContainer = document.getElementById('chatContainer');
-      chatContainer.innerHTML = html;
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
 
-    function sendChatMessage() {
-      const input = document.getElementById('chatInputText');
-      const val = input.value.trim();
-      if (!val) return;
-      input.value = "";
+        // 1. FUNGSI PERMINTAAN IZIN NOTIFIKASI BROWSER
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak Didukung',
+                    text: 'Perangkat atau browser Anda belum mendukung notifikasi push.',
+                    confirmButtonColor: '#22c55e',
+                    background: '#0c2b14',
+                    color: '#ffffff'
+                });
+                return;
+            }
 
-      callBackend({ action: "sendChat", nik: currentNik, isiPesan: val, isAi: isAiTarget, tujuan: isAiTarget ? "AI" : "ALL" }, () => {
-        fetchChatData();
-      });
-    }
+            if (Notification.permission === 'granted') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Notifikasi Aktif',
+                    text: 'Izin notifikasi sudah diaktifkan sebelumnya.',
+                    confirmButtonColor: '#22c55e',
+                    background: '#0c2b14',
+                    color: '#ffffff'
+                });
+            } else if (Notification.permission === 'denied') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Izin Ditolak',
+                    text: 'Notifikasi diblokir. Harap izinkan notifikasi melalui setelan browser/HP Anda.',
+                    confirmButtonColor: '#22c55e',
+                    background: '#0c2b14',
+                    color: '#ffffff'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Izinkan Notifikasi',
+                    text: 'Aktifkan notifikasi untuk menerima pembaruan promo, tugas harian, dan peringatan IKT secara real-time.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Izinkan Sekarang',
+                    cancelButtonText: 'Nanti',
+                    confirmButtonColor: '#22c55e',
+                    cancelButtonColor: '#475569',
+                    background: '#0c2b14',
+                    color: '#ffffff'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Notification.requestPermission().then(permission => {
+                            if (permission === 'granted') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Notifikasi Berhasil Diaktifkan!',
+                                    text: 'Anda siap menerima pemberitahuan operasional.',
+                                    confirmButtonColor: '#22c55e',
+                                    background: '#0c2b14',
+                                    color: '#ffffff'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }
 
-    function renderLeaderboard(list) {
-      let html = "";
-      list.forEach((u) => {
-        let isMe = u.nik === currentNik ? "border-2 border-amber-400" : "";
-        html += `
-          <div class="flex items-center justify-between p-2 rounded-xl bg-emerald-950/80 border border-emerald-800 ${isMe}">
-            <div class="flex items-center space-x-2.5">
-              <span class="font-bold text-amber-400 text-xs w-5 text-center">#${u.rank}</span>
-              <img src="${u.foto}" class="w-8 h-8 rounded-full border border-emerald-400 object-cover">
-              <div>
-                <p class="font-bold text-white text-xs">${u.nama}</p>
-                <p class="text-[9px] text-emerald-300">${u.toko}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-900 text-amber-300 font-bold block">${u.badge}</span>
-              <p class="font-black text-white text-xs mt-0.5">${u.poin.toLocaleString('id-ID')} <span class="text-[9px] text-emerald-400 font-normal">Pts</span></p>
-            </div>
-          </div>
-        `;
-      });
-      document.getElementById('leaderboardList').innerHTML = html || "<p class='text-center'>Belum ada data klasemen.</p>";
-    }
+        function checkNotificationStatusOnLoad() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                // Berikan opsi pengingat halus jika belum pernah mengizinkan
+                console.log("Status notifikasi: default / belum diizinkan.");
+            }
+        }
 
-    function switchTab(tabName) {
-      ['Beranda', 'Leaderboard', 'Chat', 'Profil'].forEach(t => {
-        document.getElementById('page' + t)?.classList.add('hidden');
-        document.getElementById('tab' + t)?.classList.remove('active-nav-tab');
-      });
-      document.getElementById('page' + tabName)?.classList.remove('hidden');
-      document.getElementById('tab' + tabName)?.classList.add('active-nav-tab');
+        // 2. FUNGSI DETAIL PERFORMA DISKET (Sales, IKT, Penawaran)
+        function showPerformaDetail() {
+            Swal.fire({
+                title: '💾 Performance Hub (Data Toko)',
+                html: `
+                    <div style="text-align: left; font-size: 0.85rem; line-height: 1.6;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #22c55e;">
+                            <strong style="color: #22c55e;">📊 PERFORMA SALES (SPD)</strong><br>
+                            - Capaian: <strong>104.5%</strong> (Target Terlampaui)<br>
+                            - Growth: <span style="color:#22c55e;">+5.2% YoY</span>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #f59e0b;">
+                            <strong style="color: #f59e0b;">🎯 INDIKATOR KINERJA TOKO (IKT)</strong><br>
+                            - Status Predikat: <strong>Grade A (98 Pts)</strong><br>
+                            - Fokus Perbaikan: Cek Expired Tagging
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border-left: 4px solid #ef4444;">
+                            <strong style="color: #ef4444;">🔥 PENAWARAN LANGSUNG (PSM)</strong><br>
+                            - Item Aktif: <strong>12 Produk Promo</strong><br>
+                            - Top Item: Minyak Goreng & Susu UHT
+                        </div>
+                    </div>
+                `,
+                background: '#0c2b14',
+                color: '#ffffff',
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#22c55e'
+            });
+        }
 
-      if (tabName === 'Chat') fetchChatData();
-    }
-  </script>
+        // 3. NAVIGASI UMUM
+        function navigateMenu(menuName) {
+            Swal.fire({
+                title: menuName.toUpperCase().replace('-', ' '),
+                text: 'Membuka modul operasional area...',
+                icon: 'info',
+                confirmButtonColor: '#22c55e',
+                background: '#0c2b14',
+                color: '#ffffff'
+            });
+        }
+
+        function showUserProfile() {
+            Swal.fire({
+                title: 'Profil Karyawan',
+                html: `
+                    <div style="text-align:center;">
+                        <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" style="width:80px; height:80px; border-radius:50%; border:2px solid #22c55e;">
+                        <h3 style="margin-top:10px;">Team Kacida</h3>
+                        <p style="color:#94a3b8; font-size:0.85rem;">Area Cisaat - Toko Kadudampit 1</p>
+                    </div>
+                `,
+                background: '#0c2b14',
+                color: '#ffffff',
+                confirmButtonColor: '#22c55e'
+            });
+        }
+    </script>
 </body>
 </html>
