@@ -250,12 +250,15 @@
             overflow: hidden;
             margin-bottom: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            max-width: 65%;
+            max-width: 70%;
         }
 
         .hero-title {
@@ -285,14 +288,21 @@
             font-weight: 600;
         }
 
-        .hero-3d-illustration {
-            position: absolute;
-            right: -10px;
-            bottom: 0;
-            width: 145px;
-            height: auto;
-            z-index: 1;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+        /* Ikon Pengganti Gambar Pecah */
+        .hero-icon-badge {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #22c55e;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+            flex-shrink: 0;
+            z-index: 2;
         }
 
         .banner-card {
@@ -644,18 +654,22 @@
             <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
         </section>
         
-        <!-- Hero Card -->
+        <!-- Hero Card Modern -->
         <section class="hero-card">
             <div class="hero-content">
                 <span style="font-size: 0.72rem; color: var(--text-sub);">Selamat datang kembali,</span>
-                <h1 class="hero-title" id="lblUserName">Team Kacida! 👋</h1>
+                <h1 class="hero-title" id="lblUserName">Team Kacida!</h1>
                 <p class="hero-sub">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
                 <div class="performance-badge">
                     <i class="fa-solid fa-star" style="color: var(--gold);"></i>
                     <span>Performa hari ini <strong style="color: var(--accent-green);">Sangat Baik! 🔥</strong></span>
                 </div>
             </div>
-            <img src="https://img.freepik.com/free-psd/3d-rendering-boy-character_23-2150798150.png" class="hero-3d-illustration" alt="3D Team">
+            
+            <!-- Ikon Badge Menggantikan Gambar Pecah -->
+            <div class="hero-icon-badge">
+                <i class="fa-solid fa-users"></i>
+            </div>
         </section>
 
         <!-- Carousel Banner Dinamis -->
@@ -880,7 +894,7 @@
                                 htmlList += `
                                     <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; margin-bottom: 6px; border-radius: 8px; border-left: 3px solid #22c55e;">
                                         <div style="font-weight:bold; color:#fff;">${u.nama || u.NAMA}</div>
-                                        <div style="font-size:0.75rem; color:#94a3b8;">NIK: ${u.nik || u.NIK} | Jabatan: ${u.jabatan || u.JABATAN}</div>
+                                        <div style="font-size:0.75rem; color:#94a3b8;">NIK: ${u.nik || u.NIK} | Jabatan: ${u.jabatan || u.role || u.JABATAN}</div>
                                     </div>`;
                             });
                         } else {
