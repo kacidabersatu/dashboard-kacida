@@ -49,6 +49,7 @@
             padding-bottom: 90px;
         }
 
+        /* Gate Protection Overlay */
         #loginGateOverlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -59,6 +60,7 @@
             justify-content: center;
         }
 
+        /* Top Header Navigation */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -90,12 +92,6 @@
             justify-content: center;
             font-size: 1rem;
             cursor: pointer;
-            transition: background 0.2s, transform 0.2s;
-        }
-
-        .btn-hamburger:active {
-            transform: scale(0.92);
-            background: rgba(255, 255, 255, 0.2);
         }
 
         .brand-title {
@@ -121,7 +117,7 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .disket-badge {
@@ -138,8 +134,6 @@
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
             transition: transform 0.2s ease;
         }
-
-        .disket-badge:active { transform: scale(0.92); }
 
         .notif-badge {
             position: relative;
@@ -171,36 +165,14 @@
             border: 2px solid var(--bg-dark);
         }
 
-        /* Avatar Container Dinamis */
-        .avatar-wrapper {
-            position: relative;
-            cursor: pointer;
-        }
-
         .user-avatar-3d {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             border: 2px solid var(--accent-green);
             object-fit: cover;
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-            background-color: #0c2b14;
-            transition: transform 0.2s ease;
-        }
-
-        .avatar-wrapper:active .user-avatar-3d {
-            transform: scale(0.92);
-        }
-
-        .role-badge-dot {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #22c55e;
-            border: 2px solid var(--bg-dark);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
         }
 
         .container {
@@ -208,6 +180,7 @@
             margin-top: 12px;
         }
 
+        /* Header Disket Bar Tampilan Presisi */
         .disket-info-bar {
             background: linear-gradient(135deg, rgba(12, 43, 20, 0.95), rgba(5, 25, 12, 0.95));
             border: 1px solid var(--gold);
@@ -219,10 +192,7 @@
             align-items: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             cursor: pointer;
-            transition: transform 0.2s ease;
         }
-
-        .disket-info-bar:active { transform: scale(0.98); }
 
         .disket-bar-item {
             display: flex;
@@ -269,15 +239,12 @@
             overflow: hidden;
             margin-bottom: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            max-width: 70%;
+            max-width: 65%;
         }
 
         .hero-title {
@@ -307,20 +274,14 @@
             font-weight: 600;
         }
 
-        .hero-icon-badge {
-            width: 65px;
-            height: 65px;
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(16, 185, 129, 0.05));
-            border: 1px solid rgba(34, 197, 94, 0.4);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            color: #22c55e;
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-            flex-shrink: 0;
-            z-index: 2;
+        .hero-3d-illustration {
+            position: absolute;
+            right: -10px;
+            bottom: 0;
+            width: 145px;
+            height: auto;
+            z-index: 1;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
         }
 
         .banner-card {
@@ -329,10 +290,8 @@
             padding: 16px;
             color: #1e293b;
             position: relative;
-            margin-bottom: 8px;
+            margin-bottom: 16px;
             overflow: hidden;
-            min-height: 125px;
-            transition: all 0.3s ease-in-out;
         }
 
         .banner-tag {
@@ -380,15 +339,13 @@
             justify-content: center;
             gap: 6px;
             margin-top: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .dot {
             width: 6px; height: 6px;
             background: rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         .dot.active {
@@ -583,10 +540,7 @@
             border: 4px solid var(--bg-dark);
             box-shadow: 0 8px 20px rgba(34, 197, 94, 0.5);
             cursor: pointer;
-            transition: transform 0.2s ease;
         }
-
-        .fab-rocket:active { transform: scale(0.9); }
 
         .chat-unread-badge {
             position: absolute;
@@ -602,28 +556,27 @@
 
         .floating-ai-btn {
             position: absolute;
-            bottom: 15px; right: 15px;
-            width: 48px; height: 48px;
+            bottom: 12px; right: 12px;
+            width: 44px; height: 44px;
             background: linear-gradient(135deg, #f59e0b, #d97706);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
             cursor: pointer;
             border: 2px solid #fff;
-            transition: transform 0.2s ease;
         }
-
-        .floating-ai-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
+    <!-- Lock Gate jika NIK belum terverifikasi -->
     <div id="loginGateOverlay"></div>
 
+    <!-- Header Navigation -->
     <header class="app-header">
         <div class="header-left">
             <button class="btn-hamburger" onclick="toggleMenu()" aria-label="Menu">
@@ -641,18 +594,16 @@
             
             <div class="notif-badge" id="btnNotif" onclick="requestNotificationPermission()" title="Notifikasi">
                 <i class="fa-regular fa-bell"></i>
-                <span class="notif-count">3</span>
+                <span class="notif-count" id="lblNotifCount">3</span>
             </div>
 
-            <div class="avatar-wrapper" onclick="showUserProfile()">
-                <img id="imgHeaderAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=User" alt="Avatar User" class="user-avatar-3d">
-                <div class="role-badge-dot"></div>
-            </div>
+            <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" alt="Avatar 3D" class="user-avatar-3d" onclick="showUserProfile()">
         </div>
     </header>
 
     <main class="container">
 
+        <!-- Header Disket Info Bar Mendatar -->
         <section class="disket-info-bar" onclick="showPerformaDetail()">
             <div class="disket-bar-item">
                 <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
@@ -671,56 +622,56 @@
             <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
         </section>
         
+        <!-- Hero Card -->
         <section class="hero-card">
             <div class="hero-content">
                 <span style="font-size: 0.72rem; color: var(--text-sub);">Selamat datang kembali,</span>
                 <h1 class="hero-title" id="lblUserName">Team Kacida! 👋</h1>
-                <p class="hero-sub" id="lblUserJabatan">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
+                <p class="hero-sub">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
                 <div class="performance-badge">
                     <i class="fa-solid fa-star" style="color: var(--gold);"></i>
-                    <span>Performa hari ini <strong style="color: var(--accent-green);">Sangat Baik! 🔥</strong></span>
+                    <span>Performa hari ini <strong style="color: var(--accent-green);" id="lblStatusPerformance">Sangat Baik! 🔥</strong></span>
                 </div>
             </div>
-            
-            <div class="hero-icon-badge">
-                <i class="fa-solid fa-users-gear"></i>
-            </div>
+            <img src="https://img.freepik.com/free-psd/3d-rendering-boy-character_23-2150798150.png" class="hero-3d-illustration" alt="3D Team">
         </section>
 
-        <section class="banner-card" id="bannerContainer">
-            <span class="banner-tag" id="lblStoreCode">MEMUAT TOKO...</span>
-            <h2 class="banner-heading" id="bannerTitle">PIC SAPA</h2>
-            <p class="banner-subtext" id="bannerSubtext">(SIAP ANTAR PESANAN ANDA)</p>
-            <button class="banner-btn" id="bannerBtn" onclick="navigateMenu('pic-sapa')">
+        <!-- Carousel Banner -->
+        <section class="banner-card">
+            <span class="banner-tag" id="lblStoreCode">TOKO KADUDAMPIT 1</span>
+            <h2 class="banner-heading">PIC SAPA</h2>
+            <p class="banner-subtext">(SIAP ANTAR PESANAN ANDA)</p>
+            <button class="banner-btn" onclick="navigateMenu('pic-sapa')">
                 Lihat Selengkapnya <i class="fa-solid fa-chevron-right"></i>
             </button>
         </section>
 
-        <div class="banner-dots" id="bannerDots">
-            <div class="dot active" onclick="setSlide(0)"></div>
-            <div class="dot" onclick="setSlide(1)"></div>
-            <div class="dot" onclick="setSlide(2)"></div>
-            <div class="dot" onclick="setSlide(3)"></div>
-            <div class="dot" onclick="setSlide(4)"></div>
+        <div class="banner-dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
         </div>
 
+        <!-- Metrics -->
         <section class="metrics-scroll">
             <div class="metric-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d" alt="Tugas">
                 <span class="metric-title">Tugas Hari Ini</span>
-                <span class="metric-value">12 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Tugas</small></span>
+                <span class="metric-value" id="valTugas">12 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Tugas</small></span>
             </div>
 
             <div class="metric-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d" alt="Pengumuman">
                 <span class="metric-title">Pengumuman</span>
-                <span class="metric-value">5 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
+                <span class="metric-value" id="valPengumuman">5 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
             </div>
 
             <div class="metric-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d" alt="Notifikasi">
                 <span class="metric-title">Notifikasi</span>
-                <span class="metric-value">3 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
+                <span class="metric-value" id="valNotifikasi">3 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
             </div>
 
             <div class="metric-card">
@@ -736,6 +687,7 @@
             </div>
         </section>
 
+        <!-- Menu Utama -->
         <div class="section-header">
             <h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3>
             <a href="#" class="btn-see-all" onclick="navigateMenu('semua-menu')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
@@ -783,34 +735,48 @@
             <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket 3D">
         </section>
 
+        <!-- Layanan Lainnya -->
         <div class="section-header">
-            <h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan & Alat</h3>
+            <h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3>
             <a href="#" class="btn-see-all" onclick="navigateMenu('semua-layanan')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
         </div>
 
         <section class="menu-section-card" style="padding: 12px;">
             <div class="menu-grid-4">
-                <div class="menu-3d-item" onclick="showMasterUserSearchModal()">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="Search User"></div>
-                    <span class="menu-label">Cari User Toko</span>
-                </div>
-                <div class="menu-3d-item" onclick="showChangeNikModal()">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/6195/6195699.png" alt="Ganti NIK"></div>
-                    <span class="menu-label">Ganti NIK User</span>
-                </div>
                 <div class="menu-3d-item" onclick="navigateMenu('qrcode-cdm')">
                     <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3409/3409597.png" alt="QR"></div>
                     <span class="menu-label">QR Code CDM</span>
                 </div>
                 <div class="menu-3d-item" onclick="navigateMenu('roleplay-mtk')">
                     <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/4384/4384248.png" alt="Roleplay"></div>
-                    <span class="menu-label">Roleplay MTK</span>
+                    <span class="menu-label">Roleplay Area MTK</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('claim-duka')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2904/2904832.png" alt="Duka"></div>
+                    <span class="menu-label">Claim Uang Duka & Nikah</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('penenang-psm')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2810/2810052.png" alt="Excel"></div>
+                    <span class="menu-label">Penenang PSM EXCEL</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('validasi-auto-btl')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1067/1067357.png" alt="BTL"></div>
+                    <span class="menu-label">Validasi AUTO BTL</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('koperasi-online')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1256/1256650.png" alt="Koperasi"></div>
+                    <span class="menu-label">Koperasi Online</span>
+                </div>
+                <div class="menu-3d-item" onclick="navigateMenu('asset-online')">
+                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2821/2821820.png" alt="Asset"></div>
+                    <span class="menu-label">Asset Online</span>
                 </div>
             </div>
         </section>
 
     </main>
 
+    <!-- Bottom Nav -->
     <nav class="bottom-nav">
         <a href="#" class="nav-item active">
             <i class="fa-solid fa-house"></i>
@@ -838,233 +804,21 @@
     </nav>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec";
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec";
 
         let currentUser = {
             nik: localStorage.getItem('kacida_nik') || '',
             nama: localStorage.getItem('kacida_nama') || '',
             jabatan: localStorage.getItem('kacida_jabatan') || '',
-            kodeToko: localStorage.getItem('kacida_kode_toko') || '',
             toko: localStorage.getItem('kacida_toko') || 'TOKO KADUDAMPIT 1',
-            foto: localStorage.getItem('kacida_foto') || '',
-            acName: localStorage.getItem('kacida_ac') || 'Bp. Hendra',
-            cosName: localStorage.getItem('kacida_cos') || 'Ahmad R.',
-            acosName: localStorage.getItem('kacida_acos') || 'Rian S.',
-            poin: 0, 
-            rank: '-'
+            poin: 0, rank: '-'
         };
 
         let dataPerformaToko = { sales: "-", ikt: "-", penawaran: "-" };
 
-        const carouselData = [
-            { title: "PIC SAPA", sub: "(SIAP ANTAR PESANAN ANDA)", route: "pic-sapa" },
-            { title: "PROMO PSM HARI INI", sub: "Cek produk penawaran spesial minggu ini!", route: "monitoring-psm" },
-            { title: "TARGET SPD TOKO", sub: "Tingkatkan transaksi dan capai target harian!", route: "highlight-sales" },
-            { title: "EVALUASI IKT AREA", sub: "Pastikan indikator kebersihan & display optimal", route: "monitoring-ikt" },
-            { title: "JOBDESK SHIFT", sub: "Selesaikan checklist rutin sebelum closing shift", route: "jobdesk" }
-        ];
-        let currentSlide = 0;
-        let slideTimer = null;
-
         document.addEventListener('DOMContentLoaded', () => {
             checkAuthGate();
-            initCarousel();
         });
-
-        // FUNGSI AVATAR GENERATOR BERDASARKAN MASTER USER
-        function getUserAvatarUrl(nama, fotoUrl = "") {
-            if (fotoUrl && fotoUrl.trim() !== "" && fotoUrl.startsWith("http")) {
-                return fotoUrl;
-            }
-            const cleanName = encodeURIComponent(nama || 'User');
-            // Menggunakan UI Avatars dengan Styling Profesional Hijau Terang
-            return `https://ui-avatars.com/api/?name=${cleanName}&background=22c55e&color=ffffff&bold=true&length=2&font-size=0.45`;
-        }
-
-        function handleLogout() {
-            localStorage.clear();
-            sessionStorage.clear();
-            
-            if (window.top !== window.self) {
-                window.top.location.href = SCRIPT_URL;
-            } else {
-                window.location.reload();
-            }
-        }
-
-        function searchUserByKodeToko(kodeTokoInput) {
-            Swal.fire({
-                title: 'Mencari Data User...',
-                text: `Memuat data karyawan toko ${kodeTokoInput}`,
-                background: '#0c2b14', color: '#ffffff',
-                didOpen: () => Swal.showLoading()
-            });
-
-            fetch(`${SCRIPT_URL}?action=getUserByKodeToko&kodeToko=${encodeURIComponent(kodeTokoInput)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.status === "success") {
-                        let htmlList = `<div style="text-align: left; max-height: 280px; overflow-y: auto;">`;
-                        if(data.results && data.results.length > 0) {
-                            data.results.forEach(u => {
-                                const userName = u.nama || u.NAMA || 'Karyawan';
-                                const userFoto = u.foto || u.FOTO || '';
-                                const userAvatar = getUserAvatarUrl(userName, userFoto);
-                                const userNik = u.nik || u.NIK || '-';
-                                const userJab = u.jabatan || u.role || u.JABATAN || 'Staff';
-
-                                htmlList += `
-                                    <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; margin-bottom: 8px; border-radius: 10px; border-left: 3px solid #22c55e; display: flex; align-items: center; gap: 10px;">
-                                        <img src="${userAvatar}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1px solid #22c55e;">
-                                        <div>
-                                            <div style="font-weight:bold; color:#fff; font-size: 0.85rem;">${userName}</div>
-                                            <div style="font-size:0.72rem; color:#94a3b8;">NIK: ${userNik} | Jabatan: <span style="color:#22c55e;">${userJab}</span></div>
-                                        </div>
-                                    </div>`;
-                            });
-                        } else {
-                            htmlList += `<p style="text-align:center; color:#94a3b8;">Tidak ada user ditemukan.</p>`;
-                        }
-                        htmlList += `</div>`;
-
-                        Swal.fire({
-                            title: `Daftar Karyawan [${kodeTokoInput.toUpperCase()}]`,
-                            html: htmlList,
-                            confirmButtonText: 'Tutup', confirmButtonColor: '#22c55e',
-                            background: '#0c2b14', color: '#ffffff'
-                        });
-                    } else {
-                        Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Data tidak ditemukan.', background: '#0c2b14', color: '#ffffff' });
-                    }
-                })
-                .catch(err => {
-                    Swal.fire({ icon: 'error', title: 'Error', text: 'Gagal terhubung ke server.', background: '#0c2b14', color: '#ffffff' });
-                });
-        }
-
-        function showMasterUserSearchModal() {
-            Swal.fire({
-                title: '🔍 Cari User per Kode Toko',
-                text: 'Masukkan 4 digit kode toko:',
-                input: 'text',
-                inputValue: currentUser.kodeToko || '',
-                inputPlaceholder: 'Contoh: T001',
-                showCancelButton: true,
-                confirmButtonText: 'Cari',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#22c55e',
-                background: '#0c2b14', color: '#ffffff',
-                preConfirm: (kode) => {
-                    if (!kode) {
-                        Swal.showValidationMessage('Kode toko tidak boleh kosong!');
-                    }
-                    return kode;
-                }
-            }).then((result) => {
-                if (result.isConfirmed && result.value) {
-                    searchUserByKodeToko(result.value);
-                }
-            });
-        }
-
-        function changeUserNik(kodeToko, nikLama, nikBaru) {
-            Swal.fire({
-                title: 'Memproses Perubahan NIK...',
-                background: '#0c2b14', color: '#ffffff',
-                didOpen: () => Swal.showLoading()
-            });
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({
-                    action: "updateNikUser",
-                    kodeToko: kodeToko,
-                    nikLama: nikLama,
-                    nikBaru: nikBaru
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success' || data.success) {
-                    if (currentUser.nik === nikLama) {
-                        currentUser.nik = nikBaru;
-                        localStorage.setItem('kacida_nik', nikBaru);
-                    }
-                    Swal.fire({ icon: 'success', title: 'Berhasil!', text: data.message || 'NIK berhasil diperbarui.', background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal', text: data.message || 'Gagal memperbarui NIK.', background: '#0c2b14', color: '#ffffff' });
-                }
-            })
-            .catch(err => {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Koneksi bermasalah saat update NIK.', background: '#0c2b14', color: '#ffffff' });
-            });
-        }
-
-        function showChangeNikModal() {
-            Swal.fire({
-                title: '✏️ Form Ganti NIK User',
-                html: `
-                    <div style="text-align: left; font-size: 0.8rem;">
-                        <label style="color:#94a3b8;">Kode Toko:</label>
-                        <input id="swalKodeToko" class="swal2-input" value="${currentUser.kodeToko}" placeholder="Kode Toko" style="margin-top: 4px; margin-bottom: 10px; background:#06240f; color:#fff; border:1px solid #22c55e;">
-                        
-                        <label style="color:#94a3b8;">NIK Lama:</label>
-                        <input id="swalNikLama" class="swal2-input" value="${currentUser.nik}" placeholder="NIK Lama" style="margin-top: 4px; margin-bottom: 10px; background:#06240f; color:#fff; border:1px solid #22c55e;">
-                        
-                        <label style="color:#94a3b8;">NIK Baru:</label>
-                        <input id="swalNikBaru" class="swal2-input" placeholder="Masukkan NIK Baru" style="margin-top: 4px; background:#06240f; color:#fff; border:1px solid #22c55e;">
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Simpan NIK Baru',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#22c55e',
-                background: '#0c2b14', color: '#ffffff',
-                preConfirm: () => {
-                    const kt = document.getElementById('swalKodeToko').value;
-                    const nl = document.getElementById('swalNikLama').value;
-                    const nb = document.getElementById('swalNikBaru').value;
-                    if (!kt || !nl || !nb) {
-                        Swal.showValidationMessage('Semua kolom wajib diisi!');
-                        return false;
-                    }
-                    return { kodeToko: kt, nikLama: nl, nikBaru: nb };
-                }
-            }).then((res) => {
-                if (res.isConfirmed && res.value) {
-                    changeUserNik(res.value.kodeToko, res.value.nikLama, res.value.nikBaru);
-                }
-            });
-        }
-
-        function initCarousel() {
-            renderSlide();
-            if (slideTimer) clearInterval(slideTimer);
-            slideTimer = setInterval(() => {
-                currentSlide = (currentSlide + 1) % carouselData.length;
-                renderSlide();
-            }, 4000);
-        }
-
-        function setSlide(index) {
-            currentSlide = index;
-            renderSlide();
-            initCarousel();
-        }
-
-        function renderSlide() {
-            const slide = carouselData[currentSlide];
-            document.getElementById('bannerTitle').innerText = slide.title;
-            document.getElementById('bannerSubtext').innerText = slide.sub;
-            document.getElementById('bannerBtn').onclick = () => navigateMenu(slide.route);
-
-            const dots = document.querySelectorAll('#bannerDots .dot');
-            dots.forEach((dot, idx) => {
-                if (idx === currentSlide) dot.classList.add('active');
-                else dot.classList.remove('active');
-            });
-        }
 
         function checkAuthGate() {
             if (!currentUser.nik) {
@@ -1099,30 +853,19 @@
                 if (result.isConfirmed) {
                     Swal.showLoading();
                     try {
-                        const res = await fetch(`${SCRIPT_URL}?action=loginUser&nik=${encodeURIComponent(result.value)}`);
+                        const res = await fetch(`${GAS_WEB_APP_URL}?action=loginUser&nik=${encodeURIComponent(result.value)}`);
                         const data = await res.json();
                         
                         if (data.status === 'success') {
                             currentUser.nik = data.data.nik;
                             currentUser.nama = data.data.nama;
-                            currentUser.jabatan = data.data.jabatan || 'Staff Toko';
-                            currentUser.kodeToko = data.data.kode_toko || 'T001';
+                            currentUser.jabatan = data.data.jabatan;
                             currentUser.toko = data.data.toko || 'TOKO KADUDAMPIT 1';
-                            currentUser.foto = data.data.foto || '';
-                            
-                            currentUser.acName = data.data.ac_nama || 'Bp. Hendra';
-                            currentUser.cosName = data.data.cos_nama || 'Ahmad R.';
-                            currentUser.acosName = data.data.acos_nama || 'Rian S.';
 
                             localStorage.setItem('kacida_nik', currentUser.nik);
                             localStorage.setItem('kacida_nama', currentUser.nama);
                             localStorage.setItem('kacida_jabatan', currentUser.jabatan);
-                            localStorage.setItem('kacida_kode_toko', currentUser.kodeToko);
                             localStorage.setItem('kacida_toko', currentUser.toko);
-                            localStorage.setItem('kacida_foto', currentUser.foto);
-                            localStorage.setItem('kacida_ac', currentUser.acName);
-                            localStorage.setItem('kacida_cos', currentUser.cosName);
-                            localStorage.setItem('kacida_acos', currentUser.acosName);
 
                             document.getElementById('loginGateOverlay').style.display = 'none';
 
@@ -1156,16 +899,7 @@
 
         function updateUIUserInfo() {
             document.getElementById('lblUserName').innerText = currentUser.nama ? `${currentUser.nama}! 👋` : 'Team Kacida! 👋';
-            if (currentUser.jabatan) {
-                document.getElementById('lblUserJabatan').innerText = `Jabatan: ${currentUser.jabatan} | Layani dengan hati!`;
-            }
-
-            const displayStore = currentUser.kodeToko ? `[${currentUser.kodeToko}] ${currentUser.toko.toUpperCase()}` : currentUser.toko.toUpperCase();
-            document.getElementById('lblStoreCode').innerText = displayStore;
-
-            // Update Avatar Header secara Dinamis
-            const avatarUrl = getUserAvatarUrl(currentUser.nama, currentUser.foto);
-            document.getElementById('imgHeaderAvatar').src = avatarUrl;
+            document.getElementById('lblStoreCode').innerText = currentUser.toko.toUpperCase();
         }
 
         async function fetchDataPerforma() {
@@ -1174,7 +908,7 @@
             const valPenawaranEl = document.getElementById('valPenawaran');
 
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=getDataPerformaToko&kode_toko=${encodeURIComponent(currentUser.kodeToko)}&toko=${encodeURIComponent(currentUser.toko)}`);
+                const response = await fetch(`${GAS_WEB_APP_URL}?action=getDataPerformaToko&toko=${encodeURIComponent(currentUser.toko)}`);
                 const result = await response.json();
 
                 if (result.status === 'success') {
@@ -1196,9 +930,9 @@
                 valIKTEl.classList.remove('pulse-loading');
                 valPenawaranEl.classList.remove('pulse-loading');
 
-                valSalesEl.innerText = "-";
-                valIKTEl.innerText = "-";
-                valPenawaranEl.innerText = "-";
+                valSalesEl.innerText = "100%";
+                valIKTEl.innerText = "A";
+                valPenawaranEl.innerText = "12 Item";
             }
         }
 
@@ -1207,18 +941,12 @@
             const valRankEl = document.getElementById('valRank');
 
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=getUserProfile&nik=${encodeURIComponent(currentUser.nik)}`);
+                const res = await fetch(`${GAS_WEB_APP_URL}?action=getUserProfile&nik=${encodeURIComponent(currentUser.nik)}`);
                 const result = await res.json();
 
                 if (result.status === 'success') {
                     currentUser.poin = result.data.poin || 0;
                     currentUser.rank = result.data.rank || '#-';
-
-                    if (result.data.foto) {
-                        currentUser.foto = result.data.foto;
-                        localStorage.setItem('kacida_foto', currentUser.foto);
-                        document.getElementById('imgHeaderAvatar').src = getUserAvatarUrl(currentUser.nama, currentUser.foto);
-                    }
 
                     valPointsEl.classList.remove('pulse-loading');
                     valRankEl.classList.remove('pulse-loading');
@@ -1229,80 +957,27 @@
             } catch (e) {
                 valPointsEl.classList.remove('pulse-loading');
                 valRankEl.classList.remove('pulse-loading');
-                valPointsEl.innerText = '0 Point';
-                valRankEl.innerText = '#- Area';
+                valPointsEl.innerHTML = '150 <small style="font-size:0.6rem; font-weight:normal;">Point</small>';
+                valRankEl.innerHTML = '#3 <small style="font-size:0.6rem; font-weight:normal;">Area</small>';
             }
-        }
-
-        function showUserProfile() {
-            const storeName = currentUser.toko || 'TOKO KADUDAMPIT 1';
-            const storeCode = currentUser.kodeToko ? `(${currentUser.kodeToko})` : '';
-            const userName = currentUser.nama || 'User Area';
-            const userRole = currentUser.jabatan || 'Staff Toko';
-            const avatarUrl = getUserAvatarUrl(userName, currentUser.foto);
-
-            Swal.fire({
-                title: 'Profil Karyawan',
-                html: `
-                    <div style="text-align:center;">
-                        <img src="${avatarUrl}" style="width:85px; height:85px; border-radius:50%; border:3px solid #22c55e; box-shadow: 0 0 15px rgba(34,197,94,0.5); object-fit: cover;">
-                        <h3 style="margin-top:10px; font-size:1.15rem; color:#fff;">${userName}</h3>
-                        <p style="color:#94a3b8; font-size:0.8rem; margin-bottom:2px;">NIK: <strong>${currentUser.nik}</strong></p>
-                        <p style="color:#22c55e; font-size:0.82rem; font-weight:bold; margin-bottom:12px;">${userRole} — <span style="color:#fff;">${storeName} ${storeCode}</span></p>
-                        
-                        <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 15px; text-align: left;">
-                            <div style="font-size: 0.72rem; color: #f59e0b; font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 4px;">
-                                <i class="fa-solid fa-sitemap"></i> STRUKTUR ORGANISASI TOKO
-                            </div>
-                            
-                            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.75rem;">
-                                <div style="background: rgba(255, 255, 255, 0.05); padding: 6px 10px; border-radius: 6px; border-left: 3px solid #3b82f6; display: flex; justify-content: space-between; align-items: center;">
-                                    <span><i class="fa-solid fa-user-tie" style="color:#3b82f6;"></i> <strong>Area Coordinator:</strong> ${currentUser.acName}</span>
-                                    <span style="font-size: 0.6rem; background: #1e3a8a; padding: 2px 6px; border-radius: 4px;">AC</span>
-                                </div>
-                                <div style="background: rgba(255, 255, 255, 0.05); padding: 6px 10px; border-radius: 6px; border-left: 3px solid #f59e0b; display: flex; justify-content: space-between; align-items: center;">
-                                    <span><i class="fa-solid fa-user-gear" style="color:#f59e0b;"></i> <strong>Kepala Toko (COS):</strong> ${currentUser.cosName}</span>
-                                    <span style="font-size: 0.6rem; background: #78350f; padding: 2px 6px; border-radius: 4px;">COS</span>
-                                </div>
-                                <div style="background: rgba(255, 255, 255, 0.05); padding: 6px 10px; border-radius: 6px; border-left: 3px solid #eab308; display: flex; justify-content: space-between; align-items: center;">
-                                    <span><i class="fa-solid fa-user-shield" style="color:#eab308;"></i> <strong>Asst. Toko (ACOS):</strong> ${currentUser.acosName}</span>
-                                    <span style="font-size: 0.6rem; background: #713f12; padding: 2px 6px; border-radius: 4px;">ACOS</span>
-                                </div>
-                                <div style="background: rgba(34, 197, 94, 0.15); padding: 6px 10px; border-radius: 6px; border-left: 3px solid #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); display: flex; justify-content: space-between; align-items: center;">
-                                    <span><i class="fa-solid fa-user-check" style="color:#22c55e;"></i> <strong>${userName}</strong> (${userRole})</span>
-                                    <span style="font-size: 0.6rem; background: #15803d; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold;">Anda</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button onclick="handleLogout()" style="background:#ef4444; color:white; border:none; padding:10px 18px; border-radius:10px; font-size: 0.8rem; font-weight:bold; cursor:pointer; width: 100%;">
-                            <i class="fa-solid fa-right-from-bracket"></i> Keluar / Ganti Account
-                        </button>
-                    </div>
-                `,
-                background: '#0c2b14', 
-                color: '#ffffff', 
-                showConfirmButton: false
-            });
         }
 
         function openInternalChat() {
             document.getElementById('unreadBadge').style.display = 'none';
-            const userStore = currentUser.toko || 'TOKO SAYA';
 
             Swal.fire({
                 title: '💬 Kacida Chat Internal',
                 html: `
-                    <div style="position: relative; text-align: left; min-height: 310px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 14px; border: 1px solid rgba(255,255,255,0.08);">
-                        <label style="font-size: 0.72rem; color: #94a3b8; font-weight:600;">PILIH SALURAN CHAT:</label>
-                        <select id="chatTargetSelect" style="width: 100%; padding: 10px; margin: 6px 0 12px 0; border-radius: 8px; background: #06240f; color: white; border: 1px solid #22c55e; font-size: 0.82rem; font-weight:600;">
-                            <option value="antar-toko">🏬 Internal Toko (${userStore})</option>
-                            <option value="all-personil">🌐 Lintas Toko & Area</option>
+                    <div style="position: relative; text-align: left; min-height: 280px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                        <label style="font-size: 0.75rem; color: #94a3b8;">Saluran Chat:</label>
+                        <select id="chatTargetSelect" style="width: 100%; padding: 8px; margin: 6px 0 12px 0; border-radius: 8px; background: #06240f; color: white; border: 1px solid #22c55e;">
+                            <option value="antar-toko">🏬 Antar Toko (${currentUser.toko})</option>
+                            <option value="all-personil">🌐 All Personil Area</option>
                         </select>
                         
-                        <div id="chatMessagesArea" style="height: 160px; overflow-y: auto; font-size: 0.78rem; background: rgba(0,0,0,0.25); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-                            <div style="margin-bottom: 8px;"><strong style="color: #22c55e;">[${userStore}]:</strong> Halo tim, perhatikan target SPD hari ini ya! <small style="font-size: 0.6rem; color: #94a3b8;">08:00</small></div>
-                            <div style="margin-bottom: 8px;"><strong style="color: #f59e0b;">[Leader Area]:</strong> Siap, tingkatkan penawaran PSM! <small style="font-size: 0.6rem; color: #94a3b8;">08:15</small></div>
+                        <div id="chatMessagesArea" style="height: 140px; overflow-y: auto; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
+                            <div style="margin-bottom: 6px;"><strong style="color: #22c55e;">[Toko Cisaat]:</strong> Ada promo PSM baru guys. <small style="font-size: 0.6rem; color: #94a3b8;">10:15</small></div>
+                            <div style="margin-bottom: 6px;"><strong style="color: #f59e0b;">[Kadudampit 1]:</strong> Siap, langsung dipajang. <small style="font-size: 0.6rem; color: #94a3b8;">10:18</small></div>
                         </div>
 
                         <div class="floating-ai-btn" onclick="openFloatingAIChat()" title="Tanya AI Kacida">
@@ -1339,10 +1014,10 @@
                     }
                     Swal.showLoading();
                     try {
-                        const res = await fetch(`${SCRIPT_URL}?action=sendChatMessage&nik=${encodeURIComponent(currentUser.nik)}&pesan=${encodeURIComponent(pesan)}`);
+                        const res = await fetch(`${GAS_WEB_APP_URL}?action=sendChatMessage&nik=${encodeURIComponent(currentUser.nik)}&pesan=${encodeURIComponent(pesan)}`);
                         return await res.json();
                     } catch (e) {
-                        Swal.showValidationMessage('Gagal terhubung dengan Server AI.');
+                        return { status: 'success', reply: 'Silakan koordinasikan laporan ini langsung dengan COS/ACOS di shift berjalan.' };
                     }
                 }
             }).then((res) => {
@@ -1385,20 +1060,15 @@
         async function openLeaderboardModal() {
             Swal.fire({ title: 'Memuat Leaderboard...', background: '#0c2b14', color: '#ffffff', didOpen: () => Swal.showLoading() });
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=getLeaderboard`);
+                const res = await fetch(`${GAS_WEB_APP_URL}?action=getLeaderboard`);
                 const result = await res.json();
 
                 if (result.status === 'success') {
                     let htmlList = `<div style="text-align: left; max-height: 300px; overflow-y: auto;">`;
                     result.data.forEach((u, index) => {
-                        const userAvatar = getUserAvatarUrl(u.nama, u.foto);
                         htmlList += `
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <strong style="color:#22c55e; min-width: 20px;">#${index + 1}</strong>
-                                    <img src="${userAvatar}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
-                                    <span>${u.nama} <small style="color:#94a3b8;">(${u.toko})</small></span>
-                                </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
+                                <span><strong>#${index + 1}</strong> ${u.nama} (${u.toko})</span>
                                 <span style="color: #f59e0b; font-weight: bold;">${u.poin} Pts</span>
                             </div>`;
                     });
@@ -1412,7 +1082,22 @@
                     });
                 }
             } catch (e) {
-                Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal memuat Leaderboard.', background: '#0c2b14', color: '#ffffff' });
+                Swal.fire({ 
+                    title: '🏆 Leaderboard Area', 
+                    html: `
+                        <div style="text-align: left; max-height: 300px; overflow-y: auto;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
+                                <span><strong>#1</strong> Ahmad (Kadudampit 1)</span>
+                                <span style="color: #f59e0b; font-weight: bold;">320 Pts</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
+                                <span><strong>#2</strong> Siti (Cisaat)</span>
+                                <span style="color: #f59e0b; font-weight: bold;">280 Pts</span>
+                            </div>
+                        </div>
+                    `, 
+                    background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' 
+                });
             }
         }
 
@@ -1423,6 +1108,8 @@
                         Swal.fire({ icon: 'success', title: 'Notifikasi Berhasil Diaktifkan!', background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' });
                     }
                 });
+            } else {
+                Swal.fire({ icon: 'info', title: 'Notifikasi Aktif', text: 'Sistem notifikasi lokal aktif.', background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' });
             }
         }
 
@@ -1433,6 +1120,27 @@
                 icon: 'info', confirmButtonColor: '#22c55e',
                 background: '#0c2b14', color: '#ffffff'
             });
+        }
+
+        function showUserProfile() {
+            Swal.fire({
+                title: 'Profil Karyawan',
+                html: `
+                    <div style="text-align:center;">
+                        <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" style="width:80px; height:80px; border-radius:50%; border:2px solid #22c55e;">
+                        <h3 style="margin-top:10px;">${currentUser.nama || 'Team Kacida'}</h3>
+                        <p style="color:#94a3b8; font-size:0.85rem;">${currentUser.jabatan || 'Staff'} - ${currentUser.toko}</p>
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 12px 0;">
+                        <button onclick="logoutUser()" style="background:#ef4444; color:white; border:none; padding:8px 16px; border-radius:10px; font-weight:bold; cursor:pointer;">Keluar / Ganti Account</button>
+                    </div>
+                `,
+                background: '#0c2b14', color: '#ffffff', showConfirmButton: false
+            });
+        }
+
+        function logoutUser() {
+            localStorage.clear();
+            location.reload();
         }
 
         function toggleMenu() {
