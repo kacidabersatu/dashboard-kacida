@@ -49,7 +49,6 @@
             padding-bottom: 90px;
         }
 
-        /* Gate Protection Overlay */
         #loginGateOverlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -60,7 +59,6 @@
             justify-content: center;
         }
 
-        /* Top Header Navigation */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -123,7 +121,7 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .disket-badge {
@@ -173,15 +171,36 @@
             border: 2px solid var(--bg-dark);
         }
 
+        /* Avatar Container Dinamis */
+        .avatar-wrapper {
+            position: relative;
+            cursor: pointer;
+        }
+
         .user-avatar-3d {
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 2px solid var(--accent-green);
             object-fit: cover;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
             background-color: #0c2b14;
+            transition: transform 0.2s ease;
+        }
+
+        .avatar-wrapper:active .user-avatar-3d {
+            transform: scale(0.92);
+        }
+
+        .role-badge-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #22c55e;
+            border: 2px solid var(--bg-dark);
         }
 
         .container {
@@ -288,7 +307,6 @@
             font-weight: 600;
         }
 
-        /* Ikon Pengganti Gambar Pecah */
         .hero-icon-badge {
             width: 65px;
             height: 65px;
@@ -604,10 +622,8 @@
 </head>
 <body>
 
-    <!-- Lock Gate jika NIK belum terverifikasi -->
     <div id="loginGateOverlay"></div>
 
-    <!-- Header Navigation -->
     <header class="app-header">
         <div class="header-left">
             <button class="btn-hamburger" onclick="toggleMenu()" aria-label="Menu">
@@ -628,14 +644,15 @@
                 <span class="notif-count">3</span>
             </div>
 
-            <!-- Avatar Header Terhubung dengan Profil User Aktual -->
-            <img id="imgHeaderAvatar" src="https://ui-avatars.com/api/?name=User&background=22c55e&color=fff" alt="Avatar User" class="user-avatar-3d" onclick="showUserProfile()">
+            <div class="avatar-wrapper" onclick="showUserProfile()">
+                <img id="imgHeaderAvatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=User" alt="Avatar User" class="user-avatar-3d">
+                <div class="role-badge-dot"></div>
+            </div>
         </div>
     </header>
 
     <main class="container">
 
-        <!-- Header Disket Info Bar Mendatar -->
         <section class="disket-info-bar" onclick="showPerformaDetail()">
             <div class="disket-bar-item">
                 <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
@@ -654,25 +671,22 @@
             <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
         </section>
         
-        <!-- Hero Card Modern -->
         <section class="hero-card">
             <div class="hero-content">
                 <span style="font-size: 0.72rem; color: var(--text-sub);">Selamat datang kembali,</span>
-                <h1 class="hero-title" id="lblUserName">Team Kacida!</h1>
-                <p class="hero-sub">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
+                <h1 class="hero-title" id="lblUserName">Team Kacida! 👋</h1>
+                <p class="hero-sub" id="lblUserJabatan">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
                 <div class="performance-badge">
                     <i class="fa-solid fa-star" style="color: var(--gold);"></i>
                     <span>Performa hari ini <strong style="color: var(--accent-green);">Sangat Baik! 🔥</strong></span>
                 </div>
             </div>
             
-            <!-- Ikon Badge Menggantikan Gambar Pecah -->
             <div class="hero-icon-badge">
-                <i class="fa-solid fa-users"></i>
+                <i class="fa-solid fa-users-gear"></i>
             </div>
         </section>
 
-        <!-- Carousel Banner Dinamis -->
         <section class="banner-card" id="bannerContainer">
             <span class="banner-tag" id="lblStoreCode">MEMUAT TOKO...</span>
             <h2 class="banner-heading" id="bannerTitle">PIC SAPA</h2>
@@ -690,7 +704,6 @@
             <div class="dot" onclick="setSlide(4)"></div>
         </div>
 
-        <!-- Metrics -->
         <section class="metrics-scroll">
             <div class="metric-card">
                 <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d" alt="Tugas">
@@ -723,7 +736,6 @@
             </div>
         </section>
 
-        <!-- Menu Utama -->
         <div class="section-header">
             <h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3>
             <a href="#" class="btn-see-all" onclick="navigateMenu('semua-menu')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
@@ -771,7 +783,6 @@
             <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket 3D">
         </section>
 
-        <!-- Layanan Lainnya -->
         <div class="section-header">
             <h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan & Alat</h3>
             <a href="#" class="btn-see-all" onclick="navigateMenu('semua-layanan')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
@@ -800,7 +811,6 @@
 
     </main>
 
-    <!-- Bottom Nav -->
     <nav class="bottom-nav">
         <a href="#" class="nav-item active">
             <i class="fa-solid fa-house"></i>
@@ -828,7 +838,6 @@
     </nav>
 
     <script>
-        // Web App Link Apps Script Backend
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec";
 
         let currentUser = {
@@ -847,7 +856,6 @@
 
         let dataPerformaToko = { sales: "-", ikt: "-", penawaran: "-" };
 
-        // Carousel Data
         const carouselData = [
             { title: "PIC SAPA", sub: "(SIAP ANTAR PESANAN ANDA)", route: "pic-sapa" },
             { title: "PROMO PSM HARI INI", sub: "Cek produk penawaran spesial minggu ini!", route: "monitoring-psm" },
@@ -863,7 +871,16 @@
             initCarousel();
         });
 
-        // 1. FUNGSI LOGOUT (Bebas Blank Screen)
+        // FUNGSI AVATAR GENERATOR BERDASARKAN MASTER USER
+        function getUserAvatarUrl(nama, fotoUrl = "") {
+            if (fotoUrl && fotoUrl.trim() !== "" && fotoUrl.startsWith("http")) {
+                return fotoUrl;
+            }
+            const cleanName = encodeURIComponent(nama || 'User');
+            // Menggunakan UI Avatars dengan Styling Profesional Hijau Terang
+            return `https://ui-avatars.com/api/?name=${cleanName}&background=22c55e&color=ffffff&bold=true&length=2&font-size=0.45`;
+        }
+
         function handleLogout() {
             localStorage.clear();
             sessionStorage.clear();
@@ -875,7 +892,6 @@
             }
         }
 
-        // 2. PENCARIAN MASTER USER BERDASARKAN KODE TOKO
         function searchUserByKodeToko(kodeTokoInput) {
             Swal.fire({
                 title: 'Mencari Data User...',
@@ -888,13 +904,22 @@
                 .then(res => res.json())
                 .then(data => {
                     if(data.status === "success") {
-                        let htmlList = `<div style="text-align: left; max-height: 250px; overflow-y: auto;">`;
+                        let htmlList = `<div style="text-align: left; max-height: 280px; overflow-y: auto;">`;
                         if(data.results && data.results.length > 0) {
                             data.results.forEach(u => {
+                                const userName = u.nama || u.NAMA || 'Karyawan';
+                                const userFoto = u.foto || u.FOTO || '';
+                                const userAvatar = getUserAvatarUrl(userName, userFoto);
+                                const userNik = u.nik || u.NIK || '-';
+                                const userJab = u.jabatan || u.role || u.JABATAN || 'Staff';
+
                                 htmlList += `
-                                    <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; margin-bottom: 6px; border-radius: 8px; border-left: 3px solid #22c55e;">
-                                        <div style="font-weight:bold; color:#fff;">${u.nama || u.NAMA}</div>
-                                        <div style="font-size:0.75rem; color:#94a3b8;">NIK: ${u.nik || u.NIK} | Jabatan: ${u.jabatan || u.role || u.JABATAN}</div>
+                                    <div style="background: rgba(255,255,255,0.05); padding: 8px 12px; margin-bottom: 8px; border-radius: 10px; border-left: 3px solid #22c55e; display: flex; align-items: center; gap: 10px;">
+                                        <img src="${userAvatar}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1px solid #22c55e;">
+                                        <div>
+                                            <div style="font-weight:bold; color:#fff; font-size: 0.85rem;">${userName}</div>
+                                            <div style="font-size:0.72rem; color:#94a3b8;">NIK: ${userNik} | Jabatan: <span style="color:#22c55e;">${userJab}</span></div>
+                                        </div>
                                     </div>`;
                             });
                         } else {
@@ -942,7 +967,6 @@
             });
         }
 
-        // 3. PROSES GANTI NIK USER
         function changeUserNik(kodeToko, nikLama, nikBaru) {
             Swal.fire({
                 title: 'Memproses Perubahan NIK...',
@@ -963,7 +987,6 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success' || data.success) {
-                    // Update lokal jika user mengganti NIK dirinya sendiri
                     if (currentUser.nik === nikLama) {
                         currentUser.nik = nikBaru;
                         localStorage.setItem('kacida_nik', nikBaru);
@@ -1015,7 +1038,6 @@
             });
         }
 
-        // Carousel Controller
         function initCarousel() {
             renderSlide();
             if (slideTimer) clearInterval(slideTimer);
@@ -1044,7 +1066,6 @@
             });
         }
 
-        // Auth Gate
         function checkAuthGate() {
             if (!currentUser.nik) {
                 document.getElementById('loginGateOverlay').style.display = 'flex';
@@ -1084,7 +1105,7 @@
                         if (data.status === 'success') {
                             currentUser.nik = data.data.nik;
                             currentUser.nama = data.data.nama;
-                            currentUser.jabatan = data.data.jabatan;
+                            currentUser.jabatan = data.data.jabatan || 'Staff Toko';
                             currentUser.kodeToko = data.data.kode_toko || 'T001';
                             currentUser.toko = data.data.toko || 'TOKO KADUDAMPIT 1';
                             currentUser.foto = data.data.foto || '';
@@ -1135,11 +1156,15 @@
 
         function updateUIUserInfo() {
             document.getElementById('lblUserName').innerText = currentUser.nama ? `${currentUser.nama}! 👋` : 'Team Kacida! 👋';
-            
+            if (currentUser.jabatan) {
+                document.getElementById('lblUserJabatan').innerText = `Jabatan: ${currentUser.jabatan} | Layani dengan hati!`;
+            }
+
             const displayStore = currentUser.kodeToko ? `[${currentUser.kodeToko}] ${currentUser.toko.toUpperCase()}` : currentUser.toko.toUpperCase();
             document.getElementById('lblStoreCode').innerText = displayStore;
 
-            const avatarUrl = currentUser.foto ? currentUser.foto : `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.nama || 'User')}&background=22c55e&color=fff&font-size=0.4`;
+            // Update Avatar Header secara Dinamis
+            const avatarUrl = getUserAvatarUrl(currentUser.nama, currentUser.foto);
             document.getElementById('imgHeaderAvatar').src = avatarUrl;
         }
 
@@ -1189,6 +1214,12 @@
                     currentUser.poin = result.data.poin || 0;
                     currentUser.rank = result.data.rank || '#-';
 
+                    if (result.data.foto) {
+                        currentUser.foto = result.data.foto;
+                        localStorage.setItem('kacida_foto', currentUser.foto);
+                        document.getElementById('imgHeaderAvatar').src = getUserAvatarUrl(currentUser.nama, currentUser.foto);
+                    }
+
                     valPointsEl.classList.remove('pulse-loading');
                     valRankEl.classList.remove('pulse-loading');
 
@@ -1208,16 +1239,16 @@
             const storeCode = currentUser.kodeToko ? `(${currentUser.kodeToko})` : '';
             const userName = currentUser.nama || 'User Area';
             const userRole = currentUser.jabatan || 'Staff Toko';
-            const avatarUrl = currentUser.foto ? currentUser.foto : `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=22c55e&color=fff`;
+            const avatarUrl = getUserAvatarUrl(userName, currentUser.foto);
 
             Swal.fire({
                 title: 'Profil Karyawan',
                 html: `
                     <div style="text-align:center;">
-                        <img src="${avatarUrl}" style="width:75px; height:75px; border-radius:50%; border:2px solid #22c55e; box-shadow: 0 0 10px rgba(34,197,94,0.4); object-fit: cover;">
-                        <h3 style="margin-top:8px; font-size:1.1rem; color:#fff;">${userName}</h3>
-                        <p style="color:#94a3b8; font-size:0.8rem; margin-bottom:4px;">NIK: <strong>${currentUser.nik}</strong></p>
-                        <p style="color:#94a3b8; font-size:0.8rem; margin-bottom:12px;">${userRole} - <strong style="color:#22c55e;">${storeName} ${storeCode}</strong></p>
+                        <img src="${avatarUrl}" style="width:85px; height:85px; border-radius:50%; border:3px solid #22c55e; box-shadow: 0 0 15px rgba(34,197,94,0.5); object-fit: cover;">
+                        <h3 style="margin-top:10px; font-size:1.15rem; color:#fff;">${userName}</h3>
+                        <p style="color:#94a3b8; font-size:0.8rem; margin-bottom:2px;">NIK: <strong>${currentUser.nik}</strong></p>
+                        <p style="color:#22c55e; font-size:0.82rem; font-weight:bold; margin-bottom:12px;">${userRole} — <span style="color:#fff;">${storeName} ${storeCode}</span></p>
                         
                         <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 15px; text-align: left;">
                             <div style="font-size: 0.72rem; color: #f59e0b; font-weight: bold; margin-bottom: 8px; text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 4px;">
@@ -1360,9 +1391,14 @@
                 if (result.status === 'success') {
                     let htmlList = `<div style="text-align: left; max-height: 300px; overflow-y: auto;">`;
                     result.data.forEach((u, index) => {
+                        const userAvatar = getUserAvatarUrl(u.nama, u.foto);
                         htmlList += `
-                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
-                                <span><strong>#${index + 1}</strong> ${u.nama} (${u.toko})</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <strong style="color:#22c55e; min-width: 20px;">#${index + 1}</strong>
+                                    <img src="${userAvatar}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
+                                    <span>${u.nama} <small style="color:#94a3b8;">(${u.toko})</small></span>
+                                </div>
                                 <span style="color: #f59e0b; font-weight: bold;">${u.poin} Pts</span>
                             </div>`;
                     });
