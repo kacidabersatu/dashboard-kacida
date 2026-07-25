@@ -1,7 +1,7 @@
 {
   "name": "KACIDA BERSATU",
   "short_name": "Kacida",
-  "description": "Layanan Fitur Dashboard & Portal Operasional",
+  "description": "Panduan Fitur Dashboard & Portal Operasional",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#03170a",
