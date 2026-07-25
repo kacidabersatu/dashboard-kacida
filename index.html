@@ -208,7 +208,6 @@
         </div>
 
         <main id="tabBeranda" class="container">
-            <!-- HERO DISKET INFO BAR (MEMBACA SPD RP H-1) -->
             <section class="disket-info-bar">
                 <div class="disket-bar-item">
                     <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
@@ -245,7 +244,6 @@
                 <div class="swiper-pagination"></div>
             </div>
 
-            <!-- 5 KOTAK PERFORMA BAWAH CAROUSEL (DENGAN KOTAK RANK) -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')"><img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d"><span class="metric-title">Tugas</span><span class="metric-value" id="valTasks">0</span></div>
                 <div class="metric-card" onclick="openPengumumanModal()"><img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d"><span class="metric-title">Pengumuman</span><span class="metric-value" id="valAnnounce">0</span></div>
@@ -264,7 +262,7 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT INTERNAL STYLE WHATSAPP + ASISTEN KACIDA AI IN-CHAT -->
+        <!-- TAB CHAT INTERNAL STYLE WHATSAPP + KACIDA AI -->
         <div id="tabChat" class="hidden container space-y-3">
             <h2 class="section-title"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Chat Internal WA</h2>
             
@@ -282,7 +280,6 @@
                 </select>
             </div>
 
-            <!-- PINNED CONTACT KACIDA AI -->
             <div onclick="openAIChatDialog()" style="background: linear-gradient(135deg, #0f381c, #072211); border: 1px solid var(--accent-green); padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 8px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 32px; height: 32px;">
@@ -326,15 +323,9 @@
                 <button onclick="handleLogout()" style="margin-top: 12px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 6px 16px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">LOGOUT</button>
             </div>
 
-            <!-- STRUKTUR TOKO BINAAN (UNTUK AC) ATAU BAGAN ORGANISASI -->
+            <!-- BAGAN STRUKTUR ORGANISASI SEMUA USER -->
             <div class="menu-section-card">
-                <h3 class="section-title" style="margin-bottom: 12px;"><i class="fa-solid fa-sitemap" style="color: var(--accent-green);"></i> Struktur & Toko Binaan</h3>
-                <div id="stBinaanACContainer" class="hidden" style="margin-bottom: 12px;">
-                    <p style="font-size:0.65rem; color:var(--gold); font-weight:800; margin-bottom:6px;">🏪 DAFTAR TOKO BINAAN AREA:</p>
-                    <div id="stBinaanACList" style="display:flex; flex-direction:column; gap:4px; font-size:0.7rem;"></div>
-                    <hr style="border-color:var(--card-border); margin:12px 0;">
-                </div>
-
+                <h3 class="section-title" style="margin-bottom: 12px;"><i class="fa-solid fa-sitemap" style="color: var(--accent-green);"></i> Bagan Struktur Organisasi</h3>
                 <div style="display: flex; flex-direction: column; gap: 6px; text-align: center; font-size: 0.72rem;">
                     <div style="background: var(--bg-dark); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.6rem; color: var(--text-sub);">OGM (Operations General Manager)</p><p id="stOGM" style="font-weight:700;">-</p></div>
                     <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
@@ -361,7 +352,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFQ-91PjyiOMl2t064X2UR9T5zIUhmtBMYp9QAq2gLvfbd8m9v_ea5pHt9CnYJMgIc/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb...PASTE_LINK_DEPLOY_DISINI.../exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -390,7 +381,6 @@
 
         function requestNotificationPermission() {
             if (!('Notification' in window)) return;
-            
             if (Notification.permission === 'granted') {
                 showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green); font-weight:bold;'>Notifikasi Aplikasi Sudah Aktif 🟢</p>");
             } else {
@@ -512,12 +502,10 @@
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
             document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
 
-            // DISPLAY SPD HP-1 FORMAT SANGAT RAPI
             document.getElementById("valSales").innerText = data.dataH1.spdLabel || `SPD H-1: Rp ${Number(data.dataH1.sales).toLocaleString('id-ID')}`;
             document.getElementById("valIKT").innerText = data.dataH1.iktNetSales || "-";
             document.getElementById("valPenawaran").innerText = data.dataH1.point || "-";
 
-            // 5 KOTAK METRICS DENGAN RANK REALTIME
             document.getElementById("valTasks").innerText = data.badges.tugas;
             document.getElementById("valAnnounce").innerText = data.badges.pengumuman;
             document.getElementById("valNotifCount").innerText = data.badges.notif;
@@ -596,12 +584,10 @@
             `).join("");
         }
 
-        // SILENT CLAIM POIN DIBELAKANG LAYAR (TANPA POPUP ALERT)
         async function onMenuClick(namaMenu, link) {
             if (dashboardData && dashboardData.menu.misi.some(m => String(m["Nama Menu"]).toLowerCase() === String(namaMenu).toLowerCase())) {
                 apiCall("claimMissionPoin", { namaMenu: namaMenu }).then(res => {
                     if (res && res.status === "success") {
-                        // UPDATE ANGKA POIN SECARA SILENT DI LAYAR
                         const ptEl = document.getElementById("valPoints");
                         if (ptEl) {
                             let curr = cleanNum(ptEl.innerText);
@@ -634,14 +620,6 @@
             if (list && list.length > 0) {
                 document.getElementById("acDropdownContainer").classList.remove("hidden");
                 document.getElementById("selectTokoAC").innerHTML = `<option value="ALL">🌐 REKAP RATA-RATA ALL TOKO AREA</option>` + list.map(t => `<option value="${t.substring(0,4)}">${t}</option>`).join("");
-                
-                // ISI JUGA STRUKTUR TOKO BINAAN AC DI TAB PROFIL
-                const stContainer = document.getElementById("stBinaanACContainer");
-                const stList = document.getElementById("stBinaanACList");
-                if (stContainer && stList) {
-                    stContainer.classList.remove("hidden");
-                    stList.innerHTML = list.map(t => `<div style="background:var(--bg-dark); padding:6px 10px; border-radius:6px; border:1px solid var(--card-border); font-weight:bold; color:var(--accent-green);">🏪 ${t}</div>`).join("");
-                }
             }
         }
 
@@ -667,6 +645,11 @@
             showLoading("Memuat Performance Hub...");
             const d = await apiCall("getPerforma");
             hideLoading();
+
+            if (!d || d.status === "error") {
+                showCustomModal("PERFORMANCE HUB", "<p style='color:#ef4444;'>Gagal memuat data performa hub.</p>");
+                return;
+            }
 
             const htmlBox = `
                 <div style="font-family: monospace, sans-serif; font-size: 0.7rem; line-height: 1.5; color: #fff; background: #03170a; padding: 12px; border-radius: 12px; border: 1px solid var(--card-border);">
@@ -721,7 +704,6 @@
             showCustomModal("PERFORMANCE HUB", htmlBox);
         }
 
-        // PENGUMUMAN DARI SPREADSHEET
         function openPengumumanModal() {
             if (!dashboardData || !dashboardData.announcements || dashboardData.announcements.length === 0) {
                 showCustomModal("📢 Pengumuman", "<p style='color:var(--text-sub);'>Belum ada pengumuman aktif dari Spreadsheet.</p>");
@@ -730,14 +712,13 @@
 
             const html = dashboardData.announcements.map(p => `
                 <div style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
-                    <p style="font-weight:bold; color:var(--gold);">${p.Pengumuman || p.PENGUMUMAN || 'Informasi'}</p>
+                    <p style="font-weight:bold; color:var(--gold);">${p.Pengumuman || p.PENGUMUMAN || p.pengumuman || 'Pengumuman'}</p>
                 </div>
             `).join("");
 
             showCustomModal("📢 Pengumuman Resmi", html);
         }
 
-        // NOTIFIKASI DARI SPREADSHEET
         function openNotifModal() {
             if (!dashboardData || !dashboardData.notifications || dashboardData.notifications.length === 0) {
                 showCustomModal("🔔 Notifikasi", "<p style='color:var(--text-sub);'>Tidak ada notifikasi baru.</p>");
@@ -746,7 +727,7 @@
 
             const html = dashboardData.notifications.map(n => `
                 <div style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
-                    <p style="font-weight:bold; color:var(--accent-green);">${n.PESAN || n.Pesan || 'Notifikasi'}</p>
+                    <p style="font-weight:bold; color:var(--accent-green);">${n.PESAN || n.Pesan || n.pesan || 'Notifikasi'}</p>
                     <p style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Waktu: ${n.JAM || '-'} | Tgl: ${n.TANGGAL || '-'}</p>
                 </div>
             `).join("");
@@ -776,7 +757,6 @@
                                 <span>${c.KODE_TOKO_PENGIRIM || ''}</span>
                             </div>
                             <div>${c.ISI_PESAN}</div>
-                            <div class="wa-time">${c.TIMESTAMP ? String(c.TIMESTAMP).substring(11,16) : ''}</div>
                         </div>
                     `;
                 }).join("");
