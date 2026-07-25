@@ -20,7 +20,6 @@
             --card-bg: #0A2414;
             --card-border: #1A3A2A;
             --accent-green: #22c55e;
-            --wa-green: #075e54;
             --wa-bubble-me: #056162;
             --wa-bubble-other: #26382b;
             --gold: #f59e0b;
@@ -75,7 +74,7 @@
         .banner-subtext { font-size: 0.7rem; font-weight: 700; color: #1e293b; margin-top: 2px; }
         .banner-btn { background: #dc2626; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; margin-top: 10px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; }
 
-        /* 5 METRICS CARDS GRID (TERMASUK KOTAK RANK) */
+        /* 5 METRICS CARDS GRID */
         .metrics-scroll { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 16px; }
         .metric-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; }
         .metric-icon-3d { width: 24px; height: 24px; margin: 0 auto 4px auto; display: block; }
@@ -97,19 +96,18 @@
         
         .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
 
-        /* STYLE CHAT DENGAN STYLE WHATSAPP */
+        /* STYLE CHAT WA */
         .wa-tab-container { display: flex; background: var(--bg-dark); border-radius: 12px; padding: 4px; border: 1px solid var(--card-border); margin-bottom: 10px; }
         .wa-tab-btn { flex: 1; padding: 8px; text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--text-sub); border-radius: 8px; cursor: pointer; border: none; background: transparent; }
         .wa-tab-btn.active { background: var(--accent-green); color: #03170a; }
 
-        .wa-chat-container { background: #071a0e; border: 1px solid var(--card-border); border-radius: 16px; height: 50vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        .wa-bubble { max-width: 80%; padding: 10px 12px; border-radius: 12px; font-size: 0.75rem; position: relative; line-height: 1.4; }
+        .wa-chat-container { background: #071a0e; border: 1px solid var(--card-border); border-radius: 16px; height: 46vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .wa-bubble { max-width: 82%; padding: 8px 12px; border-radius: 12px; font-size: 0.75rem; position: relative; line-height: 1.4; }
         .wa-bubble.me { align-self: flex-end; background: var(--wa-bubble-me); color: white; border-bottom-right-radius: 2px; }
         .wa-bubble.other { align-self: flex-start; background: var(--wa-bubble-other); color: white; border-bottom-left-radius: 2px; }
         .wa-bubble.ai { align-self: flex-start; background: #133a20; border: 1px solid var(--accent-green); color: white; }
         .wa-sender { font-size: 0.62rem; font-weight: 800; color: var(--accent-green); margin-bottom: 2px; display: flex; justify-content: space-between; gap: 8px; }
         .wa-time { font-size: 0.55rem; color: rgba(255,255,255,0.6); text-align: right; margin-top: 4px; }
-        .wa-reply-preview { font-size: 0.65rem; background: rgba(0,0,0,0.3); padding: 4px 8px; border-left: 3px solid var(--accent-green); border-radius: 4px; margin-bottom: 4px; color: #cbd5e1; }
 
         .bottom-nav {
             position: fixed; bottom: 12px; left: 16px; right: 16px; height: 60px; background: rgba(10, 35, 18, 0.95);
@@ -196,7 +194,7 @@
                 </div>
 
                 <div class="disket-badge" onclick="openPerformaPopup()" title="Klik Rincian Performa Hub"><i class="fa-solid fa-floppy-disk"></i></div>
-                <div class="notif-badge" onclick="requestNotificationPermission()" title="Aktifkan Notifikasi"><i class="fa-regular fa-bell"></i><span class="notif-count" id="notifBadge">3</span></div>
+                <div class="notif-badge" onclick="requestNotificationPermission()" title="Aktifkan Notifikasi"><i class="fa-regular fa-bell"></i><span class="notif-count" id="notifBadge">0</span></div>
                 
                 <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="user-avatar-3d" onclick="showBriefProfile()">
             </div>
@@ -210,21 +208,21 @@
         </div>
 
         <main id="tabBeranda" class="container">
-            <!-- HERO DISKET INFO BAR (BACA FORMAT REKAP: SPD Rp H-1 > IKT % > PENAWARAN %) -->
+            <!-- HERO DISKET INFO BAR (MEMBACA SPD RP H-1) -->
             <section class="disket-info-bar">
                 <div class="disket-bar-item">
                     <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
-                    <span class="disket-bar-val" id="valSales" style="color: var(--accent-green);">Rp 0</span>
+                    <span class="disket-bar-val" id="valSales" style="color: var(--accent-green); font-size: 0.7rem;">Memuat...</span>
                 </div>
                 <div class="disket-divider"></div>
                 <div class="disket-bar-item">
                     <span class="disket-bar-label"><i class="fa-solid fa-bullseye" style="color: var(--gold);"></i> IKT Toko</span>
-                    <span class="disket-bar-val" id="valIKT" style="color: var(--gold);">71.1%</span>
+                    <span class="disket-bar-val" id="valIKT" style="color: var(--gold);">-</span>
                 </div>
                 <div class="disket-divider"></div>
                 <div class="disket-bar-item">
                     <span class="disket-bar-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Penawaran</span>
-                    <span class="disket-bar-val" id="valPenawaran" style="color: #ef4444;">108.8%</span>
+                    <span class="disket-bar-val" id="valPenawaran" style="color: #ef4444;">-</span>
                 </div>
                 <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
             </section>
@@ -232,7 +230,7 @@
             <section class="hero-card">
                 <div class="hero-content">
                     <span style="font-size: 0.7rem; color: var(--text-sub);">Selamat datang kembali,</span>
-                    <h1 class="hero-title" id="lblUserName">YULIANTI FAUZIAH! 👋</h1>
+                    <h1 class="hero-title" id="lblUserName">USER! 👋</h1>
                     <p class="hero-sub">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
                     <div class="performance-badge">
                         <i class="fa-solid fa-star" style="color: var(--gold);"></i>
@@ -247,13 +245,13 @@
                 <div class="swiper-pagination"></div>
             </div>
 
-            <!-- 5 METRICS CARDS GRID (LENGKAP DENGAN KOTAK RANK BARU) -->
+            <!-- 5 KOTAK PERFORMA BAWAH CAROUSEL (DENGAN KOTAK RANK) -->
             <section class="metrics-scroll">
-                <div class="metric-card" onclick="switchTab('aksiCepat')"><img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d"><span class="metric-title">Tugas</span><span class="metric-value" id="valTasks">12</span></div>
-                <div class="metric-card" onclick="openPengumumanModal()"><img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d"><span class="metric-title">Pengumuman</span><span class="metric-value" id="valAnnounce">5</span></div>
-                <div class="metric-card" onclick="openNotifModal()"><img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d"><span class="metric-title">Notifikasi</span><span class="metric-value" id="valNotifCount">3</span></div>
-                <div class="metric-card"><img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d"><span class="metric-title">Point</span><span class="metric-value" id="valPoints" style="color: var(--gold);">1.250</span></div>
-                <div class="metric-card" onclick="switchTab('leaderboard')"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="metric-icon-3d"><span class="metric-title">Rank</span><span class="metric-value" id="valRank" style="color: var(--accent-green);">#2</span></div>
+                <div class="metric-card" onclick="switchTab('aksiCepat')"><img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d"><span class="metric-title">Tugas</span><span class="metric-value" id="valTasks">0</span></div>
+                <div class="metric-card" onclick="openPengumumanModal()"><img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d"><span class="metric-title">Pengumuman</span><span class="metric-value" id="valAnnounce">0</span></div>
+                <div class="metric-card" onclick="openNotifModal()"><img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d"><span class="metric-title">Notifikasi</span><span class="metric-value" id="valNotifCount">0</span></div>
+                <div class="metric-card"><img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d"><span class="metric-title">Point</span><span class="metric-value" id="valPoints" style="color: var(--gold);">0</span></div>
+                <div class="metric-card" onclick="switchTab('leaderboard')"><img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="metric-icon-3d"><span class="metric-title">Rank</span><span class="metric-value" id="valRank" style="color: var(--accent-green);">#-</span></div>
             </section>
 
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
@@ -266,7 +264,7 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT INTERNAL STYLE WHATSAPP + ASISTEN KACIDA AI -->
+        <!-- TAB CHAT INTERNAL STYLE WHATSAPP + ASISTEN KACIDA AI IN-CHAT -->
         <div id="tabChat" class="hidden container space-y-3">
             <h2 class="section-title"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Chat Internal WA</h2>
             
@@ -276,27 +274,30 @@
                 <button id="tabAllBtn" class="wa-tab-btn hidden" onclick="setChatTab('All')">🌐 All / AI</button>
             </div>
 
-            <!-- PINNED CONTACT ASISTEN KACIDA AI -->
+            <div class="menu-section-card" style="padding: 8px 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; white-space: nowrap;">Tujuan Chat:</span>
+                <select id="selectChatTujuan" style="background: var(--bg-dark); border: 1px solid var(--card-border); color: var(--accent-green); font-weight: 700; font-size: 0.72rem; width: 100%; padding: 6px; border-radius: 8px; outline: none;">
+                    <option value="Semua Personil">🌐 Semua Personil (All)</option>
+                    <option value="Area Coordinator">👨‍💼 Area Coordinator (AC)</option>
+                </select>
+            </div>
+
+            <!-- PINNED CONTACT KACIDA AI -->
             <div onclick="openAIChatDialog()" style="background: linear-gradient(135deg, #0f381c, #072211); border: 1px solid var(--accent-green); padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; margin-bottom: 8px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 36px; height: 32px;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 32px; height: 32px;">
                     <div>
-                        <p style="font-size: 0.8rem; font-weight: 800; color: var(--accent-green);">Asisten Kacida AI 🤖</p>
-                        <p style="font-size: 0.65rem; color: var(--text-sub);">Tanya sales, IKT, atau candaan harian...</p>
+                        <p style="font-size: 0.78rem; font-weight: 800; color: var(--accent-green);">Asisten Kacida AI 🤖</p>
+                        <p style="font-size: 0.62rem; color: var(--text-sub);">Tanya sales, IKT, atau candaan harian...</p>
                     </div>
                 </div>
-                <span style="font-size: 0.65rem; background: var(--accent-green); color: #03170a; font-weight: 800; padding: 2px 8px; border-radius: 10px;">TANYA AI</span>
+                <span style="font-size: 0.6rem; background: var(--accent-green); color: #03170a; font-weight: 800; padding: 3px 8px; border-radius: 10px;">TANYA AI</span>
             </div>
 
             <div id="chatBox" class="wa-chat-container custom-scrollbar"></div>
 
-            <div id="replyPreviewContainer" class="hidden" style="background: var(--card-bg); padding: 6px 12px; border-left: 3px solid var(--accent-green); border-radius: 8px 8px 0 0; font-size: 0.65rem; color: var(--text-sub); display: flex; justify-content: space-between; align-items: center;">
-                <span id="replyPreviewText">Balas ke...</span>
-                <button onclick="cancelReply()" style="background: none; border: none; color: #ef4444; font-weight: 800; cursor: pointer;">✕</button>
-            </div>
-
-            <div style="display: flex; gap: 8px;">
-                <input type="text" id="inputChatMsg" placeholder="Ketik pesan WhatsApp..." style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.75rem; color: white; outline: none;">
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.75rem; color: white; outline: none;">
                 <button onclick="kirimPesan()" style="background: var(--accent-green); color: #03170a; padding: 0 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -310,22 +311,30 @@
         </div>
 
         <div id="tabLeaderboard" class="hidden container">
-            <h2 class="section-title" style="color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-crown"></i> Leaderboard Poin & Rank</h2>
+            <h2 class="section-title" style="color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-crown"></i> Leaderboard Poin & Rank Area</h2>
             <div id="leaderboardList" class="menu-section-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
+        <!-- TAB PROFIL NAVBAR BOTTOM -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
-                <h2 id="profilNama" style="font-size: 1.1rem; font-weight: 800;">Yulianti Fauziah</h2>
-                <p id="profilJabatan" style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">Chief Of Store</p>
-                <p id="profilToko" style="font-size: 0.7rem; color: var(--text-sub);">2J16 - CARINGIN KULON</p>
-                <p id="profilNik" style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: 17060061</p>
+                <h2 id="profilNama" style="font-size: 1.1rem; font-weight: 800;">Nama</h2>
+                <p id="profilJabatan" style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">Jabatan</p>
+                <p id="profilToko" style="font-size: 0.7rem; color: var(--text-sub);">Toko</p>
+                <p id="profilNik" style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: -</p>
                 <button onclick="handleLogout()" style="margin-top: 12px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 6px 16px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">LOGOUT</button>
             </div>
 
+            <!-- STRUKTUR TOKO BINAAN (UNTUK AC) ATAU BAGAN ORGANISASI -->
             <div class="menu-section-card">
-                <h3 class="section-title" style="margin-bottom: 12px;"><i class="fa-solid fa-sitemap" style="color: var(--accent-green);"></i> Bagan Struktur Organisasi</h3>
+                <h3 class="section-title" style="margin-bottom: 12px;"><i class="fa-solid fa-sitemap" style="color: var(--accent-green);"></i> Struktur & Toko Binaan</h3>
+                <div id="stBinaanACContainer" class="hidden" style="margin-bottom: 12px;">
+                    <p style="font-size:0.65rem; color:var(--gold); font-weight:800; margin-bottom:6px;">🏪 DAFTAR TOKO BINAAN AREA:</p>
+                    <div id="stBinaanACList" style="display:flex; flex-direction:column; gap:4px; font-size:0.7rem;"></div>
+                    <hr style="border-color:var(--card-border); margin:12px 0;">
+                </div>
+
                 <div style="display: flex; flex-direction: column; gap: 6px; text-align: center; font-size: 0.72rem;">
                     <div style="background: var(--bg-dark); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.6rem; color: var(--text-sub);">OGM (Operations General Manager)</p><p id="stOGM" style="font-weight:700;">-</p></div>
                     <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
@@ -346,19 +355,18 @@
             <a href="#" onclick="switchTab('beranda')" id="navBeranda" class="nav-item active"><i class="fa-solid fa-house"></i><span>Beranda</span></a>
             <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item"><i class="fa-solid fa-comment-dots"></i><span>Chat AI</span></a>
             <div class="fab-rocket" onclick="switchTab('aksiCepat')"><i class="fa-solid fa-rocket"></i></div>
-            <a href="#" onclick="switchTab('leaderboard')" id="navLeaderboard" class="nav-item"><i class="fa-solid fa-crown"></i><span>Leaderboard</span></a>
+            <a href="#" onclick="switchTab('leaderboard')" id="navLeaderboard" class="nav-item"><i class="fa-solid fa-crown"></i><span>Rank</span></a>
             <a href="#" onclick="switchTab('profil')" id="navProfil" class="nav-item"><i class="fa-solid fa-user"></i><span>Profil</span></a>
         </nav>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHOyv1nu2ps3lLA1ewQoajSnECTv5iVPpIhFvj_4osXXm0hhnTVT96JIeUc_FRJ8IY/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzFQ-91PjyiOMl2t064X2UR9T5zIUhmtBMYp9QAq2gLvfbd8m9v_ea5pHt9CnYJMgIc/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
         let selectedKodeTokoAC = null;
         let activeChatTab = "Toko Saya";
-        let activeReplyId = null;
         let deferredPrompt = null;
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -374,7 +382,6 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA" });
-                    alert("Aplikasi Berhasil Diinstal!");
                 }
                 deferredPrompt = null;
                 document.getElementById('btnInstallPWA').classList.add('hidden');
@@ -382,10 +389,10 @@
         }
 
         function requestNotificationPermission() {
-            if (!('Notification' in window)) return alert("Browser tidak mendukung Notifikasi!");
+            if (!('Notification' in window)) return;
             
             if (Notification.permission === 'granted') {
-                showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green); font-weight:bold;'>Notifikasi Aplikasi Sudah Aktif 🟢</p><p style='font-size:0.7rem; color:var(--text-sub); margin-top:4px;'>Pesan pengingat promo dan jadwal tugas berjalan realtime.</p>");
+                showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green); font-weight:bold;'>Notifikasi Aplikasi Sudah Aktif 🟢</p>");
             } else {
                 Notification.requestPermission().then(permission => {
                     if (permission === 'granted') {
@@ -444,12 +451,11 @@
 
         window.addEventListener("DOMContentLoaded", () => {
             if (currentNik) initDashboard();
-            setInterval(checkScheduledNotifications, 60000); // RECHECK NOTIF JADWAL TIAP 60 DETIK
         });
 
         async function handleLogin() {
             const nik = document.getElementById("nikInput").value.trim();
-            if (!nik) return alert("NIK Wajib Diisi!");
+            if (!nik) return;
             
             showLoading("Proses Login...");
             currentNik = nik;
@@ -486,6 +492,7 @@
                 dashboardData = data;
                 localStorage.setItem("CACHE_DASHBOARD_" + currentNik, JSON.stringify(data));
                 renderDashboard(data);
+                populateChatDropdown();
                 if (data.user.isAC) {
                     document.getElementById("tabAreaBtn").classList.remove("hidden");
                     document.getElementById("tabAllBtn").classList.remove("hidden");
@@ -505,11 +512,12 @@
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
             document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
 
-            // HERO CARD SPD FORMAT
+            // DISPLAY SPD HP-1 FORMAT SANGAT RAPI
             document.getElementById("valSales").innerText = data.dataH1.spdLabel || `SPD H-1: Rp ${Number(data.dataH1.sales).toLocaleString('id-ID')}`;
             document.getElementById("valIKT").innerText = data.dataH1.iktNetSales || "-";
             document.getElementById("valPenawaran").innerText = data.dataH1.point || "-";
 
+            // 5 KOTAK METRICS DENGAN RANK REALTIME
             document.getElementById("valTasks").innerText = data.badges.tugas;
             document.getElementById("valAnnounce").innerText = data.badges.pengumuman;
             document.getElementById("valNotifCount").innerText = data.badges.notif;
@@ -536,8 +544,8 @@
             if (!banners || banners.length === 0) {
                 wrapper.innerHTML = `
                     <div class="swiper-slide banner-card">
-                        <span class="banner-tag">${namaToko || "2J25 - CIJALINGAN CICNTAYAN"}</span>
-                        <h2 class="banner-heading">PIC FT DAN PEOPLE CLINIC</h2>
+                        <span class="banner-tag">${namaToko || "PROMO DUKUNGAN"}</span>
+                        <h2 class="banner-heading">PIC SAPA</h2>
                         <p class="banner-subtext">(SIAP ANTAR PESANAN ANDA)</p>
                         <a href="#" class="banner-btn">Lihat Selengkapnya <i class="fa-solid fa-chevron-right"></i></a>
                     </div>
@@ -588,14 +596,19 @@
             `).join("");
         }
 
-        // AKSI KLIK MENU: KLAIM POIN REWARD JIKA MISI HAK
+        // SILENT CLAIM POIN DIBELAKANG LAYAR (TANPA POPUP ALERT)
         async function onMenuClick(namaMenu, link) {
             if (dashboardData && dashboardData.menu.misi.some(m => String(m["Nama Menu"]).toLowerCase() === String(namaMenu).toLowerCase())) {
-                const res = await apiCall("claimMissionPoin", { namaMenu: namaMenu });
-                if (res.status === "success") {
-                    alert(`🎉 Misi Selesai! Poin bertambah +${res.addedPoin} Pts`);
-                    initDashboard();
-                }
+                apiCall("claimMissionPoin", { namaMenu: namaMenu }).then(res => {
+                    if (res && res.status === "success") {
+                        // UPDATE ANGKA POIN SECARA SILENT DI LAYAR
+                        const ptEl = document.getElementById("valPoints");
+                        if (ptEl) {
+                            let curr = cleanNum(ptEl.innerText);
+                            ptEl.innerText = Number(curr + res.addedPoin).toLocaleString('id-ID');
+                        }
+                    }
+                });
             }
             if (link && link !== "#") window.open(link, "_blank");
         }
@@ -620,7 +633,27 @@
             const list = await apiCall("getDaftarToko");
             if (list && list.length > 0) {
                 document.getElementById("acDropdownContainer").classList.remove("hidden");
-                document.getElementById("selectTokoAC").innerHTML = `<option value="ALL">🌐 ALL TOKO AREA (REKAP RATA-RATA)</option>` + list.map(t => `<option value="${t.substring(0,4)}">${t}</option>`).join("");
+                document.getElementById("selectTokoAC").innerHTML = `<option value="ALL">🌐 REKAP RATA-RATA ALL TOKO AREA</option>` + list.map(t => `<option value="${t.substring(0,4)}">${t}</option>`).join("");
+                
+                // ISI JUGA STRUKTUR TOKO BINAAN AC DI TAB PROFIL
+                const stContainer = document.getElementById("stBinaanACContainer");
+                const stList = document.getElementById("stBinaanACList");
+                if (stContainer && stList) {
+                    stContainer.classList.remove("hidden");
+                    stList.innerHTML = list.map(t => `<div style="background:var(--bg-dark); padding:6px 10px; border-radius:6px; border:1px solid var(--card-border); font-weight:bold; color:var(--accent-green);">🏪 ${t}</div>`).join("");
+                }
+            }
+        }
+
+        async function populateChatDropdown() {
+            const list = await apiCall("getDaftarTokoAll");
+            const select = document.getElementById("selectChatTujuan");
+            if (select && list && list.length > 0) {
+                select.innerHTML = `
+                    <option value="Semua Personil">🌐 Semua Personil (All)</option>
+                    <option value="Area Coordinator">👨‍💼 Area Coordinator (AC)</option>
+                    ${list.map(t => `<option value="${t}">🏪 ${t}</option>`).join("")}
+                `;
             }
         }
 
@@ -688,7 +721,39 @@
             showCustomModal("PERFORMANCE HUB", htmlBox);
         }
 
-        // CHAT WA LOGIC & AI DI DALAM CHAT
+        // PENGUMUMAN DARI SPREADSHEET
+        function openPengumumanModal() {
+            if (!dashboardData || !dashboardData.announcements || dashboardData.announcements.length === 0) {
+                showCustomModal("📢 Pengumuman", "<p style='color:var(--text-sub);'>Belum ada pengumuman aktif dari Spreadsheet.</p>");
+                return;
+            }
+
+            const html = dashboardData.announcements.map(p => `
+                <div style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                    <p style="font-weight:bold; color:var(--gold);">${p.Pengumuman || p.PENGUMUMAN || 'Informasi'}</p>
+                </div>
+            `).join("");
+
+            showCustomModal("📢 Pengumuman Resmi", html);
+        }
+
+        // NOTIFIKASI DARI SPREADSHEET
+        function openNotifModal() {
+            if (!dashboardData || !dashboardData.notifications || dashboardData.notifications.length === 0) {
+                showCustomModal("🔔 Notifikasi", "<p style='color:var(--text-sub);'>Tidak ada notifikasi baru.</p>");
+                return;
+            }
+
+            const html = dashboardData.notifications.map(n => `
+                <div style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                    <p style="font-weight:bold; color:var(--accent-green);">${n.PESAN || n.Pesan || 'Notifikasi'}</p>
+                    <p style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Waktu: ${n.JAM || '-'} | Tgl: ${n.TANGGAL || '-'}</p>
+                </div>
+            `).join("");
+
+            showCustomModal("🔔 Notifikasi Aplikasi", html);
+        }
+
         function setChatTab(tabName) {
             activeChatTab = tabName;
             document.querySelectorAll('.wa-tab-btn').forEach(b => b.classList.remove('active'));
@@ -703,17 +768,15 @@
                 box.innerHTML = chats.map(c => {
                     const isMe = c.NIK_PENGIRIM == currentNik;
                     const isAI = c.PENERIMA_TIPE === "AI" || c.NIK_PENGIRIM === "AI";
-                    const initial = String(c.NAMA_PENGIRIM || "U")[0].toUpperCase();
 
                     return `
-                        <div class="wa-bubble ${isMe ? 'me' : isAI ? 'ai' : 'other'}" onclick="prepareReply('${c.ID_PESAN || ''}', '${c.NAMA_PENGIRIM || ''}', '${c.ISI_PESAN || ''}')">
-                            ${c.REPLY_TO_ID ? `<div class="wa-reply-preview">Dibalas: Pesan...</div>` : ''}
+                        <div class="wa-bubble ${isMe ? 'me' : isAI ? 'ai' : 'other'}">
                             <div class="wa-sender">
                                 <span>${isAI ? '🤖 Asisten Kacida AI' : c.NAMA_PENGIRIM + ' (' + c.JABATAN + ')'}</span>
                                 <span>${c.KODE_TOKO_PENGIRIM || ''}</span>
                             </div>
                             <div>${c.ISI_PESAN}</div>
-                            <div class="wa-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                            <div class="wa-time">${c.TIMESTAMP ? String(c.TIMESTAMP).substring(11,16) : ''}</div>
                         </div>
                     `;
                 }).join("");
@@ -721,41 +784,37 @@
             }
         }
 
-        function prepareReply(id, sender, text) {
-            activeReplyId = id;
-            document.getElementById("replyPreviewText").innerText = `Balas ${sender}: "${text.substring(0, 30)}..."`;
-            document.getElementById("replyPreviewContainer").classList.remove("hidden");
-        }
-
-        function cancelReply() {
-            activeReplyId = null;
-            document.getElementById("replyPreviewContainer").classList.add("hidden");
-        }
-
         async function kirimPesan() {
             const input = document.getElementById("inputChatMsg");
             const msg = input.value.trim();
+            const selectTujuan = document.getElementById("selectChatTujuan").value;
             if (!msg) return;
 
             input.value = "";
             showLoading("Mengirim Pesan...");
 
-            const pTipe = activeChatTab === "Toko Saya" ? "Toko" : activeChatTab === "Area Saya" ? "Area" : "All";
-            const pKode = dashboardData?.user?.kodeToko || "ALL";
+            let pTipe = "Toko";
+            let pKode = selectTujuan;
 
-            await apiCall("sendChat", { pesan: msg, penerimaTipe: pTipe, penerimaKode: pKode, replyToId: activeReplyId });
-            cancelReply();
+            if (selectTujuan === "Semua Personil") {
+                pTipe = "All";
+                pKode = "ALL";
+            } else if (selectTujuan === "Area Coordinator") {
+                pTipe = "Area";
+                pKode = "AC";
+            }
+
+            await apiCall("sendChat", { pesan: msg, penerimaTipe: pTipe, penerimaKode: pKode });
             hideLoading();
             loadChat();
         }
 
-        // TANYA KACIDA AI LANGSUNG DI DALAM TAB CHAT WA
         function openAIChatDialog() {
             showCustomModal("🤖 Asisten Kacida AI", `
                 <div>
-                    <p style="font-size:0.7rem; color:var(--text-sub); margin-bottom:8px;">Tanyakan sesuatu tentang Sales, IKT, atau candaan:</p>
-                    <textarea id="aiPromptInput" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); border-radius:12px; padding:10px; color:white; font-size:0.75rem; height:80px; outline:none; margin-bottom:10px;" placeholder="Contoh: Gimana sales MTD toko 2J16 hari ini?"></textarea>
-                    <button onclick="submitTanyaAI()" style="width:100%; background:var(--accent-green); color:#03170a; font-weight:800; padding:10px; border-radius:12px; border:none; cursor:pointer;">Kirim ke AI</button>
+                    <p style="font-size:0.7rem; color:var(--text-sub); margin-bottom:8px;">Tanyakan sesuatu seputar toko Anda:</p>
+                    <textarea id="aiPromptInput" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); border-radius:12px; padding:10px; color:white; font-size:0.75rem; height:80px; outline:none; margin-bottom:10px;" placeholder="Contoh: Gimana sales MTD toko saya hari ini?"></textarea>
+                    <button onclick="submitTanyaAI()" style="width:100%; background:var(--accent-green); color:#03170a; font-weight:800; padding:10px; border-radius:12px; border:none; cursor:pointer;">Tanyakan AI</button>
                 </div>
             `);
         }
@@ -768,33 +827,7 @@
             const res = await apiCall("askAI", { pertanyaan: q });
             hideLoading();
 
-            showCustomModal("🤖 Asisten Kacida AI:", `<div style="white-space:pre-line; font-size:0.8rem; line-height:1.5;">${res.jawaban || "Selesai"}</div>`);
-        }
-
-        async function checkScheduledNotifications() {
-            const data = await apiCall("getDashboard");
-            if (data && data.badges.notif > 0) {
-                document.getElementById("notifBadge").innerText = data.badges.notif;
-            }
-        }
-
-        function openPengumumanModal() {
-            showCustomModal("📢 Pengumuman Resmi", `
-                <div style="background:var(--bg-dark); padding:12px; border-radius:12px; border:1px solid var(--card-border);">
-                    <p style="font-weight:bold; color:var(--gold);">Target Penawaran Langsung</p>
-                    <p style="font-size:0.7rem; color:var(--text-sub); margin-top:4px;">Mohon seluruh kasir meningkatkan penawaran produk PSM & PWP hari ini.</p>
-                </div>
-            `);
-            apiCall("logActivity", { aktivitas: "Baca Pengumuman", detail: "Membuka modal pengumuman" });
-        }
-
-        function openNotifModal() {
-            showCustomModal("🔔 Notifikasi Aplikasi", `
-                <div style="background:var(--bg-dark); padding:12px; border-radius:12px; border:1px solid var(--card-border);">
-                    <p style="font-weight:bold; color:var(--accent-green);">Notifikasi Jadwal Realtime</p>
-                    <p style="font-size:0.7rem; color:var(--text-sub); margin-top:4px;">Pengingat laporan shift dan validasi ekspire berjalan otomatis.</p>
-                </div>
-            `);
+            showCustomModal("🤖 Jawaban Asisten Kacida AI:", `<div style="white-space:pre-line; font-size:0.8rem; line-height:1.5;">${res.jawaban || "Selesai"}</div>`);
         }
 
         function openAllMenuModal(kategori) {
