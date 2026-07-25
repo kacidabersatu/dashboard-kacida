@@ -173,7 +173,6 @@
                 </div>
             </div>
             <div class="header-right">
-                <!-- TOMBOL INSTAL PWA DI HEADER (OTOMATIS MUNCUL JIKA BELUM INSTAL) -->
                 <div id="btnInstallPWA" class="install-badge hidden" onclick="triggerPWAInstall()">
                     <i class="fa-solid fa-download"></i> Instal
                 </div>
@@ -181,7 +180,7 @@
                 <div class="disket-badge" onclick="openPerformaPopup()" title="Klik Rincian Performa Hub"><i class="fa-solid fa-floppy-disk"></i></div>
                 <div class="notif-badge" onclick="requestNotificationPermission()" title="Aktifkan Notifikasi"><i class="fa-regular fa-bell"></i><span class="notif-count" id="notifBadge">3</span></div>
                 
-                <!-- AVATAR HEADER: HANYA MENAMPILKAN PROFIL RINGKAS SAAT DIKLIK -->
+                <!-- AVATAR HEADER: HANYA KARTU RINGKAS SAAT DIKLIK -->
                 <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="user-avatar-3d" onclick="showBriefProfile()">
             </div>
         </header>
@@ -273,7 +272,7 @@
             <div id="leaderboardList" class="menu-section-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
-        <!-- TAB PROFIL NAVBAR BOTTOM: MENAMPILKAN BAGAN STRUKTUR ORGANISASI LENGKAP -->
+        <!-- TAB PROFIL NAVBAR BOTTOM: STRUKTUR ORGANISASI LENGKAP -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
@@ -316,14 +315,13 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQsMf-n_bx8GwriGq27tt-fM8olIgnFevJDuJiK2l8cxXC55WcFEZFAZ91iDi5KSMk/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb...PASTE_LINK_DEPLOY_DISINI.../exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
         let selectedKodeTokoAC = null;
         let deferredPrompt = null;
 
-        // TANGKAP EVENT INSTAL PWA
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -344,7 +342,6 @@
             }
         }
 
-        // REQUEST IZIN NOTIFIKASI & LOGGING KE SPREADSHEET
         function requestNotificationPermission() {
             if (!('Notification' in window)) return alert("Browser tidak mendukung Notifikasi!");
             
@@ -512,7 +509,7 @@
             new Swiper(".mainCarousel", { autoplay: { delay: 5000 }, loop: true, pagination: { el: ".swiper-pagination", clickable: true } });
         }
 
-        // SMART 3D ICON MATCHING SESUAI NAMA NAVIGASI
+        // SMART 3D ICON MATCHING
         function getSmart3DIcon(menuName, defaultIcon) {
             if (defaultIcon && defaultIcon.trim().length > 10) return defaultIcon;
             if (!menuName) return 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
@@ -545,7 +542,7 @@
             `).join("");
         }
 
-        // FUNGSI KHUSUS HEADER AVATAR: MENAMPILKAN KARTU PROFIL RINGKAS SAJA
+        // AKSI KLIK AVATAR HEADER ATAS: HANYA MENAMPILKAN KARTU RINGKAS
         function showBriefProfile() {
             if (!dashboardData) return;
             const u = dashboardData.user;
