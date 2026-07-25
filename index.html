@@ -46,7 +46,6 @@
 
         .header-right { display: flex; align-items: center; gap: 8px; }
 
-        /* ICON PERFORMANCE ELEGANT DISKET BARU (GAUGE HIGH) */
         .disket-badge { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: var(--gold); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .notif-badge { position: relative; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .notif-count { position: absolute; top: 2px; right: 2px; background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -102,6 +101,7 @@
         
         .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
 
+        /* TAMPILAN TAB CHAT TERPISAH LAPANG */
         .chat-tab-wrapper { display: flex; gap: 8px; background: var(--bg-dark); padding: 6px; border-radius: 14px; border: 1px solid var(--card-border); margin-bottom: 12px; }
         .chat-tab-pill { flex: 1; padding: 8px 12px; font-size: 0.72rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; }
         .chat-tab-pill.active { background: var(--accent-green); color: #03170a; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3); }
@@ -202,7 +202,6 @@
                     <i class="fa-solid fa-download"></i> Instal
                 </div>
 
-                <!-- ICON PERFORMANCE ELEGANT (GAUGE-HIGH) MEMBUKA DATA PERFORMANCE -->
                 <div class="disket-badge" onclick="openPerformaPopup()" title="Klik Rincian Data Performance">
                     <i class="fa-solid fa-gauge-high"></i>
                 </div>
@@ -327,6 +326,7 @@
             <div id="leaderboardList" class="menu-section-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
+        <!-- TAB PROFIL NAVBAR BOTTOM -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
@@ -360,6 +360,7 @@
             </div>
         </div>
 
+        <!-- MASCOT AI MENGAPUNG (KHUSUS DI TAB CHAT) -->
         <button id="floatingAIMascot" class="hidden" onclick="switchChatRoomMode('ai')" style="position: fixed; bottom: 80px; right: 16px; z-index: 999; background: #0A2414; border: 2px solid var(--accent-green); padding: 10px; border-radius: 50%; box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); cursor: pointer;">
             <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 32px; height: 32px; display: block;">
         </button>
@@ -377,7 +378,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCOuHK7Cuj4xCR_xXMDJyJ-N1AI6qaBw0upNJb10sTJXbhI7TrRm1uv8_mFJltdJkF/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk-25AkxDoowdiHjBpADM46rOMpjBJIeGo5q_4c0wUkvNNV4EVg7uCutXoSVMrP8HF/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -701,7 +702,6 @@
             initDashboard(kodeToko);
         }
 
-        // POPUP DATA PERFORMANCE (JUDUL & ICON GAUGE HIGH DIBERSIHKAN)
         async function openPerformaPopup() {
             showLoading("Memuat Data Performance...");
             const d = await apiCall("getPerforma");
@@ -860,7 +860,7 @@
             }
         }
 
-        // TAMPILAN OBROLAN PRIVAT KACIDA AI (STREAMING LANGSUNG TANPA POPUP)
+        // TAMPILAN PRIVAT OBROLAN 1-ON-1 DENGAN KACIDA AI (NO POPUP MODALS!)
         function renderAIChatRoom() {
             const box = document.getElementById("chatBox");
             if (aiChatHistory.length === 0) {
@@ -887,6 +887,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
+        // SINKRONISASI KIRIM CHAT TIM & CHAT PRIVAT AI (INSTANT & DYNAMIC)
         async function handleSendChatAction() {
             const input = document.getElementById("inputChatMsg");
             const msg = input.value.trim();
@@ -895,19 +896,20 @@
             input.value = "";
 
             if (chatRoomMode === 'ai') {
-                // CHAT PRIVAT DENGAN KACIDA AI (NO MODALS POPUP)
+                // CHAT PRIVAT DENGAN KACIDA AI (STREAMING LANGSUNG DILAYAR TANPA POPUP)
                 aiChatHistory.push({ sender: "ME", msg: msg });
                 
                 const tempAiIdx = aiChatHistory.length;
                 aiChatHistory.push({ sender: "AI", msg: "🤖 *Asisten Kacida AI sedang berpikir...*" });
                 renderAIChatRoom();
 
+                // PANGGIL AI GEMINI 2.0
                 const res = await apiCall("askAI", { pertanyaan: msg });
                 
-                aiChatHistory[tempAiIdx] = { sender: "AI", msg: res.jawaban || "Maaf, silakan coba lagi." };
+                aiChatHistory[tempAiIdx] = { sender: "AI", msg: res.jawaban || "Kacida AI siap membantu!" };
                 renderAIChatRoom();
             } else {
-                // CHAT TIM
+                // CHAT TIM WA INSTAN
                 const box = document.getElementById("chatBox");
                 const tempId = "msg_" + Date.now();
                 const nowTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
