@@ -1,12 +1,8 @@
-const CACHE_NAME = "kacida-bersatu-v3-pro";
+const CACHE_NAME = "kacida-bersatu-v3-final";
 const ASSETS_TO_CACHE = [
   "./",
-  "https://cdn.tailwindcss.com",
-  "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap",
-  "https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css",
-  "https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js",
-  "https://unpkg.com/lucide@latest",
-  "https://cdn.jsdelivr.net/npm/sweetalert2@11"
+  "index.html",
+  "manifest.json"
 ];
 
 self.addEventListener("install", (e) => {
