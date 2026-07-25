@@ -39,15 +39,14 @@
         .brand-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #10b981, #052e16); border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.2); }
         .header-right { display: flex; align-items: center; gap: 8px; }
 
-        /* HANYA ICON DISKET DI HEADER KANAN YANG BISA DIKLIK */
         .disket-badge { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: var(--gold); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .notif-badge { position: relative; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .notif-count { position: absolute; top: 2px; right: 2px; background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .install-badge { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 6px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 4px; cursor: pointer; }
         .user-avatar-3d { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; }
 
         .container { padding: 0 16px; margin-top: 12px; }
 
-        /* TOP 3 PERFORMANCE CARD (TIDAK BISA DIKLIK) */
         .disket-info-bar {
             background: #0A2414; border: 1px solid var(--gold); border-radius: 16px; padding: 12px 14px; margin-bottom: 14px;
             display: flex; justify-content: space-between; align-items: center; cursor: default;
@@ -57,7 +56,6 @@
         .disket-bar-val { font-size: 0.85rem; font-weight: 800; margin-top: 2px; }
         .disket-divider { width: 1px; height: 28px; background: rgba(255, 255, 255, 0.12); }
 
-        /* HERO CARD (TIDAK BISA DIKLIK) */
         .hero-card {
             background: linear-gradient(135deg, #0a3a18 0%, #06240f 100%); border: 1px solid rgba(34, 197, 94, 0.2);
             border-radius: 20px; padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; cursor: default;
@@ -107,7 +105,6 @@
         .fab-rocket { width: 50px; height: 50px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-top: -28px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
         .hidden { display: none !important; }
 
-        /* Custom Modal Glassmorphism Overlay */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(8px);
@@ -152,7 +149,6 @@
         </div>
     </div>
 
-    <!-- LOGIN SCREEN -->
     <div id="loginSection" style="max-width: 430px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 24px;">
         <div style="text-align: center; margin-bottom: 24px;">
             <img src="https://drive.google.com/uc?export=view&id=10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent-green); margin-bottom: 12px; object-fit: cover;">
@@ -166,7 +162,6 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
     <div id="appSection" class="hidden" style="max-width: 430px; margin: 0 auto; min-height: 100vh;">
         
         <header class="app-header">
@@ -178,10 +173,16 @@
                 </div>
             </div>
             <div class="header-right">
-                <!-- HANYA ICON DISKET INI YANG BISA DIKLIK UNTUK MEMBUKA PERFORMA HUB -->
+                <!-- TOMBOL INSTAL PWA DI HEADER (OTOMATIS MUNCUL JIKA BELUM INSTAL) -->
+                <div id="btnInstallPWA" class="install-badge hidden" onclick="triggerPWAInstall()">
+                    <i class="fa-solid fa-download"></i> Instal
+                </div>
+
                 <div class="disket-badge" onclick="openPerformaPopup()" title="Klik Rincian Performa Hub"><i class="fa-solid fa-floppy-disk"></i></div>
-                <div class="notif-badge" onclick="openNotifModal()"><i class="fa-regular fa-bell"></i><span class="notif-count" id="notifBadge">3</span></div>
-                <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="user-avatar-3d" onclick="switchTab('profil')">
+                <div class="notif-badge" onclick="requestNotificationPermission()" title="Aktifkan Notifikasi"><i class="fa-regular fa-bell"></i><span class="notif-count" id="notifBadge">3</span></div>
+                
+                <!-- AVATAR HEADER: HANYA MENAMPILKAN PROFIL RINGKAS SAAT DIKLIK -->
+                <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="user-avatar-3d" onclick="showBriefProfile()">
             </div>
         </header>
 
@@ -193,8 +194,6 @@
         </div>
 
         <main id="tabBeranda" class="container">
-            
-            <!-- HEADER DISKET BAR (TIDAK BISA DIKLIK) -->
             <section class="disket-info-bar">
                 <div class="disket-bar-item">
                     <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
@@ -213,7 +212,6 @@
                 <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
             </section>
             
-            <!-- HERO GREETING CARD (TIDAK BISA DIKLIK) -->
             <section class="hero-card">
                 <div class="hero-content">
                     <span style="font-size: 0.7rem; color: var(--text-sub);">Selamat datang kembali,</span>
@@ -227,13 +225,11 @@
                 <img src="https://illustrations.popsy.co/emerald/work-from-home.svg" class="hero-3d-illustration" alt="Team">
             </section>
 
-            <!-- CAROUSEL BANNER PIC SAPA -->
             <div class="swiper mainCarousel rounded-2xl overflow-hidden mb-3 border border-[#1A3A2A]">
                 <div class="swiper-wrapper" id="carouselWrapper"></div>
                 <div class="swiper-pagination"></div>
             </div>
 
-            <!-- 4 METRICS CARDS GRID -->
             <section class="metrics-scroll">
                 <div class="metric-card"><img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d"><span class="metric-title">Tugas Hari Ini</span><span class="metric-value" id="valTasks">12 <small style="font-size:0.55rem; color:var(--text-sub); font-weight:normal;">Tugas</small></span></div>
                 <div class="metric-card"><img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d"><span class="metric-title">Pengumuman</span><span class="metric-value" id="valAnnounce">5 <small style="font-size:0.55rem; color:var(--text-sub); font-weight:normal;">Baru</small></span></div>
@@ -241,14 +237,12 @@
                 <div class="metric-card"><img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d"><span class="metric-title">Point Anda</span><span class="metric-value" id="valPoints" style="color: var(--gold);">1.250 <small style="font-size:0.55rem; font-weight:normal;">Point</small></span></div>
             </section>
 
-            <!-- MENU UTAMA SECTION -->
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
                 <div id="gridMenuUtama" class="menu-grid-5"></div>
                 <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket">
             </section>
 
-            <!-- LAYANAN LAINNYA SECTION -->
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Lainnya')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
@@ -279,6 +273,7 @@
             <div id="leaderboardList" class="menu-section-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
+        <!-- TAB PROFIL NAVBAR BOTTOM: MENAMPILKAN BAGAN STRUKTUR ORGANISASI LENGKAP -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
@@ -321,11 +316,49 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQsMf-n_bx8GwriGq27tt-fM8olIgnFevJDuJiK2l8cxXC55WcFEZFAZ91iDi5KSMk/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb...PASTE_LINK_DEPLOY_DISINI.../exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
         let selectedKodeTokoAC = null;
+        let deferredPrompt = null;
+
+        // TANGKAP EVENT INSTAL PWA
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('btnInstallPWA');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        async function triggerPWAInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA" });
+                    alert("Aplikasi Berhasil Diinstal!");
+                }
+                deferredPrompt = null;
+                document.getElementById('btnInstallPWA').classList.add('hidden');
+            }
+        }
+
+        // REQUEST IZIN NOTIFIKASI & LOGGING KE SPREADSHEET
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) return alert("Browser tidak mendukung Notifikasi!");
+            
+            if (Notification.permission === 'granted') {
+                showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green); font-weight:bold;'>Notifikasi Aplikasi Sudah Aktif 🟢</p><p style='font-size:0.7rem; color:var(--text-sub); margin-top:4px;'>Anda akan menerima pesan pengingat promo dan tugas harian secara realtime.</p>");
+            } else {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        apiCall("logActivity", { aktivitas: "Izin Notifikasi", detail: "Granted" });
+                        showCustomModal("🔔 NOTIFIKASI BERHASIL DIAKTIFKAN", "<p style='color:var(--accent-green);'>Terima kasih! Notifikasi resmi aplikasi telah aktif.</p>");
+                    }
+                });
+            }
+        }
 
         function showLoading(msg = "Memuat Data...") {
             document.getElementById("loadingText").innerText = msg;
@@ -357,6 +390,7 @@
                     else if (action === "sendChat") r.sendChatMessage(currentNik, params.pesan, params.tujuan);
                     else if (action === "getDaftarToko") r.getDaftarToko(currentNik);
                     else if (action === "getDaftarTokoAll") r.getDaftarTokoAll();
+                    else if (action === "logActivity") r.logAktivitasAPI(currentNik, params.aktivitas, params.detail);
                 });
             } else {
                 const url = new URL(SCRIPT_URL);
@@ -478,13 +512,54 @@
             new Swiper(".mainCarousel", { autoplay: { delay: 5000 }, loop: true, pagination: { el: ".swiper-pagination", clickable: true } });
         }
 
+        // SMART 3D ICON MATCHING SESUAI NAMA NAVIGASI
+        function getSmart3DIcon(menuName, defaultIcon) {
+            if (defaultIcon && defaultIcon.trim().length > 10) return defaultIcon;
+            if (!menuName) return 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
+            
+            const n = String(menuName).toLowerCase();
+            if (n.includes("sementara") || n.includes("laporan")) return 'https://cdn-icons-png.flaticon.com/512/2965/2965300.png';
+            if (n.includes("shift")) return 'https://cdn-icons-png.flaticon.com/512/3767/3767084.png';
+            if (n.includes("jobdesk") || n.includes("harian")) return 'https://cdn-icons-png.flaticon.com/512/3652/3652191.png';
+            if (n.includes("exp") || n.includes("eksp") || n.includes("cek")) return 'https://cdn-icons-png.flaticon.com/512/7518/7518748.png';
+            if (n.includes("tdp") || n.includes("area")) return 'https://cdn-icons-png.flaticon.com/512/684/684908.png';
+            if (n.includes("ikt")) return 'https://cdn-icons-png.flaticon.com/512/3594/3594363.png';
+            if (n.includes("sales") || n.includes("highlight")) return 'https://cdn-icons-png.flaticon.com/512/2454/2454271.png';
+            if (n.includes("psm") || n.includes("penawaran")) return 'https://cdn-icons-png.flaticon.com/512/3112/3112946.png';
+            if (n.includes("qr") || n.includes("cdm")) return 'https://cdn-icons-png.flaticon.com/512/3409/3409597.png';
+            if (n.includes("roleplay") || n.includes("mtk")) return 'https://cdn-icons-png.flaticon.com/512/4384/4384248.png';
+            if (n.includes("duka") || n.includes("nikah") || n.includes("claim")) return 'https://cdn-icons-png.flaticon.com/512/2904/2904832.png';
+            if (n.includes("btl") || n.includes("auto")) return 'https://cdn-icons-png.flaticon.com/512/1067/1067357.png';
+            if (n.includes("koperasi")) return 'https://cdn-icons-png.flaticon.com/512/1256/1256650.png';
+            if (n.includes("asset") || n.includes("aset")) return 'https://cdn-icons-png.flaticon.com/512/2821/2821820.png';
+
+            return 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
+        }
+
         function renderMenuGrid(elementId, items) {
             document.getElementById(elementId).innerHTML = items.map(m => `
                 <a href="${m["Link Tujuan"] || '#'}" target="_blank" class="menu-3d-item">
-                    <div class="icon-box-3d"><img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}"></div>
+                    <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
                     <span class="menu-label">${m["Nama Menu"]}</span>
                 </a>
             `).join("");
+        }
+
+        // FUNGSI KHUSUS HEADER AVATAR: MENAMPILKAN KARTU PROFIL RINGKAS SAJA
+        function showBriefProfile() {
+            if (!dashboardData) return;
+            const u = dashboardData.user;
+            showCustomModal("👤 KARTU PENGGUNA", `
+                <div style="text-align: center; padding: 10px;">
+                    <img src="${u["FOTO PROFIL"] || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" style="width: 65px; height: 65px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin-bottom: 8px;">
+                    <h4 style="font-size: 1rem; font-weight: 800; color: white;">${u.NAMA || '-'}</h4>
+                    <p style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">${u.JABATAN || '-'}</p>
+                    <p style="font-size: 0.68rem; color: var(--text-sub);">${u.namaToko || '-'}</p>
+                    <p style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: ${u.NIK || '-'}</p>
+                    <hr style="border-color: var(--card-border); margin: 12px 0;">
+                    <button onclick="handleLogout()" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 8px 18px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; width: 100%;">LOGOUT</button>
+                </div>
+            `);
         }
 
         async function loadDaftarTokoAC() {
@@ -513,7 +588,6 @@
             initDashboard(kodeToko);
         }
 
-        // RINCIAN LENGKAP BENTUK BOX TABEL PERSIS FORMAT TEKS
         async function openPerformaPopup() {
             showLoading("Memuat Performance Hub...");
             const d = await apiCall("getPerforma");
@@ -579,7 +653,7 @@
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
                     ${list.map(m => `
                         <a href="${m["Link Tujuan"] || '#'}" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; align-items:center;">
-                            <div class="icon-box-3d"><img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}"></div>
+                            <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
                             <span class="menu-label">${m["Nama Menu"]}</span>
                         </a>
                     `).join('')}
