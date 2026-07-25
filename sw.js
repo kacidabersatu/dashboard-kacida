@@ -1,4 +1,4 @@
-const CACHE_NAME = "kacida-bersatu-v3-final";
+const CACHE_NAME = "kacida-bersatu-v3-perf";
 const ASSETS_TO_CACHE = [
   "./",
   "index.html",
