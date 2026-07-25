@@ -112,7 +112,7 @@
         .fab-rocket { width: 50px; height: 50px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-top: -28px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
         .hidden { display: none !important; }
 
-        /* Custom Modal Glassmorphism Overlay */
+        /* Custom Modal Overlay Native */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
@@ -128,7 +128,7 @@
             border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
         }
 
-        /* CUSTOM NATIVE LOADING OVERLAY (NO SWEETALERT) */
+        /* CUSTOM NATIVE LOADING SPINNER */
         .loading-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(3, 23, 10, 0.85); backdrop-filter: blur(8px);
@@ -335,13 +335,28 @@
     </div>
 
     <script>
+        // TARUH LINK DEPLOY APPS SCRIPT ANDA DI SINI
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQsMf-n_bx8GwriGq27tt-fM8olIgnFevJDuJiK2l8cxXC55WcFEZFAZ91iDi5KSMk/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
         let selectedKodeTokoAC = null;
 
-        // HELPER CUSTOM LOADING SPINNER
+        // DAFTAR ICON 3D CANTIK BAGI MENU DENGAN Icon URL KOSONG DI SPREADSHEET
+        const DEFAULT_ICONS = [
+            'https://cdn-icons-png.flaticon.com/512/2965/2965300.png',
+            'https://cdn-icons-png.flaticon.com/512/3767/3767084.png',
+            'https://cdn-icons-png.flaticon.com/512/3652/3652191.png',
+            'https://cdn-icons-png.flaticon.com/512/7518/7518748.png',
+            'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+            'https://cdn-icons-png.flaticon.com/512/3594/3594363.png',
+            'https://cdn-icons-png.flaticon.com/512/2454/2454271.png',
+            'https://cdn-icons-png.flaticon.com/512/3112/3112946.png',
+            'https://cdn-icons-png.flaticon.com/512/3409/3409597.png',
+            'https://cdn-icons-png.flaticon.com/512/4384/4384248.png'
+        ];
+
+        // HELPER LOADING SPINNER
         function showLoading(msg = "Memuat Data...") {
             document.getElementById("loadingText").innerText = msg;
             document.getElementById("loadingOverlay").classList.remove("hidden");
@@ -446,7 +461,7 @@
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
             document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
 
-            // FIX BUG [object Object]
+            // FIX PERMANEN UNTUK BUG [object Object]
             let iktClean = typeof data.dataH1.ikt === 'object' ? (data.dataH1.ikt.val || '92,35') : data.dataH1.ikt;
             let pointClean = typeof data.dataH1.point === 'object' ? (data.dataH1.point.val || '125') : data.dataH1.point;
 
@@ -461,8 +476,8 @@
             document.getElementById("valPoints").innerHTML = `${Number(data.badges.point).toLocaleString("id-ID")} <small style="font-size:0.55rem; font-weight:normal;">Point</small>`;
 
             renderCarousel(data.banners, data.user.namaToko);
-            renderMenuGrid("gridMenuUtama", data.menu.utama.slice(0, 10));
-            renderMenuGrid("gridMenuLainnya", data.menu.layanan.slice(0, 8));
+            renderMenuGrid("gridMenuUtama", data.menu.utama);
+            renderMenuGrid("gridMenuLainnya", data.menu.layanan);
 
             if (data.struktur) {
                 document.getElementById("stOGM").innerText = data.struktur.ogm.nama;
@@ -499,13 +514,28 @@
             new Swiper(".mainCarousel", { autoplay: { delay: 5000 }, loop: true, pagination: { el: ".swiper-pagination", clickable: true } });
         }
 
+        // FUNGSI RENDER MENU DENGAN FALLBACK ICON UNTUK SPREADSHEET
         function renderMenuGrid(elementId, items) {
-            document.getElementById(elementId).innerHTML = items.map(m => `
-                <a href="${m["Link Tujuan"] || '#'}" target="_blank" class="menu-3d-item">
-                    <div class="icon-box-3d"><img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}"></div>
-                    <span class="menu-label">${m["Nama Menu"]}</span>
-                </a>
-            `).join("");
+            const container = document.getElementById(elementId);
+            if (!items || items.length === 0) {
+                container.innerHTML = '<p style="font-size:0.7rem; color:var(--text-sub); grid-column: 1/-1;">Tidak ada menu.</p>';
+                return;
+            }
+
+            container.innerHTML = items.map((m, idx) => {
+                const iconSrc = (m["Icon URL"] && String(m["Icon URL"]).trim().length > 5) 
+                    ? m["Icon URL"] 
+                    : DEFAULT_ICONS[idx % DEFAULT_ICONS.length];
+
+                return `
+                    <a href="${m["Link Tujuan"] || '#'}" target="_blank" class="menu-3d-item">
+                        <div class="icon-box-3d">
+                            <img src="${iconSrc}" alt="Icon" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1828/1828884.png'">
+                        </div>
+                        <span class="menu-label">${m["Nama Menu"]}</span>
+                    </a>
+                `;
+            }).join("");
         }
 
         async function loadDaftarTokoAC() {
@@ -563,12 +593,18 @@
             const list = kategori === 'Utama' ? dashboardData.menu.utama : dashboardData.menu.layanan;
             showCustomModal(`Semua ${kategori}`, `
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                    ${list.map(m => `
-                        <a href="${m["Link Tujuan"] || '#'}" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; align-items:center;">
-                            <div class="icon-box-3d"><img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}"></div>
-                            <span class="menu-label">${m["Nama Menu"]}</span>
-                        </a>
-                    `).join('')}
+                    ${list.map((m, idx) => {
+                        const iconSrc = (m["Icon URL"] && String(m["Icon URL"]).trim().length > 5) 
+                            ? m["Icon URL"] 
+                            : DEFAULT_ICONS[idx % DEFAULT_ICONS.length];
+
+                        return `
+                            <a href="${m["Link Tujuan"] || '#'}" target="_blank" style="text-decoration:none; display:flex; flex-direction:column; align-items:center;">
+                                <div class="icon-box-3d"><img src="${iconSrc}"></div>
+                                <span class="menu-label">${m["Nama Menu"]}</span>
+                            </a>
+                        `;
+                    }).join('')}
                 </div>
             `);
         }
