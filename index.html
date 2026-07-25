@@ -49,13 +49,13 @@
     </div>
   </div>
 
-  <!-- MAIN CONTAINER (AFTER LOGIN) -->
+  <!-- MAIN CONTAINER -->
   <div id="appSection" class="hidden max-w-[430px] mx-auto min-h-screen relative">
 
     <!-- HEADER FIXED -->
     <header class="sticky top-0 z-40 glass-header px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <button onclick="toggleSidebar()" class="text-white hover:text-[#22C55E]"><i data-lucide="menu" class="w-6 h-6"></i></button>
+        <button onclick="openMenuSidebar()" class="text-white hover:text-[#22C55E]"><i data-lucide="menu" class="w-6 h-6"></i></button>
         <div class="flex items-center gap-2">
           <img src="https://drive.google.com/uc?export=view&id=10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" class="w-7 h-7 rounded-full border border-[#22C55E]">
           <span class="font-extrabold text-sm tracking-wide text-white">Kacida Bersatu</span>
@@ -63,28 +63,24 @@
       </div>
 
       <div class="flex items-center gap-2.5">
-        <!-- ICON DISKET -->
         <button onclick="openPerformaPopup()" class="w-9 h-9 rounded-xl bg-[#facc15] text-[#03170a] flex items-center justify-center font-bold shadow-md hover:scale-105 transition">
           <i data-lucide="save" class="w-5 h-5"></i>
         </button>
-        <!-- LONCENG NOTIF -->
         <button onclick="openNotifModal()" class="relative w-9 h-9 rounded-xl bg-[#0A2414] border border-[#1A3A2A] text-white flex items-center justify-center">
           <i data-lucide="bell" class="w-5 h-5"></i>
           <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">3</span>
         </button>
-        <!-- AVATAR PROFIL -->
         <div onclick="switchTab('profil')" class="w-9 h-9 rounded-full border-2 border-[#22C55E] overflow-hidden cursor-pointer">
           <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-full h-full object-cover">
         </div>
       </div>
     </header>
 
-    <!-- AC STORE SELECTION DROPDOWN (ONLY IF USER IS AC/ADMIN) -->
+    <!-- AC STORE DROPDOWN -->
     <div id="acDropdownContainer" class="hidden px-4 pt-3 pb-1">
       <div class="bg-card px-3 py-2 flex items-center gap-2">
         <i data-lucide="store" class="w-4 h-4 text-[#22C55E]"></i>
         <select id="selectTokoAC" onchange="onACTokoChange(this.value)" class="bg-transparent text-xs text-[#22C55E] font-bold w-full focus:outline-none">
-          <!-- Populated dynamically -->
         </select>
       </div>
     </div>
@@ -120,7 +116,7 @@
         </div>
       </div>
 
-      <!-- BANNER MENYAPA (HERO CARD) -->
+      <!-- BANNER HERO -->
       <div class="bg-gradient-to-r from-[#0A2414] via-[#1A3A2A] to-[#0A2414] p-4 card-radius border border-[#22C55E]/30 relative overflow-hidden flex items-center justify-between">
         <div class="z-10 max-w-[65%]">
           <p class="text-xs text-gray-300">Halo,</p>
@@ -136,15 +132,13 @@
         </div>
       </div>
 
-      <!-- BANNER CAROUSEL (SWIPER) -->
+      <!-- CAROUSEL BANNER -->
       <div class="swiper mainCarousel rounded-2xl overflow-hidden border border-[#1A3A2A]">
-        <div class="swiper-wrapper" id="carouselWrapper">
-          <!-- Banners JS -->
-        </div>
+        <div class="swiper-wrapper" id="carouselWrapper"></div>
         <div class="swiper-pagination"></div>
       </div>
 
-      <!-- 5 KOTAK INFORMASI -->
+      <!-- 5 KOTAK -->
       <div class="grid grid-cols-5 gap-1.5">
         <div class="bg-card p-2 text-center flex flex-col items-center justify-center">
           <i data-lucide="clipboard-list" class="w-4 h-4 text-[#22C55E] mb-1"></i>
@@ -181,9 +175,7 @@
           </h3>
           <button onclick="openAllMenuModal('Utama')" class="text-[10px] text-[#22C55E] font-semibold hover:underline">Lihat Semua &gt;</button>
         </div>
-        <div id="gridMenuUtama" class="grid grid-cols-5 gap-2">
-          <!-- Rendered via JS -->
-        </div>
+        <div id="gridMenuUtama" class="grid grid-cols-5 gap-2"></div>
       </div>
 
       <!-- LAYANAN LAINNYA -->
@@ -194,197 +186,169 @@
           </h3>
           <button onclick="openAllMenuModal('Lainnya')" class="text-[10px] text-[#22C55E] font-semibold hover:underline">Lihat Semua &gt;</button>
         </div>
-        <div id="gridMenuLainnya" class="grid grid-cols-4 gap-2">
-          <!-- Rendered via JS -->
-        </div>
+        <div id="gridMenuLainnya" class="grid grid-cols-4 gap-2"></div>
       </div>
 
     </main>
 
-    <!-- TAB CHAT -->
+    <!-- TAB CHAT INTERNAL DENGAN DROPDOWN TOKO DINAMIS SPREADSHEET -->
     <div id="tabChat" class="hidden px-4 pt-3 space-y-3">
-      <h2 class="text-base font-bold text-white flex items-center gap-2">
-        <i data-lucide="message-square" class="w-5 h-5 text-[#22C55E]"></i> Chat Internal
-      </h2>
-      <div id="chatBox" class="bg-card p-4 h-[65vh] overflow-y-auto space-y-3 custom-scrollbar">
-        <!-- Chat items -->
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="message-square" class="w-5 h-5 text-[#22C55E]"></i> Chat Internal
+        </h2>
       </div>
+
+      <!-- PILIHAN TUJUAN CHAT (DROPDOWN DINAMIS SPREADSHEET) -->
+      <div class="bg-card p-2.5 flex items-center gap-2">
+        <span class="text-[10px] text-gray-300 font-bold whitespace-nowrap">Tujuan Chat:</span>
+        <select id="selectChatTujuan" class="bg-[#03170a] text-xs text-[#22C55E] font-bold w-full p-2 rounded-xl border border-[#1A3A2A] focus:outline-none">
+          <option value="Semua Personil">🌐 Semua Personil (All)</option>
+          <option value="Area Coordinator">👨‍💼 Area Coordinator (AC)</option>
+          <!-- Pilihan toko lain akan diisi otomatis secara dinamis dari Spreadsheet Master_User -->
+        </select>
+      </div>
+
+      <div id="chatBox" class="bg-card p-4 h-[58vh] overflow-y-auto space-y-3 custom-scrollbar"></div>
+
       <div class="flex gap-2">
         <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." class="flex-1 bg-card border border-[#1A3A2A] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#22C55E]">
-        <button onclick="kirimPesan()" class="bg-[#22C55E] text-[#03170a] px-4 rounded-xl font-bold flex items-center justify-center">
-          <i data-lucide="send" class="w-4 h-4"></i>
-        </button>
+        <button onclick="kirimPesan()" class="bg-[#22C55E] text-[#03170a] px-4 rounded-xl font-bold flex items-center justify-center"><i data-lucide="send" class="w-4 h-4"></i></button>
       </div>
     </div>
 
-    <!-- TAB AKSI CEPAT / MISI -->
+    <!-- TAB MISI -->
     <div id="tabAksiCepat" class="hidden px-4 pt-3 space-y-4">
       <div class="bg-card p-4">
-        <h2 class="text-base font-extrabold text-[#22C55E] mb-1 flex items-center gap-2">
-          <i data-lucide="rocket" class="w-5 h-5"></i> Misi Hari Ini
-        </h2>
-        <p class="text-xs text-gray-400 mb-4">Selesaikan tugas harian untuk mengumpulkan poin.</p>
-        <div id="misiList" class="space-y-3">
-          <!-- Misi items -->
-        </div>
+        <h2 class="text-base font-extrabold text-[#22C55E] mb-1 flex items-center gap-2"><i data-lucide="rocket" class="w-5 h-5"></i> Misi Hari Ini</h2>
+        <div id="misiList" class="space-y-3 mt-3"></div>
       </div>
     </div>
 
     <!-- TAB LEADERBOARD -->
     <div id="tabLeaderboard" class="hidden px-4 pt-3 space-y-3">
-      <h2 class="text-base font-bold text-yellow-400 flex items-center gap-2">
-        <i data-lucide="crown" class="w-5 h-5"></i> Leaderboard Area
-      </h2>
-      <div id="leaderboardList" class="bg-card p-3 space-y-2">
-        <!-- Rendered via JS -->
-      </div>
+      <h2 class="text-base font-bold text-yellow-400 flex items-center gap-2"><i data-lucide="crown" class="w-5 h-5"></i> Leaderboard Area</h2>
+      <div id="leaderboardList" class="bg-card p-3 space-y-2"></div>
     </div>
 
     <!-- TAB PROFIL & STRUKTUR -->
     <div id="tabProfil" class="hidden px-4 pt-3 space-y-4">
-      <!-- USER CARD -->
-      <div class="bg-card p-5 text-center relative overflow-hidden">
+      <div class="bg-card p-5 text-center">
         <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-20 h-20 rounded-full mx-auto border-2 border-[#22C55E] object-cover mb-2 shadow-lg">
         <h2 id="profilNama" class="text-lg font-bold text-white">Ridwan</h2>
         <p id="profilJabatan" class="text-xs text-[#22C55E] font-semibold">Area Coordinator</p>
         <p id="profilToko" class="text-xs text-gray-400">Kadudampit</p>
         <p id="profilNik" class="text-[10px] text-gray-500 mt-1">NIK: 3201012305860001</p>
-        <button onclick="handleLogout()" class="mt-4 bg-red-500/20 text-red-400 border border-red-500/40 px-4 py-1.5 rounded-xl text-xs font-bold">
-          LOGOUT
-        </button>
+        <button onclick="handleLogout()" class="mt-4 bg-red-500/20 text-red-400 border border-red-500/40 px-4 py-1.5 rounded-xl text-xs font-bold">LOGOUT</button>
       </div>
 
-      <!-- BAGAN STRUKTUR ORGANISASI -->
+      <!-- STRUKTUR ORGANISASI -->
       <div class="bg-card p-4">
         <h3 class="text-xs font-extrabold text-white tracking-wider mb-4 flex items-center gap-2">
           <i data-lucide="sitemap" class="w-4 h-4 text-[#22C55E]"></i> Struktur Organisasi
         </h3>
-        
         <div class="space-y-2 text-center text-xs">
-          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
-            <p class="text-[9px] text-gray-400 font-bold">OGM (Operations General Manager)</p>
-            <p id="stOGM" class="font-semibold text-white">-</p>
-          </div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl"><p class="text-[9px] text-gray-400 font-bold">OGM (Operations General Manager)</p><p id="stOGM" class="font-semibold text-white">-</p></div>
           <div class="text-gray-500 text-xs">↓</div>
-          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
-            <p class="text-[9px] text-gray-400 font-bold">BM (Branch Manager)</p>
-            <p id="stBM" class="font-semibold text-white">-</p>
-          </div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl"><p class="text-[9px] text-gray-400 font-bold">BM (Branch Manager)</p><p id="stBM" class="font-semibold text-white">-</p></div>
           <div class="text-gray-500 text-xs">↓</div>
-          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
-            <p class="text-[9px] text-gray-400 font-bold">DBM (Deputy Branch Manager)</p>
-            <p id="stDBM" class="font-semibold text-white">-</p>
-          </div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl"><p class="text-[9px] text-gray-400 font-bold">DBM (Deputy Branch Manager)</p><p id="stDBM" class="font-semibold text-white">-</p></div>
           <div class="text-gray-500 text-xs">↓</div>
-          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
-            <p class="text-[9px] text-gray-400 font-bold">AM (Area Manager)</p>
-            <p id="stAM" class="font-semibold text-white">-</p>
-          </div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl"><p class="text-[9px] text-gray-400 font-bold">AM (Area Manager)</p><p id="stAM" class="font-semibold text-white">-</p></div>
           <div class="text-gray-500 text-xs">↓</div>
-          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
-            <p class="text-[9px] text-gray-400 font-bold">AC (Area Coordinator)</p>
-            <p id="stAC" class="font-semibold text-white">-</p>
-          </div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl"><p class="text-[9px] text-gray-400 font-bold">AC (Area Coordinator)</p><p id="stAC" class="font-semibold text-white">-</p></div>
           <div class="text-gray-500 text-xs">↓</div>
-          <div class="bg-[#22C55E]/20 border border-[#22C55E] p-2 rounded-xl text-[#22C55E]">
-            <p class="text-[9px] font-bold">SAYA (TOKO)</p>
-            <p id="stSaya" class="font-extrabold">-</p>
-          </div>
+          <div class="bg-[#22C55E]/20 border border-[#22C55E] p-2 rounded-xl text-[#22C55E]"><p class="text-[9px] font-bold">SAYA (TOKO)</p><p id="stSaya" class="font-extrabold">-</p></div>
         </div>
       </div>
     </div>
 
-    <!-- FLOATING KACIDA AI MASCOT -->
+    <!-- FLOATING KACIDA AI -->
     <button onclick="openKacidaAIModal()" class="fixed bottom-20 right-4 z-40 bg-[#0A2414] border-2 border-[#22C55E] p-2.5 rounded-full shadow-2xl hover:scale-110 transition roket-glow">
       <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" class="w-8 h-8">
     </button>
 
-    <!-- BOTTOM NAVIGATION -->
+    <!-- BOTTOM NAV -->
     <nav class="fixed bottom-0 left-0 right-0 z-50 glass-nav max-w-[430px] mx-auto px-4 py-2 flex items-center justify-between">
-      <button onclick="switchTab('beranda')" id="navBeranda" class="flex flex-col items-center gap-0.5 text-[#22C55E]">
-        <i data-lucide="home" class="w-5 h-5"></i>
-        <span class="text-[10px] font-semibold">Beranda</span>
-      </button>
-
-      <button onclick="switchTab('chat')" id="navChat" class="flex flex-col items-center gap-0.5 text-gray-400">
-        <i data-lucide="message-square" class="w-5 h-5"></i>
-        <span class="text-[10px] font-semibold">Chat</span>
-      </button>
-
-      <!-- ROKET TENGAH -->
-      <div class="relative -top-4">
-        <button onclick="switchTab('aksiCepat')" class="w-12 h-12 bg-[#22C55E] text-[#03170a] rounded-full flex items-center justify-center shadow-2xl roket-glow hover:scale-105 transition">
-          <i data-lucide="rocket" class="w-6 h-6"></i>
-        </button>
-      </div>
-
-      <button onclick="switchTab('leaderboard')" id="navLeaderboard" class="flex flex-col items-center gap-0.5 text-gray-400">
-        <i data-lucide="trophy" class="w-5 h-5"></i>
-        <span class="text-[10px] font-semibold">Leaderboard</span>
-      </button>
-
-      <button onclick="switchTab('profil')" id="navProfil" class="flex flex-col items-center gap-0.5 text-gray-400">
-        <i data-lucide="user" class="w-5 h-5"></i>
-        <span class="text-[10px] font-semibold">Profil</span>
-      </button>
+      <button onclick="switchTab('beranda')" id="navBeranda" class="flex flex-col items-center gap-0.5 text-[#22C55E]"><i data-lucide="home" class="w-5 h-5"></i><span class="text-[10px] font-semibold">Beranda</span></button>
+      <button onclick="switchTab('chat')" id="navChat" class="flex flex-col items-center gap-0.5 text-gray-400"><i data-lucide="message-square" class="w-5 h-5"></i><span class="text-[10px] font-semibold">Chat</span></button>
+      <div class="relative -top-4"><button onclick="switchTab('aksiCepat')" class="w-12 h-12 bg-[#22C55E] text-[#03170a] rounded-full flex items-center justify-center shadow-2xl roket-glow hover:scale-105 transition"><i data-lucide="rocket" class="w-6 h-6"></i></button></div>
+      <button onclick="switchTab('leaderboard')" id="navLeaderboard" class="flex flex-col items-center gap-0.5 text-gray-400"><i data-lucide="trophy" class="w-5 h-5"></i><span class="text-[10px] font-semibold">Leaderboard</span></button>
+      <button onclick="switchTab('profil')" id="navProfil" class="flex flex-col items-center gap-0.5 text-gray-400"><i data-lucide="user" class="w-5 h-5"></i><span class="text-[10px] font-semibold">Profil</span></button>
     </nav>
-
   </div>
 
   <script>
+    // PASTE LINK DEPLOY GOOGLE APPS SCRIPT ANDA DI SINI (JIKA PAKAI GITHUB PAGES):
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb...PASTE_LINK_DEPLOY_DISINI.../exec";
+
     let currentNik = localStorage.getItem("NIK_KACIDA") || "";
     let dashboardData = null;
     let selectedKodeTokoAC = null;
 
+    async function apiCall(action, params = {}) {
+      if (typeof google !== "undefined" && google.script && google.script.run) {
+        return new Promise((resolve, reject) => {
+          let r = google.script.run.withSuccessHandler(res => resolve(res)).withFailureHandler(err => reject(err));
+          if (action === "login") r.loginUser(params.nik);
+          else if (action === "getDashboard") r.getDashboardData(currentNik, selectedKodeTokoAC);
+          else if (action === "getPerforma") r.getPerformaPopup(currentNik, selectedKodeTokoAC);
+          else if (action === "askAI") r.askKacidaAI(currentNik, params.pertanyaan);
+          else if (action === "getLeaderboard") r.getLeaderboard();
+          else if (action === "getChat") r.getChat(currentNik);
+          else if (action === "sendChat") r.sendChatMessage(currentNik, params.pesan, params.tujuan);
+          else if (action === "getDaftarToko") r.getDaftarToko(currentNik);
+          else if (action === "getDaftarTokoAll") r.getDaftarTokoAll();
+        });
+      } else {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.append("action", action);
+        url.searchParams.append("nik", currentNik);
+        if (selectedKodeTokoAC) url.searchParams.append("kodeToko", selectedKodeTokoAC);
+        Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
+
+        const res = await fetch(url);
+        return await res.json();
+      }
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       lucide.createIcons();
-      if (currentNik) {
-        initDashboard();
-      }
+      if (currentNik) initDashboard();
     });
 
-    function handleLogin() {
+    async function handleLogin() {
       const nik = document.getElementById("nikInput").value.trim();
       if (!nik) return Swal.fire("Peringatan", "NIK Wajib Diisi!", "warning");
       
       Swal.showLoading();
-      google.script.run
-        .withSuccessHandler((res) => {
-          Swal.close();
-          if (res.status === "success") {
-            currentNik = nik;
-            localStorage.setItem("NIK_KACIDA", nik);
-            initDashboard();
-          } else {
-            Swal.fire("Error", res.message, "error");
-          }
-        })
-        .withFailureHandler(err => Swal.fire("Error", err.toString(), "error"))
-        .loginUser(nik);
+      currentNik = nik;
+      const res = await apiCall("login", { nik: nik });
+      Swal.close();
+
+      if (res.status === "success") {
+        localStorage.setItem("NIK_KACIDA", nik);
+        initDashboard();
+      } else {
+        Swal.fire("Error", res.message, "error");
+      }
     }
 
-    function initDashboard(kodeTokoPilihan = null) {
+    async function initDashboard(kodeTokoPilihan = null) {
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("appSection").classList.remove("hidden");
-      
-      google.script.run
-        .withSuccessHandler((data) => {
-          if (data.status === "error") {
-            Swal.fire("Error", data.message, "error");
-            return;
-          }
-          dashboardData = data;
-          renderDashboard(data);
-          
-          if (data.user.isAC) {
-            loadDaftarTokoAC();
-          }
-        })
-        .getDashboardData(currentNik, kodeTokoPilihan);
+      if (kodeTokoPilihan) selectedKodeTokoAC = kodeTokoPilihan;
+
+      const data = await apiCall("getDashboard");
+      if (data.status === "error") return Swal.fire("Error", data.message, "error");
+
+      dashboardData = data;
+      renderDashboard(data);
+      populateChatDropdown(); // POPULATE DROPDOWN CHAT DINAMIS SPREADSHEET
+      if (data.user.isAC) loadDaftarTokoAC();
     }
 
     function renderDashboard(data) {
-      // User Info
       document.getElementById("heroNama").innerText = (data.user.NAMA || "Ridwan") + "!";
       if (data.user["FOTO PROFIL"]) {
         document.getElementById("userAvatarHeader").src = data.user["FOTO PROFIL"];
@@ -395,7 +359,6 @@
       document.getElementById("profilToko").innerText = data.user.namaToko || "-";
       document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
 
-      // Header 3 Card
       document.getElementById("cardSalesGrowth").innerText = (data.dataH1.growth ? data.dataH1.growth.toFixed(1) : "102") + "%";
       document.getElementById("cardSalesNominal").innerText = "Rp " + Number(data.dataH1.sales).toLocaleString("id-ID");
       document.getElementById("cardIktVal").innerText = data.dataH1.ikt + "%";
@@ -403,7 +366,6 @@
       document.getElementById("cardPointVal").innerHTML = data.dataH1.point + ' <span class="text-[10px]">Point</span>';
       document.getElementById("cardPointKet").innerText = "★ " + data.dataH1.ketPoint;
 
-      // 5 Kotak
       document.getElementById("badgeTugas").innerText = data.badges.tugas;
       document.getElementById("badgePengumuman").innerText = data.badges.pengumuman;
       document.getElementById("badgeNotif").innerText = data.badges.notif;
@@ -411,16 +373,10 @@
       document.getElementById("badgePoint").innerText = Number(data.badges.point).toLocaleString("id-ID");
       document.getElementById("badgeRank").innerText = "#" + data.badges.rank;
 
-      // Banners Carousel
       renderCarousel(data.banners);
-
-      // Menu Utama
       renderMenuGrid("gridMenuUtama", data.menu.utama.slice(0, 10));
-
-      // Layanan Lainnya
       renderMenuGrid("gridMenuLainnya", data.menu.layanan.slice(0, 8));
 
-      // Struktur Organisasi
       if (data.struktur) {
         document.getElementById("stOGM").innerText = data.struktur.ogm.nama;
         document.getElementById("stBM").innerText = data.struktur.bm.nama;
@@ -436,11 +392,7 @@
     function renderCarousel(banners) {
       const wrapper = document.getElementById("carouselWrapper");
       if (!banners || banners.length === 0) {
-        wrapper.innerHTML = `
-          <div class="swiper-slide bg-gradient-to-r from-green-800 to-green-950 p-6 text-center text-xs font-semibold">
-            TOKO KADUDAMPIT 1 - PIC SAPA (SIAP ANTA PERANAN ANDA)
-          </div>
-        `;
+        wrapper.innerHTML = `<div class="swiper-slide bg-gradient-to-r from-green-800 to-green-950 p-6 text-center text-xs font-semibold">TOKO KADUDAMPIT 1 - PIC SAPA</div>`;
       } else {
         wrapper.innerHTML = banners.map(b => `
           <div class="swiper-slide bg-gradient-to-r from-green-900 to-emerald-950 p-4 flex items-center justify-between">
@@ -454,16 +406,11 @@
         `).join("");
       }
 
-      new Swiper(".mainCarousel", {
-        autoplay: { delay: 5000 },
-        loop: true,
-        pagination: { el: ".swiper-pagination", clickable: true }
-      });
+      new Swiper(".mainCarousel", { autoplay: { delay: 5000 }, loop: true, pagination: { el: ".swiper-pagination", clickable: true } });
     }
 
     function renderMenuGrid(elementId, items) {
-      const container = document.getElementById(elementId);
-      container.innerHTML = items.map(m => `
+      document.getElementById(elementId).innerHTML = items.map(m => `
         <a href="${m["Link Tujuan"] || '#'}" target="_blank" class="bg-card p-2.5 flex flex-col items-center justify-center text-center hover:border-[#22C55E] transition">
           <img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}" class="w-6 h-6 mb-1 object-contain">
           <span class="text-[9px] font-medium text-gray-200 leading-tight">${m["Nama Menu"]}</span>
@@ -471,15 +418,25 @@
       `).join("");
     }
 
-    function loadDaftarTokoAC() {
-      google.script.run.withSuccessHandler((list) => {
-        if (list && list.length > 0) {
-          const container = document.getElementById("acDropdownContainer");
-          const select = document.getElementById("selectTokoAC");
-          container.classList.remove("hidden");
-          select.innerHTML = list.map(t => `<option value="${t.substring(0,4)}">${t}</option>`).join("");
-        }
-      }).getDaftarToko(currentNik);
+    async function loadDaftarTokoAC() {
+      const list = await apiCall("getDaftarToko");
+      if (list && list.length > 0) {
+        document.getElementById("acDropdownContainer").classList.remove("hidden");
+        document.getElementById("selectTokoAC").innerHTML = list.map(t => `<option value="${t.substring(0,4)}">${t}</option>`).join("");
+      }
+    }
+
+    // MEMUAT DAFTAR TOKO SPREADSHEET SECARA DINAMIS KE DROPDOWN CHAT
+    async function populateChatDropdown() {
+      const list = await apiCall("getDaftarTokoAll");
+      const select = document.getElementById("selectChatTujuan");
+      if (select && list && list.length > 0) {
+        select.innerHTML = `
+          <option value="Semua Personil">🌐 Semua Personil (All)</option>
+          <option value="Area Coordinator">👨‍💼 Area Coordinator (AC)</option>
+          ${list.map(t => `<option value="${t}">🏪 ${t}</option>`).join("")}
+        `;
+      }
     }
 
     function onACTokoChange(kodeToko) {
@@ -487,82 +444,110 @@
       initDashboard(kodeToko);
     }
 
-    function openPerformaPopup() {
-      google.script.run.withSuccessHandler((d) => {
-        Swal.fire({
-          title: '<span class="text-xs text-[#22C55E] font-extrabold">DETAIL PERFORMA TOKO</span>',
-          background: '#0A2414',
-          color: '#fff',
-          html: `
-            <div class="text-left font-mono text-[11px] space-y-2 bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A]">
-              <div><strong class="text-yellow-400">SALES (H-1):</strong> Rp ${d.salesHarian2026.toLocaleString('id-ID')}</div>
-              <div class="text-gray-400 text-[10px]">▲ ${d.growthHarian.toFixed(1)}% vs H-2 (Rp ${d.salesHarian2025.toLocaleString('id-ID')})</div>
-              <hr class="border-[#1A3A2A]">
-              <div><strong class="text-yellow-400">MTD SALES:</strong> Rp ${d.mtd2026.toLocaleString('id-ID')}</div>
-              <div class="text-gray-400 text-[10px]">▲ ${d.mtdGrowth.toFixed(1)}% vs MTD 2025</div>
-              <hr class="border-[#1A3A2A]">
-              <div><strong class="text-green-400">IKT TOKO:</strong> ${d.acvSales}% (${d.acvSales >= 90 ? 'Baik' : 'Cukup'})</div>
-              <hr class="border-[#1A3A2A]">
-              <div><strong class="text-red-400">PENAWARAN LANGSUNG:</strong> ${d.pointDash} Point</div>
-              <div class="text-[10px] text-yellow-300">Performa: ${d.ketPoint}</div>
-              <hr class="border-[#1A3A2A]">
-              <div class="text-[9px] text-gray-500">Update Terakhir: ${d.tanggal}</div>
-            </div>
-          `,
-          confirmButtonColor: '#22C55E'
-        });
-      }).getPerformaPopup(currentNik, selectedKodeTokoAC);
+    async function openPerformaPopup() {
+      const d = await apiCall("getPerforma");
+      Swal.fire({
+        title: '<span class="text-xs text-[#22C55E] font-extrabold">DETAIL PERFORMA TOKO</span>',
+        background: '#0A2414',
+        color: '#fff',
+        html: `
+          <div class="text-left font-mono text-[11px] space-y-2 bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A]">
+            <div><strong class="text-yellow-400">SALES (H-1):</strong> Rp ${Number(d.salesHarian2026).toLocaleString('id-ID')}</div>
+            <div class="text-gray-400 text-[10px]">▲ ${d.growthHarian}% vs H-2 (Rp ${Number(d.salesHarian2025).toLocaleString('id-ID')})</div>
+            <hr class="border-[#1A3A2A]">
+            <div><strong class="text-yellow-400">MTD SALES:</strong> Rp ${Number(d.mtd2026).toLocaleString('id-ID')}</div>
+            <hr class="border-[#1A3A2A]">
+            <div><strong class="text-green-400">IKT TOKO:</strong> ${d.acvSales}%</div>
+            <hr class="border-[#1A3A2A]">
+            <div><strong class="text-red-400">PENAWARAN LANGSUNG:</strong> ${d.pointDash} Point</div>
+            <hr class="border-[#1A3A2A]">
+            <div class="text-[9px] text-gray-500">Update Terakhir: ${d.tanggal}</div>
+          </div>
+        `,
+        confirmButtonColor: '#22C55E'
+      });
     }
 
     function openAllMenuModal(kategori) {
       if (!dashboardData) return;
       const list = kategori === 'Utama' ? dashboardData.menu.utama : dashboardData.menu.layanan;
-      
-      const html = `
-        <div class="grid grid-cols-4 gap-3 text-center max-h-[60vh] overflow-y-auto p-2">
-          ${list.map(m => `
-            <a href="${m["Link Tujuan"] || '#'}" target="_blank" class="bg-[#03170a] p-2 rounded-xl border border-[#1A3A2A] flex flex-col items-center">
-              <img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}" class="w-6 h-6 mb-1">
-              <span class="text-[9px] text-white leading-tight">${m["Nama Menu"]}</span>
-            </a>
-          `).join('')}
-        </div>
-      `;
-
       Swal.fire({
         title: `<span class="text-sm font-bold text-[#22C55E]">Semua ${kategori}</span>`,
         background: '#0A2414',
-        html: html,
-        showConfirmButton: false,
-        showCloseButton: true
+        html: `
+          <div class="grid grid-cols-4 gap-3 text-center max-h-[60vh] overflow-y-auto p-2">
+            ${list.map(m => `
+              <a href="${m["Link Tujuan"] || '#'}" target="_blank" class="bg-[#03170a] p-2 rounded-xl border border-[#1A3A2A] flex flex-col items-center">
+                <img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}" class="w-6 h-6 mb-1">
+                <span class="text-[9px] text-white leading-tight">${m["Nama Menu"]}</span>
+              </a>
+            `).join('')}
+          </div>
+        `,
+        showConfirmButton: false, showCloseButton: true
       });
     }
 
-    function openKacidaAIModal() {
+    function openKacidaAIModal(promptPilihan = "") {
       Swal.fire({
-        title: '<span class="text-sm text-[#22C55E]">Tanya Kacida AI</span>',
+        title: '<div class="flex items-center justify-center gap-2"><img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" class="w-6 h-6"><span class="text-sm text-[#22C55E] font-bold">Kacida AI Super Pro</span></div>',
         background: '#0A2414',
-        input: 'textarea',
-        inputPlaceholder: 'Tanyakan sesuatu seputar operasional toko...',
-        showCancelButton: true,
-        confirmButtonText: 'Tanyakan',
-        confirmButtonColor: '#22C55E',
-        preConfirm: (q) => {
+        html: `
+          <div class="text-left space-y-2 mb-3">
+            <p class="text-[10px] text-gray-300">Pilih topik pintar atau ketik bebas (termasuk umum):</p>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="setPromptAI('Berikan analisa performa toko-toko di area saya!')" class="bg-[#03170a] border border-[#1A3A2A] text-[9px] text-[#22C55E] px-2 py-1 rounded-lg">📊 Analisa Area / Toko</button>
+              <button onclick="setPromptAI('Apa kendala terbesar toko saya dan apa strategi mengatasinya?')" class="bg-[#03170a] border border-[#1A3A2A] text-[9px] text-yellow-400 px-2 py-1 rounded-lg">💡 Kendala & Strategi</button>
+              <button onclick="setPromptAI('Berikan candaan atau joke ritel segar tentang kasir!')" class="bg-[#03170a] border border-[#1A3A2A] text-[9px] text-blue-400 px-2 py-1 rounded-lg">😄 Candaan Ritel</button>
+              <button onclick="setPromptAI('Apa itu teknologi Artificial Intelligence dan manfaatnya?')" class="bg-[#03170a] border border-[#1A3A2A] text-[9px] text-purple-400 px-2 py-1 rounded-lg">🌐 Pertanyaan Umum</button>
+            </div>
+          </div>
+          <textarea id="aiPromptInput" class="w-full bg-[#03170a] border border-[#1A3A2A] rounded-xl p-3 text-xs text-white focus:outline-none focus:border-[#22C55E] h-24" placeholder="Ketik pertanyaan bebas atau seputar toko...">${promptPilihan}</textarea>
+        `,
+        showCancelButton: true, confirmButtonText: 'Tanyakan AI', confirmButtonColor: '#22C55E',
+        preConfirm: async () => {
+          const q = document.getElementById("aiPromptInput").value.trim();
           if (!q) return Swal.showValidationMessage("Ketik pertanyaan Anda!");
-          return new Promise((resolve) => {
-            google.script.run.withSuccessHandler(res => resolve(res)).askKacidaAI(currentNik, q);
-          });
+          Swal.showLoading();
+          return await apiCall("askAI", { pertanyaan: q });
         }
       }).then((result) => {
         if (result.isConfirmed && result.value) {
           Swal.fire({
-            title: '<span class="text-xs text-[#22C55E]">Jawaban Kacida AI</span>',
-            background: '#0A2414',
-            color: '#fff',
-            text: result.value.jawaban || "Selesai",
+            title: '<span class="text-xs text-[#22C55E] font-bold">KACIDA AI RESPOND</span>',
+            background: '#0A2414', color: '#fff',
+            html: `<div class="text-left text-xs space-y-2 max-h-[60vh] overflow-y-auto p-2 bg-[#03170a] rounded-xl border border-[#1A3A2A] whitespace-pre-line">${result.value.jawaban || "Selesai"}</div>`,
             confirmButtonColor: '#22C55E'
           });
         }
+      });
+    }
+
+    function setPromptAI(text) { const input = document.getElementById("aiPromptInput"); if (input) input.value = text; }
+
+    function openMenuSidebar() {
+      Swal.fire({
+        title: '<span class="text-sm font-bold text-[#22C55E]">KACIDA BERSATU</span>',
+        background: '#0A2414',
+        html: `
+          <div class="text-left text-xs space-y-3">
+            <button onclick="switchTab('beranda'); Swal.close();" class="w-full bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A] text-white flex items-center gap-2">🏠 Beranda Dashboard</button>
+            <button onclick="switchTab('chat'); Swal.close();" class="w-full bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A] text-white flex items-center gap-2">💬 Chat Internal</button>
+            <button onclick="switchTab('aksiCepat'); Swal.close();" class="w-full bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A] text-white flex items-center gap-2">🚀 Misi Harian</button>
+            <button onclick="switchTab('leaderboard'); Swal.close();" class="w-full bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A] text-white flex items-center gap-2">🏆 Leaderboard Poin</button>
+            <button onclick="switchTab('profil'); Swal.close();" class="w-full bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A] text-white flex items-center gap-2">👤 Profil & Bagan Struktur</button>
+          </div>
+        `,
+        showConfirmButton: false, showCloseButton: true
+      });
+    }
+
+    function openNotifModal() {
+      Swal.fire({
+        title: '<span class="text-xs text-yellow-400 font-bold">Notifikasi Aplikasi</span>',
+        background: '#0A2414',
+        html: `<div class="bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A] text-xs text-left"><p class="font-bold text-[#22C55E]">Target Sales SPD Hari Ini</p><p class="text-[10px] text-gray-300">Selesaikan tugas harian Anda.</p></div>`,
+        confirmButtonColor: '#22C55E'
       });
     }
 
@@ -584,64 +569,55 @@
       if (tabName === "leaderboard") loadLeaderboard();
     }
 
-    function loadChat() {
-      google.script.run.withSuccessHandler((chats) => {
-        const box = document.getElementById("chatBox");
-        box.innerHTML = chats.map(c => `
-          <div class="p-2.5 rounded-xl border border-[#1A3A2A] ${c.NIK_PENGIRIM == currentNik ? 'bg-[#22C55E]/10 border-[#22C55E] ml-6' : 'bg-[#03170a] mr-6'}">
-            <p class="text-[9px] text-gray-400 font-bold">${c.NAMA_PENGIRIM} (${c.JABATAN})</p>
-            <p class="text-xs text-white mt-0.5">${c.ISI_PESAN}</p>
+    async function loadChat() {
+      const chats = await apiCall("getChat");
+      document.getElementById("chatBox").innerHTML = chats.map(c => `
+        <div class="p-2.5 rounded-xl border border-[#1A3A2A] ${c.NIK_PENGIRIM == currentNik ? 'bg-[#22C55E]/10 border-[#22C55E] ml-6' : 'bg-[#03170a] mr-6'}">
+          <div class="flex items-center justify-between mb-0.5">
+            <span class="text-[9px] text-gray-400 font-bold">${c.NAMA_PENGIRIM} (${c.JABATAN})</span>
+            <span class="text-[8px] bg-[#22C55E]/20 text-[#22C55E] px-1.5 py-0.5 rounded font-bold">Ke: ${c.TUJUAN || 'Semua'}</span>
           </div>
-        `).join("");
-      }).getChat(currentNik);
+          <p class="text-xs text-white">${c.ISI_PESAN}</p>
+        </div>
+      `).join("");
     }
 
-    function kirimPesan() {
+    async function kirimPesan() {
       const input = document.getElementById("inputChatMsg");
       const msg = input.value.trim();
+      const tujuan = document.getElementById("selectChatTujuan").value;
       if (!msg) return;
       input.value = "";
-      google.script.run.withSuccessHandler(() => loadChat()).sendChatMessage(currentNik, msg, "Semua");
+      await apiCall("sendChat", { pesan: msg, tujuan: tujuan });
+      loadChat();
     }
 
     function loadMisi() {
-      google.script.run.withSuccessHandler((misi) => {
-        const container = document.getElementById("misiList");
-        container.innerHTML = misi.map(m => `
-          <div class="flex items-center justify-between p-3 bg-[#03170a] border border-[#1A3A2A] rounded-xl">
-            <div>
-              <p class="text-xs font-bold text-white">${m["Nama Menu"]}</p>
-              <p class="text-[9px] text-gray-400">Selesaikan tugas harian</p>
-            </div>
-            <input type="checkbox" class="w-4 h-4 accent-[#22C55E]">
-          </div>
-        `).join("");
-      }).getMisiHarian(currentNik);
+      if (!dashboardData) return;
+      document.getElementById("misiList").innerHTML = dashboardData.menu.misi.map(m => `
+        <div class="flex items-center justify-between p-3 bg-[#03170a] border border-[#1A3A2A] rounded-xl">
+          <div><p class="text-xs font-bold text-white">${m["Nama Menu"]}</p><p class="text-[9px] text-gray-400">Misi harian</p></div>
+          <input type="checkbox" class="w-4 h-4 accent-[#22C55E]">
+        </div>
+      `).join("");
     }
 
-    function loadLeaderboard() {
-      google.script.run.withSuccessHandler((users) => {
-        const container = document.getElementById("leaderboardList");
-        container.innerHTML = users.map((u, i) => `
-          <div class="flex items-center justify-between p-2.5 bg-[#03170a] border border-[#1A3A2A] rounded-xl">
-            <div class="flex items-center gap-3">
-              <span class="text-xs font-extrabold ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-300' : 'text-amber-600'}">#${i+1}</span>
-              <div>
-                <p class="text-xs font-bold text-white">${u.NAMA}</p>
-                <p class="text-[9px] text-gray-400">${u["NAMA TOKO"]}</p>
-              </div>
-            </div>
-            <span class="text-xs font-extrabold text-[#22C55E]">${u["POIN TOTAL"] || 0} Pts</span>
+    async function loadLeaderboard() {
+      const users = await apiCall("getLeaderboard");
+      document.getElementById("leaderboardList").innerHTML = users.map((u, i) => `
+        <div class="flex items-center justify-between p-2.5 bg-[#03170a] border border-[#1A3A2A] rounded-xl">
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-extrabold ${i === 0 ? 'text-yellow-400' : 'text-gray-300'}">#${i+1}</span>
+            <div><p class="text-xs font-bold text-white">${u.NAMA}</p><p class="text-[9px] text-gray-400">${u["NAMA TOKO"]}</p></div>
           </div>
-        `).join("");
-      }).getLeaderboard();
+          <span class="text-xs font-extrabold text-[#22C55E]">${u["POIN TOTAL"] || 0} Pts</span>
+        </div>
+      `).join("");
     }
 
     function handleLogout() {
-      google.script.run.withSuccessHandler(() => {
-        localStorage.removeItem("NIK_KACIDA");
-        location.reload();
-      }).logout();
+      localStorage.removeItem("NIK_KACIDA");
+      location.reload();
     }
   </script>
 </body>
