@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    
+    <!-- SWEETALERT2 INTEGRATED SEPERTI PERMINTAAN USER -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
@@ -96,7 +99,6 @@
         
         .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
 
-        /* STYLE CHAT WA */
         .wa-tab-container { display: flex; background: var(--bg-dark); border-radius: 12px; padding: 4px; border: 1px solid var(--card-border); margin-bottom: 10px; }
         .wa-tab-btn { flex: 1; padding: 8px; text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--text-sub); border-radius: 8px; cursor: pointer; border: none; background: transparent; }
         .wa-tab-btn.active { background: var(--accent-green); color: #03170a; }
@@ -120,51 +122,11 @@
 
         .fab-rocket { width: 50px; height: 50px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-top: -28px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
         .hidden { display: none !important; }
-
-        .custom-modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.82); backdrop-filter: blur(8px);
-            z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px;
-        }
-        .custom-modal-card {
-            background: #0C2B14; border: 1px solid var(--card-border);
-            border-radius: 20px; width: 100%; max-width: 410px; padding: 18px; color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative;
-        }
-        .modal-btn-close {
-            position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.1);
-            border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
-        }
-
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(3, 23, 10, 0.85); backdrop-filter: blur(8px);
-            z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .spinner {
-            width: 42px; height: 42px; border: 4px solid rgba(34, 197, 94, 0.2);
-            border-top: 4px solid var(--accent-green); border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin-bottom: 12px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-text { font-size: 0.8rem; font-weight: 700; color: var(--accent-green); letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay" class="loading-overlay hidden">
-        <div class="spinner"></div>
-        <p id="loadingText" class="loading-text">Memuat Data...</p>
-    </div>
-
-    <div id="customModalOverlay" class="custom-modal-overlay hidden">
-        <div class="custom-modal-card">
-            <button onclick="closeCustomModal()" class="modal-btn-close"><i class="fa-solid fa-xmark"></i></button>
-            <h3 id="customModalTitle" style="font-size: 0.95rem; font-weight: 800; color: var(--accent-green); margin-bottom: 10px;">Modal Title</h3>
-            <div id="customModalBody" style="font-size: 0.78rem; line-height: 1.5; max-height: 70vh; overflow-y: auto;"></div>
-        </div>
-    </div>
-
+    <!-- LOGIN SCREEN -->
     <div id="loginSection" style="max-width: 430px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 24px;">
         <div style="text-align: center; margin-bottom: 24px;">
             <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent-green); margin-bottom: 12px; object-fit: cover;">
@@ -178,6 +140,7 @@
         </div>
     </div>
 
+    <!-- MAIN APP CONTAINER -->
     <div id="appSection" class="hidden" style="max-width: 430px; margin: 0 auto; min-height: 100vh;">
         
         <header class="app-header">
@@ -244,6 +207,7 @@
                 <div class="swiper-pagination"></div>
             </div>
 
+            <!-- 5 KOTAK PERFORMA -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')"><img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d"><span class="metric-title">Tugas</span><span class="metric-value" id="valTasks">0</span></div>
                 <div class="metric-card" onclick="openPengumumanModal()"><img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d"><span class="metric-title">Pengumuman</span><span class="metric-value" id="valAnnounce">0</span></div>
@@ -262,7 +226,7 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT INTERNAL STYLE WHATSAPP + KACIDA AI -->
+        <!-- TAB CHAT INTERNAL STYLE WHATSAPP -->
         <div id="tabChat" class="hidden container space-y-3">
             <h2 class="section-title"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Chat Internal WA</h2>
             
@@ -285,7 +249,7 @@
                     <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 32px; height: 32px;">
                     <div>
                         <p style="font-size: 0.78rem; font-weight: 800; color: var(--accent-green);">Asisten Kacida AI 🤖</p>
-                        <p style="font-size: 0.62rem; color: var(--text-sub);">Tanya sales, IKT, atau candaan harian...</p>
+                        <p style="font-size: 0.62rem; color: var(--text-sub);">Tanya sales, IKT, strategi atau candaan harian...</p>
                     </div>
                 </div>
                 <span style="font-size: 0.6rem; background: var(--accent-green); color: #03170a; font-weight: 800; padding: 3px 8px; border-radius: 10px;">TANYA AI</span>
@@ -312,7 +276,7 @@
             <div id="leaderboardList" class="menu-section-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
-        <!-- TAB PROFIL NAVBAR BOTTOM -->
+        <!-- TAB PROFIL NAVBAR BOTTOM: BAGAN SAMA PERTAMA + PERSONIL KARYAWAN TOKO -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
@@ -321,6 +285,12 @@
                 <p id="profilToko" style="font-size: 0.7rem; color: var(--text-sub);">Toko</p>
                 <p id="profilNik" style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: -</p>
                 <button onclick="handleLogout()" style="margin-top: 12px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 6px 16px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">LOGOUT</button>
+            </div>
+
+            <!-- TIM PERSONIL TOKO DARI MASTER USER -->
+            <div class="menu-section-card">
+                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-green);"></i> Tim Personil Toko</h3>
+                <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
             </div>
 
             <!-- BAGAN STRUKTUR ORGANISASI SEMUA USER -->
@@ -352,63 +322,31 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxx7BxMBfj2HznUezXpaXc_ROb-2kd_XG8W1c8Ehzfre0eOPL6HFjnVTEEinwMuAKci/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVNkSOfu9Ze6D7kOPQ-i5IvWTC9AxhEnLl3pUapmvz1Q8BWpJla0GUw8YOANAHIc0K/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
         let selectedKodeTokoAC = null;
         let activeChatTab = "Toko Saya";
-        let deferredPrompt = null;
+        let readPengumuman = false;
+        let readNotifList = [];
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const btn = document.getElementById('btnInstallPWA');
-            if (btn) btn.classList.remove('hidden');
+        // SWEETALERT2 CONFIGURATION DARK GREEN
+        const SwalDark = Swal.mixin({
+            background: '#0C2B14',
+            color: '#FFFFFF',
+            confirmButtonColor: '#22c55e',
+            cancelButtonColor: '#ef4444'
         });
 
-        async function triggerPWAInstall() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA" });
-                }
-                deferredPrompt = null;
-                document.getElementById('btnInstallPWA').classList.add('hidden');
-            }
-        }
-
-        function requestNotificationPermission() {
-            if (!('Notification' in window)) return;
-            if (Notification.permission === 'granted') {
-                showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green); font-weight:bold;'>Notifikasi Aplikasi Sudah Aktif 🟢</p>");
-            } else {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        apiCall("logActivity", { aktivitas: "Izin Notifikasi", detail: "Granted" });
-                        showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green);'>Notifikasi berhasil diaktifkan!</p>");
-                    }
-                });
-            }
-        }
-
         function showLoading(msg = "Memuat Data...") {
-            document.getElementById("loadingText").innerText = msg;
-            document.getElementById("loadingOverlay").classList.remove("hidden");
+            SwalDark.fire({
+                title: msg,
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
         }
-        function hideLoading() {
-            document.getElementById("loadingOverlay").classList.add("hidden");
-        }
-
-        function showCustomModal(title, htmlBody) {
-            document.getElementById("customModalTitle").innerText = title;
-            document.getElementById("customModalBody").innerHTML = htmlBody;
-            document.getElementById("customModalOverlay").classList.remove("hidden");
-        }
-        function closeCustomModal() {
-            document.getElementById("customModalOverlay").classList.add("hidden");
-        }
+        function hideLoading() { Swal.close(); }
 
         async function apiCall(action, params = {}) {
             if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -456,7 +394,7 @@
                 localStorage.setItem("NIK_KACIDA", nik);
                 initDashboard();
             } else {
-                alert(res.message || "Login Gagal!");
+                SwalDark.fire("Error", res.message || "Login Gagal!", "error");
             }
         }
 
@@ -506,10 +444,14 @@
             document.getElementById("valIKT").innerText = data.dataH1.iktNetSales || "-";
             document.getElementById("valPenawaran").innerText = data.dataH1.point || "-";
 
+            // UNREAD BADGES CHECKING
             document.getElementById("valTasks").innerText = data.badges.tugas;
-            document.getElementById("valAnnounce").innerText = data.badges.pengumuman;
-            document.getElementById("valNotifCount").innerText = data.badges.notif;
-            document.getElementById("notifBadge").innerText = data.badges.notif;
+            document.getElementById("valAnnounce").innerText = readPengumuman ? "0" : data.badges.pengumuman;
+            
+            const unreadNotifs = data.badges.notif - readNotifList.length;
+            document.getElementById("valNotifCount").innerText = unreadNotifs > 0 ? unreadNotifs : 0;
+            document.getElementById("notifBadge").innerText = unreadNotifs > 0 ? unreadNotifs : 0;
+            
             document.getElementById("valPoints").innerText = Number(data.badges.point).toLocaleString("id-ID");
             document.getElementById("valRank").innerText = "#" + data.badges.rank;
 
@@ -524,6 +466,18 @@
                 document.getElementById("stAM").innerText = data.struktur.am.nama;
                 document.getElementById("stAC").innerText = data.struktur.ac.nama;
                 document.getElementById("stSaya").innerText = data.struktur.saya.toko;
+
+                if (data.struktur.personilToko) {
+                    document.getElementById("timTokoContainer").innerHTML = data.struktur.personilToko.map(p => `
+                        <div style="background:var(--bg-dark); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <p style="font-size:0.75rem; font-weight:800; color:white;">${p.nama}</p>
+                                <p style="font-size:0.6rem; color:var(--text-sub);">NIK: ${p.nik}</p>
+                            </div>
+                            <span style="font-size:0.65rem; background:rgba(34, 197, 94, 0.15); color:var(--accent-green); padding:2px 8px; border-radius:6px; font-weight:bold;">${p.jabatan}</span>
+                        </div>
+                    `).join("");
+                }
             }
         }
 
@@ -602,17 +556,23 @@
         function showBriefProfile() {
             if (!dashboardData) return;
             const u = dashboardData.user;
-            showCustomModal("👤 KARTU PENGGUNA", `
-                <div style="text-align: center; padding: 10px;">
-                    <img src="${u["FOTO PROFIL"] || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" style="width: 65px; height: 65px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin-bottom: 8px;">
-                    <h4 style="font-size: 1rem; font-weight: 800; color: white;">${u.NAMA || '-'}</h4>
-                    <p style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">${u.JABATAN || '-'}</p>
-                    <p style="font-size: 0.68rem; color: var(--text-sub);">${u.namaToko || '-'}</p>
-                    <p style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: ${u.NIK || '-'}</p>
-                    <hr style="border-color: var(--card-border); margin: 12px 0;">
-                    <button onclick="handleLogout()" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 8px 18px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; width: 100%;">LOGOUT</button>
-                </div>
-            `);
+            SwalDark.fire({
+                title: '👤 KARTU PENGGUNA',
+                html: `
+                    <div style="text-align: center;">
+                        <img src="${u["FOTO PROFIL"] || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" style="width: 65px; height: 65px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin-bottom: 8px;">
+                        <h4 style="font-size: 1rem; font-weight: 800; color: white;">${u.NAMA || '-'}</h4>
+                        <p style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">${u.JABATAN || '-'}</p>
+                        <p style="font-size: 0.68rem; color: var(--text-sub);">${u.namaToko || '-'}</p>
+                        <p style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: ${u.NIK || '-'}</p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'LOGOUT',
+                cancelButtonText: 'Tutup'
+            }).then((res) => {
+                if (res.isConfirmed) handleLogout();
+            });
         }
 
         async function loadDaftarTokoAC() {
@@ -641,18 +601,19 @@
             initDashboard(kodeToko);
         }
 
+        // SWALFIRE UNTUK PERFORMA HUB
         async function openPerformaPopup() {
             showLoading("Memuat Performance Hub...");
             const d = await apiCall("getPerforma");
             hideLoading();
 
             if (!d || d.status === "error") {
-                showCustomModal("PERFORMANCE HUB", "<p style='color:#ef4444;'>Gagal memuat data performa hub.</p>");
+                SwalDark.fire("PERFORMANCE HUB", "<p style='color:#ef4444;'>Gagal memuat data performa hub.</p>", "error");
                 return;
             }
 
             const htmlBox = `
-                <div style="font-family: monospace, sans-serif; font-size: 0.7rem; line-height: 1.5; color: #fff; background: #03170a; padding: 12px; border-radius: 12px; border: 1px solid var(--card-border);">
+                <div style="font-family: monospace, sans-serif; font-size: 0.7rem; line-height: 1.5; color: #fff; text-align:left; background: #03170a; padding: 12px; border-radius: 12px; border: 1px solid var(--card-border);">
                     <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent-green); margin-bottom:2px; font-size:0.75rem;">
                         <span>📍 ${d.namaToko}</span>
                         <span style="color:var(--gold);">🏆 RANK #${d.rank}</span>
@@ -701,38 +662,53 @@
                 </div>
             `;
 
-            showCustomModal("PERFORMANCE HUB", htmlBox);
+            SwalDark.fire({
+                title: 'PERFORMANCE HUB',
+                html: htmlBox,
+                confirmButtonText: 'Tutup'
+            });
         }
 
+        // SWALFIRE UNTUK PENGUMUMAN (TANDA READ / HILANG)
         function openPengumumanModal() {
+            readPengumuman = true;
+            document.getElementById("valAnnounce").innerText = "0";
+
             if (!dashboardData || !dashboardData.announcements || dashboardData.announcements.length === 0) {
-                showCustomModal("📢 Pengumuman", "<p style='color:var(--text-sub);'>Belum ada pengumuman aktif dari Spreadsheet.</p>");
+                SwalDark.fire("📢 Pengumuman", "<p style='color:var(--text-sub);'>Belum ada pengumuman aktif dari Spreadsheet.</p>", "info");
                 return;
             }
 
             const html = dashboardData.announcements.map(p => `
-                <div style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                <div style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px; text-align:left;">
                     <p style="font-weight:bold; color:var(--gold);">${p.Pengumuman || p.PENGUMUMAN || p.pengumuman || 'Pengumuman'}</p>
                 </div>
             `).join("");
 
-            showCustomModal("📢 Pengumuman Resmi", html);
+            SwalDark.fire({ title: '📢 Pengumuman Resmi', html: html, confirmButtonText: 'Saya Mengerti' });
         }
 
+        // SWALFIRE UNTUK NOTIFIKASI (TANDA READ / HILANG)
         function openNotifModal() {
+            if (dashboardData && dashboardData.notifications) {
+                readNotifList = dashboardData.notifications.map(n => n.ID || n.Id || "1");
+                document.getElementById("valNotifCount").innerText = "0";
+                document.getElementById("notifBadge").innerText = "0";
+            }
+
             if (!dashboardData || !dashboardData.notifications || dashboardData.notifications.length === 0) {
-                showCustomModal("🔔 Notifikasi", "<p style='color:var(--text-sub);'>Tidak ada notifikasi baru.</p>");
+                SwalDark.fire("🔔 Notifikasi", "<p style='color:var(--text-sub);'>Tidak ada notifikasi baru.</p>", "info");
                 return;
             }
 
             const html = dashboardData.notifications.map(n => `
-                <div style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                <div style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px; text-align:left;">
                     <p style="font-weight:bold; color:var(--accent-green);">${n.PESAN || n.Pesan || n.pesan || 'Notifikasi'}</p>
                     <p style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Waktu: ${n.JAM || '-'} | Tgl: ${n.TANGGAL || '-'}</p>
                 </div>
             `).join("");
 
-            showCustomModal("🔔 Notifikasi Aplikasi", html);
+            SwalDark.fire({ title: '🔔 Notifikasi Aplikasi', html: html, confirmButtonText: 'Tutup' });
         }
 
         function setChatTab(tabName) {
@@ -789,52 +765,61 @@
             loadChat();
         }
 
+        // SWALFIRE KACIDA AI SANGAT CERDAS & ANALITIS
         function openAIChatDialog() {
-            showCustomModal("🤖 Asisten Kacida AI", `
-                <div>
-                    <p style="font-size:0.7rem; color:var(--text-sub); margin-bottom:8px;">Tanyakan sesuatu seputar toko Anda:</p>
-                    <textarea id="aiPromptInput" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); border-radius:12px; padding:10px; color:white; font-size:0.75rem; height:80px; outline:none; margin-bottom:10px;" placeholder="Contoh: Gimana sales MTD toko saya hari ini?"></textarea>
-                    <button onclick="submitTanyaAI()" style="width:100%; background:var(--accent-green); color:#03170a; font-weight:800; padding:10px; border-radius:12px; border:none; cursor:pointer;">Tanyakan AI</button>
-                </div>
-            `);
-        }
-
-        async function submitTanyaAI() {
-            const q = document.getElementById("aiPromptInput").value.trim();
-            if (!q) return alert("Ketik pertanyaan Anda!");
-            
-            showLoading("Asisten Kacida AI Berpikir...");
-            const res = await apiCall("askAI", { pertanyaan: q });
-            hideLoading();
-
-            showCustomModal("🤖 Jawaban Asisten Kacida AI:", `<div style="white-space:pre-line; font-size:0.8rem; line-height:1.5;">${res.jawaban || "Selesai"}</div>`);
+            SwalDark.fire({
+                title: '🤖 Asisten Kacida AI',
+                input: 'textarea',
+                inputPlaceholder: 'Tanyakan sales MTD, IKT, strategi, atau candaan harian...',
+                showCancelButton: true,
+                confirmButtonText: 'Tanyakan AI',
+                cancelButtonText: 'Batal',
+                preConfirm: async (q) => {
+                    if (!q) return Swal.showValidationMessage("Ketik pertanyaan Anda!");
+                    showLoading("Asisten Kacida AI Berpikir...");
+                    return await apiCall("askAI", { pertanyaan: q });
+                }
+            }).then((res) => {
+                hideLoading();
+                if (res.isConfirmed && res.value) {
+                    SwalDark.fire({
+                        title: '🤖 Jawaban Asisten Kacida AI:',
+                        html: `<div style="white-space:pre-line; text-align:left; font-size:0.8rem; line-height:1.5;">${res.value.jawaban || "Selesai"}</div>`,
+                        confirmButtonText: 'Mantap!'
+                    });
+                }
+            });
         }
 
         function openAllMenuModal(kategori) {
             if (!dashboardData) return;
             const list = kategori === 'Utama' ? dashboardData.menu.utama : dashboardData.menu.layanan;
-            showCustomModal(`Semua ${kategori}`, `
+            
+            const html = `
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
                     ${list.map(m => `
-                        <div onclick="onMenuClick('${m["Nama Menu"]}', '${m["Link Tujuan"] || '#'}')" style="text-decoration:none; display:flex; flex-direction:column; align-items:center; cursor:pointer;">
+                        <div onclick="Swal.close(); onMenuClick('${m["Nama Menu"]}', '${m["Link Tujuan"] || '#'}')" style="text-decoration:none; display:flex; flex-direction:column; align-items:center; cursor:pointer;">
                             <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
                             <span class="menu-label">${m["Nama Menu"]}</span>
                         </div>
                     `).join('')}
                 </div>
-            `);
+            `;
+
+            SwalDark.fire({ title: `Semua ${kategori}`, html: html, showConfirmButton: false, showCloseButton: true });
         }
 
         function openMenuSidebar() {
-            showCustomModal("Menu Navigasi", `
+            const html = `
                 <div style="display:flex; flex-direction:column; gap:8px;">
-                    <button onclick="switchTab('beranda'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">🏠 Beranda Dashboard</button>
-                    <button onclick="switchTab('chat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">💬 Chat Internal WA</button>
-                    <button onclick="switchTab('aksiCepat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">🚀 Misi Hari Ini</button>
-                    <button onclick="switchTab('leaderboard'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">🏆 Leaderboard Area</button>
-                    <button onclick="switchTab('profil'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">👤 Profil & Bagan Struktur</button>
+                    <button onclick="switchTab('beranda'); Swal.close();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🏠 Beranda Dashboard</button>
+                    <button onclick="switchTab('chat'); Swal.close();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">💬 Chat Internal WA</button>
+                    <button onclick="switchTab('aksiCepat'); Swal.close();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🚀 Misi Hari Ini</button>
+                    <button onclick="switchTab('leaderboard'); Swal.close();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🏆 Leaderboard Area</button>
+                    <button onclick="switchTab('profil'); Swal.close();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">👤 Profil & Bagan Struktur</button>
                 </div>
-            `);
+            `;
+            SwalDark.fire({ title: 'Menu Navigasi', html: html, showConfirmButton: false, showCloseButton: true });
         }
 
         function switchTab(tabName) {
