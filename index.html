@@ -1,1151 +1,648 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#03170a">
-    <title>Kacida Bersatu - Dashboard PWA</title>
-    
-    <!-- PWA Manifest & Icons -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png">
-    
-    <!-- Google Fonts & FontAwesome -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KACIDA BERSATU</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#03170a">
+  
+  <!-- CDNs -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-        :root {
-            --bg-dark: #03170a;
-            --card-bg: rgba(12, 43, 20, 0.75);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --accent-green: #22c55e;
-            --bright-green: #10b981;
-            --gold: #f59e0b;
-            --text-white: #ffffff;
-            --text-sub: #94a3b8;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 10% 10%, rgba(34, 197, 94, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 40%);
-            color: var(--text-white);
-            min-height: 100vh;
-            padding-bottom: 90px;
-        }
-
-        /* Gate Protection Overlay */
-        #loginGateOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #03170a;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Top Header Navigation */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(3, 23, 10, 0.92);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .btn-hamburger {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--card-border);
-            color: #fff;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-
-        .brand-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            font-size: 1.05rem;
-        }
-
-        .brand-icon {
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(135deg, #10b981, #052e16);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .disket-badge {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(34, 197, 94, 0.2));
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
-            transition: transform 0.2s ease;
-        }
-
-        .notif-badge {
-            position: relative;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--card-border);
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .notif-count {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: #ef4444;
-            color: #fff;
-            font-size: 0.6rem;
-            font-weight: 700;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--bg-dark);
-        }
-
-        .user-avatar-3d {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-green);
-            object-fit: cover;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
-        }
-
-        .container {
-            padding: 0 16px;
-            margin-top: 12px;
-        }
-
-        /* Header Disket Bar Tampilan Presisi */
-        .disket-info-bar {
-            background: linear-gradient(135deg, rgba(12, 43, 20, 0.95), rgba(5, 25, 12, 0.95));
-            border: 1px solid var(--gold);
-            border-radius: 16px;
-            padding: 12px 14px;
-            margin-bottom: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-        }
-
-        .disket-bar-item {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .disket-bar-label {
-            font-size: 0.65rem;
-            color: var(--text-sub);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .disket-bar-val {
-            font-size: 0.85rem;
-            font-weight: 800;
-            margin-top: 2px;
-        }
-
-        .disket-divider {
-            width: 1px;
-            height: 28px;
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .pulse-loading {
-            animation: pulse 1.5s infinite ease-in-out;
-            opacity: 0.5;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-
-        .hero-card {
-            background: linear-gradient(135deg, #0a3a18 0%, #06240f 100%);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 20px;
-            padding: 18px;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 65%;
-        }
-
-        .hero-title {
-            font-size: 1.2rem;
-            font-weight: 800;
-            margin-top: 4px;
-            line-height: 1.2;
-        }
-
-        .hero-sub {
-            font-size: 0.72rem;
-            color: var(--text-sub);
-            margin-top: 6px;
-            line-height: 1.3;
-        }
-
-        .performance-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 12px;
-            border-radius: 12px;
-            margin-top: 12px;
-            font-size: 0.72rem;
-            font-weight: 600;
-        }
-
-        .hero-3d-illustration {
-            position: absolute;
-            right: -10px;
-            bottom: 0;
-            width: 145px;
-            height: auto;
-            z-index: 1;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
-        }
-
-        .banner-card {
-            background: linear-gradient(135deg, #fff2e6 0%, #ffe4cc 100%);
-            border-radius: 18px;
-            padding: 16px;
-            color: #1e293b;
-            position: relative;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .banner-tag {
-            background: #fed7aa;
-            color: #c2410c;
-            font-size: 0.65rem;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 6px;
-            display: inline-block;
-            margin-bottom: 4px;
-        }
-
-        .banner-heading {
-            font-size: 1.35rem;
-            font-weight: 900;
-            color: #dc2626;
-            line-height: 1.1;
-        }
-
-        .banner-subtext {
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-top: 2px;
-        }
-
-        .banner-btn {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-top: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-        }
-
-        .banner-dots {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 8px;
-            margin-bottom: 12px;
-        }
-
-        .dot {
-            width: 6px; height: 6px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-        }
-
-        .dot.active {
-            width: 16px;
-            background: var(--accent-green);
-            border-radius: 10px;
-        }
-
-        .metrics-scroll {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            margin-bottom: 16px;
-            scrollbar-width: none;
-        }
-
-        .metrics-scroll::-webkit-scrollbar { display: none; }
-
-        .metric-card {
-            min-width: 110px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 14px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            position: relative;
-        }
-
-        .metric-icon-3d {
-            width: 30px; height: 30px;
-            margin-bottom: 8px;
-        }
-
-        .metric-title {
-            font-size: 0.65rem;
-            color: var(--text-sub);
-        }
-
-        .metric-value {
-            font-size: 0.95rem;
-            font-weight: 800;
-            margin-top: 2px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .section-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-see-all {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--card-border);
-            color: var(--text-sub);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.68rem;
-            text-decoration: none;
-        }
-
-        .menu-section-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 16px;
-            margin-bottom: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-grid-5 {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .menu-grid-4 {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            position: relative;
-            z-index: 2;
-            margin-top: 10px;
-        }
-
-        .menu-3d-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .icon-box-3d {
-            width: 48px; height: 48px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 6px;
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease;
-        }
-
-        .icon-box-3d:active { transform: scale(0.92); }
-
-        .icon-box-3d img {
-            width: 28px; height: 28px;
-            object-fit: contain;
-        }
-
-        .menu-label {
-            font-size: 0.62rem;
-            font-weight: 500;
-            color: var(--text-white);
-            line-height: 1.2;
-        }
-
-        .rocket-deco {
-            position: absolute;
-            right: -15px; bottom: -10px;
-            width: 90px;
-            opacity: 0.85;
-            pointer-events: none;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            bottom: 12px; left: 16px; right: 16px;
-            height: 60px;
-            background: rgba(10, 35, 18, 0.90);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 35px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            color: var(--text-sub);
-            font-size: 0.65rem;
-            cursor: pointer;
-            text-decoration: none;
-            position: relative;
-        }
-
-        .nav-item.active {
-            background: var(--accent-green);
-            color: #03170a;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: 700;
-        }
-
-        .nav-item.active i { color: #03170a; }
-
-        .nav-item i { font-size: 1.1rem; }
-
-        .fab-rocket {
-            width: 50px; height: 50px;
-            background: linear-gradient(135deg, #22c55e, #10b981);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-            margin-top: -28px;
-            border: 4px solid var(--bg-dark);
-            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.5);
-            cursor: pointer;
-        }
-
-        .chat-unread-badge {
-            position: absolute;
-            top: -2px; right: -4px;
-            background: #ef4444;
-            color: #fff;
-            font-size: 0.55rem;
-            font-weight: 800;
-            padding: 2px 5px;
-            border-radius: 10px;
-            border: 1px solid var(--bg-dark);
-        }
-
-        .floating-ai-btn {
-            position: absolute;
-            bottom: 12px; right: 12px;
-            width: 44px; height: 44px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
-            cursor: pointer;
-            border: 2px solid #fff;
-        }
-    </style>
+  <style>
+    * { font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #03170a; color: #ffffff; }
+    .bg-card { background-color: #0A2414; border: 1px solid #1A3A2A; border-radius: 24px; }
+    .card-radius { border-radius: 24px; }
+    .glass-header { background: rgba(3, 23, 10, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid #1A3A2A; }
+    .glass-nav { background: rgba(10, 36, 20, 0.9); backdrop-filter: blur(16px); border-top: 1px solid #1A3A2A; }
+    .custom-scrollbar::-webkit-scrollbar { display: none; }
+    .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .roket-glow { box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
+  </style>
 </head>
-<body>
+<body class="custom-scrollbar min-h-screen pb-28">
 
-    <!-- Lock Gate jika NIK belum terverifikasi -->
-    <div id="loginGateOverlay"></div>
+  <!-- LOGIN SECTION -->
+  <div id="loginSection" class="max-w-[430px] mx-auto min-h-screen flex flex-col justify-center px-6 py-8">
+    <div class="text-center mb-8">
+      <img id="loginLogo" src="https://drive.google.com/uc?export=view&id=10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" class="w-24 h-24 mx-auto mb-4 rounded-full border-2 border-[#22C55E] object-cover shadow-lg">
+      <h1 class="text-2xl font-extrabold text-[#22C55E] tracking-wider">KACIDA BERSATU</h1>
+      <p class="text-xs text-gray-400 mt-1">Panduan Fitur Dashboard & Portal Operasional</p>
+    </div>
 
-    <!-- Header Navigation -->
-    <header class="app-header">
-        <div class="header-left">
-            <button class="btn-hamburger" onclick="toggleMenu()" aria-label="Menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <div class="brand-title">
-                <div class="brand-icon"><i class="fa-solid fa-leaf"></i></div>
-                <span>Kacida Bersatu</span>
-            </div>
+    <div class="bg-card p-6 shadow-2xl">
+      <h2 class="text-lg font-bold mb-4 text-center text-white">Login Pengguna</h2>
+      <div class="mb-4">
+        <label class="block text-xs font-semibold text-gray-300 mb-2">NIK PENGGUNA</label>
+        <input type="text" id="nikInput" placeholder="Masukkan NIK Anda" class="w-full bg-[#03170a] border border-[#1A3A2A] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#22C55E]">
+      </div>
+      <button onclick="handleLogin()" id="btnSubmitLogin" class="w-full bg-[#22C55E] hover:bg-green-600 text-[#03170a] font-extrabold py-3 rounded-xl transition duration-200 shadow-lg">
+        MASUK APLIKASI
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER (AFTER LOGIN) -->
+  <div id="appSection" class="hidden max-w-[430px] mx-auto min-h-screen relative">
+
+    <!-- HEADER FIXED -->
+    <header class="sticky top-0 z-40 glass-header px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="text-white hover:text-[#22C55E]"><i data-lucide="menu" class="w-6 h-6"></i></button>
+        <div class="flex items-center gap-2">
+          <img src="https://drive.google.com/uc?export=view&id=10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" class="w-7 h-7 rounded-full border border-[#22C55E]">
+          <span class="font-extrabold text-sm tracking-wide text-white">Kacida Bersatu</span>
         </div>
-        <div class="header-right">
-            <div class="disket-badge" id="btnDisket" onclick="showPerformaDetail()" title="Disket Performa Sales & IKT">
-                <i class="fa-solid fa-floppy-disk"></i>
-            </div>
-            
-            <div class="notif-badge" id="btnNotif" onclick="requestNotificationPermission()" title="Notifikasi">
-                <i class="fa-regular fa-bell"></i>
-                <span class="notif-count" id="lblNotifCount">3</span>
-            </div>
+      </div>
 
-            <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" alt="Avatar 3D" class="user-avatar-3d" onclick="showUserProfile()">
+      <div class="flex items-center gap-2.5">
+        <!-- ICON DISKET -->
+        <button onclick="openPerformaPopup()" class="w-9 h-9 rounded-xl bg-[#facc15] text-[#03170a] flex items-center justify-center font-bold shadow-md hover:scale-105 transition">
+          <i data-lucide="save" class="w-5 h-5"></i>
+        </button>
+        <!-- LONCENG NOTIF -->
+        <button onclick="openNotifModal()" class="relative w-9 h-9 rounded-xl bg-[#0A2414] border border-[#1A3A2A] text-white flex items-center justify-center">
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">3</span>
+        </button>
+        <!-- AVATAR PROFIL -->
+        <div onclick="switchTab('profil')" class="w-9 h-9 rounded-full border-2 border-[#22C55E] overflow-hidden cursor-pointer">
+          <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-full h-full object-cover">
         </div>
+      </div>
     </header>
 
-    <main class="container">
+    <!-- AC STORE SELECTION DROPDOWN (ONLY IF USER IS AC/ADMIN) -->
+    <div id="acDropdownContainer" class="hidden px-4 pt-3 pb-1">
+      <div class="bg-card px-3 py-2 flex items-center gap-2">
+        <i data-lucide="store" class="w-4 h-4 text-[#22C55E]"></i>
+        <select id="selectTokoAC" onchange="onACTokoChange(this.value)" class="bg-transparent text-xs text-[#22C55E] font-bold w-full focus:outline-none">
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+    </div>
 
-        <!-- Header Disket Info Bar Mendatar -->
-        <section class="disket-info-bar" onclick="showPerformaDetail()">
-            <div class="disket-bar-item">
-                <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
-                <span class="disket-bar-val pulse-loading" id="valSales" style="color: var(--accent-green);">Memuat...</span>
-            </div>
-            <div class="disket-divider"></div>
-            <div class="disket-bar-item">
-                <span class="disket-bar-label"><i class="fa-solid fa-bullseye" style="color: var(--gold);"></i> IKT Toko</span>
-                <span class="disket-bar-val pulse-loading" id="valIKT" style="color: var(--gold);">Memuat...</span>
-            </div>
-            <div class="disket-divider"></div>
-            <div class="disket-bar-item">
-                <span class="disket-bar-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Penawaran</span>
-                <span class="disket-bar-val pulse-loading" id="valPenawaran" style="color: #ef4444;">Memuat...</span>
-            </div>
-            <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
-        </section>
-        
-        <!-- Hero Card -->
-        <section class="hero-card">
-            <div class="hero-content">
-                <span style="font-size: 0.72rem; color: var(--text-sub);">Selamat datang kembali,</span>
-                <h1 class="hero-title" id="lblUserName">Team Kacida! 👋</h1>
-                <p class="hero-sub">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
-                <div class="performance-badge">
-                    <i class="fa-solid fa-star" style="color: var(--gold);"></i>
-                    <span>Performa hari ini <strong style="color: var(--accent-green);" id="lblStatusPerformance">Sangat Baik! 🔥</strong></span>
-                </div>
-            </div>
-            <img src="https://img.freepik.com/free-psd/3d-rendering-boy-character_23-2150798150.png" class="hero-3d-illustration" alt="3D Team">
-        </section>
-
-        <!-- Carousel Banner -->
-        <section class="banner-card">
-            <span class="banner-tag" id="lblStoreCode">TOKO KADUDAMPIT 1</span>
-            <h2 class="banner-heading">PIC SAPA</h2>
-            <p class="banner-subtext">(SIAP ANTAR PESANAN ANDA)</p>
-            <button class="banner-btn" onclick="navigateMenu('pic-sapa')">
-                Lihat Selengkapnya <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        </section>
-
-        <div class="banner-dots">
-            <div class="dot active"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
+    <!-- TAB BERANDA -->
+    <main id="tabBeranda" class="px-4 pt-3 space-y-4">
+      
+      <!-- 3 CARD HEADER -->
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-card p-3 text-center border-l-2 border-[#22C55E]">
+          <div class="flex items-center justify-center gap-1 text-[10px] text-gray-400 font-semibold mb-1">
+            <i data-lucide="trending-up" class="w-3 h-3 text-[#22C55E]"></i> Sales SPD (H-1)
+          </div>
+          <div id="cardSalesGrowth" class="text-lg font-extrabold text-[#22C55E]">102%</div>
+          <div id="cardSalesNominal" class="text-[10px] font-bold text-white">Rp 45.320.000</div>
+          <div id="cardSalesVs" class="text-[9px] text-green-400 font-medium">▲ +8,2% vs H-2</div>
         </div>
 
-        <!-- Metrics -->
-        <section class="metrics-scroll">
-            <div class="metric-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d" alt="Tugas">
-                <span class="metric-title">Tugas Hari Ini</span>
-                <span class="metric-value" id="valTugas">12 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Tugas</small></span>
-            </div>
-
-            <div class="metric-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d" alt="Pengumuman">
-                <span class="metric-title">Pengumuman</span>
-                <span class="metric-value" id="valPengumuman">5 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
-            </div>
-
-            <div class="metric-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d" alt="Notifikasi">
-                <span class="metric-title">Notifikasi</span>
-                <span class="metric-value" id="valNotifikasi">3 <small style="font-size:0.6rem; font-weight:normal; color:var(--text-sub);">Baru</small></span>
-            </div>
-
-            <div class="metric-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d" alt="Poin">
-                <span class="metric-title">Point Anda</span>
-                <span class="metric-value pulse-loading" id="valPoints" style="color: var(--gold);">0 <small style="font-size:0.6rem; font-weight:normal;">Point</small></span>
-            </div>
-
-            <div class="metric-card">
-                <img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="metric-icon-3d" alt="Rank">
-                <span class="metric-title">Rank Anda</span>
-                <span class="metric-value pulse-loading" id="valRank" style="color: var(--accent-green);">- <small style="font-size:0.6rem; font-weight:normal;">Area</small></span>
-            </div>
-        </section>
-
-        <!-- Menu Utama -->
-        <div class="section-header">
-            <h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3>
-            <a href="#" class="btn-see-all" onclick="navigateMenu('semua-menu')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
+        <div class="bg-card p-3 text-center border-l-2 border-yellow-400">
+          <div class="flex items-center justify-center gap-1 text-[10px] text-gray-400 font-semibold mb-1">
+            <i data-lucide="target" class="w-3 h-3 text-yellow-400"></i> IKT Toko
+          </div>
+          <div id="cardIktVal" class="text-lg font-extrabold text-yellow-400">92,35%</div>
+          <div class="text-[10px] text-gray-300 mt-1">Pencapaian <span id="cardIktKet" class="text-green-400 font-bold">Baik</span></div>
         </div>
 
-        <section class="menu-section-card">
-            <div class="menu-grid-5">
-                <div class="menu-3d-item" onclick="navigateMenu('laporan-sementara')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2965/2965300.png" alt="Laporan"></div>
-                    <span class="menu-label">Laporan Sementara</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('laporan-shift')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3767/3767084.png" alt="Shift"></div>
-                    <span class="menu-label">Laporan Akhir Shift</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('jobdesk')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png" alt="Jobdesk"></div>
-                    <span class="menu-label">Jobdesk Harian</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('validasi-exp')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png" alt="Exp"></div>
-                    <span class="menu-label">Validasi Cek Exp</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('tdp-area')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" alt="TDP"></div>
-                    <span class="menu-label">TDP Area</span>
-                </div>
-            </div>
-
-            <div class="menu-grid-4">
-                <div class="menu-3d-item" onclick="navigateMenu('monitoring-ikt')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3594/3594363.png" alt="IKT"></div>
-                    <span class="menu-label">Monitoring IKT</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('highlight-sales')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2454/2454271.png" alt="Sales"></div>
-                    <span class="menu-label">Highlight Sales</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('monitoring-psm')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" alt="PSM"></div>
-                    <span class="menu-label">Monitoring PSM</span>
-                </div>
-            </div>
-
-            <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket 3D">
-        </section>
-
-        <!-- Layanan Lainnya -->
-        <div class="section-header">
-            <h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3>
-            <a href="#" class="btn-see-all" onclick="navigateMenu('semua-layanan')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
+        <div class="bg-card p-3 text-center border-l-2 border-red-500">
+          <div class="flex items-center justify-center gap-1 text-[10px] text-gray-400 font-semibold mb-1">
+            <i data-lucide="gift" class="w-3 h-3 text-red-500"></i> Penawaran
+          </div>
+          <div id="cardPointVal" class="text-lg font-extrabold text-red-500">125 <span class="text-[10px]">Point</span></div>
+          <div id="cardPointKet" class="text-[10px] text-yellow-400 font-bold mt-1">★ Sangat Baik</div>
         </div>
+      </div>
 
-        <section class="menu-section-card" style="padding: 12px;">
-            <div class="menu-grid-4">
-                <div class="menu-3d-item" onclick="navigateMenu('qrcode-cdm')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/3409/3409597.png" alt="QR"></div>
-                    <span class="menu-label">QR Code CDM</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('roleplay-mtk')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/4384/4384248.png" alt="Roleplay"></div>
-                    <span class="menu-label">Roleplay Area MTK</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('claim-duka')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2904/2904832.png" alt="Duka"></div>
-                    <span class="menu-label">Claim Uang Duka & Nikah</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('penenang-psm')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2810/2810052.png" alt="Excel"></div>
-                    <span class="menu-label">Penenang PSM EXCEL</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('validasi-auto-btl')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1067/1067357.png" alt="BTL"></div>
-                    <span class="menu-label">Validasi AUTO BTL</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('koperasi-online')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/1256/1256650.png" alt="Koperasi"></div>
-                    <span class="menu-label">Koperasi Online</span>
-                </div>
-                <div class="menu-3d-item" onclick="navigateMenu('asset-online')">
-                    <div class="icon-box-3d"><img src="https://cdn-icons-png.flaticon.com/512/2821/2821820.png" alt="Asset"></div>
-                    <span class="menu-label">Asset Online</span>
-                </div>
-            </div>
-        </section>
+      <!-- BANNER MENYAPA (HERO CARD) -->
+      <div class="bg-gradient-to-r from-[#0A2414] via-[#1A3A2A] to-[#0A2414] p-4 card-radius border border-[#22C55E]/30 relative overflow-hidden flex items-center justify-between">
+        <div class="z-10 max-w-[65%]">
+          <p class="text-xs text-gray-300">Halo,</p>
+          <h2 id="heroNama" class="text-xl font-extrabold text-white tracking-wide">Ridwan! 👋</h2>
+          <p class="text-[11px] text-gray-300 mt-1 leading-tight">Semangat bekerja hari ini! Mari capai target terbaik Anda.</p>
+          <div class="mt-3 inline-flex items-center gap-1.5 bg-[#03170a]/80 px-3 py-1 rounded-full border border-[#22C55E]">
+            <span class="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
+            <span class="text-[10px] font-semibold text-gray-200">Performa hari ini: <span class="text-[#22C55E]">Sangat Baik!</span></span>
+          </div>
+        </div>
+        <div class="z-10 w-28">
+          <img src="https://illustrations.popsy.co/emerald/work-from-home.svg" class="w-full object-contain">
+        </div>
+      </div>
+
+      <!-- BANNER CAROUSEL (SWIPER) -->
+      <div class="swiper mainCarousel rounded-2xl overflow-hidden border border-[#1A3A2A]">
+        <div class="swiper-wrapper" id="carouselWrapper">
+          <!-- Banners JS -->
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+
+      <!-- 5 KOTAK INFORMASI -->
+      <div class="grid grid-cols-5 gap-1.5">
+        <div class="bg-card p-2 text-center flex flex-col items-center justify-center">
+          <i data-lucide="clipboard-list" class="w-4 h-4 text-[#22C55E] mb-1"></i>
+          <p class="text-[9px] text-gray-400">Tugas Hari Ini</p>
+          <p id="badgeTugas" class="text-xs font-bold text-white">12</p>
+        </div>
+        <div class="bg-card p-2 text-center flex flex-col items-center justify-center">
+          <i data-lucide="megaphone" class="w-4 h-4 text-blue-400 mb-1"></i>
+          <p class="text-[9px] text-gray-400">Pengumuman</p>
+          <p id="badgePengumuman" class="text-xs font-bold text-white">5</p>
+        </div>
+        <div class="bg-card p-2 text-center flex flex-col items-center justify-center">
+          <i data-lucide="bell" class="w-4 h-4 text-yellow-400 mb-1"></i>
+          <p class="text-[9px] text-gray-400">Notifikasi</p>
+          <p id="badgeNotif" class="text-xs font-bold text-white">3</p>
+        </div>
+        <div class="bg-card p-2 text-center flex flex-col items-center justify-center">
+          <i data-lucide="award" class="w-4 h-4 text-orange-400 mb-1"></i>
+          <p class="text-[9px] text-gray-400">Point Anda</p>
+          <p id="badgePoint" class="text-xs font-bold text-white">1.250</p>
+        </div>
+        <div class="bg-card p-2 text-center flex flex-col items-center justify-center">
+          <i data-lucide="trophy" class="w-4 h-4 text-yellow-300 mb-1"></i>
+          <p class="text-[9px] text-gray-400">Rank Anda</p>
+          <p id="badgeRank" class="text-xs font-bold text-yellow-400">#7</p>
+        </div>
+      </div>
+
+      <!-- MENU UTAMA -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xs font-extrabold text-white tracking-wider flex items-center gap-1">
+            <i data-lucide="grid" class="w-3.5 h-3.5 text-[#22C55E]"></i> Menu Utama
+          </h3>
+          <button onclick="openAllMenuModal('Utama')" class="text-[10px] text-[#22C55E] font-semibold hover:underline">Lihat Semua &gt;</button>
+        </div>
+        <div id="gridMenuUtama" class="grid grid-cols-5 gap-2">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- LAYANAN LAINNYA -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xs font-extrabold text-white tracking-wider flex items-center gap-1">
+            <i data-lucide="layers" class="w-3.5 h-3.5 text-yellow-400"></i> Layanan Lainnya
+          </h3>
+          <button onclick="openAllMenuModal('Lainnya')" class="text-[10px] text-[#22C55E] font-semibold hover:underline">Lihat Semua &gt;</button>
+        </div>
+        <div id="gridMenuLainnya" class="grid grid-cols-4 gap-2">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
 
     </main>
 
-    <!-- Bottom Nav -->
-    <nav class="bottom-nav">
-        <a href="#" class="nav-item active">
-            <i class="fa-solid fa-house"></i>
-            <span>Beranda</span>
-        </a>
-        
-        <a href="#" class="nav-item" onclick="openInternalChat()">
-            <i class="fa-solid fa-comments"></i>
-            <span>Chat</span>
-            <span class="chat-unread-badge" id="unreadBadge">2</span>
-        </a>
-        
-        <div class="fab-rocket" onclick="navigateMenu('aksi-cepat')">
-            <i class="fa-solid fa-rocket"></i>
-        </div>
+    <!-- TAB CHAT -->
+    <div id="tabChat" class="hidden px-4 pt-3 space-y-3">
+      <h2 class="text-base font-bold text-white flex items-center gap-2">
+        <i data-lucide="message-square" class="w-5 h-5 text-[#22C55E]"></i> Chat Internal
+      </h2>
+      <div id="chatBox" class="bg-card p-4 h-[65vh] overflow-y-auto space-y-3 custom-scrollbar">
+        <!-- Chat items -->
+      </div>
+      <div class="flex gap-2">
+        <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." class="flex-1 bg-card border border-[#1A3A2A] rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-[#22C55E]">
+        <button onclick="kirimPesan()" class="bg-[#22C55E] text-[#03170a] px-4 rounded-xl font-bold flex items-center justify-center">
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
 
-        <a href="#" class="nav-item" onclick="openLeaderboardModal()">
-            <i class="fa-solid fa-crown"></i>
-            <span>Leaderboard</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showUserProfile()">
-            <i class="fa-solid fa-user"></i>
-            <span>Profil</span>
-        </a>
+    <!-- TAB AKSI CEPAT / MISI -->
+    <div id="tabAksiCepat" class="hidden px-4 pt-3 space-y-4">
+      <div class="bg-card p-4">
+        <h2 class="text-base font-extrabold text-[#22C55E] mb-1 flex items-center gap-2">
+          <i data-lucide="rocket" class="w-5 h-5"></i> Misi Hari Ini
+        </h2>
+        <p class="text-xs text-gray-400 mb-4">Selesaikan tugas harian untuk mengumpulkan poin.</p>
+        <div id="misiList" class="space-y-3">
+          <!-- Misi items -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB LEADERBOARD -->
+    <div id="tabLeaderboard" class="hidden px-4 pt-3 space-y-3">
+      <h2 class="text-base font-bold text-yellow-400 flex items-center gap-2">
+        <i data-lucide="crown" class="w-5 h-5"></i> Leaderboard Area
+      </h2>
+      <div id="leaderboardList" class="bg-card p-3 space-y-2">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+
+    <!-- TAB PROFIL & STRUKTUR -->
+    <div id="tabProfil" class="hidden px-4 pt-3 space-y-4">
+      <!-- USER CARD -->
+      <div class="bg-card p-5 text-center relative overflow-hidden">
+        <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-20 h-20 rounded-full mx-auto border-2 border-[#22C55E] object-cover mb-2 shadow-lg">
+        <h2 id="profilNama" class="text-lg font-bold text-white">Ridwan</h2>
+        <p id="profilJabatan" class="text-xs text-[#22C55E] font-semibold">Area Coordinator</p>
+        <p id="profilToko" class="text-xs text-gray-400">Kadudampit</p>
+        <p id="profilNik" class="text-[10px] text-gray-500 mt-1">NIK: 3201012305860001</p>
+        <button onclick="handleLogout()" class="mt-4 bg-red-500/20 text-red-400 border border-red-500/40 px-4 py-1.5 rounded-xl text-xs font-bold">
+          LOGOUT
+        </button>
+      </div>
+
+      <!-- BAGAN STRUKTUR ORGANISASI -->
+      <div class="bg-card p-4">
+        <h3 class="text-xs font-extrabold text-white tracking-wider mb-4 flex items-center gap-2">
+          <i data-lucide="sitemap" class="w-4 h-4 text-[#22C55E]"></i> Struktur Organisasi
+        </h3>
+        
+        <div class="space-y-2 text-center text-xs">
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
+            <p class="text-[9px] text-gray-400 font-bold">OGM (Operations General Manager)</p>
+            <p id="stOGM" class="font-semibold text-white">-</p>
+          </div>
+          <div class="text-gray-500 text-xs">↓</div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
+            <p class="text-[9px] text-gray-400 font-bold">BM (Branch Manager)</p>
+            <p id="stBM" class="font-semibold text-white">-</p>
+          </div>
+          <div class="text-gray-500 text-xs">↓</div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
+            <p class="text-[9px] text-gray-400 font-bold">DBM (Deputy Branch Manager)</p>
+            <p id="stDBM" class="font-semibold text-white">-</p>
+          </div>
+          <div class="text-gray-500 text-xs">↓</div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
+            <p class="text-[9px] text-gray-400 font-bold">AM (Area Manager)</p>
+            <p id="stAM" class="font-semibold text-white">-</p>
+          </div>
+          <div class="text-gray-500 text-xs">↓</div>
+          <div class="bg-[#03170a] border border-[#1A3A2A] p-2 rounded-xl">
+            <p class="text-[9px] text-gray-400 font-bold">AC (Area Coordinator)</p>
+            <p id="stAC" class="font-semibold text-white">-</p>
+          </div>
+          <div class="text-gray-500 text-xs">↓</div>
+          <div class="bg-[#22C55E]/20 border border-[#22C55E] p-2 rounded-xl text-[#22C55E]">
+            <p class="text-[9px] font-bold">SAYA (TOKO)</p>
+            <p id="stSaya" class="font-extrabold">-</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOATING KACIDA AI MASCOT -->
+    <button onclick="openKacidaAIModal()" class="fixed bottom-20 right-4 z-40 bg-[#0A2414] border-2 border-[#22C55E] p-2.5 rounded-full shadow-2xl hover:scale-110 transition roket-glow">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" class="w-8 h-8">
+    </button>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 glass-nav max-w-[430px] mx-auto px-4 py-2 flex items-center justify-between">
+      <button onclick="switchTab('beranda')" id="navBeranda" class="flex flex-col items-center gap-0.5 text-[#22C55E]">
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Beranda</span>
+      </button>
+
+      <button onclick="switchTab('chat')" id="navChat" class="flex flex-col items-center gap-0.5 text-gray-400">
+        <i data-lucide="message-square" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Chat</span>
+      </button>
+
+      <!-- ROKET TENGAH -->
+      <div class="relative -top-4">
+        <button onclick="switchTab('aksiCepat')" class="w-12 h-12 bg-[#22C55E] text-[#03170a] rounded-full flex items-center justify-center shadow-2xl roket-glow hover:scale-105 transition">
+          <i data-lucide="rocket" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <button onclick="switchTab('leaderboard')" id="navLeaderboard" class="flex flex-col items-center gap-0.5 text-gray-400">
+        <i data-lucide="trophy" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Leaderboard</span>
+      </button>
+
+      <button onclick="switchTab('profil')" id="navProfil" class="flex flex-col items-center gap-0.5 text-gray-400">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span class="text-[10px] font-semibold">Profil</span>
+      </button>
     </nav>
 
-    <script>
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHkGHYn45xCJPIHNKv9kCkI5HRti_v4_OFzAzfuYUeudb4BAGDMAgBYh3uG1589NfDEA/exec";
+  </div>
 
-        let currentUser = {
-            nik: localStorage.getItem('kacida_nik') || '',
-            nama: localStorage.getItem('kacida_nama') || '',
-            jabatan: localStorage.getItem('kacida_jabatan') || '',
-            toko: localStorage.getItem('kacida_toko') || 'TOKO KADUDAMPIT 1',
-            poin: 0, rank: '-'
-        };
+  <script>
+    let currentNik = localStorage.getItem("NIK_KACIDA") || "";
+    let dashboardData = null;
+    let selectedKodeTokoAC = null;
 
-        let dataPerformaToko = { sales: "-", ikt: "-", penawaran: "-" };
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      if (currentNik) {
+        initDashboard();
+      }
+    });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAuthGate();
+    function handleLogin() {
+      const nik = document.getElementById("nikInput").value.trim();
+      if (!nik) return Swal.fire("Peringatan", "NIK Wajib Diisi!", "warning");
+      
+      Swal.showLoading();
+      google.script.run
+        .withSuccessHandler((res) => {
+          Swal.close();
+          if (res.status === "success") {
+            currentNik = nik;
+            localStorage.setItem("NIK_KACIDA", nik);
+            initDashboard();
+          } else {
+            Swal.fire("Error", res.message, "error");
+          }
+        })
+        .withFailureHandler(err => Swal.fire("Error", err.toString(), "error"))
+        .loginUser(nik);
+    }
+
+    function initDashboard(kodeTokoPilihan = null) {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("appSection").classList.remove("hidden");
+      
+      google.script.run
+        .withSuccessHandler((data) => {
+          if (data.status === "error") {
+            Swal.fire("Error", data.message, "error");
+            return;
+          }
+          dashboardData = data;
+          renderDashboard(data);
+          
+          if (data.user.isAC) {
+            loadDaftarTokoAC();
+          }
+        })
+        .getDashboardData(currentNik, kodeTokoPilihan);
+    }
+
+    function renderDashboard(data) {
+      // User Info
+      document.getElementById("heroNama").innerText = (data.user.NAMA || "Ridwan") + "!";
+      if (data.user["FOTO PROFIL"]) {
+        document.getElementById("userAvatarHeader").src = data.user["FOTO PROFIL"];
+        document.getElementById("profilFoto").src = data.user["FOTO PROFIL"];
+      }
+      document.getElementById("profilNama").innerText = data.user.NAMA || "-";
+      document.getElementById("profilJabatan").innerText = data.user.JABATAN || "-";
+      document.getElementById("profilToko").innerText = data.user.namaToko || "-";
+      document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
+
+      // Header 3 Card
+      document.getElementById("cardSalesGrowth").innerText = (data.dataH1.growth ? data.dataH1.growth.toFixed(1) : "102") + "%";
+      document.getElementById("cardSalesNominal").innerText = "Rp " + Number(data.dataH1.sales).toLocaleString("id-ID");
+      document.getElementById("cardIktVal").innerText = data.dataH1.ikt + "%";
+      document.getElementById("cardIktKet").innerText = data.dataH1.ketIkt;
+      document.getElementById("cardPointVal").innerHTML = data.dataH1.point + ' <span class="text-[10px]">Point</span>';
+      document.getElementById("cardPointKet").innerText = "★ " + data.dataH1.ketPoint;
+
+      // 5 Kotak
+      document.getElementById("badgeTugas").innerText = data.badges.tugas;
+      document.getElementById("badgePengumuman").innerText = data.badges.pengumuman;
+      document.getElementById("badgeNotif").innerText = data.badges.notif;
+      document.getElementById("notifBadge").innerText = data.badges.notif;
+      document.getElementById("badgePoint").innerText = Number(data.badges.point).toLocaleString("id-ID");
+      document.getElementById("badgeRank").innerText = "#" + data.badges.rank;
+
+      // Banners Carousel
+      renderCarousel(data.banners);
+
+      // Menu Utama
+      renderMenuGrid("gridMenuUtama", data.menu.utama.slice(0, 10));
+
+      // Layanan Lainnya
+      renderMenuGrid("gridMenuLainnya", data.menu.layanan.slice(0, 8));
+
+      // Struktur Organisasi
+      if (data.struktur) {
+        document.getElementById("stOGM").innerText = data.struktur.ogm.nama;
+        document.getElementById("stBM").innerText = data.struktur.bm.nama;
+        document.getElementById("stDBM").innerText = data.struktur.dbm.nama;
+        document.getElementById("stAM").innerText = data.struktur.am.nama;
+        document.getElementById("stAC").innerText = data.struktur.ac.nama;
+        document.getElementById("stSaya").innerText = data.struktur.saya.toko;
+      }
+
+      lucide.createIcons();
+    }
+
+    function renderCarousel(banners) {
+      const wrapper = document.getElementById("carouselWrapper");
+      if (!banners || banners.length === 0) {
+        wrapper.innerHTML = `
+          <div class="swiper-slide bg-gradient-to-r from-green-800 to-green-950 p-6 text-center text-xs font-semibold">
+            TOKO KADUDAMPIT 1 - PIC SAPA (SIAP ANTA PERANAN ANDA)
+          </div>
+        `;
+      } else {
+        wrapper.innerHTML = banners.map(b => `
+          <div class="swiper-slide bg-gradient-to-r from-green-900 to-emerald-950 p-4 flex items-center justify-between">
+            <div>
+              <p class="text-[10px] text-yellow-400 font-bold">${b["NAMA TOKO"] || "PROMO DUKUNGAN"}</p>
+              <h4 class="text-sm font-extrabold text-white">${b.PIC || "PIC SAPA"}</h4>
+              <p class="text-[10px] text-gray-300 mt-1">${b.SUBTITLE || "Siap antar pesanan Anda"}</p>
+            </div>
+            <a href="${b["LINK DRIVE"] || '#'}" target="_blank" class="bg-[#22C55E] text-[#03170a] px-3 py-1.5 rounded-xl text-[10px] font-bold">Lihat</a>
+          </div>
+        `).join("");
+      }
+
+      new Swiper(".mainCarousel", {
+        autoplay: { delay: 5000 },
+        loop: true,
+        pagination: { el: ".swiper-pagination", clickable: true }
+      });
+    }
+
+    function renderMenuGrid(elementId, items) {
+      const container = document.getElementById(elementId);
+      container.innerHTML = items.map(m => `
+        <a href="${m["Link Tujuan"] || '#'}" target="_blank" class="bg-card p-2.5 flex flex-col items-center justify-center text-center hover:border-[#22C55E] transition">
+          <img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}" class="w-6 h-6 mb-1 object-contain">
+          <span class="text-[9px] font-medium text-gray-200 leading-tight">${m["Nama Menu"]}</span>
+        </a>
+      `).join("");
+    }
+
+    function loadDaftarTokoAC() {
+      google.script.run.withSuccessHandler((list) => {
+        if (list && list.length > 0) {
+          const container = document.getElementById("acDropdownContainer");
+          const select = document.getElementById("selectTokoAC");
+          container.classList.remove("hidden");
+          select.innerHTML = list.map(t => `<option value="${t.substring(0,4)}">${t}</option>`).join("");
+        }
+      }).getDaftarToko(currentNik);
+    }
+
+    function onACTokoChange(kodeToko) {
+      selectedKodeTokoAC = kodeToko;
+      initDashboard(kodeToko);
+    }
+
+    function openPerformaPopup() {
+      google.script.run.withSuccessHandler((d) => {
+        Swal.fire({
+          title: '<span class="text-xs text-[#22C55E] font-extrabold">DETAIL PERFORMA TOKO</span>',
+          background: '#0A2414',
+          color: '#fff',
+          html: `
+            <div class="text-left font-mono text-[11px] space-y-2 bg-[#03170a] p-3 rounded-xl border border-[#1A3A2A]">
+              <div><strong class="text-yellow-400">SALES (H-1):</strong> Rp ${d.salesHarian2026.toLocaleString('id-ID')}</div>
+              <div class="text-gray-400 text-[10px]">▲ ${d.growthHarian.toFixed(1)}% vs H-2 (Rp ${d.salesHarian2025.toLocaleString('id-ID')})</div>
+              <hr class="border-[#1A3A2A]">
+              <div><strong class="text-yellow-400">MTD SALES:</strong> Rp ${d.mtd2026.toLocaleString('id-ID')}</div>
+              <div class="text-gray-400 text-[10px]">▲ ${d.mtdGrowth.toFixed(1)}% vs MTD 2025</div>
+              <hr class="border-[#1A3A2A]">
+              <div><strong class="text-green-400">IKT TOKO:</strong> ${d.acvSales}% (${d.acvSales >= 90 ? 'Baik' : 'Cukup'})</div>
+              <hr class="border-[#1A3A2A]">
+              <div><strong class="text-red-400">PENAWARAN LANGSUNG:</strong> ${d.pointDash} Point</div>
+              <div class="text-[10px] text-yellow-300">Performa: ${d.ketPoint}</div>
+              <hr class="border-[#1A3A2A]">
+              <div class="text-[9px] text-gray-500">Update Terakhir: ${d.tanggal}</div>
+            </div>
+          `,
+          confirmButtonColor: '#22C55E'
         });
+      }).getPerformaPopup(currentNik, selectedKodeTokoAC);
+    }
 
-        function checkAuthGate() {
-            if (!currentUser.nik) {
-                document.getElementById('loginGateOverlay').style.display = 'flex';
-                promptLogin();
-            } else {
-                document.getElementById('loginGateOverlay').style.display = 'none';
-                updateUIUserInfo();
-                fetchDataPerforma();
-                fetchUserData();
-            }
+    function openAllMenuModal(kategori) {
+      if (!dashboardData) return;
+      const list = kategori === 'Utama' ? dashboardData.menu.utama : dashboardData.menu.layanan;
+      
+      const html = `
+        <div class="grid grid-cols-4 gap-3 text-center max-h-[60vh] overflow-y-auto p-2">
+          ${list.map(m => `
+            <a href="${m["Link Tujuan"] || '#'}" target="_blank" class="bg-[#03170a] p-2 rounded-xl border border-[#1A3A2A] flex flex-col items-center">
+              <img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}" class="w-6 h-6 mb-1">
+              <span class="text-[9px] text-white leading-tight">${m["Nama Menu"]}</span>
+            </a>
+          `).join('')}
+        </div>
+      `;
+
+      Swal.fire({
+        title: `<span class="text-sm font-bold text-[#22C55E]">Semua ${kategori}</span>`,
+        background: '#0A2414',
+        html: html,
+        showConfirmButton: false,
+        showCloseButton: true
+      });
+    }
+
+    function openKacidaAIModal() {
+      Swal.fire({
+        title: '<span class="text-sm text-[#22C55E]">Tanya Kacida AI</span>',
+        background: '#0A2414',
+        input: 'textarea',
+        inputPlaceholder: 'Tanyakan sesuatu seputar operasional toko...',
+        showCancelButton: true,
+        confirmButtonText: 'Tanyakan',
+        confirmButtonColor: '#22C55E',
+        preConfirm: (q) => {
+          if (!q) return Swal.showValidationMessage("Ketik pertanyaan Anda!");
+          return new Promise((resolve) => {
+            google.script.run.withSuccessHandler(res => resolve(res)).askKacidaAI(currentNik, q);
+          });
         }
-
-        function promptLogin() {
-            Swal.fire({
-                title: '🔑 Login Karyawan',
-                text: 'Masukkan NIK Karyawan Anda:',
-                input: 'text',
-                inputPlaceholder: 'Contoh: 20240101',
-                allowOutsideClick: false,
-                confirmButtonText: 'Masuk Aplikasi',
-                confirmButtonColor: '#22c55e',
-                background: '#0c2b14',
-                color: '#ffffff',
-                preConfirm: (nik) => {
-                    if (!nik) {
-                        Swal.showValidationMessage('NIK Wajib Diisi!');
-                    }
-                    return nik;
-                }
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    Swal.showLoading();
-                    try {
-                        const res = await fetch(`${GAS_WEB_APP_URL}?action=loginUser&nik=${encodeURIComponent(result.value)}`);
-                        const data = await res.json();
-                        
-                        if (data.status === 'success') {
-                            currentUser.nik = data.data.nik;
-                            currentUser.nama = data.data.nama;
-                            currentUser.jabatan = data.data.jabatan;
-                            currentUser.toko = data.data.toko || 'TOKO KADUDAMPIT 1';
-
-                            localStorage.setItem('kacida_nik', currentUser.nik);
-                            localStorage.setItem('kacida_nama', currentUser.nama);
-                            localStorage.setItem('kacida_jabatan', currentUser.jabatan);
-                            localStorage.setItem('kacida_toko', currentUser.toko);
-
-                            document.getElementById('loginGateOverlay').style.display = 'none';
-
-                            Swal.fire({
-                                icon: 'success', title: 'Login Berhasil!',
-                                text: `Selamat Datang, ${currentUser.nama}`,
-                                timer: 1500, showConfirmButton: false,
-                                background: '#0c2b14', color: '#ffffff'
-                            });
-
-                            updateUIUserInfo();
-                            fetchDataPerforma();
-                            fetchUserData();
-                        } else {
-                            Swal.fire({
-                                icon: 'error', title: 'Login Gagal',
-                                text: data.message || 'NIK Tidak Terdaftar!',
-                                background: '#0c2b14', color: '#ffffff'
-                            }).then(() => promptLogin());
-                        }
-                    } catch (e) {
-                        Swal.fire({
-                            icon: 'error', title: 'Koneksi Gagal',
-                            text: 'Gagal terhubung ke backend server.',
-                            background: '#0c2b14', color: '#ffffff'
-                        }).then(() => promptLogin());
-                    }
-                }
-            });
+      }).then((result) => {
+        if (result.isConfirmed && result.value) {
+          Swal.fire({
+            title: '<span class="text-xs text-[#22C55E]">Jawaban Kacida AI</span>',
+            background: '#0A2414',
+            color: '#fff',
+            text: result.value.jawaban || "Selesai",
+            confirmButtonColor: '#22C55E'
+          });
         }
+      });
+    }
 
-        function updateUIUserInfo() {
-            document.getElementById('lblUserName').innerText = currentUser.nama ? `${currentUser.nama}! 👋` : 'Team Kacida! 👋';
-            document.getElementById('lblStoreCode').innerText = currentUser.toko.toUpperCase();
-        }
+    function switchTab(tabName) {
+      ["beranda", "chat", "aksiCepat", "leaderboard", "profil"].forEach(t => {
+        const el = document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1));
+        const nav = document.getElementById("nav" + t.charAt(0).toUpperCase() + t.slice(1));
+        if (el) el.classList.add("hidden");
+        if (nav) nav.className = "flex flex-col items-center gap-0.5 text-gray-400";
+      });
 
-        async function fetchDataPerforma() {
-            const valSalesEl = document.getElementById('valSales');
-            const valIKTEl = document.getElementById('valIKT');
-            const valPenawaranEl = document.getElementById('valPenawaran');
+      const activeTab = document.getElementById("tab" + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      const activeNav = document.getElementById("nav" + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+      if (activeTab) activeTab.classList.remove("hidden");
+      if (activeNav) activeNav.className = "flex flex-col items-center gap-0.5 text-[#22C55E]";
 
-            try {
-                const response = await fetch(`${GAS_WEB_APP_URL}?action=getDataPerformaToko&toko=${encodeURIComponent(currentUser.toko)}`);
-                const result = await response.json();
+      if (tabName === "chat") loadChat();
+      if (tabName === "aksiCepat") loadMisi();
+      if (tabName === "leaderboard") loadLeaderboard();
+    }
 
-                if (result.status === 'success') {
-                    dataPerformaToko.sales = result.data.sales || '100%';
-                    dataPerformaToko.ikt = result.data.ikt || 'A';
-                    dataPerformaToko.penawaran = result.data.penawaran || '0 Item';
-                }
+    function loadChat() {
+      google.script.run.withSuccessHandler((chats) => {
+        const box = document.getElementById("chatBox");
+        box.innerHTML = chats.map(c => `
+          <div class="p-2.5 rounded-xl border border-[#1A3A2A] ${c.NIK_PENGIRIM == currentNik ? 'bg-[#22C55E]/10 border-[#22C55E] ml-6' : 'bg-[#03170a] mr-6'}">
+            <p class="text-[9px] text-gray-400 font-bold">${c.NAMA_PENGIRIM} (${c.JABATAN})</p>
+            <p class="text-xs text-white mt-0.5">${c.ISI_PESAN}</p>
+          </div>
+        `).join("");
+      }).getChat(currentNik);
+    }
 
-                valSalesEl.classList.remove('pulse-loading');
-                valIKTEl.classList.remove('pulse-loading');
-                valPenawaranEl.classList.remove('pulse-loading');
+    function kirimPesan() {
+      const input = document.getElementById("inputChatMsg");
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = "";
+      google.script.run.withSuccessHandler(() => loadChat()).sendChatMessage(currentNik, msg, "Semua");
+    }
 
-                valSalesEl.innerText = dataPerformaToko.sales;
-                valIKTEl.innerText = dataPerformaToko.ikt;
-                valPenawaranEl.innerText = dataPerformaToko.penawaran;
+    function loadMisi() {
+      google.script.run.withSuccessHandler((misi) => {
+        const container = document.getElementById("misiList");
+        container.innerHTML = misi.map(m => `
+          <div class="flex items-center justify-between p-3 bg-[#03170a] border border-[#1A3A2A] rounded-xl">
+            <div>
+              <p class="text-xs font-bold text-white">${m["Nama Menu"]}</p>
+              <p class="text-[9px] text-gray-400">Selesaikan tugas harian</p>
+            </div>
+            <input type="checkbox" class="w-4 h-4 accent-[#22C55E]">
+          </div>
+        `).join("");
+      }).getMisiHarian(currentNik);
+    }
 
-            } catch (error) {
-                valSalesEl.classList.remove('pulse-loading');
-                valIKTEl.classList.remove('pulse-loading');
-                valPenawaranEl.classList.remove('pulse-loading');
+    function loadLeaderboard() {
+      google.script.run.withSuccessHandler((users) => {
+        const container = document.getElementById("leaderboardList");
+        container.innerHTML = users.map((u, i) => `
+          <div class="flex items-center justify-between p-2.5 bg-[#03170a] border border-[#1A3A2A] rounded-xl">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-extrabold ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-gray-300' : 'text-amber-600'}">#${i+1}</span>
+              <div>
+                <p class="text-xs font-bold text-white">${u.NAMA}</p>
+                <p class="text-[9px] text-gray-400">${u["NAMA TOKO"]}</p>
+              </div>
+            </div>
+            <span class="text-xs font-extrabold text-[#22C55E]">${u["POIN TOTAL"] || 0} Pts</span>
+          </div>
+        `).join("");
+      }).getLeaderboard();
+    }
 
-                valSalesEl.innerText = "100%";
-                valIKTEl.innerText = "A";
-                valPenawaranEl.innerText = "12 Item";
-            }
-        }
-
-        async function fetchUserData() {
-            const valPointsEl = document.getElementById('valPoints');
-            const valRankEl = document.getElementById('valRank');
-
-            try {
-                const res = await fetch(`${GAS_WEB_APP_URL}?action=getUserProfile&nik=${encodeURIComponent(currentUser.nik)}`);
-                const result = await res.json();
-
-                if (result.status === 'success') {
-                    currentUser.poin = result.data.poin || 0;
-                    currentUser.rank = result.data.rank || '#-';
-
-                    valPointsEl.classList.remove('pulse-loading');
-                    valRankEl.classList.remove('pulse-loading');
-
-                    valPointsEl.innerHTML = `${Number(currentUser.poin).toLocaleString('id-ID')} <small style="font-size:0.6rem; font-weight:normal;">Point</small>`;
-                    valRankEl.innerHTML = `#${currentUser.rank} <small style="font-size:0.6rem; font-weight:normal;">Area</small>`;
-                }
-            } catch (e) {
-                valPointsEl.classList.remove('pulse-loading');
-                valRankEl.classList.remove('pulse-loading');
-                valPointsEl.innerHTML = '150 <small style="font-size:0.6rem; font-weight:normal;">Point</small>';
-                valRankEl.innerHTML = '#3 <small style="font-size:0.6rem; font-weight:normal;">Area</small>';
-            }
-        }
-
-        function openInternalChat() {
-            document.getElementById('unreadBadge').style.display = 'none';
-
-            Swal.fire({
-                title: '💬 Kacida Chat Internal',
-                html: `
-                    <div style="position: relative; text-align: left; min-height: 280px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px;">
-                        <label style="font-size: 0.75rem; color: #94a3b8;">Saluran Chat:</label>
-                        <select id="chatTargetSelect" style="width: 100%; padding: 8px; margin: 6px 0 12px 0; border-radius: 8px; background: #06240f; color: white; border: 1px solid #22c55e;">
-                            <option value="antar-toko">🏬 Antar Toko (${currentUser.toko})</option>
-                            <option value="all-personil">🌐 All Personil Area</option>
-                        </select>
-                        
-                        <div id="chatMessagesArea" style="height: 140px; overflow-y: auto; font-size: 0.8rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px;">
-                            <div style="margin-bottom: 6px;"><strong style="color: #22c55e;">[Toko Cisaat]:</strong> Ada promo PSM baru guys. <small style="font-size: 0.6rem; color: #94a3b8;">10:15</small></div>
-                            <div style="margin-bottom: 6px;"><strong style="color: #f59e0b;">[Kadudampit 1]:</strong> Siap, langsung dipajang. <small style="font-size: 0.6rem; color: #94a3b8;">10:18</small></div>
-                        </div>
-
-                        <div class="floating-ai-btn" onclick="openFloatingAIChat()" title="Tanya AI Kacida">
-                            <i class="fa-solid fa-robot"></i>
-                        </div>
-                    </div>
-                `,
-                input: 'text',
-                inputPlaceholder: 'Tulis pesan internal...',
-                showCancelButton: true,
-                confirmButtonText: 'Kirim Pesan',
-                cancelButtonText: 'Tutup',
-                confirmButtonColor: '#22c55e',
-                background: '#0c2b14',
-                color: '#ffffff'
-            });
-        }
-
-        function openFloatingAIChat() {
-            Swal.fire({
-                title: '🤖 Kacida AI Assistant',
-                text: 'Silahkan ajukan pertanyaan seputar SOP, IKT, atau Produk Penawaran:',
-                input: 'textarea',
-                inputPlaceholder: 'Tanyakan sesuatu...',
-                showCancelButton: true,
-                confirmButtonText: 'Tanya AI',
-                confirmButtonColor: '#f59e0b',
-                background: '#0c2b14',
-                color: '#ffffff',
-                preConfirm: async (pesan) => {
-                    if (!pesan) {
-                        Swal.showValidationMessage('Pertanyaan tidak boleh kosong!');
-                        return false;
-                    }
-                    Swal.showLoading();
-                    try {
-                        const res = await fetch(`${GAS_WEB_APP_URL}?action=sendChatMessage&nik=${encodeURIComponent(currentUser.nik)}&pesan=${encodeURIComponent(pesan)}`);
-                        return await res.json();
-                    } catch (e) {
-                        return { status: 'success', reply: 'Silakan koordinasikan laporan ini langsung dengan COS/ACOS di shift berjalan.' };
-                    }
-                }
-            }).then((res) => {
-                if (res.isConfirmed && res.value) {
-                    Swal.fire({
-                        title: 'Jawaban AI:',
-                        text: res.value.reply || 'Berhasil diproses.',
-                        icon: 'info',
-                        confirmButtonColor: '#22c55e',
-                        background: '#0c2b14', color: '#ffffff'
-                    });
-                }
-            });
-        }
-
-        function showPerformaDetail() {
-            Swal.fire({
-                title: '💾 Performance Hub (Data Toko)',
-                html: `
-                    <div style="text-align: left; font-size: 0.85rem; line-height: 1.6;">
-                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #22c55e;">
-                            <strong style="color: #22c55e;">📊 PERFORMA SALES (SPD)</strong><br>
-                            - Capaian: <strong>${dataPerformaToko.sales}</strong>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #f59e0b;">
-                            <strong style="color: #f59e0b;">🎯 INDIKATOR KINERJA TOKO (IKT)</strong><br>
-                            - Status Predikat: <strong>${dataPerformaToko.ikt}</strong>
-                        </div>
-                        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border-left: 4px solid #ef4444;">
-                            <strong style="color: #ef4444;">🔥 PENAWARAN LANGSUNG (PSM)</strong><br>
-                            - Item Aktif: <strong>${dataPerformaToko.penawaran}</strong>
-                        </div>
-                    </div>
-                `,
-                background: '#0c2b14', color: '#ffffff',
-                confirmButtonText: 'Tutup', confirmButtonColor: '#22c55e'
-            });
-        }
-
-        async function openLeaderboardModal() {
-            Swal.fire({ title: 'Memuat Leaderboard...', background: '#0c2b14', color: '#ffffff', didOpen: () => Swal.showLoading() });
-            try {
-                const res = await fetch(`${GAS_WEB_APP_URL}?action=getLeaderboard`);
-                const result = await res.json();
-
-                if (result.status === 'success') {
-                    let htmlList = `<div style="text-align: left; max-height: 300px; overflow-y: auto;">`;
-                    result.data.forEach((u, index) => {
-                        htmlList += `
-                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
-                                <span><strong>#${index + 1}</strong> ${u.nama} (${u.toko})</span>
-                                <span style="color: #f59e0b; font-weight: bold;">${u.poin} Pts</span>
-                            </div>`;
-                    });
-                    htmlList += `</div>`;
-
-                    Swal.fire({
-                        title: '🏆 Leaderboard Area',
-                        html: htmlList,
-                        confirmButtonText: 'Tutup', confirmButtonColor: '#22c55e',
-                        background: '#0c2b14', color: '#ffffff'
-                    });
-                }
-            } catch (e) {
-                Swal.fire({ 
-                    title: '🏆 Leaderboard Area', 
-                    html: `
-                        <div style="text-align: left; max-height: 300px; overflow-y: auto;">
-                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
-                                <span><strong>#1</strong> Ahmad (Kadudampit 1)</span>
-                                <span style="color: #f59e0b; font-weight: bold;">320 Pts</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(255,255,255,0.05); margin-bottom: 6px; border-radius: 8px;">
-                                <span><strong>#2</strong> Siti (Cisaat)</span>
-                                <span style="color: #f59e0b; font-weight: bold;">280 Pts</span>
-                            </div>
-                        </div>
-                    `, 
-                    background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' 
-                });
-            }
-        }
-
-        function requestNotificationPermission() {
-            if ('Notification' in window) {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        Swal.fire({ icon: 'success', title: 'Notifikasi Berhasil Diaktifkan!', background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' });
-                    }
-                });
-            } else {
-                Swal.fire({ icon: 'info', title: 'Notifikasi Aktif', text: 'Sistem notifikasi lokal aktif.', background: '#0c2b14', color: '#ffffff', confirmButtonColor: '#22c55e' });
-            }
-        }
-
-        function navigateMenu(menuName) {
-            Swal.fire({
-                title: menuName.toUpperCase().replace(/-/g, ' '),
-                text: 'Membuka modul operasional area...',
-                icon: 'info', confirmButtonColor: '#22c55e',
-                background: '#0c2b14', color: '#ffffff'
-            });
-        }
-
-        function showUserProfile() {
-            Swal.fire({
-                title: 'Profil Karyawan',
-                html: `
-                    <div style="text-align:center;">
-                        <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" style="width:80px; height:80px; border-radius:50%; border:2px solid #22c55e;">
-                        <h3 style="margin-top:10px;">${currentUser.nama || 'Team Kacida'}</h3>
-                        <p style="color:#94a3b8; font-size:0.85rem;">${currentUser.jabatan || 'Staff'} - ${currentUser.toko}</p>
-                        <hr style="border-color: rgba(255,255,255,0.1); margin: 12px 0;">
-                        <button onclick="logoutUser()" style="background:#ef4444; color:white; border:none; padding:8px 16px; border-radius:10px; font-weight:bold; cursor:pointer;">Keluar / Ganti Account</button>
-                    </div>
-                `,
-                background: '#0c2b14', color: '#ffffff', showConfirmButton: false
-            });
-        }
-
-        function logoutUser() {
-            localStorage.clear();
-            location.reload();
-        }
-
-        function toggleMenu() {
-            Swal.fire({ title: 'Menu Navigasi', text: 'Akses cepat sidebar navigasi.', icon: 'info', confirmButtonColor: '#22c55e', background: '#0c2b14', color: '#ffffff' });
-        }
-    </script>
+    function handleLogout() {
+      google.script.run.withSuccessHandler(() => {
+        localStorage.removeItem("NIK_KACIDA");
+        location.reload();
+      }).logout();
+    }
+  </script>
 </body>
 </html>
