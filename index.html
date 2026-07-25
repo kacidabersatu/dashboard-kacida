@@ -9,7 +9,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
@@ -39,8 +39,12 @@
         }
         .header-left { display: flex; align-items: center; gap: 10px; }
         .btn-hamburger { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .brand-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; }
-        .brand-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #10b981, #052e16); border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.2); }
+        
+        /* HEADER LOGO 3D & TITLE POPPINS */
+        .brand-title { display: flex; align-items: center; gap: 8px; }
+        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.05rem; color: #ffffff; letter-spacing: 0.3px; }
+        .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #22c55e 0%, #052e16 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3); }
+
         .header-right { display: flex; align-items: center; gap: 8px; }
 
         .disket-badge { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: var(--gold); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
@@ -98,11 +102,16 @@
         
         .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
 
-        .wa-chat-container { background: #071a0e; border: 1px solid var(--card-border); border-radius: 16px; height: 58vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        /* TAMPILAN TAB CHAT PERCANTIK DENGAN JARAK PAS */
+        .chat-tab-wrapper { display: flex; gap: 8px; background: var(--bg-dark); padding: 6px; border-radius: 14px; border: 1px solid var(--card-border); margin-bottom: 12px; }
+        .chat-tab-pill { flex: 1; padding: 8px 12px; font-size: 0.72rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; }
+        .chat-tab-pill.active { background: var(--accent-green); color: #03170a; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3); }
+
+        .wa-chat-container { background: #071a0e; border: 1px solid var(--card-border); border-radius: 16px; height: 52vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
         .wa-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.75rem; position: relative; line-height: 1.4; word-wrap: break-word; }
         .wa-bubble.me { align-self: flex-end; background: var(--wa-bubble-me); color: white; border-bottom-right-radius: 2px; }
         .wa-bubble.other { align-self: flex-start; background: var(--wa-bubble-other); color: white; border-bottom-left-radius: 2px; }
-        .wa-bubble.ai { align-self: flex-start; background: #133a20; border: 1px solid var(--accent-green); color: white; width: 88%; }
+        .wa-bubble.ai { align-self: flex-start; background: #133a20; border: 1px solid var(--accent-green); color: white; width: 90%; }
         .wa-sender { font-size: 0.62rem; font-weight: 800; color: var(--accent-green); margin-bottom: 2px; display: flex; justify-content: space-between; gap: 8px; }
         .wa-time { font-size: 0.55rem; color: rgba(255,255,255,0.6); text-align: right; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
 
@@ -115,7 +124,7 @@
         .nav-item.active { background: var(--accent-green); color: #03170a; padding: 6px 14px; border-radius: 20px; font-weight: 700; }
         .nav-item.active i { color: #03170a; }
 
-        .nav-badge-count { position: absolute; top: -2px; right: 4px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 800; padding: 1px 5px; border-radius: 10px; }
+        .nav-badge-count { position: absolute; top: -3px; right: 2px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 800; padding: 1px 5px; border-radius: 10px; border: 1px solid var(--bg-dark); }
 
         .fab-rocket { width: 50px; height: 50px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-top: -28px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
         .hidden { display: none !important; }
@@ -164,11 +173,10 @@
         </div>
     </div>
 
-    <!-- LOGIN SCREEN -->
     <div id="loginSection">
         <div style="text-align: center; margin-top: 20vh; margin-bottom: 24px;">
-            <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent-green); margin-bottom: 12px; object-fit: cover;">
-            <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--accent-green);">KACIDA BERSATU</h1>
+            <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 90px; height: 90px; border-radius: 20px; border: 2px solid var(--accent-green); margin-bottom: 12px; object-fit: cover;">
+            <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--accent-green); font-family: 'Poppins', sans-serif;">KACIDA BERSATU</h1>
             <p style="font-size: 0.75rem; color: var(--text-sub);">Panduan Fitur Dashboard & Portal Operasional</p>
         </div>
         <div class="menu-section-card" style="padding: 24px;">
@@ -178,15 +186,16 @@
         </div>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
     <div id="appSection" class="hidden">
         
         <header class="app-header">
             <div class="header-left">
                 <button class="btn-hamburger" onclick="openMenuSidebar()"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
-                    <div class="brand-icon"><i class="fa-solid fa-leaf"></i></div>
-                    <span>Kacida Bersatu</span>
+                    <div class="brand-icon">
+                        <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;">
+                    </div>
+                    <span class="brand-title-text">Kacida Bersatu</span>
                 </div>
             </div>
             <div class="header-right">
@@ -285,16 +294,15 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT TERPISAH: CHAT TIM & KACIDA AI PRIVAT -->
+        <!-- TAB CHAT TERPISAH: CHAT TIM vs CHAT PRIVAT KACIDA AI -->
         <div id="tabChat" class="hidden container space-y-3">
-            <h2 class="section-title" id="chatHeaderTitle"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room chat Tim Kacida</h2>
+            <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room chat Tim Kacida</h2>
             
-            <div style="display:flex; background:var(--bg-dark); padding:4px; border-radius:12px; border:1px solid var(--card-border); margin-bottom:8px;">
-                <button id="btnTabTeamChat" class="wa-tab-btn active" onclick="switchChatRoomMode('team')">💬 Chat Tim</button>
-                <button id="btnTabAIChat" class="wa-tab-btn" onclick="switchChatRoomMode('ai')">🤖 Kacida AI (Privat)</button>
+            <div class="chat-tab-wrapper">
+                <button id="btnTabTeam" class="chat-tab-pill active" onclick="switchChatRoomMode('team')"><i class="fa-solid fa-users"></i> Chat Tim</button>
+                <button id="btnTabAI" class="chat-tab-pill" onclick="switchChatRoomMode('ai')"><i class="fa-solid fa-robot"></i> Kacida AI (Privat)</button>
             </div>
 
-            <!-- CHAT BOX DUAL MODE -->
             <div id="chatBox" class="wa-chat-container custom-scrollbar"></div>
 
             <div style="display: flex; gap: 8px; margin-top: 8px;">
@@ -316,6 +324,7 @@
             <div id="leaderboardList" class="menu-section-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
+        <!-- TAB PROFIL NAVBAR BOTTOM -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
@@ -326,6 +335,7 @@
                 <button onclick="handleLogout()" style="margin-top: 12px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 6px 16px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">LOGOUT</button>
             </div>
 
+            <!-- PERSONIL TOKO DARI SPREADSHEET MASTER USER -->
             <div class="menu-section-card">
                 <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-green);"></i> Tim Personil Toko (Master User)</h3>
                 <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -349,15 +359,16 @@
             </div>
         </div>
 
-        <!-- TOMBOL MASKOT AI KHUSUS MUNCUL DI TAB CHAT SAJA -->
+        <!-- MASKOT AI MENGAPUNG (KHUSUS MUNCUL DI TAB CHAT) -->
         <button id="floatingAIMascot" class="hidden" onclick="switchChatRoomMode('ai')" style="position: fixed; bottom: 80px; right: 16px; z-index: 999; background: #0A2414; border: 2px solid var(--accent-green); padding: 10px; border-radius: 50%; box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); cursor: pointer;">
             <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 32px; height: 32px; display: block;">
         </button>
 
+        <!-- NAVBAR BOTTOM WITH UNREAD CHAT BADGE -->
         <nav class="bottom-nav">
             <a href="#" onclick="switchTab('beranda')" id="navBeranda" class="nav-item active"><i class="fa-solid fa-house"></i><span>Beranda</span></a>
             <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item">
-                <span id="navChatBadge" class="nav-badge-count hidden">2</span>
+                <span id="navChatBadge" class="nav-badge-count hidden">0</span>
                 <i class="fa-solid fa-comment-dots"></i><span>Chat</span>
             </a>
             <div class="fab-rocket" onclick="switchTab('aksiCepat')"><i class="fa-solid fa-rocket"></i></div>
@@ -367,14 +378,18 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBzeArsRC9ao9q-_GjI8_uS5VHx0stcW1TSMg_dJNJC1BHszFq1m3FwDAk6jMAJebG/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyOpDbNPYM1CJVQgwY8QfpEZod1hutJJjn89HJEX5jBg3CFIrU25tQqO7ZxLD-iy9bN/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
         let selectedKodeTokoAC = null;
-        let chatMode = "team"; // 'team' ATAU 'ai'
-        let aiChatHistory = []; // MEMORI CHAT PRIVAT USER DENGAN AI KACIDA
+        let chatRoomMode = "team"; // 'team' ATAU 'ai'
+        let aiChatHistory = []; // MEMORI CHAT PRIVAT DENGAN KACIDA AI
+        let readPengumuman = false;
+        let readNotifList = [];
+        let deferredPrompt = null;
 
+        // FUNGSI DETEKSI AVATAR 3D BERGENDER DIVERSIFIKASI
         function get3DAvatar(nama, fotoUrl) {
             if (fotoUrl && String(fotoUrl).trim().length > 10) return fotoUrl;
             if (!nama) return "https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
@@ -391,6 +406,35 @@
             return femaleKeywords.some(kw => n.includes(kw))
                 ? "https://cdn-icons-png.flaticon.com/512/4140/4140047.png" 
                 : "https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('btnInstallPWA');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        async function triggerPWAInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA" });
+                }
+                deferredPrompt = null;
+                document.getElementById('btnInstallPWA').classList.add('hidden');
+            }
+        }
+
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) return;
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    apiCall("logActivity", { aktivitas: "Izin Notifikasi", detail: "Granted" });
+                    showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green); font-weight:bold;'>Izin Notifikasi HP Berhasil Diaktifkan! 🟢</p>");
+                }
+            });
         }
 
         function showLoading(msg = "Memuat Data...") {
@@ -498,15 +542,33 @@
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
             document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
 
-            // DISKET HEADER BARINGKAS
             document.getElementById("valSales").innerText = data.dataH1.spdLabel || `Tgl 25 : Rp ${Number(data.dataH1.sales).toLocaleString('id-ID')}`;
             document.getElementById("valIKT").innerText = data.dataH1.iktNetSales || "-";
             document.getElementById("valPenawaran").innerText = data.dataH1.point || "-";
 
             document.getElementById("valTasks").innerText = data.badges.tugas;
-            document.getElementById("valAnnounce").innerText = data.badges.pengumuman;
-            document.getElementById("valNotifCount").innerText = data.badges.notif;
-            document.getElementById("notifBadge").innerText = data.badges.notif;
+            
+            const unreadAnnounces = readPengumuman ? 0 : data.badges.pengumuman;
+            document.getElementById("valAnnounce").innerText = unreadAnnounces;
+            if (unreadAnnounces > 0) document.getElementById("dotAnnounce").classList.remove("hidden");
+            else document.getElementById("dotAnnounce").classList.add("hidden");
+
+            const unreadNotifs = data.badges.notif - readNotifList.length;
+            const validUnreadNotifs = unreadNotifs > 0 ? unreadNotifs : 0;
+            document.getElementById("valNotifCount").innerText = validUnreadNotifs;
+            document.getElementById("notifBadge").innerText = validUnreadNotifs;
+            if (validUnreadNotifs > 0) document.getElementById("dotNotif").classList.remove("hidden");
+            else document.getElementById("dotNotif").classList.add("hidden");
+
+            // BADGE CHAT UNREAD DYNAMIC
+            if (data.badges.chatUnread && data.badges.chatUnread !== "0") {
+                const navBadge = document.getElementById("navChatBadge");
+                if (navBadge) {
+                    navBadge.innerText = data.badges.chatUnread;
+                    navBadge.classList.remove("hidden");
+                }
+            }
+
             document.getElementById("valPoints").innerText = Number(data.badges.point).toLocaleString("id-ID");
             document.getElementById("valRank").innerText = "#" + data.badges.rank;
 
@@ -705,6 +767,10 @@
         }
 
         function openPengumumanModal() {
+            readPengumuman = true;
+            document.getElementById("valAnnounce").innerText = "0";
+            document.getElementById("dotAnnounce").classList.add("hidden");
+
             if (!dashboardData || !dashboardData.announcements || dashboardData.announcements.length === 0) {
                 showCustomModal("📢 Pengumuman", "<p style='color:var(--text-sub);'>Belum ada pengumuman aktif dari Spreadsheet.</p>");
                 return;
@@ -723,6 +789,13 @@
         }
 
         function openNotifModal() {
+            if (dashboardData && dashboardData.notifications) {
+                readNotifList = dashboardData.notifications.map(n => n.ID || n.Id || "1");
+                document.getElementById("valNotifCount").innerText = "0";
+                document.getElementById("notifBadge").innerText = "0";
+                document.getElementById("dotNotif").classList.add("hidden");
+            }
+
             if (!dashboardData || !dashboardData.notifications || dashboardData.notifications.length === 0) {
                 showCustomModal("🔔 Notifikasi", "<p style='color:var(--text-sub);'>Tidak ada notifikasi baru.</p>");
                 return;
@@ -741,29 +814,28 @@
             showCustomModal("🔔 Notifikasi Aplikasi", html);
         }
 
-        // SWAP ANTARA MODE CHAT TIM DAN CHAT PRIVAT AI KACIDA
+        // TAMPILAN DUAL TAB DI ROOM CHAT (CHAT TIM vs KACIDA AI PRIVAT)
         function switchChatRoomMode(mode) {
-            chatMode = mode;
-            const btnTeam = document.getElementById("btnTabTeamChat");
-            const btnAI = document.getElementById("btnTabAIChat");
-            const headerTitle = document.getElementById("chatHeaderTitle");
+            chatRoomMode = mode;
+            const btnTeam = document.getElementById("btnTabTeam");
+            const btnAI = document.getElementById("btnTabAI");
+            const title = document.getElementById("chatTitleHeader");
 
             if (mode === 'team') {
                 btnTeam.classList.add("active");
                 btnAI.classList.remove("active");
-                headerTitle.innerHTML = `<i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room chat Tim Kacida`;
+                title.innerHTML = `<i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room chat Tim Kacida`;
                 loadChat();
             } else {
                 btnAI.classList.add("active");
                 btnTeam.classList.remove("active");
-                headerTitle.innerHTML = `<i class="fa-solid fa-robot" style="color: var(--accent-green);"></i> Chat Privat Kacida AI`;
+                title.innerHTML = `<i class="fa-solid fa-robot" style="color: var(--accent-green);"></i> Chat Privat Kacida AI`;
                 renderAIChatRoom();
             }
         }
 
-        // CHAT TIM WA REALTIME
         async function loadChat() {
-            if (chatMode !== 'team') return;
+            if (chatRoomMode !== 'team') return;
             const chats = await apiCall("getChat");
             const box = document.getElementById("chatBox");
             if (chats && Array.isArray(chats)) {
@@ -790,14 +862,14 @@
             }
         }
 
-        // TAMPILAN RUANG CHAT PRIVAT KACIDA AI (100% ALA META AI WA DENGAN DOKUMEN REALTIME)
+        // CHAT PRIVAT KACIDA AI INLINE (100% BEBAS DENGAN GEMINI 2.0 FLASH - NO POPUP)
         function renderAIChatRoom() {
             const box = document.getElementById("chatBox");
             if (aiChatHistory.length === 0) {
                 const uName = dashboardData?.user?.NAMA || "Kak";
                 aiChatHistory.push({
                     sender: "AI",
-                    msg: `Halo ${uName}! 👋\nSaya **Asisten Kacida AI**. Mau tanya Sales, IKT, strategi, atau butuh candaan kasir hari ini? Silakan langsung ketik di bawah!`
+                    msg: `Halo ${uName}! 👋\nSaya **Asisten Kacida AI**. Mau tanya Sales, IKT, strategi toko, atau pengetahuan umum apa saja? Bebas tanya apapun disini!`
                 });
             }
 
@@ -817,7 +889,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // EKSEKUSI KIRIM CHAT (OTOMATIS CABANGKAN CHAT TIM ATAU CHAT PRIVAT AI)
+        // SINKRONISASI PENANGANAN KIRIM CHAT TIM / AI
         async function handleSendChatAction() {
             const input = document.getElementById("inputChatMsg");
             const msg = input.value.trim();
@@ -825,20 +897,21 @@
 
             input.value = "";
 
-            if (chatMode === 'ai') {
-                // CHAT PRIVAT AI GEMINI 2.0 (STREAMING LANGSUNG DILAYAR TANPA POPUP)
+            if (chatRoomMode === 'ai') {
+                // KIRIM KE KACIDA AI PRIVAT
                 aiChatHistory.push({ sender: "ME", msg: msg });
                 
                 const tempAiIdx = aiChatHistory.length;
-                aiChatHistory.push({ sender: "AI", msg: "🤖 *Kacida AI sedang menganalisa data...*" });
+                aiChatHistory.push({ sender: "AI", msg: "🤖 *Kacida AI sedang mengetik...*" });
                 renderAIChatRoom();
 
+                // PANGGIL GEMINI 2.0 FLASH INLINE
                 const res = await apiCall("askAI", { pertanyaan: msg });
                 
                 aiChatHistory[tempAiIdx] = { sender: "AI", msg: res.jawaban || "Kacida AI siap membantu!" };
                 renderAIChatRoom();
             } else {
-                // CHAT TIM WHATSAPP
+                // KIRIM KE CHAT TIM WA INSTAN
                 const box = document.getElementById("chatBox");
                 const tempId = "msg_" + Date.now();
                 const nowTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -883,11 +956,11 @@
         function openMenuSidebar() {
             showCustomModal("Menu Navigasi", `
                 <div style="display:flex; flex-direction:column; gap:8px;">
-                    <button onclick="switchTab('beranda'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">🏠 Beranda Dashboard</button>
-                    <button onclick="switchTab('chat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">💬 Room chat Tim Kacida</button>
-                    <button onclick="switchTab('aksiCepat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">🚀 Misi Hari Ini</button>
-                    <button onclick="switchTab('leaderboard'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">🏆 Leaderboard Area</button>
-                    <button onclick="switchTab('profil'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white;">👤 Profil & Bagan Struktur</button>
+                    <button onclick="switchTab('beranda'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🏠 Beranda Dashboard</button>
+                    <button onclick="switchTab('chat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">💬 Room chat Tim Kacida</button>
+                    <button onclick="switchTab('aksiCepat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🚀 Misi Hari Ini</button>
+                    <button onclick="switchTab('leaderboard'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🏆 Leaderboard Area</button>
+                    <button onclick="switchTab('profil'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">👤 Profil & Bagan Struktur</button>
                 </div>
             `);
         }
@@ -908,7 +981,8 @@
             const floatingAi = document.getElementById("floatingAIMascot");
             if (tabName === "chat") {
                 if (floatingAi) floatingAi.classList.remove("hidden");
-                loadChat();
+                document.getElementById("navChatBadge").classList.add("hidden");
+                switchChatRoomMode(chatRoomMode);
             } else {
                 if (floatingAi) floatingAi.classList.add("hidden");
             }
