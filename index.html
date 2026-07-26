@@ -456,7 +456,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-1TogzPAE7RaRKXuWTbSsJXt9N6pJ5Sip5YV1Ltfn2GaahNhoKPljdqyEq79Lqc-F/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5dMwVVd-KLC_lz-koc99M5kFbhG7D9PMCu1dq9eF13a7rZkN-Quf-znmtZCeN7etL/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -723,7 +723,6 @@
                     const notifId = n.ID || n.Id || (rawJam + "_" + (n.PESAN || ""));
                     const pushedKey = `PUSHED_${todayStr}_${currentHour}_${notifId}`;
 
-                    // Kirim sekali per-jam agar tidak spam saat refresh
                     if (!localStorage.getItem(pushedKey)) {
                         localStorage.setItem(pushedKey, "TRUE");
 
@@ -1137,7 +1136,6 @@
                         ${d.pesanApresiasi ? `<div style="margin-top:6px; padding:6px; background:rgba(34,197,94,0.1); border:1px solid var(--accent-green); border-radius:6px; color:var(--accent-green); font-size:0.62rem;">${d.pesanApresiasi}</div>` : ''}
                     </div>
 
-                    <!-- TOMBOL SALIN RINGKASAN INSTAN -->
                     <div style="margin-top:12px; border-top:1px dashed var(--card-border); padding-top:8px;">
                         <button id="btnCopyPerforma" onclick="copyPerformaText()" class="btn-copy-action">
                             <i class="fa-regular fa-copy" style="font-size:0.9rem;"></i> Salin Teks Ringkasan Performa
@@ -1200,7 +1198,6 @@
             showCustomModal("📢 Pengumuman Resmi", html);
         }
 
-        // POPUP MODAL NOTIFIKASI - BISA DIKLIK LINK TUJUAN & DILOGKAN KE LOG_AKTIVITAS
         function openNotifModal() {
             if (dashboardData && dashboardData.notifications) {
                 const notifIds = dashboardData.notifications.map(n => n.ID || n.Id || n.PESAN);
