@@ -176,6 +176,29 @@
         .tbl-sales-mtd tr:nth-child(even) {
             background: rgba(255, 255, 255, 0.02);
         }
+
+        /* TOAST MELAYANG POPUP RANK LOGIN */
+        .toast-rank-popup {
+            position: fixed; top: 70px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px;
+            z-index: 9998; padding: 12px 16px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px);
+            animation: fadeInDown 0.4s ease forwards;
+        }
+        .toast-rank-popup.top-rank {
+            background: rgba(5, 46, 22, 0.95); border: 2px solid var(--accent-green); color: #fff;
+        }
+        .toast-rank-popup.flop-rank {
+            background: rgba(69, 10, 10, 0.95); border: 2px solid #ef4444; color: #fff;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* STAR RATING SURVEY */
+        .star-rating { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
+        .star-rating i { font-size: 1.6rem; color: #475569; cursor: pointer; transition: color 0.2s; }
+        .star-rating i.active { color: var(--gold); }
     </style>
 </head>
 <body>
@@ -183,6 +206,15 @@
     <div id="loadingOverlay" class="loading-overlay hidden">
         <div class="spinner"></div>
         <p id="loadingText" class="loading-text">Memuat Data...</p>
+    </div>
+
+    <!-- TOAST MELAYANG LOGIN -->
+    <div id="toastRankPopup" class="toast-rank-popup hidden">
+        <div id="toastRankIcon" style="font-size: 1.5rem;">🏆</div>
+        <div>
+            <h4 id="toastRankTitle" style="font-size: 0.85rem; font-weight: 800;">STATUS TOKO</h4>
+            <p id="toastRankMsg" style="font-size: 0.68rem; opacity: 0.9;">Message...</p>
+        </div>
     </div>
 
     <div id="customModalOverlay" class="custom-modal-overlay hidden">
@@ -229,7 +261,10 @@
                     <i class="fa-solid fa-gauge-high"></i>
                 </div>
                 
-                <div class="notif-badge" onclick="requestNotificationPermission()" title="Aktifkan Notifikasi"><i class="fa-regular fa-bell"></i><span class="notif-count" id="notifBadge">0</span></div>
+                <div id="notifPermBtn" class="notif-badge" onclick="manageNotificationPermission()" title="Pengaturan Notifikasi App">
+                    <i id="notifIconHeader" class="fa-regular fa-bell"></i>
+                    <span class="notif-count" id="notifBadge">0</span>
+                </div>
                 
                 <img id="userAvatarHeader" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" class="user-avatar-3d" onclick="showBriefProfile()">
             </div>
@@ -398,7 +433,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMmqeCBfMqTE8hwPj08gunjbgXDvY7aRimStPoGXJq7wxFzavQHUBE7H7AFtx2Q_Qq/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN0UXVX-kNaKR2m0-zMySUUXSadbrc8kEFkuoGuqJoV4C_xqpkj46tU2Ah2m2wSDtY/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -411,6 +446,7 @@
         let lastReadChatCount = Number(localStorage.getItem("LAST_READ_CHAT_COUNT_" + currentNik) || 0);
         let deferredPrompt = null;
         let lastPerformaText = "";
+        let selectedRatingStars = 5;
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -418,6 +454,7 @@
             });
         }
 
+        // GENERATOR AVATAR 3D BERVARIASI & KEREN
         function get3DAvatar(nama, fotoUrl) {
             if (fotoUrl && String(fotoUrl).trim().length > 10) return fotoUrl;
             if (!nama) return "https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
@@ -431,9 +468,25 @@
                 "YAYU", "HESTI", "RISMANI", "EVA", "ANI", "ANISA", "MAULIDYA"
             ];
             
-            return femaleKeywords.some(kw => n.includes(kw))
-                ? "https://cdn-icons-png.flaticon.com/512/4140/4140047.png" 
-                : "https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
+            const isFemale = femaleKeywords.some(kw => n.includes(kw));
+
+            // Variasi avatar keren berdasarkan karakter nama
+            const femaleAvatars = [
+                "https://cdn-icons-png.flaticon.com/512/4140/4140047.png",
+                "https://cdn-icons-png.flaticon.com/512/6997/6997662.png",
+                "https://cdn-icons-png.flaticon.com/512/4140/4140037.png",
+                "https://cdn-icons-png.flaticon.com/512/1154/1154448.png"
+            ];
+
+            const maleAvatars = [
+                "https://cdn-icons-png.flaticon.com/512/4140/4140048.png",
+                "https://cdn-icons-png.flaticon.com/512/6997/6997674.png",
+                "https://cdn-icons-png.flaticon.com/512/4140/4140061.png",
+                "https://cdn-icons-png.flaticon.com/512/2202/2202112.png"
+            ];
+
+            const index = (n.charCodeAt(0) + (n.charCodeAt(1) || 0)) % 4;
+            return isFemale ? femaleAvatars[index] : maleAvatars[index];
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -455,14 +508,63 @@
             }
         }
 
-        function requestNotificationPermission() {
-            if (!('Notification' in window)) return;
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    apiCall("logActivity", { aktivitas: "Izin Notifikasi", detail: "Granted" });
-                    showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green); font-weight:bold;'>Izin Notifikasi HP Berhasil Diaktifkan! 🟢</p>");
-                }
-            });
+        // IZIN & DOKUMEN RINCI PUSH NOTIFIKASI
+        function manageNotificationPermission() {
+            if (!('Notification' in window)) {
+                showCustomModal("🔔 FITUR NOTIFIKASI", "<p style='color:#ef4444;'>Browser Anda tidak mendukung push notifikasi.</p>");
+                return;
+            }
+
+            const currentPerm = Notification.permission;
+
+            if (currentPerm === 'granted') {
+                showCustomModal("🔔 STATUS NOTIFIKASI", `
+                    <div style="text-align:center; padding:8px;">
+                        <i class="fa-solid fa-bell-circle-check" style="font-size:2.5rem; color:var(--accent-green); margin-bottom:8px;"></i>
+                        <h4 style="color:var(--accent-green); font-size:0.9rem; font-weight:800;">NOTIFIKASI SUDAH AKTIF 🟢</h4>
+                        <p style="font-size:0.7rem; color:var(--text-sub); margin-top:6px; line-height:1.4;">
+                            Aplikasi Kacida Bersatu sudah diizinkan mengirimkan pemberitahuan penting seperti pengumuman jam kerja, instruksi shift, dan update sales.
+                        </p>
+                    </div>
+                `);
+                apiCall("logActivity", { aktivitas: "Cek Notifikasi", detail: "Status: Granted (Aktif)" });
+            } else if (currentPerm === 'denied') {
+                showCustomModal("⚠️ IZIN DIBLOKIR", `
+                    <div style="padding:6px;">
+                        <p style="color:#ef4444; font-weight:bold; margin-bottom:6px;">Notifikasi Sebelumnya Dinonaktifkan / Diblokir!</p>
+                        <p style="font-size:0.7rem; color:var(--text-sub); line-height:1.4;">
+                            Untuk mengaktifkannya kembali:<br/>
+                            1. Klik ikon gembok 🔒 di sebelah kiri URL browser HP Anda.<br/>
+                            2. Pilih <b>Izin Situs (Permissions)</b>.<br/>
+                            3. Ubah Notifikasi menjadi <b>Izinkan (Allow)</b>.
+                        </p>
+                    </div>
+                `);
+                apiCall("logActivity", { aktivitas: "Izin Notifikasi Diblokir", detail: "Status: Denied" });
+            } else {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        updateNotifBellIcon(true);
+                        apiCall("logActivity", { aktivitas: "Izin Notifikasi Diberikan", detail: "Status: Granted" });
+                        showCustomModal("🔔 NOTIFIKASI AKTIF", "<p style='color:var(--accent-green); font-weight:bold;'>Izin Notifikasi HP Berhasil Diaktifkan! 🟢</p>");
+                    } else {
+                        updateNotifBellIcon(false);
+                        apiCall("logActivity", { aktivitas: "Izin Notifikasi Ditolak", detail: "Status: Prompt Dismissed" });
+                    }
+                });
+            }
+        }
+
+        function updateNotifBellIcon(isGranted) {
+            const icon = document.getElementById("notifIconHeader");
+            if (!icon) return;
+            if (isGranted) {
+                icon.className = "fa-solid fa-bell";
+                icon.style.color = "var(--accent-green)";
+            } else {
+                icon.className = "fa-regular fa-bell";
+                icon.style.color = "#ffffff";
+            }
         }
 
         function showLoading(msg = "Memuat Data...") {
@@ -499,6 +601,7 @@
                     else if (action === "claimMissionPoin") r.claimMissionPoin(currentNik, params.namaMenu);
                     else if (action === "readNotif") r.readNotif(currentNik, params.idNotif);
                     else if (action === "logActivity") r.logAktivitasAPI(currentNik, params.aktivitas, params.detail);
+                    else if (action === "submitSurvey") r.submitSurveyData(currentNik, params.rating, params.saran);
                 });
             } else {
                 const url = new URL(SCRIPT_URL);
@@ -513,6 +616,9 @@
         }
 
         window.addEventListener("DOMContentLoaded", () => {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                updateNotifBellIcon(true);
+            }
             if (currentNik) initDashboard();
         });
 
@@ -522,6 +628,11 @@
             
             showLoading("Proses Login...");
             currentNik = nik;
+
+            // TRACK LOGIN COUNT UNTUK FITUR SURVEY
+            let loginCount = Number(localStorage.getItem("LOGIN_COUNT_" + nik) || 0) + 1;
+            localStorage.setItem("LOGIN_COUNT_" + nik, loginCount);
+
             const res = await apiCall("login", { nik: nik });
             hideLoading();
 
@@ -556,6 +667,106 @@
                 localStorage.setItem("CACHE_DASHBOARD_" + currentNik, JSON.stringify(data));
                 renderDashboard(data);
                 if (data.user.isAC) loadDaftarTokoAC();
+
+                // CEK RANK & TAMPILKAN TOAST POPUP MELAYANG MASA AWAL MASUK
+                checkAndShowRankToast();
+
+                // CEK SURAK SURVEI JIKA SUDAH LOGIN >= 5 KALI
+                checkAndShowSurveyModal();
+            }
+        }
+
+        // TOAST MELAYANG APRESIASI TOP / PERINGATAN FLOP TOKO
+        async function checkAndShowRankToast() {
+            const perf = await apiCall("getPerforma");
+            if (!perf || perf.status === "error") return;
+
+            const rankNum = Number(perf.rankPenawaran || 10);
+            const totalToko = Number(perf.totalTokoArea || 18);
+            const toast = document.getElementById("toastRankPopup");
+            const icon = document.getElementById("toastRankIcon");
+            const title = document.getElementById("toastRankTitle");
+            const msg = document.getElementById("toastRankMsg");
+
+            if (!toast) return;
+
+            if (rankNum <= 5) {
+                toast.className = "toast-rank-popup top-rank";
+                icon.innerText = "🎉";
+                title.innerText = `TOP TOKO AREA (RANK #${rankNum}/${totalToko})`;
+                msg.innerText = `Luar biasa! Performa penawaran toko ${perf.kodeToko} sangat stabil. Pertahankan! 🔥`;
+            } else if (rankNum >= 14) {
+                toast.className = "toast-rank-popup flop-rank";
+                icon.innerText = "⚠️";
+                title.innerText = `FLOP TOKO AREA (RANK #${rankNum}/${totalToko})`;
+                msg.innerText = `PERINGATAN KERAS: Performa penawaran toko ${perf.kodeToko} perlu evaluasi dan dorongan kasir harian!`;
+            } else {
+                toast.className = "toast-rank-popup top-rank";
+                icon.innerText = "📊";
+                title.innerText = `PERFORMA TOKO (RANK #${rankNum}/${totalToko})`;
+                msg.innerText = `Tingkatkan terus penawaran produk PSM & PWP untuk mencapai TOP 5!`;
+            }
+
+            toast.classList.remove("hidden");
+            setTimeout(() => {
+                toast.classList.add("hidden");
+            }, 4500);
+        }
+
+        // POP-UP SURVEY JIKA LOGIN >= 5 KALI
+        function checkAndShowSurveyModal() {
+            const loginCount = Number(localStorage.getItem("LOGIN_COUNT_" + currentNik) || 0);
+            const isSurveyDone = localStorage.getItem("SURVEY_DONE_" + currentNik);
+
+            if (loginCount >= 5 && isSurveyDone !== "TRUE") {
+                showCustomModal("⭐ SURVEY KEPUASAN PWA", `
+                    <div style="text-align: center; padding: 4px;">
+                        <p style="font-size:0.75rem; color:var(--text-sub);">Anda telah menggunakan aplikasi ini lebih dari 5 kali. Mohon berikan penilaian dan masukan Anda!</p>
+                        
+                        <div class="star-rating" id="starRatingBox">
+                            <i class="fa-solid fa-star active" onclick="setSurveyRating(1)"></i>
+                            <i class="fa-solid fa-star active" onclick="setSurveyRating(2)"></i>
+                            <i class="fa-solid fa-star active" onclick="setSurveyRating(3)"></i>
+                            <i class="fa-solid fa-star active" onclick="setSurveyRating(4)"></i>
+                            <i class="fa-solid fa-star active" onclick="setSurveyRating(5)"></i>
+                        </div>
+
+                        <label style="font-size:0.68rem; font-weight:700; color:#cbd5e1; display:block; text-align:left; margin-bottom:4px;">PESAN DAN SARAN (WAJIB):</label>
+                        <textarea id="txtSurveySaran" placeholder="Tuliskan masukan atau kendala Anda di sini..." style="width:100%; height:75px; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:8px; font-size:0.72rem; outline:none; resize:none; margin-bottom:12px;"></textarea>
+
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="closeCustomModal()" style="flex:1; background:rgba(255,255,255,0.1); color:var(--text-sub); font-weight:700; padding:10px; border-radius:10px; border:none; cursor:pointer;">Nanti</button>
+                            <button onclick="handleSurveySubmit()" style="flex:2; background:var(--accent-green); color:#03170a; font-weight:800; padding:10px; border-radius:10px; border:none; cursor:pointer;">KIRIM SURVEY</button>
+                        </div>
+                    </div>
+                `);
+            }
+        }
+
+        function setSurveyRating(starCount) {
+            selectedRatingStars = starCount;
+            const stars = document.querySelectorAll("#starRatingBox i");
+            stars.forEach((s, idx) => {
+                if (idx < starCount) s.classList.add("active");
+                else s.classList.remove("active");
+            });
+        }
+
+        async function handleSurveySubmit() {
+            const saran = document.getElementById("txtSurveySaran").value.trim();
+            if (!saran) {
+                alert("Mohon isi kolom Pesan dan Saran terlebih dahulu!");
+                return;
+            }
+
+            showLoading("Mengirim Survey...");
+            const res = await apiCall("submitSurvey", { rating: selectedRatingStars, saran: saran });
+            hideLoading();
+
+            if (res && res.status === "success") {
+                localStorage.setItem("SURVEY_DONE_" + currentNik, "TRUE");
+                closeCustomModal();
+                showCustomModal("TERIMA KASIH", `<p style="color:var(--accent-green); font-weight:bold;">${res.message}</p>`);
             }
         }
 
@@ -582,7 +793,15 @@
             if (unreadAnnounces > 0) document.getElementById("dotAnnounce").classList.remove("hidden");
             else document.getElementById("dotAnnounce").classList.add("hidden");
 
-            const unreadNotifs = data.badges.notif - readNotifList.length;
+            // NOTIFIKASI FILTERING JAM DARI SHEET
+            const currentHour = new Date().getHours();
+            const validActiveNotifs = (data.notifications || []).filter(n => {
+                if (!n.JAM) return true;
+                const setHour = parseInt(String(n.JAM).split(":")[0], 10);
+                return isNaN(setHour) || setHour === currentHour;
+            });
+
+            const unreadNotifs = validActiveNotifs.length - readNotifList.length;
             const validUnreadNotifs = unreadNotifs > 0 ? unreadNotifs : 0;
             document.getElementById("valNotifCount").innerText = validUnreadNotifs;
             document.getElementById("notifBadge").innerText = validUnreadNotifs;
@@ -731,6 +950,7 @@
             initDashboard(kodeToko);
         }
 
+        // RINCIAN SALES BULAN BERJALAN: SALES 2026, STD 2026, APC 2026
         async function openSalesMTDModal() {
             showLoading("Memuat Rincian Sales Bulan Berjalan...");
             const d = await apiCall("getDetailSalesMTD");
@@ -746,9 +966,9 @@
                 rowsHtml = d.listHarian.map(item => `
                     <tr>
                         <td style="font-weight:700;">${item.tanggalFormatted}</td>
-                        <td style="color:var(--accent-green); font-weight:800;">Rp ${item.spd.toLocaleString('id-ID')}</td>
-                        <td style="color:var(--gold); font-weight:700;">${item.std}</td>
-                        <td style="color:#38bdf8;">${item.apc}</td>
+                        <td style="color:var(--accent-green); font-weight:800;">${item.sales2026}</td>
+                        <td style="color:var(--gold); font-weight:700;">${item.std2026}</td>
+                        <td style="color:#38bdf8;">${item.apc2026}</td>
                     </tr>
                 `).join("");
             } else {
@@ -770,9 +990,9 @@
                             <thead>
                                 <tr>
                                     <th>TANGGAL</th>
-                                    <th>SPD (Rata2)</th>
-                                    <th>STD</th>
-                                    <th>APC</th>
+                                    <th>SALES 2026</th>
+                                    <th>STD 2026</th>
+                                    <th>APC 2026</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -786,6 +1006,7 @@
             showCustomModal("📊 RINCIAN SALES BULAN BERJALAN", htmlBox);
         }
 
+        // DATA PERFORMANCE: MTD 2025 AMAN FIX NaN + ICON SALIN INSTAN (BOX TEXTAREA DISUBIKAN)
         async function openPerformaPopup() {
             showLoading("Memuat Data Performance...");
             const d = await apiCall("getPerforma");
@@ -796,15 +1017,14 @@
                 return;
             }
 
-            lastPerformaText = `📊 *PERFORMA TOKO ${d.namaToko}*\n🏆 RANK AREA #${d.rank} (${d.tanggalTxt})\n\n💰 *Sales 2026*: Rp ${Number(d.sales2026).toLocaleString('id-ID')}\n📈 *Growth*: ${d.growthHarian >= 0 ? '+' : ''}${d.growthHarian.toFixed(1)}%\n📊 *MTD Sales*: Rp ${Number(d.mtd2026).toLocaleString('id-ID')} (${d.mtdGrowth.toFixed(1)}%)\n⚡ *SPD*: Rp ${Math.round(d.spd).toLocaleString('id-ID')}\n🚀 *Rank Penawaran*: #${d.rankPenawaran} dari ${d.totalTokoArea} Toko\n🎯 *Point Penawaran*: ${d.pointDash} (${d.ketPoint})\n\n#KacidaBersatu`;
+            lastPerformaText = `📊 *PERFORMA TOKO ${d.namaToko}*\nTgl: ${d.tanggalTxt}\n\n💰 *Sales 2026*: Rp ${Number(d.sales2026).toLocaleString('id-ID')}\n📈 *Growth Harian*: ${d.growthHarian >= 0 ? '+' : ''}${d.growthHarian.toFixed(1)}%\n📊 *MTD Sales 2026*: Rp ${Number(d.mtd2026).toLocaleString('id-ID')} (${d.mtdGrowth.toFixed(1)}%)\n⚡ *SPD 2026*: Rp ${Math.round(d.spd).toLocaleString('id-ID')}\n🚀 *Rank Penawaran Area*: #${d.rankPenawaran} dari ${d.totalTokoArea} Toko\n🎯 *Point Penawaran*: ${d.pointDash} (${d.ketPoint})\n\n#KacidaBersatu`;
 
             const htmlBox = `
                 <div style="font-family: monospace, sans-serif; font-size: 0.7rem; line-height: 1.5; color: #fff; background: #03170a; padding: 12px; border-radius: 12px; border: 1px solid var(--card-border);">
                     <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent-green); margin-bottom:2px; font-size:0.75rem;">
                         <span>📍 ${d.namaToko}</span>
-                        <span style="color:var(--gold);">🏆 RANK #${d.rank}</span>
+                        <span style="color:var(--text-sub); font-size:0.62rem;">📅 Update: ${d.tanggalTxt}</span>
                     </div>
-                    <div style="color:var(--text-sub); font-size:0.62rem; margin-bottom:8px;">📅 Update Terakhir: ${d.tanggalTxt} (Hari ke-${d.hariAktif} Aktif)</div>
 
                     <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
                         <div style="color:var(--gold); font-weight:700;">💰 SALES HARIAN (${d.tglOnly})</div>
@@ -816,7 +1036,7 @@
                     <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
                         <div style="color:#38bdf8; font-weight:700;">📊 MTD SALES & AVERAGE (s/d Tanggal ${d.tanggalTxt})</div>
                         <div style="padding-left:6px;">MTD Sales 2026 : Rp ${Number(d.mtd2026).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px;">MTD Sales 2025 : Rp ${Number(d.mtd25).toLocaleString('id-ID')}</div>
+                        <div style="padding-left:6px;">MTD Sales 2025 : Rp ${Number(d.mtd2025 || 0).toLocaleString('id-ID')}</div>
                         <div style="padding-left:6px; color:var(--accent-green); font-weight:700;">📊 MTD Growth    : ${d.mtdGrowth >= 0 ? '+' : ''}${d.mtdGrowth.toFixed(1)}% ${d.mtdGrowth >= 0 ? '🟢' : '🔴'}</div>
                         <div style="padding-left:6px; color:var(--gold); font-weight:700;">⚡ SPD 2026 (Rata-rata/Hari) : Rp ${Math.round(d.spd).toLocaleString('id-ID')}</div>
                     </div>
@@ -840,7 +1060,7 @@
                     <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
                         <div style="color:#ef4444; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
                             <span>🚀 PENAWARAN LANGSUNG</span>
-                            <span style="color:var(--gold); font-size:0.65rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px; border:1px solid var(--gold);">🏆 RANK #${d.rankPenawaran || d.rank} DARI ${d.totalTokoArea || 18} TOKO</span>
+                            <span style="color:var(--gold); font-size:0.65rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px; border:1px solid var(--gold);">🏆 RANK #${d.rankPenawaran || 1} DARI ${d.totalTokoArea || 18} TOKO</span>
                         </div>
                         <div style="padding-left:6px; margin-top:4px;">Point Dashboard : <strong>${d.pointDash}</strong> (${d.ketPoint})</div>
                         <div style="padding-left:6px; font-size:0.62rem; color:#cbd5e1; margin-top:2px;">
@@ -849,11 +1069,10 @@
                         ${d.pesanApresiasi ? `<div style="margin-top:6px; padding:6px; background:rgba(34,197,94,0.1); border:1px solid var(--accent-green); border-radius:6px; color:var(--accent-green); font-size:0.62rem;">${d.pesanApresiasi}</div>` : ''}
                     </div>
 
-                    <div style="margin-top:10px; border-top:1px dashed var(--card-border); padding-top:8px;">
-                        <div style="font-size:0.62rem; color:var(--text-sub); margin-bottom:4px; font-weight:700;">📋 TEKS RINGKASAN PERFORMA (BISA DISALIN):</div>
-                        <textarea id="txtPerformaSummary" readonly style="width:100%; height:95px; background:var(--bg-dark); color:#22c55e; border:1px solid var(--card-border); border-radius:8px; padding:6px 8px; font-family:monospace; font-size:0.62rem; outline:none; resize:none;">${lastPerformaText}</textarea>
+                    <!-- TOMBOL SALIN RINGKASAN INSTAN -->
+                    <div style="margin-top:12px; border-top:1px dashed var(--card-border); padding-top:8px;">
                         <button id="btnCopyPerforma" onclick="copyPerformaText()" class="btn-copy-action">
-                            <i class="fa-regular fa-copy" style="font-size:0.85rem;"></i> Salin Teks Ringkasan
+                            <i class="fa-regular fa-copy" style="font-size:0.9rem;"></i> Salin Teks Ringkasan Performa
                         </button>
                     </div>
                 </div>
@@ -863,30 +1082,31 @@
         }
 
         function copyPerformaText() {
-            const txtArea = document.getElementById("txtPerformaSummary");
             const btn = document.getElementById("btnCopyPerforma");
-            if (!txtArea) return;
-
-            txtArea.select();
-            txtArea.setSelectionRange(0, 99999);
+            if (!lastPerformaText) return;
 
             try {
                 if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(txtArea.value);
+                    navigator.clipboard.writeText(lastPerformaText);
                 } else {
+                    const temp = document.createElement("textarea");
+                    temp.value = lastPerformaText;
+                    document.body.appendChild(temp);
+                    temp.select();
                     document.execCommand("copy");
+                    document.body.removeChild(temp);
                 }
                 
                 if (btn) {
-                    btn.innerHTML = `<i class="fa-solid fa-check" style="font-size:0.85rem;"></i> Berhasil Disalin!`;
+                    btn.innerHTML = `<i class="fa-solid fa-check" style="font-size:0.9rem;"></i> Berhasil Disalin!`;
                     btn.style.background = "#38bdf8";
                     setTimeout(() => {
-                        btn.innerHTML = `<i class="fa-regular fa-copy" style="font-size:0.85rem;"></i> Salin Teks Ringkasan`;
+                        btn.innerHTML = `<i class="fa-regular fa-copy" style="font-size:0.9rem;"></i> Salin Teks Ringkasan Performa`;
                         btn.style.background = "var(--accent-green)";
                     }, 2500);
                 }
             } catch(e) {
-                alert("Gagal menyalin otomatis, silakan blok teks di atas dan salin manual.");
+                alert("Gagal menyalin otomatis, silakan coba lagi.");
             }
         }
 
@@ -930,7 +1150,7 @@
                     <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" style="width:32px; height:32px;">
                     <div>
                         <p style="font-weight:bold; color:var(--accent-green); font-size:0.75rem;">${n.PESAN || n.Pesan || n.pesan || 'Notifikasi'}</p>
-                        <p style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Waktu: ${n.JAM || '-'} | Tgl: ${n.TANGGAL || '-'}</p>
+                        <p style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Waktu: ${n.JAM || '-'} | Status: Active</p>
                     </div>
                 </div>
             `).join("");
