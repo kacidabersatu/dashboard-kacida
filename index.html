@@ -101,7 +101,6 @@
         
         .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
 
-        /* TAMPILAN TAB CHAT TERPISAH LAPANG */
         .chat-tab-wrapper { display: flex; gap: 8px; background: var(--bg-dark); padding: 6px; border-radius: 14px; border: 1px solid var(--card-border); margin-bottom: 12px; }
         .chat-tab-pill { flex: 1; padding: 8px 12px; font-size: 0.72rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; }
         .chat-tab-pill.active { background: var(--accent-green); color: #03170a; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3); }
@@ -172,6 +171,7 @@
         </div>
     </div>
 
+    <!-- LOGIN SCREEN -->
     <div id="loginSection">
         <div style="text-align: center; margin-top: 20vh; margin-bottom: 24px;">
             <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 90px; height: 90px; border-radius: 20px; border: 2px solid var(--accent-green); margin-bottom: 12px; object-fit: cover;">
@@ -185,6 +185,7 @@
         </div>
     </div>
 
+    <!-- MAIN APP CONTAINER -->
     <div id="appSection" class="hidden">
         
         <header class="app-header">
@@ -296,7 +297,7 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT TERPISAH: CHAT TIM vs KACIDA AI PRIVAT -->
+        <!-- TAB CHAT TERPISAH DUA TAB: CHAT TIM vs CHAT PRIVAT KACIDA AI -->
         <div id="tabChat" class="hidden container space-y-3">
             <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room chat Tim Kacida</h2>
             
@@ -326,7 +327,6 @@
             <div id="leaderboardList" class="menu-section-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
-        <!-- TAB PROFIL NAVBAR BOTTOM -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
@@ -360,7 +360,6 @@
             </div>
         </div>
 
-        <!-- MASCOT AI MENGAPUNG (KHUSUS DI TAB CHAT) -->
         <button id="floatingAIMascot" class="hidden" onclick="switchChatRoomMode('ai')" style="position: fixed; bottom: 80px; right: 16px; z-index: 999; background: #0A2414; border: 2px solid var(--accent-green); padding: 10px; border-radius: 50%; box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); cursor: pointer;">
             <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 32px; height: 32px; display: block;">
         </button>
@@ -378,7 +377,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk-25AkxDoowdiHjBpADM46rOMpjBJIeGo5q_4c0wUkvNNV4EVg7uCutXoSVMrP8HF/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytNAkgXQrkqga_on4rPP9Qj0EMXrY9PzZg9y6GFbh2oJvRSPbyCG2ZMK1edRlVJRQY/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -560,6 +559,7 @@
             if (validUnreadNotifs > 0) document.getElementById("dotNotif").classList.remove("hidden");
             else document.getElementById("dotNotif").classList.add("hidden");
 
+            // ANKGA UNREAD BADGE CHAT
             if (data.badges.chatUnread && data.badges.chatUnread !== "0") {
                 const navBadge = document.getElementById("navChatBadge");
                 if (navBadge) {
@@ -860,7 +860,7 @@
             }
         }
 
-        // TAMPILAN PRIVAT OBROLAN 1-ON-1 DENGAN KACIDA AI (NO POPUP MODALS!)
+        // TAMPILAN OBROLAN PRIVAT KACIDA AI (100% BEBAS GEMINI 2.0 FLASH - INLINE CHAT STREAM)
         function renderAIChatRoom() {
             const box = document.getElementById("chatBox");
             if (aiChatHistory.length === 0) {
@@ -873,9 +873,10 @@
 
             box.innerHTML = aiChatHistory.map(c => {
                 const isMe = c.sender === "ME";
+                const isErr = c.isError === true;
                 const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 return `
-                    <div class="wa-bubble ${isMe ? 'me' : 'ai'}">
+                    <div class="wa-bubble ${isMe ? 'me' : 'ai'}" style="${isErr ? 'border-color:#ef4444;' : ''}">
                         <div class="wa-sender">
                             <span>${isMe ? 'SAYA' : '🤖 Asisten Kacida AI'}</span>
                         </div>
@@ -887,7 +888,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // SINKRONISASI KIRIM CHAT TIM & CHAT PRIVAT AI (INSTANT & DYNAMIC)
+        // SINKRONISASI PENGIRIMAN PESAN PAKAI RESPON NYATA GEMINI 2.0
         async function handleSendChatAction() {
             const input = document.getElementById("inputChatMsg");
             const msg = input.value.trim();
@@ -896,20 +897,24 @@
             input.value = "";
 
             if (chatRoomMode === 'ai') {
-                // CHAT PRIVAT DENGAN KACIDA AI (STREAMING LANGSUNG DILAYAR TANPA POPUP)
+                // CHAT PRIVAT DENGAN KACIDA AI (GEMINI 2.0 FLASH INLINE)
                 aiChatHistory.push({ sender: "ME", msg: msg });
                 
                 const tempAiIdx = aiChatHistory.length;
                 aiChatHistory.push({ sender: "AI", msg: "🤖 *Asisten Kacida AI sedang berpikir...*" });
                 renderAIChatRoom();
 
-                // PANGGIL AI GEMINI 2.0
+                // PANGGIL GEMINI API
                 const res = await apiCall("askAI", { pertanyaan: msg });
                 
-                aiChatHistory[tempAiIdx] = { sender: "AI", msg: res.jawaban || "Kacida AI siap membantu!" };
+                if (res && res.status === "success" && res.jawaban) {
+                    aiChatHistory[tempAiIdx] = { sender: "AI", msg: res.jawaban };
+                } else {
+                    aiChatHistory[tempAiIdx] = { sender: "AI", msg: "⚠️ " + (res?.message || "Gagal mendapatkan respon dari AI. Silakan coba lagi!"), isError: true };
+                }
                 renderAIChatRoom();
             } else {
-                // CHAT TIM WA INSTAN
+                // CHAT TIM WA INSTAN CEKLIS SPREADSHEET
                 const box = document.getElementById("chatBox");
                 const tempId = "msg_" + Date.now();
                 const nowTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
