@@ -56,9 +56,10 @@
 
         .disket-info-bar {
             background: #0A2414; border: 1px solid var(--gold); border-radius: 16px; padding: 12px 14px; margin-bottom: 14px;
-            display: flex; justify-content: space-between; align-items: center; cursor: default;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
-        .disket-bar-item { display: flex; flex-direction: column; align-items: flex-start; }
+        .disket-bar-item { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; padding: 2px 4px; border-radius: 8px; transition: background 0.2s; }
+        .disket-bar-item:active { background: rgba(255,255,255,0.05); }
         .disket-bar-label { font-size: 0.65rem; color: var(--text-sub); display: flex; align-items: center; gap: 4px; }
         .disket-bar-val { font-size: 0.82rem; font-weight: 800; margin-top: 2px; }
         .disket-divider { width: 1px; height: 28px; background: rgba(255, 255, 255, 0.12); }
@@ -134,7 +135,7 @@
         }
         .custom-modal-card {
             background: #0C2B14; border: 1px solid var(--card-border);
-            border-radius: 20px; width: 100%; max-width: 360px; padding: 16px; color: white;
+            border-radius: 20px; width: 100%; max-width: 400px; padding: 16px; color: white;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative;
         }
         .modal-btn-close {
@@ -154,6 +155,27 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .loading-text { font-size: 0.75rem; font-weight: 700; color: var(--accent-green); }
+
+        .btn-copy-action {
+            background: var(--accent-green); color: #03170a; font-weight: 800; font-size: 0.72rem;
+            padding: 8px 12px; border-radius: 10px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; margin-top: 6px; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .tbl-sales-mtd {
+            width: 100%; border-collapse: collapse; text-align: center; font-size: 0.65rem; margin-top: 8px;
+        }
+        .tbl-sales-mtd th {
+            background: rgba(34, 197, 94, 0.2); color: var(--accent-green); padding: 6px 3px; border: 1px solid var(--card-border); font-weight: 800;
+        }
+        .tbl-sales-mtd td {
+            padding: 5px 3px; border: 1px solid var(--card-border); color: #fff;
+        }
+        .tbl-sales-mtd tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
     </style>
 </head>
 <body>
@@ -167,16 +189,16 @@
         <div class="custom-modal-card">
             <button onclick="closeCustomModal()" class="modal-btn-close"><i class="fa-solid fa-xmark"></i></button>
             <h3 id="customModalTitle" style="font-size: 0.95rem; font-weight: 800; color: var(--accent-green); margin-bottom: 10px;">Modal Title</h3>
-            <div id="customModalBody" style="font-size: 0.78rem; line-height: 1.5; max-height: 65vh; overflow-y: auto;"></div>
+            <div id="customModalBody" style="font-size: 0.78rem; line-height: 1.5; max-height: 68vh; overflow-y: auto;"></div>
         </div>
     </div>
 
     <!-- LOGIN SCREEN -->
     <div id="loginSection">
-        <div style="text-align: center; margin-top: 20vh; margin-bottom: 24px;">
+        <div style="text-align: center; margin-top: 18vh; margin-bottom: 24px;">
             <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 90px; height: 90px; border-radius: 20px; border: 2px solid var(--accent-green); margin-bottom: 12px; object-fit: cover;">
             <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--accent-green); font-family: 'Poppins', sans-serif;">KACIDA BERSATU</h1>
-            <p style="font-size: 0.75rem; color: var(--text-sub);">Panduan Fitur Dashboard & Portal Operasional</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub);">Portal Performa & Operasional Retail</p>
         </div>
         <div class="menu-section-card" style="padding: 24px;">
             <label style="font-size: 0.75rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 8px;">NIK PENGGUNA</label>
@@ -203,7 +225,7 @@
                     <i class="fa-solid fa-download"></i> Instal
                 </div>
 
-                <div class="disket-badge" onclick="openPerformaPopup()" title="Klik Rincian Data Performance">
+                <div class="disket-badge" onclick="openPerformaPopup()" title="Rincian Data Performance">
                     <i class="fa-solid fa-gauge-high"></i>
                 </div>
                 
@@ -222,28 +244,28 @@
 
         <main id="tabBeranda" class="container">
             <section class="disket-info-bar">
-                <div class="disket-bar-item">
+                <div class="disket-bar-item" onclick="openSalesMTDModal()" title="Klik Rincian Sales Bulan Berjalan">
                     <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
                     <span class="disket-bar-val" id="valSales" style="color: var(--accent-green); font-size: 0.72rem;">Memuat...</span>
                 </div>
                 <div class="disket-divider"></div>
-                <div class="disket-bar-item">
+                <div class="disket-bar-item" onclick="openPerformaPopup()">
                     <span class="disket-bar-label"><i class="fa-solid fa-bullseye" style="color: var(--gold);"></i> IKT Toko</span>
                     <span class="disket-bar-val" id="valIKT" style="color: var(--gold);">-</span>
                 </div>
                 <div class="disket-divider"></div>
-                <div class="disket-bar-item">
+                <div class="disket-bar-item" onclick="openPerformaPopup()">
                     <span class="disket-bar-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Penawaran</span>
                     <span class="disket-bar-val" id="valPenawaran" style="color: #ef4444;">-</span>
                 </div>
-                <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);"></i>
+                <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);" onclick="openPerformaPopup()"></i>
             </section>
             
             <section class="hero-card">
                 <div class="hero-content">
                     <span style="font-size: 0.7rem; color: var(--text-sub);">Selamat datang kembali,</span>
                     <h1 class="hero-title" id="lblUserName">USER! 👋</h1>
-                    <p class="hero-sub">Tetap semangat, layani dengan hati dan jadilah yang terbaik!</p>
+                    <p class="hero-sub">Tetap semangat, layani dengan hati dan capai target performa!</p>
                     <div class="performance-badge">
                         <i class="fa-solid fa-star" style="color: var(--gold);"></i>
                         <span>Performa hari ini <strong style="color: var(--accent-green);">Sangat Baik! 🔥</strong></span>
@@ -297,9 +319,8 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT TERPISAH DUA TAB: CHAT TIM vs CHAT PRIVAT KACIDA AI -->
         <div id="tabChat" class="hidden container space-y-3">
-            <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room chat Tim Kacida</h2>
+            <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room Chat Tim Kacida</h2>
             
             <div class="chat-tab-wrapper">
                 <button id="btnTabTeam" class="chat-tab-pill active" onclick="switchChatRoomMode('team')"><i class="fa-solid fa-users"></i> Chat Tim</button>
@@ -309,7 +330,7 @@
             <div id="chatBox" class="wa-chat-container custom-scrollbar"></div>
 
             <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.75rem; color: white; outline: none;">
+                <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') handleSendChatAction()" style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.75rem; color: white; outline: none;">
                 <button onclick="handleSendChatAction()" style="background: var(--accent-green); color: #03170a; padding: 0 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -377,7 +398,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytNAkgXQrkqga_on4rPP9Qj0EMXrY9PzZg9y6GFbh2oJvRSPbyCG2ZMK1edRlVJRQY/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMmqeCBfMqTE8hwPj08gunjbgXDvY7aRimStPoGXJq7wxFzavQHUBE7H7AFtx2Q_Qq/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -386,8 +407,16 @@
         let aiChatHistory = [];
         let readPengumuman = false;
         let readNotifList = [];
+        let chatAutoRefreshTimer = null;
         let lastReadChatCount = Number(localStorage.getItem("LAST_READ_CHAT_COUNT_" + currentNik) || 0);
         let deferredPrompt = null;
+        let lastPerformaText = "";
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
 
         function get3DAvatar(nama, fotoUrl) {
             if (fotoUrl && String(fotoUrl).trim().length > 10) return fotoUrl;
@@ -460,6 +489,7 @@
                     if (action === "login") r.loginUser(params.nik);
                     else if (action === "getDashboard") r.getDashboardData(currentNik, selectedKodeTokoAC);
                     else if (action === "getPerforma") r.getPerformaPopup(currentNik, selectedKodeTokoAC);
+                    else if (action === "getDetailSalesMTD") r.getDetailSalesMTD(currentNik, selectedKodeTokoAC);
                     else if (action === "askAI") r.askKacidaAI(currentNik, params.pertanyaan);
                     else if (action === "getLeaderboard") r.getLeaderboard();
                     else if (action === "getChat") r.getChatFiltered(currentNik);
@@ -559,7 +589,6 @@
             if (validUnreadNotifs > 0) document.getElementById("dotNotif").classList.remove("hidden");
             else document.getElementById("dotNotif").classList.add("hidden");
 
-            // ANKGA UNREAD BADGE CHAT
             if (data.badges.chatUnread && data.badges.chatUnread !== "0") {
                 const navBadge = document.getElementById("navChatBadge");
                 if (navBadge) {
@@ -702,6 +731,61 @@
             initDashboard(kodeToko);
         }
 
+        async function openSalesMTDModal() {
+            showLoading("Memuat Rincian Sales Bulan Berjalan...");
+            const d = await apiCall("getDetailSalesMTD");
+            hideLoading();
+
+            if (!d || d.status === "error") {
+                showCustomModal("📊 RINCIAN SALES BULAN BERJALAN", `<p style='color:#ef4444;'>Gagal memuat rincian: ${d?.message || 'Koneksi terganggu'}</p>`);
+                return;
+            }
+
+            let rowsHtml = "";
+            if (d.listHarian && d.listHarian.length > 0) {
+                rowsHtml = d.listHarian.map(item => `
+                    <tr>
+                        <td style="font-weight:700;">${item.tanggalFormatted}</td>
+                        <td style="color:var(--accent-green); font-weight:800;">Rp ${item.spd.toLocaleString('id-ID')}</td>
+                        <td style="color:var(--gold); font-weight:700;">${item.std}</td>
+                        <td style="color:#38bdf8;">${item.apc}</td>
+                    </tr>
+                `).join("");
+            } else {
+                rowsHtml = `<tr><td colspan="4" style="color:var(--text-sub);">Belum ada data harian di bulan ini.</td></tr>`;
+            }
+
+            const htmlBox = `
+                <div style="font-size: 0.75rem;">
+                    <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent-green); margin-bottom:4px;">
+                        <span>📍 ${d.namaToko}</span>
+                        <span style="color:var(--gold);">🗓️ ${d.bulanName}</span>
+                    </div>
+                    <div style="color:var(--text-sub); font-size:0.65rem; margin-bottom:10px;">
+                        Total MTD Sales (s/d Tgl ${d.targetDay}): <strong style="color:#fff;">Rp ${Number(d.totalMtdSales).toLocaleString('id-ID')}</strong>
+                    </div>
+
+                    <div style="max-height: 50vh; overflow-y: auto; border: 1px solid var(--card-border); border-radius: 10px;">
+                        <table class="tbl-sales-mtd">
+                            <thead>
+                                <tr>
+                                    <th>TANGGAL</th>
+                                    <th>SPD (Rata2)</th>
+                                    <th>STD</th>
+                                    <th>APC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            showCustomModal("📊 RINCIAN SALES BULAN BERJALAN", htmlBox);
+        }
+
         async function openPerformaPopup() {
             showLoading("Memuat Data Performance...");
             const d = await apiCall("getPerforma");
@@ -711,6 +795,8 @@
                 showCustomModal("📊 DATA PERFORMANCE", `<p style='color:#ef4444;'>Gagal memuat data: ${d?.message || 'Koneksi terganggu'}</p>`);
                 return;
             }
+
+            lastPerformaText = `📊 *PERFORMA TOKO ${d.namaToko}*\n🏆 RANK AREA #${d.rank} (${d.tanggalTxt})\n\n💰 *Sales 2026*: Rp ${Number(d.sales2026).toLocaleString('id-ID')}\n📈 *Growth*: ${d.growthHarian >= 0 ? '+' : ''}${d.growthHarian.toFixed(1)}%\n📊 *MTD Sales*: Rp ${Number(d.mtd2026).toLocaleString('id-ID')} (${d.mtdGrowth.toFixed(1)}%)\n⚡ *SPD*: Rp ${Math.round(d.spd).toLocaleString('id-ID')}\n🚀 *Rank Penawaran*: #${d.rankPenawaran} dari ${d.totalTokoArea} Toko\n🎯 *Point Penawaran*: ${d.pointDash} (${d.ketPoint})\n\n#KacidaBersatu`;
 
             const htmlBox = `
                 <div style="font-family: monospace, sans-serif; font-size: 0.7rem; line-height: 1.5; color: #fff; background: #03170a; padding: 12px; border-radius: 12px; border: 1px solid var(--card-border);">
@@ -730,7 +816,7 @@
                     <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
                         <div style="color:#38bdf8; font-weight:700;">📊 MTD SALES & AVERAGE (s/d Tanggal ${d.tanggalTxt})</div>
                         <div style="padding-left:6px;">MTD Sales 2026 : Rp ${Number(d.mtd2026).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px;">MTD Sales 2025 : Rp ${Number(d.mtd2025).toLocaleString('id-ID')}</div>
+                        <div style="padding-left:6px;">MTD Sales 2025 : Rp ${Number(d.mtd25).toLocaleString('id-ID')}</div>
                         <div style="padding-left:6px; color:var(--accent-green); font-weight:700;">📊 MTD Growth    : ${d.mtdGrowth >= 0 ? '+' : ''}${d.mtdGrowth.toFixed(1)}% ${d.mtdGrowth >= 0 ? '🟢' : '🔴'}</div>
                         <div style="padding-left:6px; color:var(--gold); font-weight:700;">⚡ SPD 2026 (Rata-rata/Hari) : Rp ${Math.round(d.spd).toLocaleString('id-ID')}</div>
                     </div>
@@ -752,17 +838,56 @@
                     </div>
 
                     <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
-                        <div style="color:#ef4444; font-weight:700;">🚀 PENAWARAN LANGSUNG</div>
-                        <div style="padding-left:6px;">Point Dashboard : <strong>${d.pointDash}</strong> (${d.ketPoint})</div>
+                        <div style="color:#ef4444; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
+                            <span>🚀 PENAWARAN LANGSUNG</span>
+                            <span style="color:var(--gold); font-size:0.65rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px; border:1px solid var(--gold);">🏆 RANK #${d.rankPenawaran || d.rank} DARI ${d.totalTokoArea || 18} TOKO</span>
+                        </div>
+                        <div style="padding-left:6px; margin-top:4px;">Point Dashboard : <strong>${d.pointDash}</strong> (${d.ketPoint})</div>
                         <div style="padding-left:6px; font-size:0.62rem; color:#cbd5e1; margin-top:2px;">
                             PSM: ${d.psm} | PWP: ${d.pwp} | SERBA GRATIS: ${d.serbaGratis} | APC: ${d.apc}
                         </div>
                         ${d.pesanApresiasi ? `<div style="margin-top:6px; padding:6px; background:rgba(34,197,94,0.1); border:1px solid var(--accent-green); border-radius:6px; color:var(--accent-green); font-size:0.62rem;">${d.pesanApresiasi}</div>` : ''}
                     </div>
+
+                    <div style="margin-top:10px; border-top:1px dashed var(--card-border); padding-top:8px;">
+                        <div style="font-size:0.62rem; color:var(--text-sub); margin-bottom:4px; font-weight:700;">📋 TEKS RINGKASAN PERFORMA (BISA DISALIN):</div>
+                        <textarea id="txtPerformaSummary" readonly style="width:100%; height:95px; background:var(--bg-dark); color:#22c55e; border:1px solid var(--card-border); border-radius:8px; padding:6px 8px; font-family:monospace; font-size:0.62rem; outline:none; resize:none;">${lastPerformaText}</textarea>
+                        <button id="btnCopyPerforma" onclick="copyPerformaText()" class="btn-copy-action">
+                            <i class="fa-regular fa-copy" style="font-size:0.85rem;"></i> Salin Teks Ringkasan
+                        </button>
+                    </div>
                 </div>
             `;
 
             showCustomModal("📊 DATA PERFORMANCE", htmlBox);
+        }
+
+        function copyPerformaText() {
+            const txtArea = document.getElementById("txtPerformaSummary");
+            const btn = document.getElementById("btnCopyPerforma");
+            if (!txtArea) return;
+
+            txtArea.select();
+            txtArea.setSelectionRange(0, 99999);
+
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(txtArea.value);
+                } else {
+                    document.execCommand("copy");
+                }
+                
+                if (btn) {
+                    btn.innerHTML = `<i class="fa-solid fa-check" style="font-size:0.85rem;"></i> Berhasil Disalin!`;
+                    btn.style.background = "#38bdf8";
+                    setTimeout(() => {
+                        btn.innerHTML = `<i class="fa-regular fa-copy" style="font-size:0.85rem;"></i> Salin Teks Ringkasan`;
+                        btn.style.background = "var(--accent-green)";
+                    }, 2500);
+                }
+            } catch(e) {
+                alert("Gagal menyalin otomatis, silakan blok teks di atas dan salin manual.");
+            }
         }
 
         function openPengumumanModal() {
@@ -822,17 +947,27 @@
             if (mode === 'team') {
                 btnTeam.classList.add("active");
                 btnAI.classList.remove("active");
-                title.innerHTML = `<i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room chat Tim Kacida`;
+                title.innerHTML = `<i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room Chat Tim Kacida`;
                 loadChat();
+
+                if (!chatAutoRefreshTimer) {
+                    chatAutoRefreshTimer = setInterval(() => {
+                        if (chatRoomMode === 'team') loadChat(true);
+                    }, 8000);
+                }
             } else {
                 btnAI.classList.add("active");
                 btnTeam.classList.remove("active");
                 title.innerHTML = `<i class="fa-solid fa-robot" style="color: var(--accent-green);"></i> Chat Privat Kacida AI`;
+                if (chatAutoRefreshTimer) {
+                    clearInterval(chatAutoRefreshTimer);
+                    chatAutoRefreshTimer = null;
+                }
                 renderAIChatRoom();
             }
         }
 
-        async function loadChat() {
+        async function loadChat(isBackgroundRefresh = false) {
             if (chatRoomMode !== 'team') return;
             const chats = await apiCall("getChat");
             const box = document.getElementById("chatBox");
@@ -856,11 +991,13 @@
                         </div>
                     `;
                 }).join("");
-                box.scrollTop = box.scrollHeight;
+
+                if (!isBackgroundRefresh) {
+                    box.scrollTop = box.scrollHeight;
+                }
             }
         }
 
-        // TAMPILAN OBROLAN PRIVAT KACIDA AI (100% BEBAS GEMINI 2.0 FLASH - INLINE CHAT STREAM)
         function renderAIChatRoom() {
             const box = document.getElementById("chatBox");
             if (aiChatHistory.length === 0) {
@@ -888,7 +1025,6 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // SINKRONISASI PENGIRIMAN PESAN PAKAI RESPON NYATA GEMINI 2.0
         async function handleSendChatAction() {
             const input = document.getElementById("inputChatMsg");
             const msg = input.value.trim();
@@ -897,14 +1033,12 @@
             input.value = "";
 
             if (chatRoomMode === 'ai') {
-                // CHAT PRIVAT DENGAN KACIDA AI (GEMINI 2.0 FLASH INLINE)
                 aiChatHistory.push({ sender: "ME", msg: msg });
                 
                 const tempAiIdx = aiChatHistory.length;
                 aiChatHistory.push({ sender: "AI", msg: "🤖 *Asisten Kacida AI sedang berpikir...*" });
                 renderAIChatRoom();
 
-                // PANGGIL GEMINI API
                 const res = await apiCall("askAI", { pertanyaan: msg });
                 
                 if (res && res.status === "success" && res.jawaban) {
@@ -914,7 +1048,6 @@
                 }
                 renderAIChatRoom();
             } else {
-                // CHAT TIM WA INSTAN CEKLIS SPREADSHEET
                 const box = document.getElementById("chatBox");
                 const tempId = "msg_" + Date.now();
                 const nowTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -960,7 +1093,7 @@
             showCustomModal("Menu Navigasi", `
                 <div style="display:flex; flex-direction:column; gap:8px;">
                     <button onclick="switchTab('beranda'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🏠 Beranda Dashboard</button>
-                    <button onclick="switchTab('chat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">💬 Room chat Tim Kacida</button>
+                    <button onclick="switchTab('chat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">💬 Room Chat Tim Kacida</button>
                     <button onclick="switchTab('aksiCepat'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🚀 Misi Hari Ini</button>
                     <button onclick="switchTab('leaderboard'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">🏆 Leaderboard Area</button>
                     <button onclick="switchTab('profil'); closeCustomModal();" style="background:var(--bg-dark); padding:10px; border-radius:10px; border:1px solid var(--card-border); color:white; cursor:pointer;">👤 Profil & Bagan Struktur</button>
@@ -969,6 +1102,11 @@
         }
 
         function switchTab(tabName) {
+            if (chatAutoRefreshTimer && tabName !== "chat") {
+                clearInterval(chatAutoRefreshTimer);
+                chatAutoRefreshTimer = null;
+            }
+
             ["beranda", "chat", "aksiCepat", "leaderboard", "profil"].forEach(t => {
                 const el = document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1));
                 const nav = document.getElementById("nav" + t.charAt(0).toUpperCase() + t.slice(1));
