@@ -47,8 +47,8 @@
         .header-right { display: flex; align-items: center; gap: 8px; }
 
         .disket-badge { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: var(--gold); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        /* LONCENG HEADER TANPA BADGE MERAH */
         .notif-badge { position: relative; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .notif-count { position: absolute; top: 2px; right: 2px; background: #ef4444; color: #fff; font-size: 0.6rem; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .install-badge { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 6px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 4px; cursor: pointer; }
         .user-avatar-3d { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; }
 
@@ -81,11 +81,29 @@
         .banner-btn { background: #dc2626; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; margin-top: 10px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; }
 
         .metrics-scroll { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 16px; }
-        .metric-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; }
-        .metric-icon-3d { width: 24px; height: 24px; margin: 0 auto 4px auto; display: block; }
+        .metric-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .metric-card:active { transform: scale(0.96); }
+        .metric-icon-3d { width: 24px; height: 24px; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         .metric-title { font-size: 0.58rem; color: var(--text-sub); display: block; }
         .metric-value { font-size: 0.8rem; font-weight: 800; }
-        .red-dot-badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; }
+        .red-dot-badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; }
+
+        /* KOTAK METRICS 3D & BERWARNA KHUSUS PENGUMUMAN DAN NOTIFIKASI */
+        .metric-card.card-3d-announce {
+            background: linear-gradient(135deg, #2e1065 0%, #4338ca 100%);
+            border: 1.5px solid #818cf8;
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+        }
+        .metric-card.card-3d-announce .metric-title { color: #c7d2fe; }
+        .metric-card.card-3d-announce .metric-value { color: #ffffff; }
+
+        .metric-card.card-3d-notif {
+            background: linear-gradient(135deg, #022c22 0%, #059669 100%);
+            border: 1.5px solid #34d399;
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+        }
+        .metric-card.card-3d-notif .metric-title { color: #a7f3d0; }
+        .metric-card.card-3d-notif .metric-value { color: #ffffff; }
 
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .section-title { font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
@@ -177,7 +195,6 @@
             background: rgba(255, 255, 255, 0.02);
         }
 
-        /* TOAST MELAYANG POPUP RANK LOGIN */
         .toast-rank-popup {
             position: fixed; top: 70px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px;
             z-index: 9998; padding: 12px 16px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);
@@ -195,7 +212,6 @@
             to { opacity: 1; transform: translate(-50%, 0); }
         }
 
-        /* STAR RATING SURVEY */
         .star-rating { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
         .star-rating i { font-size: 1.6rem; color: #475569; cursor: pointer; transition: color 0.2s; }
         .star-rating i.active { color: var(--gold); }
@@ -208,7 +224,7 @@
         <p id="loadingText" class="loading-text">Memuat Data...</p>
     </div>
 
-    <!-- TOAST MELAYANG LOGIN -->
+    <!-- TOAST MELAYANG POPUP RANK LOGIN -->
     <div id="toastRankPopup" class="toast-rank-popup hidden">
         <div id="toastRankIcon" style="font-size: 1.5rem;">🏆</div>
         <div>
@@ -261,9 +277,9 @@
                     <i class="fa-solid fa-gauge-high"></i>
                 </div>
                 
-                <div id="notifPermBtn" class="notif-badge" onclick="manageNotificationPermission()" title="Pengaturan Notifikasi App">
+                <!-- LONCENG HEADER TANPA BADGE MERAH -->
+                <div id="notifPermBtn" class="notif-badge" onclick="manageNotificationPermission()" title="Pengaturan Notifikasi HP">
                     <i id="notifIconHeader" class="fa-regular fa-bell"></i>
-                    <span class="notif-count" id="notifBadge">0</span>
                 </div>
                 
                 <img id="userAvatarHeader" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" class="user-avatar-3d" onclick="showBriefProfile()">
@@ -314,29 +330,36 @@
                 <div class="swiper-pagination"></div>
             </div>
 
+            <!-- KOTAK METRICS DI BAWAH CAROUSEL (DENGAN TAMPILAN 3D NEON PADA PENGUMUMAN & NOTIFIKASI) -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d">
                     <span class="metric-title">Tugas</span>
                     <span class="metric-value" id="valTasks">0</span>
                 </div>
-                <div class="metric-card" onclick="openPengumumanModal()">
+                
+                <!-- KOTAK PENGUMUMAN 3D BERWARNA -->
+                <div class="metric-card card-3d-announce" onclick="openPengumumanModal()">
                     <span id="dotAnnounce" class="red-dot-badge hidden"></span>
                     <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d">
                     <span class="metric-title">Pengumuman</span>
                     <span class="metric-value" id="valAnnounce">0</span>
                 </div>
-                <div class="metric-card" onclick="openNotifModal()">
+
+                <!-- KOTAK NOTIFIKASI 3D BERWARNA -->
+                <div class="metric-card card-3d-notif" onclick="openNotifModal()">
                     <span id="dotNotif" class="red-dot-badge hidden"></span>
                     <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d">
                     <span class="metric-title">Notifikasi</span>
                     <span class="metric-value" id="valNotifCount">0</span>
                 </div>
+
                 <div class="metric-card">
                     <img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d">
                     <span class="metric-title">Point</span>
                     <span class="metric-value" id="valPoints" style="color: var(--gold);">0</span>
                 </div>
+                
                 <div class="metric-card" onclick="switchTab('leaderboard')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="metric-icon-3d">
                     <span class="metric-title">Rank</span>
@@ -433,7 +456,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwN0UXVX-kNaKR2m0-zMySUUXSadbrc8kEFkuoGuqJoV4C_xqpkj46tU2Ah2m2wSDtY/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-1TogzPAE7RaRKXuWTbSsJXt9N6pJ5Sip5YV1Ltfn2GaahNhoKPljdqyEq79Lqc-F/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -441,7 +464,7 @@
         let chatRoomMode = "team";
         let aiChatHistory = [];
         let readPengumuman = false;
-        let readNotifList = [];
+        let readNotifList = JSON.parse(localStorage.getItem("READ_NOTIFS_" + currentNik) || "[]");
         let chatAutoRefreshTimer = null;
         let lastReadChatCount = Number(localStorage.getItem("LAST_READ_CHAT_COUNT_" + currentNik) || 0);
         let deferredPrompt = null;
@@ -470,7 +493,6 @@
             
             const isFemale = femaleKeywords.some(kw => n.includes(kw));
 
-            // Variasi avatar keren berdasarkan karakter nama
             const femaleAvatars = [
                 "https://cdn-icons-png.flaticon.com/512/4140/4140047.png",
                 "https://cdn-icons-png.flaticon.com/512/6997/6997662.png",
@@ -508,7 +530,7 @@
             }
         }
 
-        // IZIN & DOKUMEN RINCI PUSH NOTIFIKASI
+        // IZIN NOTIFIKASI TANPA BADGE LONCENG HEADER
         function manageNotificationPermission() {
             if (!('Notification' in window)) {
                 showCustomModal("🔔 FITUR NOTIFIKASI", "<p style='color:#ef4444;'>Browser Anda tidak mendukung push notifikasi.</p>");
@@ -523,7 +545,7 @@
                         <i class="fa-solid fa-bell-circle-check" style="font-size:2.5rem; color:var(--accent-green); margin-bottom:8px;"></i>
                         <h4 style="color:var(--accent-green); font-size:0.9rem; font-weight:800;">NOTIFIKASI SUDAH AKTIF 🟢</h4>
                         <p style="font-size:0.7rem; color:var(--text-sub); margin-top:6px; line-height:1.4;">
-                            Aplikasi Kacida Bersatu sudah diizinkan mengirimkan pemberitahuan penting seperti pengumuman jam kerja, instruksi shift, dan update sales.
+                            Aplikasi Kacida Bersatu sudah diizinkan mengirimkan pemberitahuan langsung di HP Anda sesuai dengan jadwal jam yang telah diatur di Spreadsheet.
                         </p>
                     </div>
                 `);
@@ -629,7 +651,6 @@
             showLoading("Proses Login...");
             currentNik = nik;
 
-            // TRACK LOGIN COUNT UNTUK FITUR SURVEY
             let loginCount = Number(localStorage.getItem("LOGIN_COUNT_" + nik) || 0) + 1;
             localStorage.setItem("LOGIN_COUNT_" + nik, loginCount);
 
@@ -668,15 +689,71 @@
                 renderDashboard(data);
                 if (data.user.isAC) loadDaftarTokoAC();
 
-                // CEK RANK & TAMPILKAN TOAST POPUP MELAYANG MASA AWAL MASUK
                 checkAndShowRankToast();
-
-                // CEK SURAK SURVEI JIKA SUDAH LOGIN >= 5 KALI
                 checkAndShowSurveyModal();
+
+                // TRIGGERS PUSH NOTIFIKASI NATIVE SPREADSHEET SESUAI JAM ACTIVE
+                checkAndTriggerHourlyPushNotif(data.notifications);
             }
         }
 
-        // TOAST MELAYANG APRESIASI TOP / PERINGATAN FLOP TOKO
+        // MESIN PUSH NOTIFIKASI BAWAAN HP SESUAI JAM DI SPREADSHEET (AKTIF SELAMA JAM TERTENTU)
+        function checkAndTriggerHourlyPushNotif(notifications) {
+            if (!notifications || !Array.isArray(notifications)) return;
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+            const now = new Date();
+            const currentHour = now.getHours();
+            const todayStr = now.toISOString().split('T')[0];
+
+            notifications.forEach(n => {
+                const statusStr = String(n.STATUS || n.Status || "Aktif").toLowerCase().trim();
+                if (statusStr !== "aktif" && statusStr !== "ya" && statusStr !== "tampil" && statusStr !== "") return;
+
+                const rawJam = String(n.JAM || n.Jam || "").trim();
+                if (!rawJam) return;
+
+                let notifHour = -1;
+                if (rawJam.includes(":")) {
+                    notifHour = parseInt(rawJam.split(":")[0], 10);
+                }
+
+                // Cek apakah jam saat ini persis sama dengan jam yang diset di spreadsheet (misal jam 18)
+                if (notifHour === currentHour) {
+                    const notifId = n.ID || n.Id || (rawJam + "_" + (n.PESAN || ""));
+                    const pushedKey = `PUSHED_${todayStr}_${currentHour}_${notifId}`;
+
+                    // Kirim sekali per-jam agar tidak spam saat refresh
+                    if (!localStorage.getItem(pushedKey)) {
+                        localStorage.setItem(pushedKey, "TRUE");
+
+                        const notifTitle = "KACIDA BERSATU 🔔";
+                        const notifMessage = n.PESAN || n.Pesan || "Ada laporan/pemberitahuan baru yang perlu Anda cek!";
+                        const targetUrl = n["LINK TUJUAN"] || n.Link || n.LINK || "https://sites.google.com/view/laporansementara";
+
+                        const notifOptions = {
+                            body: notifMessage,
+                            icon: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
+                            badge: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
+                            data: { url: targetUrl }
+                        };
+
+                        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                            navigator.serviceWorker.ready.then(reg => {
+                                reg.showNotification(notifTitle, notifOptions);
+                            });
+                        } else {
+                            const notifObj = new Notification(notifTitle, notifOptions);
+                            notifObj.onclick = function(e) {
+                                e.preventDefault();
+                                window.open(targetUrl, '_blank');
+                            };
+                        }
+                    }
+                }
+            });
+        }
+
         async function checkAndShowRankToast() {
             const perf = await apiCall("getPerforma");
             if (!perf || perf.status === "error") return;
@@ -694,17 +771,17 @@
                 toast.className = "toast-rank-popup top-rank";
                 icon.innerText = "🎉";
                 title.innerText = `TOP TOKO AREA (RANK #${rankNum}/${totalToko})`;
-                msg.innerText = `Luar biasa! Performa penawaran toko ${perf.kodeToko} sangat stabil. Pertahankan! 🔥`;
+                msg.innerText = `Luar biasa! Performa penawaran toko ${perf.kodeToko} sangat bagus. Pertahankan! 🔥`;
             } else if (rankNum >= 14) {
                 toast.className = "toast-rank-popup flop-rank";
                 icon.innerText = "⚠️";
                 title.innerText = `FLOP TOKO AREA (RANK #${rankNum}/${totalToko})`;
-                msg.innerText = `PERINGATAN KERAS: Performa penawaran toko ${perf.kodeToko} perlu evaluasi dan dorongan kasir harian!`;
+                msg.innerText = `PERINGATAN KERAS: Performa penawaran toko ${perf.kodeToko} perlu evaluasi dan peningkatan kasir harian!`;
             } else {
                 toast.className = "toast-rank-popup top-rank";
                 icon.innerText = "📊";
                 title.innerText = `PERFORMA TOKO (RANK #${rankNum}/${totalToko})`;
-                msg.innerText = `Tingkatkan terus penawaran produk PSM & PWP untuk mencapai TOP 5!`;
+                msg.innerText = `Tingkatkan terus penawaran produk PSM & PWP untuk masuk TOP 5!`;
             }
 
             toast.classList.remove("hidden");
@@ -713,7 +790,6 @@
             }, 4500);
         }
 
-        // POP-UP SURVEY JIKA LOGIN >= 5 KALI
         function checkAndShowSurveyModal() {
             const loginCount = Number(localStorage.getItem("LOGIN_COUNT_" + currentNik) || 0);
             const isSurveyDone = localStorage.getItem("SURVEY_DONE_" + currentNik);
@@ -793,18 +869,12 @@
             if (unreadAnnounces > 0) document.getElementById("dotAnnounce").classList.remove("hidden");
             else document.getElementById("dotAnnounce").classList.add("hidden");
 
-            // NOTIFIKASI FILTERING JAM DARI SHEET
-            const currentHour = new Date().getHours();
-            const validActiveNotifs = (data.notifications || []).filter(n => {
-                if (!n.JAM) return true;
-                const setHour = parseInt(String(n.JAM).split(":")[0], 10);
-                return isNaN(setHour) || setHour === currentHour;
-            });
+            // KOTAK NOTIFIKASI DI BAWAH CROUSEL SELALU MENAMPILKAN BADGE BELUM DIBACA
+            const allActiveNotifs = data.notifications || [];
+            const unreadNotifsCount = allActiveNotifs.length - readNotifList.length;
+            const validUnreadNotifs = unreadNotifsCount > 0 ? unreadNotifsCount : 0;
 
-            const unreadNotifs = validActiveNotifs.length - readNotifList.length;
-            const validUnreadNotifs = unreadNotifs > 0 ? unreadNotifs : 0;
             document.getElementById("valNotifCount").innerText = validUnreadNotifs;
-            document.getElementById("notifBadge").innerText = validUnreadNotifs;
             if (validUnreadNotifs > 0) document.getElementById("dotNotif").classList.remove("hidden");
             else document.getElementById("dotNotif").classList.add("hidden");
 
@@ -950,7 +1020,6 @@
             initDashboard(kodeToko);
         }
 
-        // RINCIAN SALES BULAN BERJALAN: SALES 2026, STD 2026, APC 2026
         async function openSalesMTDModal() {
             showLoading("Memuat Rincian Sales Bulan Berjalan...");
             const d = await apiCall("getDetailSalesMTD");
@@ -1006,7 +1075,6 @@
             showCustomModal("📊 RINCIAN SALES BULAN BERJALAN", htmlBox);
         }
 
-        // DATA PERFORMANCE: MTD 2025 AMAN FIX NaN + ICON SALIN INSTAN (BOX TEXTAREA DISUBIKAN)
         async function openPerformaPopup() {
             showLoading("Memuat Data Performance...");
             const d = await apiCall("getPerforma");
@@ -1132,30 +1200,48 @@
             showCustomModal("📢 Pengumuman Resmi", html);
         }
 
+        // POPUP MODAL NOTIFIKASI - BISA DIKLIK LINK TUJUAN & DILOGKAN KE LOG_AKTIVITAS
         function openNotifModal() {
             if (dashboardData && dashboardData.notifications) {
-                readNotifList = dashboardData.notifications.map(n => n.ID || n.Id || "1");
+                const notifIds = dashboardData.notifications.map(n => n.ID || n.Id || n.PESAN);
+                readNotifList = [...new Set([...readNotifList, ...notifIds])];
+                localStorage.setItem("READ_NOTIFS_" + currentNik, JSON.stringify(readNotifList));
+
                 document.getElementById("valNotifCount").innerText = "0";
-                document.getElementById("notifBadge").innerText = "0";
                 document.getElementById("dotNotif").classList.add("hidden");
             }
 
             if (!dashboardData || !dashboardData.notifications || dashboardData.notifications.length === 0) {
-                showCustomModal("🔔 Notifikasi", "<p style='color:var(--text-sub);'>Tidak ada notifikasi baru.</p>");
+                showCustomModal("🔔 Notifikasi", "<p style='color:var(--text-sub);'>Tidak ada notifikasi baru saat ini.</p>");
                 return;
             }
 
-            const html = dashboardData.notifications.map(n => `
-                <div style="background:var(--bg-dark); padding:10px; border-radius:12px; border:1px solid var(--card-border); margin-bottom:8px; display:flex; gap:10px; align-items:center;">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" style="width:32px; height:32px;">
-                    <div>
-                        <p style="font-weight:bold; color:var(--accent-green); font-size:0.75rem;">${n.PESAN || n.Pesan || n.pesan || 'Notifikasi'}</p>
-                        <p style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Waktu: ${n.JAM || '-'} | Status: Active</p>
+            const html = dashboardData.notifications.map((n, idx) => {
+                const targetUrl = n["LINK TUJUAN"] || n.Link || n.LINK || "#";
+                const hasLink = targetUrl && targetUrl !== "#";
+                const notifId = n.ID || n.Id || (idx + 1);
+
+                return `
+                    <div onclick="onNotifItemClick('${notifId}', '${targetUrl}')" style="background:var(--bg-dark); padding:10px 12px; border-radius:12px; border:1px solid var(--card-border); margin-bottom:8px; display:flex; gap:10px; align-items:center; cursor:${hasLink ? 'pointer' : 'default'};">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" style="width:32px; height:32px;">
+                        <div style="flex:1;">
+                            <p style="font-weight:bold; color:var(--accent-green); font-size:0.75rem;">${n.PESAN || n.Pesan || 'Notifikasi'}</p>
+                            <p style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">
+                                Jam: <b>${n.JAM || '-'}</b> ${hasLink ? '| <span style="color:#38bdf8;">Klik untuk buka link 🔗</span>' : ''}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            `).join("");
+                `;
+            }).join("");
 
             showCustomModal("🔔 Notifikasi Aplikasi", html);
+        }
+
+        function onNotifItemClick(idNotif, linkUrl) {
+            apiCall("readNotif", { idNotif: idNotif });
+            if (linkUrl && linkUrl !== "#") {
+                window.open(linkUrl, "_blank");
+            }
         }
 
         function switchChatRoomMode(mode) {
