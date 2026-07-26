@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kacida-pwa-cache-v1';
+const CACHE_NAME = 'kacida-pwa-cache-v2';
 const urlsToCache = [
   './',
   'manifest.json'
@@ -34,7 +34,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// EVENT BUKA LINK SAAT NOTIFIKASI DI HP DIKLIK PENGGUNA
+// EVENT KLIK NOTIFIKASI HP -> BUKALINK TUJUAN DARI SPREADSHEET
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   
