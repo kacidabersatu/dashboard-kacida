@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#03170a">
-    <title>Kacida Bersatu - Android 3D Pro</title>
+    <title>Kacida Bersatu - Android 3D Premium</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     
@@ -28,7 +28,7 @@
             --wa-bubble-other: #26382b;
             --gold: #f59e0b;
             --text-white: #ffffff;
-            --text-sub: #a1a1aa;
+            --text-sub: #94a3b8;
         }
 
         * { 
@@ -54,33 +54,37 @@
 
         #loginSection, #appSection { width: 100%; max-width: 480px; margin: 0 auto; padding: 0 12px; }
 
-        /* HEADER 3D MOCKUP ACCURATE */
+        /* HEADER 3D DEEP OCEAN EMERALD MESH BACKGROUND */
         .app-header {
-            display: flex; flex-direction: column; gap: 8px; padding: 10px 16px;
-            position: sticky; top: 0; z-index: 100; background: rgba(3, 23, 10, 0.95);
-            backdrop-filter: blur(16px); border-bottom: 1px solid var(--card-border); width: 100%; max-width: 480px;
+            display: flex; flex-direction: column; gap: 10px; padding: 12px 18px;
+            position: sticky; top: 0; z-index: 100;
+            background: radial-gradient(circle at 80% -20%, #064e3b 0%, #03170a 65%), linear-gradient(180deg, #062c19 0%, #03170a 100%);
+            backdrop-filter: blur(16px); border-bottom: 1px solid rgba(34, 197, 94, 0.25); width: 100%; max-width: 480px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .header-left { display: flex; align-items: center; gap: 10px; }
-        .btn-hamburger { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; min-width: 42px; min-height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .btn-hamburger { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; min-width: 42px; min-height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
         .btn-hamburger:active { transform: scale(0.92); }
 
         .brand-title { display: flex; align-items: center; gap: 8px; }
-        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.1rem; color: #ffffff; letter-spacing: 0.5px; }
+        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.15rem; color: #ffffff; letter-spacing: 0.5px; }
         .brand-icon { width: 34px; height: 34px; background: linear-gradient(135deg, #22c55e 0%, #052e16 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 0 12px rgba(34, 197, 94, 0.4); }
 
-        .header-right { display: flex; align-items: center; gap: 8px; }
+        .header-right { display: flex; align-items: center; gap: 10px; }
 
         .disket-badge { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: var(--gold); min-width: 42px; min-height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .notif-badge { position: relative; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); min-width: 42px; min-height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .install-badge { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 4px; cursor: pointer; min-height: 40px; }
-        .user-avatar-3d { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+        
+        /* AVATAR MANUSIA REALISTIS 3D */
+        .user-avatar-3d { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; box-shadow: 0 0 12px rgba(34, 197, 94, 0.5); }
 
-        /* WIDGET REALTIME SUB-HEADER */
+        /* WIDGET SUB-HEADER TRANSPARAN SANGAT MODERN */
         .widget-sub-header {
-            background: rgba(10, 36, 20, 0.75); border: 1px solid var(--card-border); border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px;
             padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;
-            backdrop-filter: blur(8px); margin-top: 2px;
+            backdrop-filter: blur(12px); margin-top: 2px;
         }
         .widget-item { display: flex; align-items: center; gap: 6px; font-weight: 700; color: #e2e8f0; }
 
@@ -96,14 +100,14 @@
         .disket-bar-val { font-size: 0.85rem; font-weight: 800; margin-top: 2px; }
         .disket-divider { width: 1px; height: 28px; background: rgba(255, 255, 255, 0.12); }
 
-        /* HERO CARD 3D MOCKUP */
+        /* HERO CARD 3D MOCKUP EXACT MATCH */
         .hero-card {
             background: linear-gradient(135deg, #0a3a18 0%, #06240f 100%); border: 1px solid rgba(34, 197, 94, 0.3);
             border-radius: 22px; padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; cursor: default;
             box-shadow: 0 6px 20px rgba(0,0,0,0.5);
         }
         .hero-content { position: relative; z-index: 2; max-width: 65%; }
-        .hero-title { font-size: 1.2rem; font-weight: 800; margin-top: 4px; line-height: 1.2; text-transform: uppercase; color: #fff; }
+        .hero-title { font-size: 1.25rem; font-weight: 800; margin-top: 4px; line-height: 1.2; text-transform: uppercase; color: #fff; }
         .hero-sub { font-size: 0.75rem; color: var(--text-sub); margin-top: 6px; line-height: 1.3; }
         .performance-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.5); padding: 8px 12px; border-radius: 12px; margin-top: 12px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.08); }
         .hero-3d-illustration { position: absolute; right: -10px; bottom: -5px; width: 140px; z-index: 1; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.6)); }
@@ -194,14 +198,14 @@
         }
 
         .btn-copy-action {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #03170a; font-weight: 800; font-size: 0.82rem;
-            padding: 12px 16px; border-radius: 14px; border: none; cursor: pointer;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; font-weight: 800; font-size: 0.85rem;
+            padding: 14px; border-radius: 14px; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; margin-top: 10px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-            transition: all 0.2s ease; min-height: 46px;
+            width: 100%; margin-top: 10px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            transition: all 0.2s ease; min-height: 48px;
         }
 
-        .tbl-sales-mtd { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.72rem; margin-top: 8px; }
+        .tbl-sales-mtd { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.75rem; margin-top: 8px; }
         .tbl-sales-mtd th { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); padding: 8px 4px; border: 1px solid var(--card-border); font-weight: 800; }
         .tbl-sales-mtd td { padding: 8px 4px; border: 1px solid var(--card-border); color: #fff; }
         .tbl-sales-mtd tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
@@ -221,7 +225,7 @@
         .star-rating i.active { color: var(--gold); }
 
         .gauge-container { display: flex; flex-direction: column; align-items: center; margin: 8px 0; }
-        .gauge-svg { width: 150px; height: 85px; }
+        .gauge-svg { width: 160px; height: 90px; }
 
         .sub-tab-btn { flex: 1; padding: 10px; font-size: 0.78rem; font-weight: 800; border-radius: 12px; border: 1px solid var(--card-border); background: var(--bg-dark); color: var(--text-sub); cursor: pointer; text-align: center; min-height: 42px; }
         .sub-tab-btn.active { background: var(--accent-green); color: #03170a; border-color: var(--accent-green); }
@@ -280,6 +284,7 @@
     <!-- MAIN APP CONTAINER -->
     <div id="appSection" class="hidden">
         
+        <!-- HEADER 3D DEEP OCEAN EMERALD (LUAS, MODEREN, NON-DESAK) -->
         <header class="app-header">
             <div class="header-top-row">
                 <div class="header-left">
@@ -304,18 +309,18 @@
                         <i id="notifIconHeader" class="fa-regular fa-bell"></i>
                     </div>
                     
-                    <img id="userAvatarHeader" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" class="user-avatar-3d" onclick="triggerHaptic(); showBriefProfile();">
+                    <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80" class="user-avatar-3d" onclick="triggerHaptic(); showBriefProfile();">
                 </div>
             </div>
 
-            <!-- SUB-HEADER WIDGET REALTIME (CUACA & JADWAL SHOLAT) -->
+            <!-- SUB-HEADER WIDGET REALTIME TRANSPARAN -->
             <div class="widget-sub-header">
                 <div class="widget-item" id="weatherWidget">
-                    <span>⛅ Jakarta: 30°C Cerah</span>
+                    <span>⛅ Jakarta: 30°C Cerah Berawan</span>
                 </div>
                 <div style="width: 1px; height: 16px; background: rgba(255,255,255,0.15);"></div>
                 <div class="widget-item" id="prayerWidget" style="color: var(--accent-green);">
-                    <span>🕌 Dzuhur 12:05 WIB</span>
+                    <span>🕌 Maghrib 18:10 WIB</span>
                 </div>
             </div>
         </header>
@@ -328,6 +333,7 @@
         </div>
 
         <main id="tabBeranda" class="container">
+            <!-- DISKET INFO BAR 3D -->
             <section class="disket-info-bar">
                 <div class="disket-bar-item" onclick="triggerHaptic(); openSalesMTDModal();" title="Klik Rincian Sales Bulan Berjalan">
                     <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
@@ -335,24 +341,24 @@
                 </div>
                 <div class="disket-divider"></div>
                 <div class="disket-bar-item" onclick="triggerHaptic(); openPerformaPopup();">
-                    <span class="disket-bar-label"><i class="fa-solid fa-bullseye" style="color: var(--gold);"></i> IKT Toko</span>
+                    <span class="disket-bar-label"><i class="fa-solid fa-shield-halved" style="color: var(--accent-green);"></i> IKT Toko</span>
                     <span class="disket-bar-val" id="valIKT" style="color: var(--gold);">-</span>
                 </div>
                 <div class="disket-divider"></div>
                 <div class="disket-bar-item" onclick="triggerHaptic(); openPerformaPopup();">
-                    <span class="disket-bar-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Penawaran</span>
+                    <span class="disket-bar-label"><i class="fa-solid fa-gift" style="color: #ef4444;"></i> Penawaran</span>
                     <span class="disket-bar-val" id="valPenawaran" style="color: #ef4444;">-</span>
                 </div>
                 <i class="fa-solid fa-chevron-right" style="font-size: 0.85rem; color: var(--text-sub);" onclick="triggerHaptic(); openPerformaPopup();"></i>
             </section>
             
-            <!-- HERO MOCKUP 3D PRESISI -->
+            <!-- HERO MOCKUP IMAGE 2 EXACT MATCH -->
             <section class="hero-card">
                 <div class="hero-content">
                     <span style="font-size: 0.75rem; color: var(--text-sub);">Selamat datang kembali,</span>
                     <h1 class="hero-title" id="lblUserName">USER! 👋</h1>
                     <p class="hero-sub">Tetap Semangat, Raih Target Terbaik!</p>
-                    <button onclick="triggerHaptic(); openSalesMTDModal();" style="background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 6px 12px; border-radius: 12px; font-size: 0.72rem; font-weight: 800; margin-top: 10px; cursor: pointer;">
+                    <button onclick="triggerHaptic(); openSalesMTDModal();" style="background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 8px 14px; border-radius: 14px; font-size: 0.75rem; font-weight: 800; margin-top: 12px; cursor: pointer;">
                         Lihat Ringkasan Sales H-1 ➔
                     </button>
                 </div>
@@ -443,7 +449,7 @@
 
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
-                <img id="profilFoto" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" style="width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
+                <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
                 <h2 id="profilNama" style="font-size: 1.15rem; font-weight: 800;">Nama</h2>
                 <p id="profilJabatan" style="font-size: 0.78rem; color: var(--accent-green); font-weight: 700;">Jabatan</p>
                 <p id="profilToko" style="font-size: 0.75rem; color: var(--text-sub);">Toko</p>
@@ -491,7 +497,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-fcgbDPXX55k8FX4XaOO3FMoJfvaLH5dBb3-abp777I8TaYCkStA89U-CqM0up_57/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpO8SDx054jZjp5f5e7Y1qeQCba5Vpxjo7_3lDer2cLUHTMUKQecd9DTQVzHDEa1mD/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -512,7 +518,6 @@
             }
         }
 
-        // DETEKSI OTOMATIS OS DEVICE DENGAN AKURAT
         function getDeviceOS() {
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             if (/android/i.test(ua)) return "Android Mobile";
@@ -572,6 +577,40 @@
             } catch(e) {}
         }
 
+        // GENERATOR AVATAR MANUSIA REALISTIS 3D (INSTANT & ANTI-BLOCKING)
+        function get3DAvatar(nama, fotoUrl) {
+            if (fotoUrl && String(fotoUrl).trim().length > 10) return fotoUrl;
+            if (!nama) return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80";
+            
+            const n = String(nama).toUpperCase();
+            const femaleKeywords = [
+                "SITI", "YULIANTI", "ARINI", "REVA", "DESI", "RINA", "INDRI", "DEWI", 
+                "FITRI", "NUR", "ELSA", "SRI", "TANZILLA", "FANNY", "FAUZIA", "NURUL", 
+                "NADIRA", "YULIA", "SUCI", "SALSA", "HERLIN", "NOPI", "MAULIDA", "NISRINA", 
+                "NASYWA", "SINTA", "PUTRI", "MARIAM", "MIRSYA", "GADIS", "ASTRI", "TASYA",
+                "YAYU", "HESTI", "RISMANI", "EVA", "ANI", "ANISA", "MAULIDYA"
+            ];
+            
+            const isFemale = femaleKeywords.some(kw => n.includes(kw));
+
+            const femaleAvatars = [
+                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=250&q=80",
+                "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=250&q=80",
+                "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=250&q=80",
+                "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=250&q=80"
+            ];
+
+            const maleAvatars = [
+                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=250&q=80",
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=250&q=80",
+                "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=250&q=80"
+            ];
+
+            const index = (n.charCodeAt(0) + (n.charCodeAt(1) || 0)) % 4;
+            return isFemale ? femaleAvatars[index] : maleAvatars[index];
+        }
+
         function startVoiceRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -625,39 +664,6 @@
             }
 
             return str.length <= 8 && str.includes(":") ? str : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        }
-
-        function get3DAvatar(nama, fotoUrl) {
-            if (fotoUrl && String(fotoUrl).trim().length > 10) return fotoUrl;
-            if (!nama) return "https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
-            
-            const n = String(nama).toUpperCase();
-            const femaleKeywords = [
-                "SITI", "YULIANTI", "ARINI", "REVA", "DESI", "RINA", "INDRI", "DEWI", 
-                "FITRI", "NUR", "ELSA", "SRI", "TANZILLA", "FANNY", "FAUZIA", "NURUL", 
-                "NADIRA", "YULIA", "SUCI", "SALSA", "HERLIN", "NOPI", "MAULIDA", "NISRINA", 
-                "NASYWA", "SINTA", "PUTRI", "MARIAM", "MIRSYA", "GADIS", "ASTRI", "TASYA",
-                "YAYU", "HESTI", "RISMANI", "EVA", "ANI", "ANISA", "MAULIDYA"
-            ];
-            
-            const isFemale = femaleKeywords.some(kw => n.includes(kw));
-
-            const femaleAvatars = [
-                "https://cdn-icons-png.flaticon.com/512/4140/4140047.png",
-                "https://cdn-icons-png.flaticon.com/512/6997/6997662.png",
-                "https://cdn-icons-png.flaticon.com/512/4140/4140037.png",
-                "https://cdn-icons-png.flaticon.com/512/1154/1154448.png"
-            ];
-
-            const maleAvatars = [
-                "https://cdn-icons-png.flaticon.com/512/4140/4140048.png",
-                "https://cdn-icons-png.flaticon.com/512/6997/6997674.png",
-                "https://cdn-icons-png.flaticon.com/512/4140/4140061.png",
-                "https://cdn-icons-png.flaticon.com/512/2202/2202112.png"
-            ];
-
-            const index = (n.charCodeAt(0) + (n.charCodeAt(1) || 0)) % 4;
-            return isFemale ? femaleAvatars[index] : maleAvatars[index];
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -781,7 +787,7 @@
                     .then(w => {
                         if (w && w.current_weather) {
                             const temp = Math.round(w.current_weather.temperature);
-                            document.getElementById("weatherWidget").innerHTML = `<span>⛅ Jakarta ${temp}°C Cerah</span>`;
+                            document.getElementById("weatherWidget").innerHTML = `<span>⛅ Jakarta ${temp}°C Cerah Berawan</span>`;
                         }
                     }).catch(() => {});
 
@@ -791,7 +797,7 @@
                     .then(p => {
                         if (p && p.data && p.data.timings) {
                             const t = p.data.timings;
-                            document.getElementById("prayerWidget").innerHTML = `<span>🕌 Dzuhur ${t.Dhuhr} WIB</span>`;
+                            document.getElementById("prayerWidget").innerHTML = `<span>🕌 Maghrib ${t.Maghrib || '18:10'} WIB</span>`;
                         }
                     }).catch(() => {});
             } catch(e) {}
@@ -1058,7 +1064,7 @@
                     document.getElementById("timTokoContainer").innerHTML = data.struktur.personilToko.map(p => `
                         <div style="background:var(--bg-dark); padding:10px 12px; border-radius:10px; border:1px solid var(--card-border); display:flex; justify-content:space-between; align-items:center;">
                             <div style="display:flex; align-items:center; gap:10px;">
-                                <img src="${get3DAvatar(p.nama, p.foto)}" style="width:34px; height:34px; border-radius:50%; object-fit:cover;">
+                                <img src="${get3DAvatar(p.nama, p.foto)}" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
                                 <div>
                                     <p style="font-size:0.8rem; font-weight:800; color:white;">${escapeHTML(p.nama)}</p>
                                     <p style="font-size:0.68rem; color:var(--text-sub);">NIK: ${p.nik}</p>
@@ -1426,8 +1432,8 @@
             const u = dashboardData.user;
             showCustomModal("👤 KARTU PENGGUNA", `
                 <div style="text-align: center; padding: 10px;">
-                    <img src="${get3DAvatar(u.NAMA, u["FOTO PROFIL"])}" style="width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin-bottom: 8px;">
-                    <h4 style="font-size: 1.1rem; font-weight: 800; color: white;">${escapeHTML(u.NAMA || '-')}</h4>
+                    <img src="${get3DAvatar(u.NAMA, u["FOTO PROFIL"])}" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin-bottom: 8px;">
+                    <h4 style="font-size: 1.15rem; font-weight: 800; color: white;">${escapeHTML(u.NAMA || '-')}</h4>
                     <p style="font-size: 0.8rem; color: var(--accent-green); font-weight: 700;">${escapeHTML(u.JABATAN || '-')}</p>
                     <p style="font-size: 0.75rem; color: var(--text-sub);">${escapeHTML(u.namaToko || '-')}</p>
                     <p style="font-size: 0.68rem; color: #64748b; margin-top: 2px;">NIK: ${u.NIK || '-'}</p>
@@ -1451,7 +1457,7 @@
             initDashboard(kodeToko);
         }
 
-        // SALES MTD MOCKUP PRESISI 1:1
+        // SALES MTD & GRAFIK TREN EXACT MOCKUP IMAGE 1
         async function openSalesMTDModal() {
             showSwalLoading("Memuat Sales MTD & Grafik Tren...");
             const d = await apiCall("getDetailSalesMTD");
@@ -1476,8 +1482,8 @@
                     return `
                         <div style="background:var(--card-bg); border:1px solid var(--card-border); padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                             <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="background:rgba(34,197,94,0.15); border:1px solid var(--accent-green); border-radius:12px; padding:6px 12px; text-align:center;">
-                                    <span style="font-size:1.1rem; font-weight:800; color:var(--accent-green); display:block;">${item.day}</span>
+                                <div style="background:rgba(34,197,94,0.15); border:1px solid var(--accent-green); border-radius:12px; padding:6px 12px; text-align:center; min-width:50px;">
+                                    <span style="font-size:1.15rem; font-weight:900; color:var(--accent-green); display:block;">${item.day}</span>
                                     <span style="font-size:0.6rem; color:var(--text-sub); display:block; text-transform:uppercase;">JUL 2026</span>
                                 </div>
                                 <div>
@@ -1499,17 +1505,33 @@
 
             const htmlBox = `
                 <div style="font-size: 0.8rem;">
-                    <!-- SUMMARY CARD MOCKUP PRESISI -->
-                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; padding:16px; margin-bottom:14px; position:relative;">
+                    <!-- HEADER MOCKUP PRESISI 1 -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div>
+                            <span style="font-size:0.9rem; font-weight:900; color:white;">Sales MTD & Grafik Tren</span>
+                            <p style="font-size:0.7rem; color:var(--text-sub);">${d.kodeToko} • Toko Kacida</p>
+                        </div>
+                        <span style="background:rgba(255,255,255,0.08); border:1px solid var(--card-border); padding:6px 12px; border-radius:12px; font-size:0.75rem; font-weight:800; color:white;">📅 ${d.bulanName} ∨</span>
+                    </div>
+
+                    <!-- TOTAL SALES MTD CARD -->
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; padding:16px; margin-bottom:14px; position:relative; box-shadow:0 4px 15px rgba(0,0,0,0.4);">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                             <div>
                                 <span style="font-size:0.72rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES MTD (s/d Tgl ${d.targetDay})</span>
-                                <h2 style="font-size:1.5rem; font-weight:900; color:white; margin-top:4px;">Rp ${Number(d.totalMtdSales).toLocaleString('id-ID')}</h2>
+                                <h2 style="font-size:1.6rem; font-weight:900; color:white; margin-top:4px;">Rp ${Number(d.totalMtdSales).toLocaleString('id-ID')}</h2>
                             </div>
-                            <span style="background:rgba(34,197,94,0.2); color:var(--accent-green); border:1px solid var(--accent-green); padding:4px 10px; border-radius:10px; font-size:0.75rem; font-weight:800;">▲ +12.4% <br/><small style="font-size:0.58rem; color:var(--text-sub);">vs 2025</small></span>
+                            <span style="background:rgba(34,197,94,0.2); color:var(--accent-green); border:1px solid var(--accent-green); padding:4px 10px; border-radius:10px; font-size:0.75rem; font-weight:800; text-align:right;">▲ +12.4%<br/><small style="font-size:0.58rem; color:var(--text-sub);">vs 2025</small></span>
                         </div>
-                        <div style="margin-top:12px; border-top:1px dashed var(--card-border); padding-top:8px; display:flex; justify-content:space-between; font-size:0.75rem;">
-                            <span>⚡ <b>Rata-Rata SPD:</b> <strong style="color:var(--accent-green);">Rp ${Math.round(d.totalMtdSales/d.targetDay).toLocaleString('id-ID')} / Hari</strong></span>
+                        <div style="margin-top:12px; border-top:1px dashed var(--card-border); padding-top:8px; display:flex; flex-direction:column; gap:4px; font-size:0.75rem;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>⚡ <b>Rata-Rata SPD</b></span>
+                                <strong style="color:var(--accent-green);">Rp ${Math.round(d.totalMtdSales/d.targetDay).toLocaleString('id-ID')} / Hari</strong>
+                            </div>
+                            <div style="display:flex; justify-content:space-between;">
+                                <span>🔮 <b>Proyeksi Akhir MTD</b></span>
+                                <strong style="color:var(--accent-green);">Rp ${Number(Math.round((d.totalMtdSales/d.targetDay)*31)).toLocaleString('id-ID')}</strong>
+                            </div>
                         </div>
                     </div>
 
@@ -1519,9 +1541,16 @@
                         <canvas id="chartSalesTrend" style="width:100%; height:160px;"></canvas>
                     </div>
 
+                    <!-- FILTER CHIPS MOCKUP PRESISI -->
+                    <div style="display:flex; gap:6px; margin-bottom:12px; overflow-x:auto;">
+                        <button style="background:rgba(255,255,255,0.1); border:1px solid var(--card-border); color:white; padding:6px 12px; border-radius:12px; font-size:0.7rem; font-weight:800; cursor:pointer;">≡ Filter: Semua</button>
+                        <button style="background:rgba(34,197,94,0.15); border:1px solid var(--accent-green); color:var(--accent-green); padding:6px 12px; border-radius:12px; font-size:0.7rem; font-weight:800; cursor:pointer;">↑ Achieved (Growth)</button>
+                        <button style="background:rgba(239,68,68,0.15); border:1px solid #ef4444; color:#ef4444; padding:6px 12px; border-radius:12px; font-size:0.7rem; font-weight:800; cursor:pointer;">↓ Decline (Turun)</button>
+                    </div>
+
                     <!-- RINCIAN HARIAN LIST -->
                     <h4 style="font-size:0.85rem; font-weight:800; color:white; margin-bottom:8px;">📋 RINCIAN HARIAN</h4>
-                    <div style="max-height: 38vh; overflow-y: auto;">
+                    <div style="max-height: 35vh; overflow-y: auto;">
                         ${rowsHtml}
                     </div>
                 </div>
@@ -1560,7 +1589,7 @@
             }, 200);
         }
 
-        // KARTU PERFORMA MOCKUP PRESISI 1:1 WITH ALL DETAILS INTACT
+        // DATA PERFORMANCE TOKO MOCKUP PRESISI IMAGE 3 (IKT & PENAWARAN DIPISAH LENGKAP!)
         async function openPerformaPopup() {
             showSwalLoading("Memuat Data Performance...");
             const d = await apiCall("getPerforma");
@@ -1576,7 +1605,7 @@
 
             const htmlBox = `
                 <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.8rem; line-height: 1.5; color: #fff; background: #03170a; padding: 14px; border-radius: 20px; border: 1px solid var(--card-border);">
-                    <!-- SPEEDOMETER GAUGE ARCH MOCKUP -->
+                    <!-- SPEEDOMETER GAUGE ARCH MOCKUP IMAGE 3 EXACT -->
                     <div class="gauge-container">
                         <svg class="gauge-svg" viewBox="0 0 100 50">
                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#1A3A2A" stroke-width="10"/>
@@ -1614,39 +1643,58 @@
                         </ul>
                     </div>
 
-                    <!-- CARD 3: IKT & PENAWARAN LANGSUNG (DETAILED) -->
+                    <!-- CARD 3: IKT TOKO (DIPISAH TEGAS) -->
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); padding:14px; border-radius:18px; margin-top:10px;">
+                        <h4 style="color:var(--accent-green); font-size:0.85rem; font-weight:800; margin-bottom:8px;">🎯 IKT TOKO (ACV)</h4>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center;">
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.62rem; display:block;">NET SALES</span>
+                                <strong style="color:var(--accent-green); font-size:0.85rem;">${d.acvNetSales}</strong>
+                            </div>
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.62rem; display:block;">PROFIT</span>
+                                <strong style="color:var(--gold); font-size:0.85rem;">${d.acvProfit}</strong>
+                            </div>
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.62rem; display:block;">GM %</span>
+                                <strong style="color:#38bdf8; font-size:0.85rem;">${d.acvGM}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD 4: PENAWARAN LANGSUNG (DIPISAH TEGAS) -->
                     <div style="background:var(--card-bg); border:1px solid var(--card-border); padding:14px; border-radius:18px; margin-top:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <h4 style="color:white; font-size:0.85rem; font-weight:800;">🎯 IKT & PENAWARAN LANGSUNG</h4>
+                            <h4 style="color:#ef4444; font-size:0.85rem; font-weight:800;">🚀 PENAWARAN LANGSUNG</h4>
                             <span style="font-size:0.7rem; color:var(--gold); font-weight:800;">🏆 RANK #${d.rankPenawaran || 1}/${d.totalTokoArea || 18}</span>
                         </div>
 
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.75rem;">
                             <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
-                                <span style="color:var(--text-sub); font-size:0.65rem;">ACV NET SALES</span>
-                                <p style="font-size:0.9rem; font-weight:800; color:var(--accent-green);">${d.acvNetSales}</p>
-                            </div>
-                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
-                                <span style="color:var(--text-sub); font-size:0.65rem;">ACV PROFIT</span>
-                                <p style="font-size:0.9rem; font-weight:800; color:var(--gold);">${d.acvProfit}</p>
-                            </div>
-                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
-                                <span style="color:var(--text-sub); font-size:0.65rem;">ACV GM%</span>
-                                <p style="font-size:0.9rem; font-weight:800; color:#38bdf8;">${d.acvGM}</p>
+                                <span style="color:var(--text-sub); font-size:0.65rem;">POINT DASHBOARD</span>
+                                <p style="font-size:0.88rem; font-weight:800; color:var(--gold);">${d.pointDash}</p>
                             </div>
                             <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="color:var(--text-sub); font-size:0.65rem;">PSM REAL</span>
-                                <p style="font-size:0.9rem; font-weight:800; color:var(--accent-green);">${d.psm}</p>
+                                <p style="font-size:0.88rem; font-weight:800; color:var(--accent-green);">${d.psm}</p>
+                            </div>
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.65rem;">PWP REAL</span>
+                                <p style="font-size:0.88rem; font-weight:800; color:#38bdf8;">${d.pwp}</p>
+                            </div>
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.65rem;">SERBA GRATIS</span>
+                                <p style="font-size:0.88rem; font-weight:800; color:white;">${d.serbaGratis}</p>
                             </div>
                         </div>
 
                         <div style="font-size:0.7rem; color:#cbd5e1; margin-top:8px; border-top:1px dashed var(--card-border); padding-top:6px;">
-                            PWP: <b>${d.pwp}</b> | Serba Gratis: <b>${d.serbaGratis}</b> | APC: <b>${d.apc}</b>
+                            • Transaksi APC: <b>${d.apc}</b>
                         </div>
                     </div>
 
                     <!-- PURPLE HD DOWNLOAD BUTTON MOCKUP PRESISI -->
-                    <button onclick="triggerHaptic(); downloadPerformaCardHD();" style="width:100%; background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color:white; font-weight:800; padding:14px; border-radius:14px; border:none; margin-top:14px; cursor:pointer; font-size:0.85rem; box-shadow:0 4px 15px rgba(99,102,241,0.4); display:flex; justify-content:center; align-items:center; gap:8px;">
+                    <button onclick="triggerHaptic(); downloadPerformaCardHD();" class="btn-copy-action">
                         <i class="fa-solid fa-download"></i> DOWNLOAD KARTU PERFORMA HD <span style="background:rgba(255,255,255,0.2); font-size:0.65rem; padding:2px 6px; border-radius:4px;">HD</span>
                     </button>
                 </div>
