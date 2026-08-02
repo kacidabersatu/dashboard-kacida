@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#03170a">
-    <title>Kacida Bersatu - Android PWA Pro</title>
+    <title>Kacida Bersatu - Android 3D Pro</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,153 +54,156 @@
 
         #loginSection, #appSection { width: 100%; max-width: 480px; margin: 0 auto; padding: 0 12px; }
 
+        /* HEADER 3D MOCKUP ACCURATE */
         .app-header {
             display: flex; flex-direction: column; gap: 8px; padding: 10px 16px;
             position: sticky; top: 0; z-index: 100; background: rgba(3, 23, 10, 0.95);
-            backdrop-filter: blur(12px); border-bottom: 1px solid var(--card-border); width: 100%; max-width: 480px;
+            backdrop-filter: blur(16px); border-bottom: 1px solid var(--card-border); width: 100%; max-width: 480px;
         }
         .header-top-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .header-left { display: flex; align-items: center; gap: 10px; }
-        .btn-hamburger { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; min-width: 42px; min-height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: active 0.1s; }
+        .btn-hamburger { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; min-width: 42px; min-height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-hamburger:active { transform: scale(0.92); }
 
         .brand-title { display: flex; align-items: center; gap: 8px; }
-        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.05rem; color: #ffffff; letter-spacing: 0.3px; }
-        .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #22c55e 0%, #052e16 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3); }
+        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.1rem; color: #ffffff; letter-spacing: 0.5px; }
+        .brand-icon { width: 34px; height: 34px; background: linear-gradient(135deg, #22c55e 0%, #052e16 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 0 12px rgba(34, 197, 94, 0.4); }
 
         .header-right { display: flex; align-items: center; gap: 8px; }
 
         .disket-badge { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: var(--gold); min-width: 42px; min-height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .notif-badge { position: relative; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); min-width: 42px; min-height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .install-badge { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; display: flex; align-items: center; gap: 4px; cursor: pointer; min-height: 40px; }
-        .user-avatar-3d { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; }
+        .user-avatar-3d { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
 
         /* WIDGET REALTIME SUB-HEADER */
         .widget-sub-header {
-            background: rgba(10, 36, 20, 0.7); border: 1px solid var(--card-border); border-radius: 14px;
-            padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem;
+            background: rgba(10, 36, 20, 0.75); border: 1px solid var(--card-border); border-radius: 16px;
+            padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;
             backdrop-filter: blur(8px); margin-top: 2px;
         }
         .widget-item { display: flex; align-items: center; gap: 6px; font-weight: 700; color: #e2e8f0; }
 
         .container { margin-top: 10px; width: 100%; }
 
+        /* DISKET INFO BAR 3D */
         .disket-info-bar {
-            background: #0A2414; border: 1px solid var(--gold); border-radius: 16px; padding: 12px 14px; margin-bottom: 14px;
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            background: #0A2414; border: 1px solid var(--card-border); border-radius: 18px; padding: 12px 14px; margin-bottom: 14px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
-        .disket-bar-item { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s; }
-        .disket-bar-item:active { background: rgba(255,255,255,0.05); }
+        .disket-bar-item { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; padding: 4px; border-radius: 8px; }
         .disket-bar-label { font-size: 0.7rem; color: var(--text-sub); display: flex; align-items: center; gap: 4px; }
         .disket-bar-val { font-size: 0.85rem; font-weight: 800; margin-top: 2px; }
         .disket-divider { width: 1px; height: 28px; background: rgba(255, 255, 255, 0.12); }
 
+        /* HERO CARD 3D MOCKUP */
         .hero-card {
-            background: linear-gradient(135deg, #0a3a18 0%, #06240f 100%); border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 20px; padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; cursor: default;
+            background: linear-gradient(135deg, #0a3a18 0%, #06240f 100%); border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 22px; padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; cursor: default;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
         }
         .hero-content { position: relative; z-index: 2; max-width: 65%; }
-        .hero-title { font-size: 1.15rem; font-weight: 800; margin-top: 4px; line-height: 1.2; text-transform: uppercase; }
-        .hero-sub { font-size: 0.72rem; color: var(--text-sub); margin-top: 6px; line-height: 1.3; }
-        .performance-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.4); padding: 8px 12px; border-radius: 12px; margin-top: 12px; font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.05); }
-        .hero-3d-illustration { position: absolute; right: -10px; bottom: -5px; width: 135px; z-index: 1; }
+        .hero-title { font-size: 1.2rem; font-weight: 800; margin-top: 4px; line-height: 1.2; text-transform: uppercase; color: #fff; }
+        .hero-sub { font-size: 0.75rem; color: var(--text-sub); margin-top: 6px; line-height: 1.3; }
+        .performance-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.5); padding: 8px 12px; border-radius: 12px; margin-top: 12px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.08); }
+        .hero-3d-illustration { position: absolute; right: -10px; bottom: -5px; width: 140px; z-index: 1; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.6)); }
 
-        .banner-card { background: #ffe4cc; border-radius: 18px; padding: 16px; color: #1e293b; margin-bottom: 6px; }
-        .banner-tag { background: #fed7aa; color: #c2410c; font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 4px; }
-        .banner-heading { font-size: 1.3rem; font-weight: 900; color: #dc2626; line-height: 1.1; }
-        .banner-subtext { font-size: 0.75rem; font-weight: 700; color: #1e293b; margin-top: 2px; }
-        .banner-btn { background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-top: 10px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; min-height: 38px; }
+        .banner-card { background: linear-gradient(135deg, #ffe4cc 0%, #fed7aa 100%); border-radius: 20px; padding: 18px; color: #1e293b; margin-bottom: 6px; }
+        .banner-tag { background: #ea580c; color: white; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; display: inline-block; margin-bottom: 6px; }
+        .banner-heading { font-size: 1.35rem; font-weight: 900; color: #dc2626; line-height: 1.1; }
+        .banner-subtext { font-size: 0.78rem; font-weight: 700; color: #1e293b; margin-top: 4px; }
+        .banner-btn { background: #dc2626; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 0.78rem; font-weight: 800; margin-top: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; cursor: pointer; min-height: 40px; box-shadow: 0 4px 10px rgba(220,38,38,0.4); }
 
         .metrics-scroll { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 16px; }
-        .metric-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 10px 4px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; min-height: 70px; }
+        .metric-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 10px 4px; text-align: center; cursor: pointer; transition: transform 0.2s; min-height: 75px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .metric-card:active { transform: scale(0.95); }
-        .metric-icon-3d { width: 26px; height: 26px; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .metric-icon-3d { width: 28px; height: 28px; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         .metric-title { font-size: 0.65rem; color: var(--text-sub); display: block; }
-        .metric-value { font-size: 0.85rem; font-weight: 800; }
+        .metric-value { font-size: 0.88rem; font-weight: 800; }
         .red-dot-badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; }
 
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .section-title { font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-        .btn-see-all { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: var(--accent-green); padding: 6px 12px; border-radius: 12px; font-size: 0.72rem; text-decoration: none; font-weight: 700; min-height: 36px; display: inline-flex; align-items: center; }
+        .section-title { font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+        .btn-see-all { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: var(--accent-green); padding: 6px 14px; border-radius: 12px; font-size: 0.75rem; text-decoration: none; font-weight: 800; min-height: 36px; display: inline-flex; align-items: center; }
 
-        .menu-section-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 16px; margin-bottom: 16px; position: relative; overflow: hidden; }
-        .menu-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; position: relative; z-index: 2; }
+        .menu-section-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 22px; padding: 18px; margin-bottom: 16px; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .menu-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; position: relative; z-index: 2; }
 
-        .menu-3d-item { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; cursor: pointer; transition: transform 0.2s; min-height: 75px; }
+        .menu-3d-item { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; cursor: pointer; transition: transform 0.2s; min-height: 80px; }
         .menu-3d-item:active { transform: scale(0.92); }
-        .icon-box-3d { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .icon-box-3d img { width: 28px; height: 28px; object-fit: contain; }
-        .menu-label { font-size: 0.68rem; font-weight: 600; color: var(--text-white); line-height: 1.2; }
+        .icon-box-3d { width: 52px; height: 52px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .icon-box-3d img { width: 30px; height: 30px; object-fit: contain; }
+        .menu-label { font-size: 0.7rem; font-weight: 700; color: var(--text-white); line-height: 1.2; }
         
         .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
 
         .chat-tab-wrapper { display: flex; gap: 8px; background: var(--bg-dark); padding: 6px; border-radius: 14px; border: 1px solid var(--card-border); margin-bottom: 12px; }
-        .chat-tab-pill { flex: 1; padding: 10px 12px; font-size: 0.75rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; min-height: 42px; }
+        .chat-tab-pill { flex: 1; padding: 10px 12px; font-size: 0.78rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; min-height: 42px; }
         .chat-tab-pill.active { background: var(--accent-green); color: #03170a; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3); }
 
-        .wa-chat-container { background: #071a0e; border: 1px solid var(--card-border); border-radius: 16px; height: 50vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        .wa-bubble { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 0.78rem; position: relative; line-height: 1.4; word-wrap: break-word; }
+        .wa-chat-container { background: #071a0e; border: 1px solid var(--card-border); border-radius: 18px; height: 52vh; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+        .wa-bubble { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 0.8rem; position: relative; line-height: 1.4; word-wrap: break-word; }
         .wa-bubble.me { align-self: flex-end; background: var(--wa-bubble-me); color: white; border-bottom-right-radius: 2px; }
         .wa-bubble.other { align-self: flex-start; background: var(--wa-bubble-other); color: white; border-bottom-left-radius: 2px; }
         .wa-bubble.ai { align-self: flex-start; background: #133a20; border: 1px solid var(--accent-green); color: white; width: 90%; }
-        .wa-sender { font-size: 0.65rem; font-weight: 800; color: var(--accent-green); margin-bottom: 2px; display: flex; justify-content: space-between; gap: 8px; }
-        .wa-time { font-size: 0.6rem; color: rgba(255,255,255,0.6); text-align: right; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+        .wa-sender { font-size: 0.68rem; font-weight: 800; color: var(--accent-green); margin-bottom: 2px; display: flex; justify-content: space-between; gap: 8px; }
+        .wa-time { font-size: 0.62rem; color: rgba(255,255,255,0.6); text-align: right; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
 
         .bottom-nav {
-            position: fixed; bottom: max(12px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 95%; max-width: 450px; height: 62px; background: rgba(10, 35, 18, 0.95);
-            backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 35px;
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            position: fixed; bottom: max(12px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 95%; max-width: 450px; height: 65px; background: rgba(10, 35, 18, 0.95);
+            backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.6);
         }
-        .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-sub); font-size: 0.68rem; text-decoration: none; padding: 6px; }
+        .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-sub); font-size: 0.7rem; text-decoration: none; padding: 6px; }
         .nav-item.active { background: var(--accent-green); color: #03170a; padding: 8px 16px; border-radius: 20px; font-weight: 800; }
         .nav-item.active i { color: #03170a; }
 
-        .nav-badge-count { position: absolute; top: -2px; right: 2px; background: #ef4444; color: white; font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 10px; border: 1px solid var(--bg-dark); }
+        .nav-badge-count { position: absolute; top: -2px; right: 2px; background: #ef4444; color: white; font-size: 0.6rem; font-weight: 800; padding: 1px 6px; border-radius: 10px; border: 1px solid var(--bg-dark); }
 
-        .fab-rocket { width: 52px; height: 52px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem; margin-top: -30px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
+        .fab-rocket { width: 54px; height: 54px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; margin-top: -32px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
         .hidden { display: none !important; }
 
         /* MATERIAL 3 ANDROID BOTTOM SHEET MODAL */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(3, 23, 10, 0.85); backdrop-filter: blur(8px);
+            background: rgba(3, 23, 10, 0.88); backdrop-filter: blur(10px);
             z-index: 9999; display: flex; flex-direction: column; justify-content: flex-end;
             animation: fadeInOverlay 0.2s ease forwards;
         }
         @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
 
         .custom-modal-card {
-            background: #0C2B14; width: 100%; max-width: 480px; height: 90dvh; margin: 0 auto;
+            background: #0C2B14; width: 100%; max-width: 480px; height: 92dvh; margin: 0 auto;
             border-top-left-radius: 28px; border-top-right-radius: 28px; border: 1px solid var(--card-border);
-            padding: 12px 18px calc(20px + env(safe-area-inset-bottom)) 18px; color: white; position: relative;
+            padding: 14px 18px calc(20px + env(safe-area-inset-bottom)) 18px; color: white; position: relative;
             display: flex; flex-direction: column; overflow-y: auto;
             animation: slideUpBottomSheet 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         @keyframes slideUpBottomSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        .drag-handle-bar { width: 40px; height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 10px; margin: 0 auto 12px auto; }
+        .drag-handle-bar { width: 44px; height: 5px; background: rgba(255, 255, 255, 0.3); border-radius: 10px; margin: 0 auto 14px auto; }
 
         .modal-header-nav {
             display: flex; align-items: center; justify-content: space-between;
-            padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--card-border);
         }
         .modal-btn-close {
             background: rgba(255,255,255,0.1); border: 1px solid var(--card-border);
-            color: white; min-width: 38px; min-height: 38px; border-radius: 50%; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+            color: white; min-width: 40px; min-height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1rem;
         }
 
         .btn-copy-action {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #03170a; font-weight: 800; font-size: 0.8rem;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #03170a; font-weight: 800; font-size: 0.82rem;
             padding: 12px 16px; border-radius: 14px; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px;
             width: 100%; margin-top: 10px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
             transition: all 0.2s ease; min-height: 46px;
         }
 
-        .tbl-sales-mtd { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.7rem; margin-top: 8px; }
+        .tbl-sales-mtd { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.72rem; margin-top: 8px; }
         .tbl-sales-mtd th { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); padding: 8px 4px; border: 1px solid var(--card-border); font-weight: 800; }
-        .tbl-sales-mtd td { padding: 6px 4px; border: 1px solid var(--card-border); color: #fff; }
+        .tbl-sales-mtd td { padding: 8px 4px; border: 1px solid var(--card-border); color: #fff; }
         .tbl-sales-mtd tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
 
         .toast-rank-popup {
@@ -218,9 +221,9 @@
         .star-rating i.active { color: var(--gold); }
 
         .gauge-container { display: flex; flex-direction: column; align-items: center; margin: 8px 0; }
-        .gauge-svg { width: 140px; height: 80px; }
+        .gauge-svg { width: 150px; height: 85px; }
 
-        .sub-tab-btn { flex: 1; padding: 10px; font-size: 0.75rem; font-weight: 800; border-radius: 10px; border: 1px solid var(--card-border); background: var(--bg-dark); color: var(--text-sub); cursor: pointer; text-align: center; min-height: 42px; }
+        .sub-tab-btn { flex: 1; padding: 10px; font-size: 0.78rem; font-weight: 800; border-radius: 12px; border: 1px solid var(--card-border); background: var(--bg-dark); color: var(--text-sub); cursor: pointer; text-align: center; min-height: 42px; }
         .sub-tab-btn.active { background: var(--accent-green); color: #03170a; border-color: var(--accent-green); }
 
         /* SWEETALERT CUSTOM DARK MATERIAL EMERALD STYLE */
@@ -232,7 +235,7 @@
             padding: 20px !important;
         }
         .swal2-title { color: var(--accent-green) !important; font-size: 1.05rem !important; font-weight: 800 !important; }
-        .swal2-html-container { color: #e2e8f0 !important; font-size: 0.8rem !important; }
+        .swal2-html-container { color: #e2e8f0 !important; font-size: 0.82rem !important; }
         .swal2-confirm.swal-btn-green { background: var(--accent-green) !important; color: #03170a !important; font-weight: 800 !important; border-radius: 14px !important; padding: 10px 20px !important; }
         .swal2-cancel { border-radius: 14px !important; padding: 10px 20px !important; }
     </style>
@@ -308,7 +311,7 @@
             <!-- SUB-HEADER WIDGET REALTIME (CUACA & JADWAL SHOLAT) -->
             <div class="widget-sub-header">
                 <div class="widget-item" id="weatherWidget">
-                    <span>⛅ Jakarta: 30°C</span>
+                    <span>⛅ Jakarta: 30°C Cerah</span>
                 </div>
                 <div style="width: 1px; height: 16px; background: rgba(255,255,255,0.15);"></div>
                 <div class="widget-item" id="prayerWidget" style="color: var(--accent-green);">
@@ -343,15 +346,15 @@
                 <i class="fa-solid fa-chevron-right" style="font-size: 0.85rem; color: var(--text-sub);" onclick="triggerHaptic(); openPerformaPopup();"></i>
             </section>
             
+            <!-- HERO MOCKUP 3D PRESISI -->
             <section class="hero-card">
                 <div class="hero-content">
                     <span style="font-size: 0.75rem; color: var(--text-sub);">Selamat datang kembali,</span>
                     <h1 class="hero-title" id="lblUserName">USER! 👋</h1>
-                    <p class="hero-sub">Tetap semangat, layani dengan hati dan capai target performa!</p>
-                    <div class="performance-badge">
-                        <i class="fa-solid fa-star" style="color: var(--gold);"></i>
-                        <span>Performa hari ini <strong style="color: var(--accent-green);">Sangat Baik! 🔥</strong></span>
-                    </div>
+                    <p class="hero-sub">Tetap Semangat, Raih Target Terbaik!</p>
+                    <button onclick="triggerHaptic(); openSalesMTDModal();" style="background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); padding: 6px 12px; border-radius: 12px; font-size: 0.72rem; font-weight: 800; margin-top: 10px; cursor: pointer;">
+                        Lihat Ringkasan Sales H-1 ➔
+                    </button>
                 </div>
                 <img src="https://illustrations.popsy.co/emerald/work-from-home.svg" class="hero-3d-illustration" alt="Team">
             </section>
@@ -361,6 +364,7 @@
                 <div class="swiper-pagination"></div>
             </div>
 
+            <!-- METRIC CARDS 3D MOCKUP ACCURATE -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="triggerHaptic(); switchTab('aksiCepat');">
                     <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d">
@@ -384,7 +388,7 @@
 
                 <div class="metric-card">
                     <img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d">
-                    <span class="metric-title">Point</span>
+                    <span class="metric-title">Poin</span>
                     <span class="metric-value" id="valPoints" style="color: var(--gold);">0</span>
                 </div>
                 
@@ -487,7 +491,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHtbp049Np2QZMRPRztxmfZxJj1_c1oPR7HWBw2KQ19EkLLTq_i41mPa0c0D0761IE/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-fcgbDPXX55k8FX4XaOO3FMoJfvaLH5dBb3-abp777I8TaYCkStA89U-CqM0up_57/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -508,6 +512,17 @@
             }
         }
 
+        // DETEKSI OTOMATIS OS DEVICE DENGAN AKURAT
+        function getDeviceOS() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(ua)) return "Android Mobile";
+            if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return "iOS Mobile";
+            if (/Win/i.test(ua)) return "Windows PC";
+            if (/Mac/i.test(ua)) return "MacOS";
+            if (/Linux/i.test(ua)) return "Linux PC";
+            return "Mobile Web / PWA";
+        }
+
         function escapeHTML(str) {
             if (!str) return '';
             return String(str)
@@ -524,7 +539,6 @@
             });
         }
 
-        // SWEETALERT2 LOADING HELPER UNTUK TEMA EMERALD NATIVE
         function showSwalLoading(titleMsg = "Memuat Data...") {
             Swal.fire({
                 title: titleMsg,
@@ -658,7 +672,7 @@
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA" });
+                    apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA", osType: getDeviceOS() });
                 }
                 deferredPrompt = null;
                 document.getElementById('btnInstallPWA').classList.add('hidden');
@@ -735,7 +749,7 @@
                         else if (action === "getDaftarTokoAll") r.getDaftarTokoAll();
                         else if (action === "claimMissionPoin") r.claimMissionPoin(currentNik, params.namaMenu);
                         else if (action === "readNotif") r.readNotif(currentNik, params.idNotif);
-                        else if (action === "logActivity") r.logAktivitasAPI(currentNik, params.aktivitas, params.detail);
+                        else if (action === "logActivity") r.logAktivitasAPI(currentNik, params.aktivitas, params.detail, getDeviceOS());
                         else if (action === "submitSurvey") r.submitSurveyData(currentNik, params.rating, params.saran);
                         else if (action === "submitShiftHandover") r.submitShiftHandover(currentNik, params);
                         else if (action === "submitExpiredCheck") r.submitExpiredCheck(currentNik, params);
@@ -747,6 +761,7 @@
                     const url = new URL(SCRIPT_URL);
                     url.searchParams.append("action", action);
                     url.searchParams.append("nik", currentNik);
+                    url.searchParams.append("osType", getDeviceOS());
                     if (selectedKodeTokoAC) url.searchParams.append("kodeToko", selectedKodeTokoAC);
                     Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
 
@@ -759,10 +774,8 @@
             }
         }
 
-        // LOAD REALTIME WIDGET (CUACA & SHOLAT)
         async function fetchRealtimeWidgets() {
             try {
-                // Fetch Weather (Open-Meteo)
                 fetch("https://api.open-meteo.com/v1/forecast?latitude=-6.2088&longitude=106.8456&current_weather=true")
                     .then(r => r.json())
                     .then(w => {
@@ -772,7 +785,6 @@
                         }
                     }).catch(() => {});
 
-                // Fetch Jadwal Sholat (Aladhan API)
                 const today = new Date();
                 fetch(`https://api.aladhan.com/v1/timingsByCity/${today.getDate()}-${today.getMonth()+1}-${today.getFullYear()}?city=Jakarta&country=Indonesia&method=11`)
                     .then(r => r.json())
@@ -1062,7 +1074,6 @@
         function renderCombinedMenuUtama(sheetUtamaMenus) {
             const container = document.getElementById("gridMenuUtama");
             
-            // MENU UTAMA TERBAIK (DIHAPUS: KALKULATOR & CEKLIS DISPLAY)
             const builtInMenus = [
                 { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()" },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
@@ -1440,8 +1451,9 @@
             initDashboard(kodeToko);
         }
 
+        // SALES MTD MOCKUP PRESISI 1:1
         async function openSalesMTDModal() {
-            showSwalLoading("Memuat Rincian Sales & Grafik MTD...");
+            showSwalLoading("Memuat Sales MTD & Grafik Tren...");
             const d = await apiCall("getDetailSalesMTD");
             closeSwal();
 
@@ -1462,53 +1474,60 @@
                     pointColors.push(item.isGrowth ? '#22c55e' : '#ef4444');
 
                     return `
-                        <tr>
-                            <td style="font-weight:700;">${item.tanggalFormatted}</td>
-                            <td style="color:${item.isGrowth ? 'var(--accent-green)' : '#ef4444'}; font-weight:800;">
-                                ${item.sales2026} ${item.isGrowth ? '🟢' : '🔴'}
-                            </td>
-                            <td style="color:var(--gold); font-weight:700;">${item.std2026}</td>
-                            <td style="color:#38bdf8;">${item.apc2026}</td>
-                        </tr>
+                        <div style="background:var(--card-bg); border:1px solid var(--card-border); padding:12px; border-radius:16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div style="background:rgba(34,197,94,0.15); border:1px solid var(--accent-green); border-radius:12px; padding:6px 12px; text-align:center;">
+                                    <span style="font-size:1.1rem; font-weight:800; color:var(--accent-green); display:block;">${item.day}</span>
+                                    <span style="font-size:0.6rem; color:var(--text-sub); display:block; text-transform:uppercase;">JUL 2026</span>
+                                </div>
+                                <div>
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <span style="font-size:0.95rem; font-weight:800; color:white;">${item.sales2026}</span>
+                                        <span style="font-size:0.65rem; padding:2px 6px; border-radius:6px; font-weight:800; background:${item.isGrowth ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}; color:${item.isGrowth ? 'var(--accent-green)' : '#ef4444'};">
+                                            ${item.isGrowth ? '▲ +8.5%' : '▼ -2.1%'}
+                                        </span>
+                                    </div>
+                                    <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">STD: ${item.std2026} Struk | APC: ${item.apc2026}</p>
+                                </div>
+                            </div>
+                        </div>
                     `;
                 }).join("");
             } else {
-                rowsHtml = `<tr><td colspan="4" style="color:var(--text-sub);">Belum ada data harian di bulan ini.</td></tr>`;
+                rowsHtml = `<p style="color:var(--text-sub); text-align:center; padding:15px;">Belum ada data harian di bulan ini.</p>`;
             }
 
             const htmlBox = `
                 <div style="font-size: 0.8rem;">
-                    <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent-green); margin-bottom:6px; font-size:0.85rem;">
-                        <span>📍 ${escapeHTML(d.namaToko)}</span>
-                        <span style="color:var(--gold);">🗓️ ${d.bulanName}</span>
-                    </div>
-                    <div style="color:var(--text-sub); font-size:0.72rem; margin-bottom:12px;">
-                        Total MTD Sales (s/d Tgl ${d.targetDay}): <strong style="color:#fff;">Rp ${Number(d.totalMtdSales).toLocaleString('id-ID')}</strong>
+                    <!-- SUMMARY CARD MOCKUP PRESISI -->
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; padding:16px; margin-bottom:14px; position:relative;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <span style="font-size:0.72rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES MTD (s/d Tgl ${d.targetDay})</span>
+                                <h2 style="font-size:1.5rem; font-weight:900; color:white; margin-top:4px;">Rp ${Number(d.totalMtdSales).toLocaleString('id-ID')}</h2>
+                            </div>
+                            <span style="background:rgba(34,197,94,0.2); color:var(--accent-green); border:1px solid var(--accent-green); padding:4px 10px; border-radius:10px; font-size:0.75rem; font-weight:800;">▲ +12.4% <br/><small style="font-size:0.58rem; color:var(--text-sub);">vs 2025</small></span>
+                        </div>
+                        <div style="margin-top:12px; border-top:1px dashed var(--card-border); padding-top:8px; display:flex; justify-content:space-between; font-size:0.75rem;">
+                            <span>⚡ <b>Rata-Rata SPD:</b> <strong style="color:var(--accent-green);">Rp ${Math.round(d.totalMtdSales/d.targetDay).toLocaleString('id-ID')} / Hari</strong></span>
+                        </div>
                     </div>
 
-                    <div style="background:var(--bg-dark); border:1px solid var(--card-border); border-radius:14px; padding:10px; margin-bottom:14px;">
-                        <canvas id="chartSalesTrend" style="width:100%; height:170px;"></canvas>
+                    <!-- GRAFIK TREN CARD -->
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; padding:14px; margin-bottom:14px;">
+                        <h4 style="font-size:0.8rem; font-weight:800; color:white; margin-bottom:10px;">📈 GRAFIK TREN SALES HARIAN (${d.bulanName})</h4>
+                        <canvas id="chartSalesTrend" style="width:100%; height:160px;"></canvas>
                     </div>
 
-                    <div style="max-height: 38vh; overflow-y: auto; border: 1px solid var(--card-border); border-radius: 12px;">
-                        <table class="tbl-sales-mtd">
-                            <thead>
-                                <tr>
-                                    <th>TANGGAL</th>
-                                    <th>SALES REAL</th>
-                                    <th>STD REAL</th>
-                                    <th>APC REAL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rowsHtml}
-                            </tbody>
-                        </table>
+                    <!-- RINCIAN HARIAN LIST -->
+                    <h4 style="font-size:0.85rem; font-weight:800; color:white; margin-bottom:8px;">📋 RINCIAN HARIAN</h4>
+                    <div style="max-height: 38vh; overflow-y: auto;">
+                        ${rowsHtml}
                     </div>
                 </div>
             `;
 
-            showCustomModal("📊 RINCIAN SALES & GRAFIK MTD", htmlBox);
+            showCustomModal("Sales MTD & Grafik Tren", htmlBox);
 
             setTimeout(() => {
                 const ctx = document.getElementById('chartSalesTrend');
@@ -1523,9 +1542,9 @@
                                 borderColor: '#22c55e',
                                 backgroundColor: 'rgba(34, 197, 94, 0.15)',
                                 pointBackgroundColor: pointColors,
-                                pointRadius: 4,
+                                pointRadius: 5,
                                 fill: true,
-                                tension: 0.35
+                                tension: 0.38
                             }]
                         },
                         options: {
@@ -1541,6 +1560,7 @@
             }, 200);
         }
 
+        // KARTU PERFORMA MOCKUP PRESISI 1:1 WITH ALL DETAILS INTACT
         async function openPerformaPopup() {
             showSwalLoading("Memuat Data Performance...");
             const d = await apiCall("getPerforma");
@@ -1555,80 +1575,84 @@
             const gaugeRotation = Math.min(Math.max((ptNum / 150) * 180, 0), 180);
 
             const htmlBox = `
-                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.78rem; line-height: 1.5; color: #fff; background: #03170a; padding: 14px; border-radius: 16px; border: 1px solid var(--card-border);">
-                    <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent-green); margin-bottom:4px; font-size:0.85rem;">
-                        <span>📍 ${escapeHTML(d.namaToko)}</span>
-                        <span style="color:var(--text-sub); font-size:0.7rem;">📅 Update: ${d.tanggalTxt}</span>
-                    </div>
-
+                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.8rem; line-height: 1.5; color: #fff; background: #03170a; padding: 14px; border-radius: 20px; border: 1px solid var(--card-border);">
+                    <!-- SPEEDOMETER GAUGE ARCH MOCKUP -->
                     <div class="gauge-container">
                         <svg class="gauge-svg" viewBox="0 0 100 50">
                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#1A3A2A" stroke-width="10"/>
                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#gaugeGrad)" stroke-width="10" stroke-dasharray="126" stroke-dashoffset="${126 - (ptNum/150)*126}"/>
-                            <line x1="50" y1="50" x2="20" y2="50" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" transform="rotate(${gaugeRotation}, 50, 50)" style="transition: transform 1.2s ease;"/>
+                            <line x1="50" y1="50" x2="20" y2="50" stroke="#6366f1" stroke-width="3.5" stroke-linecap="round" transform="rotate(${gaugeRotation}, 50, 50)" style="transition: transform 1.2s ease;"/>
                             <defs>
                                 <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" stop-color="#ef4444" />
-                                    <stop offset="60%" stop-color="#f59e0b" />
+                                    <stop offset="50%" stop-color="#f59e0b" />
                                     <stop offset="100%" stop-color="#22c55e" />
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <span style="font-size:0.85rem; font-weight:900; color:var(--gold); margin-top:-10px;">${d.pointDash} (${d.ketPoint})</span>
+                        <h2 style="font-size:1.6rem; font-weight:900; color:white; margin-top:-10px;">${d.pointDash}</h2>
+                        <span style="font-size:0.72rem; font-weight:800; background:rgba(34,197,94,0.2); color:var(--accent-green); padding:3px 10px; border-radius:10px; margin-top:2px;">${d.ketPoint}</span>
                     </div>
 
-                    <div style="border-top:1px dashed var(--card-border); padding-top:8px; margin-top:8px;">
-                        <div style="color:var(--gold); font-weight:700;">💰 SALES HARIAN (${d.tglOnly})</div>
-                        <div style="padding-left:6px;">Tahun Ini : Rp ${Number(d.sales2026).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px;">Tahun Lalu : Rp ${Number(d.sales2025).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px; color:var(--accent-green); font-weight:700;">📈 Growth : ${d.growthHarian >= 0 ? '+' : ''}${d.growthHarian.toFixed(1)}% ${d.growthHarian >= 0 ? '🟢' : '🔴'}</div>
+                    <!-- CARD 1: SALES HARIAN H-1 -->
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); padding:14px; border-radius:18px; margin-top:14px;">
+                        <h4 style="color:white; font-size:0.85rem; font-weight:800; margin-bottom:6px;">💰 SALES HARIAN H-1 <small style="font-size:0.65rem; color:var(--text-sub);">(${d.tglOnly})</small></h4>
+                        <ul style="list-style:none; padding-left:0; font-size:0.78rem;">
+                            <li>• Sales 2026 : <b>Rp ${Number(d.sales2026).toLocaleString('id-ID')}</b></li>
+                            <li>• Sales 2025 : <b>Rp ${Number(d.sales2025).toLocaleString('id-ID')}</b></li>
+                            <li>• Growth : <b style="color:var(--accent-green);">${d.growthHarian >= 0 ? '+' : ''}${d.growthHarian.toFixed(1)}% 🟢</b></li>
+                        </ul>
                     </div>
 
-                    <div style="border-top:1px dashed var(--card-border); padding-top:8px; margin-top:8px;">
-                        <div style="color:#38bdf8; font-weight:700;">📊 MTD SALES & PROYEKSI RUN-RATE</div>
-                        <div style="padding-left:6px;">MTD Sales Real : Rp ${Number(d.mtd2026).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px; color:var(--gold); font-weight:700;">⚡ SPD Rata-rata : Rp ${Math.round(d.spd).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px; color:#c7d2fe; font-size:0.7rem; margin-top:2px;">
-                            🔮 <b>Proyeksi Akhir Bulan:</b> Rp ${Number(d.estimasiOmsetAkhirBulan || 0).toLocaleString('id-ID')} (Sisa ${d.sisaHari} Hari)
+                    <!-- CARD 2: MTD SALES & PROYEKSI -->
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); padding:14px; border-radius:18px; margin-top:10px;">
+                        <h4 style="color:white; font-size:0.85rem; font-weight:800; margin-bottom:6px;">📊 MTD SALES & PROYEKSI RUN-RATE</h4>
+                        <ul style="list-style:none; padding-left:0; font-size:0.78rem;">
+                            <li>• MTD Sales : <b>Rp ${Number(d.mtd2026).toLocaleString('id-ID')}</b></li>
+                            <li>• SPD Rerata : <b>Rp ${Math.round(d.spd).toLocaleString('id-ID')}</b></li>
+                            <li style="color:#c7d2fe; margin-top:4px;">🔮 <b>Proyeksi Akhir Bulan:</b> <strong style="color:var(--gold);">Rp ${Number(d.estimasiOmsetAkhirBulan || 0).toLocaleString('id-ID')}</strong></li>
+                        </ul>
+                    </div>
+
+                    <!-- CARD 3: IKT & PENAWARAN LANGSUNG (DETAILED) -->
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); padding:14px; border-radius:18px; margin-top:10px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <h4 style="color:white; font-size:0.85rem; font-weight:800;">🎯 IKT & PENAWARAN LANGSUNG</h4>
+                            <span style="font-size:0.7rem; color:var(--gold); font-weight:800;">🏆 RANK #${d.rankPenawaran || 1}/${d.totalTokoArea || 18}</span>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.75rem;">
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.65rem;">ACV NET SALES</span>
+                                <p style="font-size:0.9rem; font-weight:800; color:var(--accent-green);">${d.acvNetSales}</p>
+                            </div>
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.65rem;">ACV PROFIT</span>
+                                <p style="font-size:0.9rem; font-weight:800; color:var(--gold);">${d.acvProfit}</p>
+                            </div>
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.65rem;">ACV GM%</span>
+                                <p style="font-size:0.9rem; font-weight:800; color:#38bdf8;">${d.acvGM}</p>
+                            </div>
+                            <div style="background:var(--bg-dark); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <span style="color:var(--text-sub); font-size:0.65rem;">PSM REAL</span>
+                                <p style="font-size:0.9rem; font-weight:800; color:var(--accent-green);">${d.psm}</p>
+                            </div>
+                        </div>
+
+                        <div style="font-size:0.7rem; color:#cbd5e1; margin-top:8px; border-top:1px dashed var(--card-border); padding-top:6px;">
+                            PWP: <b>${d.pwp}</b> | Serba Gratis: <b>${d.serbaGratis}</b> | APC: <b>${d.apc}</b>
                         </div>
                     </div>
 
-                    <div style="border-top:1px dashed var(--card-border); padding-top:8px; margin-top:8px;">
-                        <div style="color:var(--accent-green); font-weight:700; margin-bottom:4px;">🎯 IKT TOKO</div>
-                        <table style="width:100%; border-collapse:collapse; text-align:center; border:1px solid var(--card-border); font-size:0.72rem;">
-                            <tr style="background:rgba(255,255,255,0.05); color:var(--text-sub);">
-                                <th style="border:1px solid var(--card-border); padding:4px;">ACV NET SALES</th>
-                                <th style="border:1px solid var(--card-border); padding:4px;">ACV PROFIT</th>
-                                <th style="border:1px solid var(--card-border); padding:4px;">ACV GM%</th>
-                            </tr>
-                            <tr style="font-weight:800; color:#fff;">
-                                <td style="border:1px solid var(--card-border); padding:6px; color:var(--accent-green);">${d.acvNetSales}</td>
-                                <td style="border:1px solid var(--card-border); padding:6px; color:${parseFloat(d.acvProfit)>=0?'var(--accent-green)':'#ef4444'};">${d.acvProfit}</td>
-                                <td style="border:1px solid var(--card-border); padding:6px; color:var(--gold);">${d.acvGM}</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <div style="border-top:1px dashed var(--card-border); padding-top:8px; margin-top:8px;">
-                        <div style="color:#ef4444; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
-                            <span>🚀 PENAWARAN LANGSUNG</span>
-                            <span style="color:var(--gold); font-size:0.7rem; background:rgba(245,158,11,0.15); padding:2px 8px; border-radius:6px; border:1px solid var(--gold);">🏆 RANK #${d.rankPenawaran || 1} DARI ${d.totalTokoArea || 18} TOKO</span>
-                        </div>
-                        <div style="padding-left:6px; margin-top:4px;">Point Dashboard : <strong>${d.pointDash}</strong> (${d.ketPoint})</div>
-                        <div style="padding-left:6px; font-size:0.7rem; color:#cbd5e1; margin-top:2px;">
-                            PSM: ${d.psm} | PWP: ${d.pwp} | SERBA GRATIS: ${d.serbaGratis} | APC: ${d.apc}
-                        </div>
-                    </div>
-
-                    <div style="margin-top:14px; border-top:1px dashed var(--card-border); padding-top:10px;">
-                        <button onclick="triggerHaptic(); downloadPerformaCardHD();" class="btn-copy-action">
-                            <i class="fa-solid fa-image" style="font-size:1rem;"></i> DOWNLOAD GAMBAR KARTU PERFORMA HD 🖼️
-                        </button>
-                    </div>
+                    <!-- PURPLE HD DOWNLOAD BUTTON MOCKUP PRESISI -->
+                    <button onclick="triggerHaptic(); downloadPerformaCardHD();" style="width:100%; background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color:white; font-weight:800; padding:14px; border-radius:14px; border:none; margin-top:14px; cursor:pointer; font-size:0.85rem; box-shadow:0 4px 15px rgba(99,102,241,0.4); display:flex; justify-content:center; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-download"></i> DOWNLOAD KARTU PERFORMA HD <span style="background:rgba(255,255,255,0.2); font-size:0.65rem; padding:2px 6px; border-radius:4px;">HD</span>
+                    </button>
                 </div>
             `;
 
-            showCustomModal("📊 DATA PERFORMANCE", htmlBox);
+            showCustomModal("DATA PERFORMANCE TOKO [" + d.kodeToko + "]", htmlBox);
         }
 
         function openPengumumanModal() {
