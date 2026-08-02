@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#03170a">
-    <title>Kacida Bersatu - Dashboard PWA Enterprise Pro</title>
+    <title>Kacida Bersatu - Dashboard PWA Pro</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
@@ -22,168 +22,123 @@
     <style>
         :root {
             --bg-dark: #03170a;
-            --bg-darker: #020f07;
-            --card-bg: rgba(10, 36, 20, 0.85);
+            --card-bg: #0A2414;
             --card-border: #1A3A2A;
             --accent-green: #22c55e;
-            --accent-green-glow: rgba(34, 197, 94, 0.35);
             --wa-bubble-me: #056162;
             --wa-bubble-other: #26382b;
             --gold: #f59e0b;
-            --gold-glow: rgba(245, 158, 11, 0.3);
             --text-white: #ffffff;
-            --text-sub: #94a3b8;
-            --glass-blur: blur(16px);
-            --radius-main: 24px;
+            --text-sub: #a1a1aa;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-dark); color: var(--text-white); min-height: 100vh; padding-bottom: 95px; display: flex; flex-direction: column; align-items: center; -webkit-font-smoothing: antialiased; }
+        body { background-color: var(--bg-dark); color: var(--text-white); min-height: 100vh; padding-bottom: 90px; display: flex; flex-direction: column; align-items: center; -webkit-font-smoothing: antialiased; }
 
         #loginSection, #appSection { width: 100%; max-width: 480px; margin: 0 auto; padding: 0 12px; }
 
-        /* HEADER ENTERPRISE */
         .app-header {
-            display: flex; justify-content: space-between; align-items: center; padding: 12px 14px;
-            position: sticky; top: 0; z-index: 100; background: rgba(3, 23, 10, 0.88);
-            backdrop-filter: var(--glass-blur); border-bottom: 1px solid rgba(34, 197, 94, 0.15); width: 100%; max-width: 480px;
+            display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;
+            position: sticky; top: 0; z-index: 100; background: rgba(3, 23, 10, 0.95);
+            backdrop-filter: blur(12px); border-bottom: 1px solid var(--card-border); width: 100%; max-width: 480px;
         }
         .header-left { display: flex; align-items: center; gap: 10px; }
-        .btn-hamburger { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--card-border); color: #fff; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
+        .btn-hamburger { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: active 0.1s; }
         .btn-hamburger:active { transform: scale(0.92); }
 
         .brand-title { display: flex; align-items: center; gap: 8px; }
-        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1.05rem; color: #ffffff; letter-spacing: 0.3px; display: flex; flex-direction: column; line-height: 1.1; }
-        .brand-icon { width: 34px; height: 34px; background: linear-gradient(135deg, #22c55e 0%, #052e16 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 0 12px rgba(34, 197, 94, 0.4); }
-
-        .sync-chip { background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: var(--accent-green); font-size: 0.58rem; font-weight: 800; padding: 2px 7px; border-radius: 12px; display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; }
+        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1.05rem; color: #ffffff; letter-spacing: 0.3px; }
+        .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #22c55e 0%, #052e16 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3); }
 
         .header-right { display: flex; align-items: center; gap: 8px; }
-        .disket-badge { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--gold); color: var(--gold); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+
+        .disket-badge { background: rgba(245, 158, 11, 0.2); border: 1px solid var(--gold); color: var(--gold); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .notif-badge { position: relative; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .install-badge { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 6px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 4px; cursor: pointer; }
-        .user-avatar-3d { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; box-shadow: 0 0 12px var(--accent-green-glow); }
+        .user-avatar-3d { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; }
 
-        .container { margin-top: 10px; width: 100%; }
+        .container { margin-top: 12px; width: 100%; }
 
-        /* WIDGET CUACA & SHOLAT 3D GLASS */
-        .weather-sholat-card {
-            background: linear-gradient(135deg, rgba(10, 36, 20, 0.9) 0%, rgba(4, 20, 11, 0.95) 100%);
-            border: 1px solid var(--card-border); border-radius: 20px; padding: 12px 16px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center; backdrop-filter: var(--glass-blur);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        .disket-info-bar {
+            background: #0A2414; border: 1px solid var(--gold); border-radius: 16px; padding: 12px 14px; margin-bottom: 14px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
-        .weather-part { display: flex; align-items: center; gap: 10px; }
-        .weather-icon-3d { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
-        .weather-info { display: flex; flex-direction: column; }
-        .weather-loc { font-size: 0.62rem; color: var(--text-sub); font-weight: 600; }
-        .weather-temp { font-size: 1.05rem; font-weight: 800; color: #fff; line-height: 1.1; }
-        .weather-desc { font-size: 0.62rem; color: var(--accent-green); font-weight: 700; }
+        .disket-bar-item { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; padding: 2px 4px; border-radius: 8px; transition: background 0.2s; }
+        .disket-bar-item:active { background: rgba(255,255,255,0.05); }
+        .disket-bar-label { font-size: 0.65rem; color: var(--text-sub); display: flex; align-items: center; gap: 4px; }
+        .disket-bar-val { font-size: 0.82rem; font-weight: 800; margin-top: 2px; }
+        .disket-divider { width: 1px; height: 28px; background: rgba(255, 255, 255, 0.12); }
 
-        .sholat-part { display: flex; align-items: center; gap: 10px; text-align: right; border-left: 1px solid rgba(255, 255, 255, 0.08); padding-left: 12px; }
-        .sholat-info { display: flex; flex-direction: column; }
-        .sholat-title { font-size: 0.62rem; color: var(--text-sub); font-weight: 600; }
-        .sholat-time { font-size: 1.05rem; font-weight: 800; color: var(--gold); line-height: 1.1; }
-        .sholat-sub { font-size: 0.62rem; color: var(--text-sub); }
-        .sholat-icon-3d { width: 34px; height: 34px; object-fit: contain; }
-
-        /* TELEMETRY METRICS ROW */
-        .telemetry-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-        .telemetry-card {
-            background: linear-gradient(145deg, rgba(10, 36, 20, 0.85) 0%, rgba(3, 23, 10, 0.95) 100%);
-            border: 1px solid var(--card-border); border-radius: 16px; padding: 10px 10px;
-            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
-        }
-        .telemetry-card:active { transform: scale(0.96); }
-        .telemetry-header { font-size: 0.62rem; color: var(--text-sub); display: flex; align-items: center; gap: 4px; font-weight: 600; }
-        .telemetry-value { font-size: 0.85rem; font-weight: 800; margin-top: 4px; line-height: 1.2; }
-        .telemetry-sparkline { font-size: 0.58rem; font-weight: 800; margin-top: 4px; display: inline-flex; align-items: center; gap: 3px; }
-
-        /* HERO CARD ENTERPRISE */
         .hero-card {
-            background: linear-gradient(135deg, rgba(8, 48, 24, 0.95) 0%, rgba(3, 23, 10, 0.98) 100%);
-            border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 24px; padding: 18px;
-            position: relative; overflow: hidden; margin-bottom: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #0a3a18 0%, #06240f 100%); border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 20px; padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px; cursor: default;
         }
         .hero-content { position: relative; z-index: 2; max-width: 65%; }
-        .hero-title { font-size: 1.1rem; font-weight: 900; margin-top: 2px; line-height: 1.25; text-transform: uppercase; color: #fff; font-family: 'Poppins', sans-serif; }
-        .hero-sub { font-size: 0.68rem; color: var(--text-sub); margin-top: 4px; line-height: 1.35; }
-        
-        .target-progress-box { margin-top: 12px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 8px 10px; }
-        .target-lbl { font-size: 0.62rem; color: var(--text-sub); display: flex; justify-content: space-between; font-weight: 700; }
-        .target-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 4px; overflow: hidden; }
-        .target-bar-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #10b981); border-radius: 10px; width: 94%; }
+        .hero-title { font-size: 1.15rem; font-weight: 800; margin-top: 2px; line-height: 1.2; text-transform: uppercase; }
+        .hero-sub { font-size: 0.7rem; color: var(--text-sub); margin-top: 6px; line-height: 1.3; }
+        .performance-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.4); padding: 8px 12px; border-radius: 12px; margin-top: 12px; font-size: 0.7rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.05); }
+        .hero-3d-illustration { position: absolute; right: -10px; bottom: -5px; width: 135px; z-index: 1; }
 
-        .performance-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.45); padding: 6px 10px; border-radius: 12px; margin-top: 10px; font-size: 0.65rem; font-weight: 700; border: 1px solid rgba(34, 197, 94, 0.25); }
-        .hero-3d-illustration { position: absolute; right: -5px; bottom: -5px; width: 145px; z-index: 1; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.6)); }
+        .banner-card { background: #ffe4cc; border-radius: 18px; padding: 16px; color: #1e293b; margin-bottom: 6px; }
+        .banner-tag { background: #fed7aa; color: #c2410c; font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 4px; }
+        .banner-heading { font-size: 1.3rem; font-weight: 900; color: #dc2626; line-height: 1.1; }
+        .banner-subtext { font-size: 0.7rem; font-weight: 700; color: #1e293b; margin-top: 2px; }
+        .banner-btn { background: #dc2626; color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; margin-top: 10px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; }
 
-        /* PROMO CAROUSEL */
-        .banner-card { background: linear-gradient(135deg, #ffe4cc 0%, #ffd0a8 100%); border-radius: 20px; padding: 16px; color: #1e293b; margin-bottom: 6px; position: relative; overflow: hidden; }
-        .banner-tag { background: #fed7aa; color: #c2410c; font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 8px; display: inline-block; margin-bottom: 4px; }
-        .banner-heading { font-size: 1.25rem; font-weight: 900; color: #dc2626; line-height: 1.1; font-family: 'Poppins', sans-serif; }
-        .banner-subtext { font-size: 0.75rem; font-weight: 700; color: #1e293b; margin-top: 2px; }
-        .banner-btn { background: #dc2626; color: white; border: none; padding: 7px 16px; border-radius: 20px; font-size: 0.68rem; font-weight: 800; margin-top: 10px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; box-shadow: 0 4px 10px rgba(220,38,38,0.3); }
+        .metrics-scroll { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 16px; }
+        .metric-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .metric-card:active { transform: scale(0.96); }
+        .metric-icon-3d { width: 24px; height: 24px; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .metric-title { font-size: 0.58rem; color: var(--text-sub); display: block; }
+        .metric-value { font-size: 0.8rem; font-weight: 800; }
+        .red-dot-badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; }
 
-        /* METRIC CARDS GRID 5 */
-        .metrics-scroll { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 14px; }
-        .metric-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 10px 4px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; backdrop-filter: var(--glass-blur); }
-        .metric-card:active { transform: scale(0.95); }
-        .metric-icon-3d { width: 28px; height: 28px; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
-        .metric-title { font-size: 0.58rem; color: var(--text-sub); display: block; font-weight: 600; }
-        .metric-value { font-size: 0.82rem; font-weight: 800; }
-        .red-dot-badge { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 8px #ef4444; }
-
-        /* SECTION HEADERS & MENU GRIDS */
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .section-title { font-size: 0.88rem; font-weight: 800; display: flex; align-items: center; gap: 6px; font-family: 'Poppins', sans-serif; }
-        .btn-see-all { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: var(--accent-green); padding: 4px 10px; border-radius: 12px; font-size: 0.65rem; text-decoration: none; font-weight: 800; }
+        .section-title { font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .btn-see-all { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: var(--accent-green); padding: 4px 10px; border-radius: 12px; font-size: 0.65rem; text-decoration: none; font-weight: 700; }
 
-        .menu-section-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 22px; padding: 16px; margin-bottom: 14px; position: relative; overflow: hidden; backdrop-filter: var(--glass-blur); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-        .menu-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; position: relative; z-index: 2; }
+        .menu-section-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 16px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .menu-grid-5 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; position: relative; z-index: 2; }
         .menu-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; position: relative; z-index: 2; }
 
         .menu-3d-item { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; cursor: pointer; transition: transform 0.2s; }
         .menu-3d-item:active { transform: scale(0.92); }
-        .icon-box-3d { width: 46px; height: 46px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.35); transition: border-color 0.2s; }
-        .menu-3d-item:hover .icon-box-3d { border-color: var(--accent-green); }
-        .icon-box-3d img { width: 28px; height: 28px; object-fit: contain; }
-        .menu-label { font-size: 0.6rem; font-weight: 700; color: var(--text-white); line-height: 1.2; }
+        .icon-box-3d { width: 44px; height: 44px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .icon-box-3d img { width: 26px; height: 28px; object-fit: contain; }
+        .menu-label { font-size: 0.6rem; font-weight: 600; color: var(--text-white); line-height: 1.2; }
         
-        .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 90px; z-index: 1; pointer-events: none; opacity: 0.85; filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.3)); }
+        .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
 
-        /* CHAT ROOM STYLING */
-        .chat-tab-wrapper { display: flex; gap: 8px; background: var(--bg-dark); padding: 6px; border-radius: 16px; border: 1px solid var(--card-border); margin-bottom: 12px; }
-        .chat-tab-pill { flex: 1; padding: 10px 12px; font-size: 0.72rem; font-weight: 800; border-radius: 12px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; }
-        .chat-tab-pill.active { background: var(--accent-green); color: #03170a; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4); }
+        .chat-tab-wrapper { display: flex; gap: 8px; background: var(--bg-dark); padding: 6px; border-radius: 14px; border: 1px solid var(--card-border); margin-bottom: 12px; }
+        .chat-tab-pill { flex: 1; padding: 8px 12px; font-size: 0.72rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; }
+        .chat-tab-pill.active { background: var(--accent-green); color: #03170a; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.3); }
 
-        .wa-chat-container { background: rgba(4, 20, 11, 0.95); border: 1px solid var(--card-border); border-radius: 20px; height: 55vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        .wa-bubble { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.78rem; position: relative; line-height: 1.45; word-wrap: break-word; }
-        .wa-bubble.me { align-self: flex-end; background: var(--wa-bubble-me); color: white; border-bottom-right-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .wa-bubble.other { align-self: flex-start; background: var(--wa-bubble-other); color: white; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
-        .wa-bubble.ai { align-self: flex-start; background: rgba(19, 58, 32, 0.95); border: 1px solid var(--accent-green); color: white; width: 92%; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2); }
-        .wa-sender { font-size: 0.65rem; font-weight: 800; color: var(--accent-green); margin-bottom: 3px; display: flex; justify-content: space-between; gap: 8px; }
-        .wa-time { font-size: 0.58rem; color: rgba(255,255,255,0.6); text-align: right; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+        .wa-chat-container { background: #071a0e; border: 1px solid var(--card-border); border-radius: 16px; height: 52vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .wa-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.75rem; position: relative; line-height: 1.4; word-wrap: break-word; }
+        .wa-bubble.me { align-self: flex-end; background: var(--wa-bubble-me); color: white; border-bottom-right-radius: 2px; }
+        .wa-bubble.other { align-self: flex-start; background: var(--wa-bubble-other); color: white; border-bottom-left-radius: 2px; }
+        .wa-bubble.ai { align-self: flex-start; background: #133a20; border: 1px solid var(--accent-green); color: white; width: 90%; }
+        .wa-sender { font-size: 0.62rem; font-weight: 800; color: var(--accent-green); margin-bottom: 2px; display: flex; justify-content: space-between; gap: 8px; }
+        .wa-time { font-size: 0.55rem; color: rgba(255,255,255,0.6); text-align: right; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
 
-        /* FLOATING BOTTOM NAV CAPSULE */
         .bottom-nav {
-            position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); width: 94%; max-width: 450px; height: 64px; background: rgba(8, 32, 17, 0.92);
-            backdrop-filter: blur(20px); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 35px;
-            display: flex; justify-style: space-around; align-items: center; z-index: 1000; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; height: 60px; background: rgba(10, 35, 18, 0.95);
+            backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 35px;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
         }
-        .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--text-sub); font-size: 0.62rem; text-decoration: none; font-weight: 700; transition: all 0.2s ease; }
-        .nav-item.active { background: var(--accent-green); color: #03170a; padding: 7px 16px; border-radius: 22px; font-weight: 800; box-shadow: 0 0 12px rgba(34, 197, 94, 0.5); }
+        .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-sub); font-size: 0.65rem; text-decoration: none; }
+        .nav-item.active { background: var(--accent-green); color: #03170a; padding: 6px 14px; border-radius: 20px; font-weight: 700; }
         .nav-item.active i { color: #03170a; }
 
-        .nav-badge-count { position: absolute; top: -4px; right: 0px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 800; padding: 1px 5px; border-radius: 10px; border: 1px solid var(--bg-dark); }
+        .nav-badge-count { position: absolute; top: -3px; right: 2px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 800; padding: 1px 5px; border-radius: 10px; border: 1px solid var(--bg-dark); }
 
-        .fab-rocket { width: 52px; height: 52px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.25rem; margin-top: -30px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 20px rgba(34, 197, 94, 0.7); transition: transform 0.2s; }
-        .fab-rocket:active { transform: scale(0.9); }
+        .fab-rocket { width: 50px; height: 50px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-top: -28px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 15px rgba(34, 197, 94, 0.5); }
         .hidden { display: none !important; }
 
-        /* FULL SCREEN MODAL NATIVE APP */
+        /* FULL SCREEN NATIVE APP MODAL */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(2, 15, 7, 0.98); backdrop-filter: blur(16px);
+            background: rgba(3, 23, 10, 0.98); backdrop-filter: blur(12px);
             z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
             animation: slideUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -192,8 +147,8 @@
             to { transform: translateY(0); }
         }
         .custom-modal-card {
-            background: #082011; width: 100%; max-width: 480px; height: 100vh;
-            padding: 16px 16px 85px 16px; color: white; position: relative;
+            background: #0C2B14; width: 100%; max-width: 480px; height: 100vh;
+            padding: 16px 16px 80px 16px; color: white; position: relative;
             display: flex; flex-direction: column; overflow-y: auto;
         }
         .modal-header-nav {
@@ -202,40 +157,27 @@
         }
         .modal-btn-close {
             background: rgba(255,255,255,0.1); border: 1px solid var(--card-border);
-            color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+            color: white; width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
         }
-
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(2, 15, 7, 0.9); backdrop-filter: blur(10px);
-            z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .spinner {
-            width: 42px; height: 42px; border: 3px solid rgba(34, 197, 94, 0.2);
-            border-top: 3px solid var(--accent-green); border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin-bottom: 12px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-text { font-size: 0.78rem; font-weight: 800; color: var(--accent-green); letter-spacing: 0.5px; }
 
         .btn-copy-action {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #03170a; font-weight: 800; font-size: 0.78rem;
-            padding: 12px 16px; border-radius: 14px; border: none; cursor: pointer;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #03170a; font-weight: 800; font-size: 0.75rem;
+            padding: 10px 14px; border-radius: 12px; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; margin-top: 10px; box-shadow: 0 4px 18px rgba(34, 197, 94, 0.4);
+            width: 100%; margin-top: 8px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
             transition: all 0.2s ease;
         }
 
-        .tbl-sales-mtd { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.68rem; margin-top: 8px; }
-        .tbl-sales-mtd th { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); padding: 7px 4px; border: 1px solid var(--card-border); font-weight: 800; }
-        .tbl-sales-mtd td { padding: 6px 4px; border: 1px solid var(--card-border); color: #fff; }
+        .tbl-sales-mtd { width: 100%; border-collapse: collapse; text-align: center; font-size: 0.65rem; margin-top: 8px; }
+        .tbl-sales-mtd th { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); padding: 6px 3px; border: 1px solid var(--card-border); font-weight: 800; }
+        .tbl-sales-mtd td { padding: 5px 3px; border: 1px solid var(--card-border); color: #fff; }
         .tbl-sales-mtd tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
 
         .toast-rank-popup {
-            position: fixed; top: 70px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 430px;
-            z-index: 9998; padding: 12px 16px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            display: flex; align-items: center; gap: 12px; backdrop-filter: blur(12px);
+            position: fixed; top: 70px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px;
+            z-index: 9998; padding: 12px 16px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px);
             animation: fadeInDown 0.4s ease forwards;
         }
         .toast-rank-popup.top-rank { background: rgba(5, 46, 22, 0.95); border: 2px solid var(--accent-green); color: #fff; }
@@ -246,40 +188,35 @@
         }
 
         .star-rating { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
-        .star-rating i { font-size: 1.7rem; color: #475569; cursor: pointer; transition: color 0.2s; }
+        .star-rating i { font-size: 1.6rem; color: #475569; cursor: pointer; transition: color 0.2s; }
         .star-rating i.active { color: var(--gold); }
 
         .gauge-container { display: flex; flex-direction: column; align-items: center; margin: 8px 0; }
-        .gauge-svg { width: 140px; height: 80px; }
+        .gauge-svg { width: 130px; height: 75px; }
 
-        .sub-tab-btn { flex: 1; padding: 9px; font-size: 0.72rem; font-weight: 800; border-radius: 10px; border: 1px solid var(--card-border); background: var(--bg-dark); color: var(--text-sub); cursor: pointer; text-align: center; }
+        .sub-tab-btn { flex: 1; padding: 8px; font-size: 0.7rem; font-weight: 700; border-radius: 8px; border: 1px solid var(--card-border); background: var(--bg-dark); color: var(--text-sub); cursor: pointer; text-align: center; }
         .sub-tab-btn.active { background: var(--accent-green); color: #03170a; border-color: var(--accent-green); }
 
-        /* SWEETALERT CUSTOM DARK STYLE */
+        /* SWEETALERT CUSTOM DARK EMERALD STYLE */
         .swal2-popup.swal-dark-custom {
-            background: #082011 !important;
+            background: #0C2B14 !important;
             border: 1px solid var(--card-border) !important;
-            border-radius: 22px !important;
+            border-radius: 20px !important;
             color: #ffffff !important;
         }
-        .swal2-title { color: var(--accent-green) !important; font-size: 1.05rem !important; font-weight: 800 !important; }
-        .swal2-html-container { color: #e2e8f0 !important; font-size: 0.8rem !important; }
+        .swal2-title { color: var(--accent-green) !important; font-size: 1rem !important; font-weight: 800 !important; }
+        .swal2-html-container { color: #e2e8f0 !important; font-size: 0.78rem !important; }
         .swal2-confirm.swal-btn-green { background: var(--accent-green) !important; color: #03170a !important; font-weight: 800 !important; border-radius: 12px !important; }
     </style>
 </head>
 <body>
 
-    <div id="loadingOverlay" class="loading-overlay hidden">
-        <div class="spinner"></div>
-        <p id="loadingText" class="loading-text">Memuat Data...</p>
-    </div>
-
     <!-- TOAST POPUP RANK LOGIN -->
     <div id="toastRankPopup" class="toast-rank-popup hidden">
-        <div id="toastRankIcon" style="font-size: 1.6rem;">🏆</div>
+        <div id="toastRankIcon" style="font-size: 1.5rem;">🏆</div>
         <div>
-            <h4 id="toastRankTitle" style="font-size: 0.88rem; font-weight: 800;">STATUS TOKO</h4>
-            <p id="toastRankMsg" style="font-size: 0.7rem; opacity: 0.9;">Message...</p>
+            <h4 id="toastRankTitle" style="font-size: 0.85rem; font-weight: 800;">STATUS TOKO</h4>
+            <p id="toastRankMsg" style="font-size: 0.68rem; opacity: 0.9;">Message...</p>
         </div>
     </div>
 
@@ -287,7 +224,7 @@
     <div id="customModalOverlay" class="custom-modal-overlay hidden">
         <div id="customModalCard" class="custom-modal-card">
             <div class="modal-header-nav">
-                <h3 id="customModalTitle" style="font-size: 0.98rem; font-weight: 800; color: var(--accent-green); font-family: 'Poppins', sans-serif;">Modal Title</h3>
+                <h3 id="customModalTitle" style="font-size: 0.95rem; font-weight: 800; color: var(--accent-green);">Modal Title</h3>
                 <button onclick="closeCustomModal()" class="modal-btn-close"><i class="fa-solid fa-arrow-left"></i></button>
             </div>
             <div id="customModalBody" style="font-size: 0.78rem; line-height: 1.5; flex: 1;"></div>
@@ -296,15 +233,15 @@
 
     <!-- LOGIN SCREEN -->
     <div id="loginSection">
-        <div style="text-align: center; margin-top: 15vh; margin-bottom: 24px;">
-            <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 95px; height: 95px; border-radius: 24px; border: 2px solid var(--accent-green); margin-bottom: 12px; object-fit: cover; box-shadow: 0 0 25px rgba(34, 197, 94, 0.4);">
-            <h1 style="font-size: 1.6rem; font-weight: 900; color: var(--accent-green); font-family: 'Poppins', sans-serif;">KACIDA BERSATU</h1>
-            <p style="font-size: 0.78rem; color: var(--text-sub);">Portal Performa & Operasional Retail Pro</p>
+        <div style="text-align: center; margin-top: 18vh; margin-bottom: 24px;">
+            <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 90px; height: 90px; border-radius: 20px; border: 2px solid var(--accent-green); margin-bottom: 12px; object-fit: cover;">
+            <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--accent-green); font-family: 'Poppins', sans-serif;">KACIDA BERSATU</h1>
+            <p style="font-size: 0.75rem; color: var(--text-sub);">Portal Performa & Operasional Retail</p>
         </div>
         <div class="menu-section-card" style="padding: 24px;">
             <label style="font-size: 0.75rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 8px;">NIK PENGGUNA</label>
-            <input type="text" id="nikInput" placeholder="Masukkan NIK Anda" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 16px; color: white; font-size: 0.88rem; margin-bottom: 16px; outline: none;">
-            <button onclick="handleLogin()" style="width: 100%; background: var(--accent-green); color: #03170a; font-weight: 800; padding: 13px; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);">MASUK APLIKASI</button>
+            <input type="text" id="nikInput" placeholder="Masukkan NIK Anda" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 16px; color: white; font-size: 0.85rem; margin-bottom: 16px; outline: none;">
+            <button onclick="handleLogin()" style="width: 100%; background: var(--accent-green); color: #03170a; font-weight: 800; padding: 12px; border-radius: 12px; border: none; cursor: pointer;">MASUK APLIKASI</button>
         </div>
     </div>
 
@@ -318,10 +255,7 @@
                     <div class="brand-icon">
                         <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;">
                     </div>
-                    <div class="brand-title-text">
-                        <span>Kacida Bersatu</span>
-                        <span class="sync-chip"><i class="fa-solid fa-circle" style="font-size: 6px;"></i> Toko Active • Sync 1m lalu</span>
-                    </div>
+                    <span class="brand-title-text">Kacida Bersatu</span>
                 </div>
             </div>
             <div class="header-right">
@@ -344,84 +278,47 @@
         <div id="acDropdownContainer" class="hidden container">
             <div class="menu-section-card" style="padding: 10px 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
                 <i class="fa-solid fa-store" style="color: var(--accent-green);"></i>
-                <select id="selectTokoAC" onchange="onACTokoChange(this.value)" style="background: transparent; border: none; color: var(--accent-green); font-weight: 800; font-size: 0.78rem; width: 100%; outline: none;"></select>
+                <select id="selectTokoAC" onchange="onACTokoChange(this.value)" style="background: transparent; border: none; color: var(--accent-green); font-weight: 700; font-size: 0.75rem; width: 100%; outline: none;"></select>
             </div>
         </div>
 
         <main id="tabBeranda" class="container">
-
-            <!-- WIDGET CUACA & JADWAL SHOLAT -->
-            <section class="weather-sholat-card">
-                <div class="weather-part">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1163/1163661.png" class="weather-icon-3d" alt="Sun Cloud">
-                    <div class="weather-info">
-                        <span class="weather-loc"><i class="fa-solid fa-location-dot" style="color:var(--accent-green);"></i> Jakarta, ID</span>
-                        <span class="weather-temp">30°C</span>
-                        <span class="weather-desc">Cerah Berawan</span>
-                    </div>
+            <section class="disket-info-bar">
+                <div class="disket-bar-item" onclick="openSalesMTDModal()" title="Klik Rincian Sales Bulan Berjalan">
+                    <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</span>
+                    <span class="disket-bar-val" id="valSales" style="color: var(--accent-green); font-size: 0.72rem;">Memuat...</span>
                 </div>
-                <div class="sholat-part">
-                    <div class="sholat-info">
-                        <span class="sholat-title">Maghrib</span>
-                        <span class="sholat-time">18:10 <span style="font-size: 0.6rem; font-weight:600;">WIB</span></span>
-                        <span class="sholat-sub">Jadwal Sholat</span>
-                    </div>
-                    <img src="https://cdn-icons-png.flaticon.com/512/2822/2822295.png" class="sholat-icon-3d" alt="Mosque">
+                <div class="disket-divider"></div>
+                <div class="disket-bar-item" onclick="openPerformaPopup()">
+                    <span class="disket-bar-label"><i class="fa-solid fa-bullseye" style="color: var(--gold);"></i> IKT Toko</span>
+                    <span class="disket-bar-val" id="valIKT" style="color: var(--gold);">-</span>
                 </div>
-            </section>
-
-            <!-- TELEMETRY ROW (SALES SPD, IKT TOKO, PENAWARAN) -->
-            <section class="telemetry-row">
-                <div class="telemetry-card" onclick="openSalesMTDModal()" title="Klik Rincian Sales">
-                    <div class="telemetry-header"><i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i> Sales SPD</div>
-                    <div class="telemetry-value" id="valSales" style="color: var(--accent-green);">Rp 4.2M</div>
-                    <div class="telemetry-sparkline" style="color: var(--accent-green);"><i class="fa-solid fa-arrow-trend-up"></i> +5.0%</div>
+                <div class="disket-divider"></div>
+                <div class="disket-bar-item" onclick="openPerformaPopup()">
+                    <span class="disket-bar-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Penawaran</span>
+                    <span class="disket-bar-val" id="valPenawaran" style="color: #ef4444;">-</span>
                 </div>
-                <div class="telemetry-card" onclick="openPerformaPopup()" title="IKT Toko">
-                    <div class="telemetry-header"><i class="fa-solid fa-shield-halved" style="color: var(--gold);"></i> IKT Toko</div>
-                    <div class="telemetry-value" id="valIKT" style="color: var(--gold);">102.4%</div>
-                    <div class="telemetry-sparkline" style="color: var(--gold);"><i class="fa-solid fa-arrow-trend-up"></i> +2.3%</div>
-                </div>
-                <div class="telemetry-card" onclick="openPerformaPopup()" title="Penawaran Langsung">
-                    <div class="telemetry-header"><i class="fa-solid fa-gift" style="color: #ef4444;"></i> Penawaran</div>
-                    <div class="telemetry-value" id="valPenawaran" style="color: #ef4444;">94.5%</div>
-                    <div class="telemetry-sparkline" style="color: var(--gold);"><i class="fa-solid fa-star"></i> BAIK</div>
-                </div>
+                <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);" onclick="openPerformaPopup()"></i>
             </section>
             
-            <!-- HERO CARD ENTERPRISE -->
             <section class="hero-card">
                 <div class="hero-content">
-                    <span style="font-size: 0.7rem; color: var(--text-sub);">Selamat datang kembali,</span>
+                    <span style="font-size: 0.7rem; color: var(--text-sub);" id="lblGreetingText">Selamat Pagi,</span>
                     <h1 class="hero-title" id="lblUserName">USER! 👋</h1>
                     <p class="hero-sub">Tetap semangat, layani dengan hati dan capai target performa!</p>
-                    
-                    <div class="target-progress-box">
-                        <div class="target-lbl">
-                            <span>Target SPD Hari Ini</span>
-                            <span style="color:var(--accent-green);">94%</span>
-                        </div>
-                        <div class="target-bar-bg">
-                            <div class="target-bar-fill"></div>
-                        </div>
-                        <div style="font-size:0.58rem; color:var(--text-sub); margin-top:3px; text-align:right;">Rp 4.230.000 / Rp 4.500.000</div>
-                    </div>
-
                     <div class="performance-badge">
-                        <i class="fa-solid fa-fire" style="color: var(--gold);"></i>
+                        <i class="fa-solid fa-star" style="color: var(--gold);"></i>
                         <span>Performa hari ini <strong style="color: var(--accent-green);">Sangat Baik! 🔥</strong></span>
                     </div>
                 </div>
-                <img src="https://illustrations.popsy.co/emerald/work-from-home.svg" class="hero-3d-illustration" alt="Staff 3D">
+                <img src="https://illustrations.popsy.co/emerald/work-from-home.svg" class="hero-3d-illustration" alt="Team">
             </section>
 
-            <!-- BANNER PROMO CAROUSEL -->
             <div class="swiper mainCarousel rounded-2xl overflow-hidden mb-3 border border-[#1A3A2A]">
                 <div class="swiper-wrapper" id="carouselWrapper"></div>
                 <div class="swiper-pagination"></div>
             </div>
 
-            <!-- METRIC CARDS GRID -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d">
@@ -456,24 +353,14 @@
                 </div>
             </section>
 
-            <!-- MENU UTAMA SECTION -->
-            <div class="section-header">
-                <h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3>
-                <a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
-            </div>
+            <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
                 <div id="gridMenuUtama" class="menu-grid-5"></div>
                 <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket">
             </section>
 
-            <!-- LAYANAN LAINNYA SECTION -->
-            <div class="section-header">
-                <h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3>
-                <a href="#" class="btn-see-all" onclick="openAllMenuModal('Lainnya')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
-            </div>
-            <section class="menu-section-card">
-                <div id="gridMenuLainnya" class="menu-grid-4"></div>
-            </section>
+            <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Lainnya')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
+            <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
         <div id="tabChat" class="hidden container space-y-3">
@@ -481,24 +368,24 @@
             
             <div class="chat-tab-wrapper">
                 <button id="btnTabTeam" class="chat-tab-pill active" onclick="switchChatRoomMode('team')"><i class="fa-solid fa-users"></i> Chat Tim</button>
-                <button id="btnTabAI" class="chat-tab-pill" onclick="switchChatRoomMode('ai')"><i class="fa-solid fa-robot"></i> Kacida AI (Groq Full Engine)</button>
+                <button id="btnTabAI" class="chat-tab-pill" onclick="switchChatRoomMode('ai')"><i class="fa-solid fa-robot"></i> Kacida AI (Groq Engine)</button>
             </div>
 
             <div id="chatBox" class="wa-chat-container custom-scrollbar"></div>
 
             <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-                <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') handleSendChatAction()" style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 11px 14px; font-size: 0.78rem; color: white; outline: none;">
+                <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') handleSendChatAction()" style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.75rem; color: white; outline: none;">
                 
-                <button id="btnVoiceMic" onclick="startVoiceRecognition()" title="Voice Command Suara" style="background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); color: var(--accent-green); width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem;"><i class="fa-solid fa-microphone"></i></button>
+                <button id="btnVoiceMic" onclick="startVoiceRecognition()" title="Voice Command Suara" style="background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); color: var(--accent-green); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem;"><i class="fa-solid fa-microphone"></i></button>
                 
-                <button onclick="handleSendChatAction()" style="background: var(--accent-green); color: #03170a; padding: 0 18px; height: 42px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(34,197,94,0.4);"><i class="fa-solid fa-paper-plane"></i></button>
+                <button onclick="handleSendChatAction()" style="background: var(--accent-green); color: #03170a; padding: 0 16px; height: 40px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
 
         <div id="tabAksiCepat" class="hidden container">
             <div class="menu-section-card">
                 <h2 class="section-title" style="color: var(--accent-green);"><i class="fa-solid fa-rocket"></i> Misi Hari Ini</h2>
-                <p style="font-size: 0.72rem; color: var(--text-sub); margin: 4px 0 12px 0;">Klik menu misi di bawah untuk mengumpulkan poin reward!</p>
+                <p style="font-size: 0.7rem; color: var(--text-sub); margin: 4px 0 12px 0;">Klik menu misi di bawah untuk mengumpulkan poin reward!</p>
                 <div id="misiList" style="display: flex; flex-direction: column; gap: 8px;"></div>
             </div>
         </div>
@@ -510,12 +397,12 @@
 
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
-                <img id="profilFoto" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" style="width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto; box-shadow: 0 0 15px rgba(34,197,94,0.4);">
-                <h2 id="profilNama" style="font-size: 1.15rem; font-weight: 800;">Nama</h2>
-                <p id="profilJabatan" style="font-size: 0.75rem; color: var(--accent-green); font-weight: 700;">Jabatan</p>
-                <p id="profilToko" style="font-size: 0.72rem; color: var(--text-sub);">Toko</p>
-                <p id="profilNik" style="font-size: 0.65rem; color: #64748b; margin-top: 2px;">NIK: -</p>
-                <button onclick="handleLogout()" style="margin-top: 14px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 8px 18px; border-radius: 12px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">LOGOUT</button>
+                <img id="profilFoto" src="https://cdn-icons-png.flaticon.com/512/4140/4140048.png" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin: 0 auto 8px auto;">
+                <h2 id="profilNama" style="font-size: 1.1rem; font-weight: 800;">Nama</h2>
+                <p id="profilJabatan" style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">Jabatan</p>
+                <p id="profilToko" style="font-size: 0.7rem; color: var(--text-sub);">Toko</p>
+                <p id="profilNik" style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: -</p>
+                <button onclick="handleLogout()" style="margin-top: 12px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 6px 16px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">LOGOUT</button>
             </div>
 
             <div class="menu-section-card">
@@ -541,8 +428,8 @@
             </div>
         </div>
 
-        <button id="floatingAIMascot" class="hidden" onclick="switchChatRoomMode('ai')" style="position: fixed; bottom: 85px; right: 16px; z-index: 999; background: #0A2414; border: 2px solid var(--accent-green); padding: 10px; border-radius: 50%; box-shadow: 0 0 20px rgba(34, 197, 94, 0.7); cursor: pointer;">
-            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 34px; height: 34px; display: block;">
+        <button id="floatingAIMascot" class="hidden" onclick="switchChatRoomMode('ai')" style="position: fixed; bottom: 80px; right: 16px; z-index: 999; background: #0A2414; border: 2px solid var(--accent-green); padding: 10px; border-radius: 50%; box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); cursor: pointer;">
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 32px; height: 32px; display: block;">
         </button>
 
         <nav class="bottom-nav">
@@ -558,7 +445,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQ7xUY_bIzL5AZp48R5IcHeuBYQ4j2EgSwX08O8wzh3XC4pr0ANm-3NeDvx4YfpvFk/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwH0gUj04nL8176h8FjS2zp26niZt3_RTz9vl_WNjuhx_sCFJ6o7bkCN9eEsLLgnAMr/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -572,8 +459,9 @@
         let deferredPrompt = null;
         let selectedRatingStars = 5;
         let previousChatCount = 0;
+        let salesChartInstance = null;
+        let swiperInstance = null;
 
-        // HELPER ANTI-XSS ESCAPING
         function escapeHTML(str) {
             if (!str) return '';
             return String(str)
@@ -582,6 +470,14 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#039;');
+        }
+
+        function getTimeGreeting() {
+            const hour = new Date().getHours();
+            if (hour >= 3 && hour < 11) return "Selamat Pagi 🌅";
+            if (hour >= 11 && hour < 15) return "Selamat Siang ☀️";
+            if (hour >= 15 && hour < 18) return "Selamat Sore 🌆";
+            return "Selamat Malam 🌙";
         }
 
         if ('serviceWorker' in navigator) {
@@ -593,6 +489,7 @@
         function playChatSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (ctx.state === 'suspended') { ctx.resume(); }
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = 'sine';
@@ -634,11 +531,8 @@
 
         function formatChatTime(rawTime) {
             if (!rawTime) return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
             const str = String(rawTime).trim();
-            if (str === "" || str.toLowerCase().includes("invalid")) {
-                return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            }
+            if (str === "" || str.toLowerCase().includes("invalid")) return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
             if (str.includes(" ")) {
                 const parts = str.split(" ");
@@ -655,9 +549,7 @@
             }
 
             let d = new Date(str);
-            if (!isNaN(d.getTime())) {
-                return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            }
+            if (!isNaN(d.getTime())) return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
             return str.length <= 8 && str.includes(":") ? str : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
@@ -667,14 +559,7 @@
             if (!nama) return "https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
             
             const n = String(nama).toUpperCase();
-            const femaleKeywords = [
-                "SITI", "YULIANTI", "ARINI", "REVA", "DESI", "RINA", "INDRI", "DEWI", 
-                "FITRI", "NUR", "ELSA", "SRI", "TANZILLA", "FANNY", "FAUZIA", "NURUL", 
-                "NADIRA", "YULIA", "SUCI", "SALSA", "HERLIN", "NOPI", "MAULIDA", "NISRINA", 
-                "NASYWA", "SINTA", "PUTRI", "MARIAM", "MIRSYA", "GADIS", "ASTRI", "TASYA",
-                "YAYU", "HESTI", "RISMANI", "EVA", "ANI", "ANISA", "MAULIDYA"
-            ];
-            
+            const femaleKeywords = ["SITI", "YULIANTI", "ARINI", "REVA", "DESI", "RINA", "INDRI", "DEWI", "FITRI", "NUR", "ELSA", "SRI", "FANNY", "FAUZIA", "NURUL", "SINTA", "PUTRI", "ANISA"];
             const isFemale = femaleKeywords.some(kw => n.includes(kw));
 
             const femaleAvatars = [
@@ -710,7 +595,8 @@
                     apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA" });
                 }
                 deferredPrompt = null;
-                document.getElementById('btnInstallPWA').classList.add('hidden');
+                const btn = document.getElementById('btnInstallPWA');
+                if (btn) btn.classList.add('hidden');
             }
         }
 
@@ -726,14 +612,14 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Notifikasi Aktif 🟢',
-                    text: 'Notifikasi HP Anda sudah dalam status aktif dan siap menerima pemberitahuan.',
+                    text: 'Notifikasi HP Anda sudah aktif dan siap menerima pemberitahuan.',
                     customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' }
                 });
             } else if (currentPerm === 'denied') {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Izin Diblokir ⚠️',
-                    text: 'Buka Izin Situs (Permissions) di sebelah gembok URL browser HP Anda dan ubah ke Izinkan (Allow).',
+                    text: 'Buka Izin Situs di browser HP Anda dan ubah ke Izinkan (Allow).',
                     customClass: { popup: 'swal-dark-custom' }
                 });
             } else {
@@ -759,11 +645,17 @@
         }
 
         function showLoading(msg = "Memuat Data...") {
-            document.getElementById("loadingText").innerText = msg;
-            document.getElementById("loadingOverlay").classList.remove("hidden");
+            Swal.fire({
+                title: msg,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => { Swal.showLoading(); },
+                customClass: { popup: 'swal-dark-custom' }
+            });
         }
+
         function hideLoading() {
-            document.getElementById("loadingOverlay").classList.add("hidden");
+            Swal.close();
         }
 
         function showCustomModal(title, htmlBody) {
@@ -796,9 +688,7 @@
                         else if (action === "submitSurvey") r.submitSurveyData(currentNik, params.rating, params.saran);
                         else if (action === "submitShiftHandover") r.submitShiftHandover(currentNik, params);
                         else if (action === "submitExpiredCheck") r.submitExpiredCheck(currentNik, params);
-                        else if (action === "submitDisplayCheck") r.submitDisplayCheck(currentNik, params);
                         else if (action === "confirmExpired") r.confirmExpiredHandled(currentNik, params.idExpired);
-                        else if (action === "confirmHandover") r.confirmHandoverAction(currentNik, params.idHandover);
                     });
                 } else {
                     const url = new URL(SCRIPT_URL);
@@ -896,7 +786,7 @@
                 if (!localStorage.getItem(confirmKey)) {
                     showCustomModal("📋 LAPORAN SERAH TERIMA SHIFT 1", `
                         <div style="font-size:0.75rem; line-height:1.5;">
-                            <p style="color:var(--text-sub); margin-bottom:8px;">Berikut adalah laporan serah terima dari Shift 1 untuk seluruh personil toko:</p>
+                            <p style="color:var(--text-sub); margin-bottom:8px;">Berikut adalah laporan serah terima dari Shift 1:</p>
                             
                             <div style="background:var(--bg-dark); border:1px solid var(--card-border); padding:10px; border-radius:10px; margin-bottom:12px;">
                                 <p style="color:var(--accent-green); font-weight:bold;">👤 Kasir Shift 1: ${escapeHTML(latestHandover.NAMA_KASIR || '-')}</p>
@@ -919,7 +809,7 @@
                                     Oke Saya Terima Informasinya
                                 </button>
                                 <button onclick="closeCustomModal()" style="width:100%; background:rgba(255,255,255,0.08); color:var(--text-sub); font-weight:700; padding:8px; border-radius:10px; border:none; cursor:pointer;">
-                                    ✖️ Tutup / Saya Sedang Libur
+                                    ✖️ Tutup
                                 </button>
                             </div>
                         </div>
@@ -1027,6 +917,7 @@
         }
 
         function renderDashboard(data) {
+            document.getElementById("lblGreetingText").innerText = getTimeGreeting() + ",";
             document.getElementById("lblUserName").innerText = (escapeHTML(data.user.NAMA) || "USER") + "! 👋";
             
             const userAvatar = get3DAvatar(data.user.NAMA, data.user["FOTO PROFIL"]);
@@ -1092,10 +983,9 @@
         function renderCombinedMenuUtama(sheetUtamaMenus) {
             const container = document.getElementById("gridMenuUtama");
             
+            // MENU UTAMA TERINTEGRASI (KALKULATOR & CEKLIS DISPLAY TELAH DIHAPUS)
             const builtInMenus = [
-                { name: "Kalkulator Kasir", icon: "https://cdn-icons-png.flaticon.com/512/3112/3112946.png", action: "openKalkulatorKasirModal()" },
                 { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()" },
-                { name: "Ceklis Display", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openCeklisDisplayModal()" },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
                 { name: "Roleplay Kasir AI", icon: "https://cdn-icons-png.flaticon.com/512/4384/4384248.png", action: "openRoleplayModal()" }
             ];
@@ -1119,6 +1009,12 @@
 
         function renderCarousel(banners, namaToko) {
             const wrapper = document.getElementById("carouselWrapper");
+            if (!wrapper) return;
+
+            if (swiperInstance) {
+                swiperInstance.destroy(true, true);
+            }
+
             if (!banners || banners.length === 0) {
                 wrapper.innerHTML = `
                     <div class="swiper-slide banner-card">
@@ -1139,7 +1035,7 @@
                 `).join("");
             }
 
-            new Swiper(".mainCarousel", { autoplay: { delay: 5000 }, loop: true, pagination: { el: ".swiper-pagination", clickable: true } });
+            swiperInstance = new Swiper(".mainCarousel", { autoplay: { delay: 5000 }, loop: true, pagination: { el: ".swiper-pagination", clickable: true } });
         }
 
         function getSmart3DIcon(menuName, defaultIcon) {
@@ -1182,50 +1078,6 @@
                 });
             }
             if (link && link !== "#") window.open(link, "_blank");
-        }
-
-        function openKalkulatorKasirModal() {
-            showCustomModal("🧮 KALKULATOR TARGET KASIR", `
-                <div style="font-size:0.75rem;">
-                    <p style="color:var(--text-sub); margin-bottom:10px;">Masukkan pencapaian transaksi penawaran Anda saat ini:</p>
-
-                    <label style="font-weight:700; color:var(--accent-green);">Aktual Transaksi PSM (Pcs):</label>
-                    <input type="number" id="calcActPsm" placeholder="Contoh: 15" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
-
-                    <label style="font-weight:700; color:var(--gold);">Aktual Transaksi PWP (Pcs):</label>
-                    <input type="number" id="calcActPwp" placeholder="Contoh: 8" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
-
-                    <label style="font-weight:700; color:#38bdf8;">Aktual Transaksi Serba Gratis (Pcs):</label>
-                    <input type="number" id="calcActSerba" placeholder="Contoh: 12" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 12px 0; outline:none;">
-
-                    <button onclick="calculateCashierTarget()" style="width:100%; background:var(--accent-green); color:#03170a; font-weight:800; padding:12px; border-radius:10px; border:none; cursor:pointer; margin-top:8px;">HITUNG REKOMENDASI KASIR</button>
-
-                    <div id="calcResultBox" class="hidden" style="margin-top:12px; background:rgba(34,197,94,0.1); border:1px solid var(--accent-green); padding:10px; border-radius:10px;">
-                        <h4 style="color:var(--accent-green); font-weight:800; margin-bottom:4px;">🎯 STRATEGI REKOMENDASI:</h4>
-                        <p id="calcResultMsg" style="font-size:0.72rem; line-height:1.4; color:#e2e8f0;"></p>
-                    </div>
-                </div>
-            `);
-        }
-
-        function calculateCashierTarget() {
-            const psm = Math.max(0, Number(document.getElementById("calcActPsm").value || 0));
-            const pwp = Math.max(0, Number(document.getElementById("calcActPwp").value || 0));
-            const serba = Math.max(0, Number(document.getElementById("calcActSerba").value || 0));
-
-            const gapPsm = 25 - psm > 0 ? 25 - psm : 0;
-            const gapPwp = 15 - pwp > 0 ? 15 - pwp : 0;
-            const gapSerba = 20 - serba > 0 ? 20 - serba : 0;
-
-            const box = document.getElementById("calcResultBox");
-            const msg = document.getElementById("calcResultMsg");
-
-            msg.innerHTML = `
-                • <b>PSM:</b> Tercapai ${psm} Pcs ${gapPsm > 0 ? `<span style="color:#ef4444;">(Butuh +${gapPsm} Pcs)</span>` : '<span style="color:var(--accent-green);">(TARGET OK 🟢)</span>'}<br/>
-                • <b>PWP:</b> Tercapai ${pwp} Pcs ${gapPwp > 0 ? `<span style="color:#ef4444;">(Butuh +${gapPwp} Pcs)</span>` : '<span style="color:var(--accent-green);">(TARGET OK 🟢)</span>'}<br/>
-                • <b>Serba Gratis:</b> Tercapai ${serba} Pcs ${gapSerba > 0 ? `<span style="color:#ef4444;">(Butuh +${gapSerba} Pcs)</span>` : '<span style="color:var(--accent-green);">(TARGET OK 🟢)</span>'}
-            `;
-            box.classList.remove("hidden");
         }
 
         function openCeklisExpiredModal() {
@@ -1341,59 +1193,6 @@
             if (res && res.status === "success") {
                 closeCustomModal();
                 Swal.fire({ icon: 'success', title: 'Berhasil', text: res.message, customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' } });
-            }
-        }
-
-        function openCeklisDisplayModal() {
-            showCustomModal("✨ AUDIT KERAPIHAN DISPLAY TOKO", `
-                <div style="font-size:0.75rem;">
-                    <p style="color:var(--text-sub); margin-bottom:10px;">Centang kriteria kerapihan untuk klaim <b>+5 Poin Reward</b>:</p>
-
-                    <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
-                        <label style="background:var(--bg-dark); padding:10px; border-radius:8px; border:1px solid var(--card-border); display:flex; align-items:center; gap:8px; cursor:pointer;">
-                            <input type="checkbox" id="chkPriceTag" checked style="accent-color:var(--accent-green); width:18px; height:18px;">
-                            <span>Etiket Harga (*Price Tag*) Sesuai & Lengkap</span>
-                        </label>
-
-                        <label style="background:var(--bg-dark); padding:10px; border-radius:8px; border:1px solid var(--card-border); display:flex; align-items:center; gap:8px; cursor:pointer;">
-                            <input type="checkbox" id="chkFefo" checked style="accent-color:var(--accent-green); width:18px; height:18px;">
-                            <span>Penataan Barang Sesuai Metode FEFO</span>
-                        </label>
-
-                        <label style="background:var(--bg-dark); padding:10px; border-radius:8px; border:1px solid var(--card-border); display:flex; align-items:center; gap:8px; cursor:pointer;">
-                            <input type="checkbox" id="chkKebersihan" checked style="accent-color:var(--accent-green); width:18px; height:18px;">
-                            <span>Kebersihan Rak & Area Toko Rapi</span>
-                        </label>
-
-                        <label style="background:var(--bg-dark); padding:10px; border-radius:8px; border:1px solid var(--card-border); display:flex; align-items:center; gap:8px; cursor:pointer;">
-                            <input type="checkbox" id="chkKasirDisplay" checked style="accent-color:var(--accent-green); width:18px; height:18px;">
-                            <span>Display Meja Kasir Terpajang Sesuai</span>
-                        </label>
-                    </div>
-
-                    <button onclick="handleDisplaySubmit()" style="width:100%; background:var(--accent-green); color:#03170a; font-weight:800; padding:12px; border-radius:10px; border:none; cursor:pointer;">SIMPAN & KLAIM +5 POIN</button>
-                </div>
-            `);
-        }
-
-        async function handleDisplaySubmit() {
-            const priceTagOk = document.getElementById("chkPriceTag").checked ? "YA" : "TIDAK";
-            const fefoOk = document.getElementById("chkFefo").checked ? "YA" : "TIDAK";
-            const kebersihanOk = document.getElementById("chkKebersihan").checked ? "YA" : "TIDAK";
-            const displayKasirOk = document.getElementById("chkKasirDisplay").checked ? "YA" : "TIDAK";
-
-            showLoading("Menyimpan Ceklis Display...");
-            const res = await apiCall("submitDisplayCheck", { priceTagOk, fefoOk, kebersihanOk, displayKasirOk });
-            hideLoading();
-
-            if (res && res.status === "success") {
-                const ptEl = document.getElementById("valPoints");
-                if (ptEl) {
-                    let curr = Number(String(ptEl.innerText).replace(/\./g, '')) || 0;
-                    ptEl.innerText = Number(curr + 5).toLocaleString('id-ID');
-                }
-                closeCustomModal();
-                Swal.fire({ icon: 'success', title: 'Poin Ditambahkan! 🎉', text: res.message, customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' } });
             }
         }
 
@@ -1610,35 +1409,15 @@
                         <span>📍 ${escapeHTML(d.namaToko)}</span>
                         <span style="color:var(--gold);">🗓️ ${d.bulanName}</span>
                     </div>
-                    <div style="color:var(--text-sub); font-size:0.68rem; margin-bottom:12px;">
+                    <div style="color:var(--text-sub); font-size:0.65rem; margin-bottom:10px;">
                         Total MTD Sales (s/d Tgl ${d.targetDay}): <strong style="color:#fff;">Rp ${Number(d.totalMtdSales).toLocaleString('id-ID')}</strong>
                     </div>
 
-                    <!-- 4 METRIC SUMMARY BOXES -->
-                    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px; margin-bottom:12px;">
-                        <div style="background:rgba(34,197,94,0.12); border:1px solid var(--accent-green); border-radius:12px; padding:8px 4px; text-align:center;">
-                            <span style="font-size:0.55rem; color:var(--accent-green); font-weight:800; display:block;">TOTAL SALES MTD</span>
-                            <span style="font-size:0.75rem; font-weight:900; color:#fff; margin-top:2px; display:block;">Rp ${Number(d.totalMtdSales).toLocaleString('id-ID')}</span>
-                        </div>
-                        <div style="background:rgba(245,158,11,0.12); border:1px solid var(--gold); border-radius:12px; padding:8px 4px; text-align:center;">
-                            <span style="font-size:0.55rem; color:var(--gold); font-weight:800; display:block;">STD MTD</span>
-                            <span style="font-size:0.75rem; font-weight:900; color:#fff; margin-top:2px; display:block;">Rp 0</span>
-                        </div>
-                        <div style="background:rgba(56,189,248,0.12); border:1px solid #38bdf8; border-radius:12px; padding:8px 4px; text-align:center;">
-                            <span style="font-size:0.55rem; color:#38bdf8; font-weight:800; display:block;">APC MTD</span>
-                            <span style="font-size:0.75rem; font-weight:900; color:#fff; margin-top:2px; display:block;">Rp 0</span>
-                        </div>
-                        <div style="background:rgba(147,51,234,0.12); border:1px solid #a855f7; border-radius:12px; padding:8px 4px; text-align:center;">
-                            <span style="font-size:0.55rem; color:#a855f7; font-weight:800; display:block;">GAP vs STD</span>
-                            <span style="font-size:0.75rem; font-weight:900; color:#fff; margin-top:2px; display:block;">0%</span>
-                        </div>
-                    </div>
-
-                    <div style="background:var(--bg-dark); border:1px solid var(--card-border); border-radius:16px; padding:10px; margin-bottom:12px;">
+                    <div style="background:var(--bg-dark); border:1px solid var(--card-border); border-radius:12px; padding:8px; margin-bottom:12px;">
                         <canvas id="chartSalesTrend" style="width:100%; height:160px;"></canvas>
                     </div>
 
-                    <div style="max-height: 38vh; overflow-y: auto; border: 1px solid var(--card-border); border-radius: 12px;">
+                    <div style="max-height: 40vh; overflow-y: auto; border: 1px solid var(--card-border); border-radius: 10px;">
                         <table class="tbl-sales-mtd">
                             <thead>
                                 <tr>
@@ -1661,7 +1440,10 @@
             setTimeout(() => {
                 const ctx = document.getElementById('chartSalesTrend');
                 if (ctx && typeof Chart !== "undefined") {
-                    new Chart(ctx, {
+                    if (salesChartInstance) {
+                        salesChartInstance.destroy();
+                    }
+                    salesChartInstance = new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: labels,
@@ -1669,11 +1451,11 @@
                                 label: 'Sales (Rp)',
                                 data: dataCurr,
                                 borderColor: '#22c55e',
-                                backgroundColor: 'rgba(34, 197, 94, 0.12)',
+                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
                                 pointBackgroundColor: pointColors,
-                                pointRadius: 5,
+                                pointRadius: 4,
                                 fill: true,
-                                tension: 0.35
+                                tension: 0.3
                             }]
                         },
                         options: {
@@ -1703,10 +1485,10 @@
             const gaugeRotation = Math.min(Math.max((ptNum / 150) * 180, 0), 180);
 
             const htmlBox = `
-                <div style="font-family: monospace, sans-serif; font-size: 0.72rem; line-height: 1.5; color: #fff; background: #03170a; padding: 14px; border-radius: 16px; border: 1px solid var(--card-border);">
-                    <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent-green); margin-bottom:2px; font-size:0.78rem;">
+                <div style="font-family: monospace, sans-serif; font-size: 0.7rem; line-height: 1.5; color: #fff; background: #03170a; padding: 12px; border-radius: 12px; border: 1px solid var(--card-border);">
+                    <div style="display:flex; justify-content:space-between; font-weight:800; color:var(--accent-green); margin-bottom:2px; font-size:0.75rem;">
                         <span>📍 ${escapeHTML(d.namaToko)}</span>
-                        <span style="color:var(--text-sub); font-size:0.65rem;">📅 Update: ${d.tanggalTxt}</span>
+                        <span style="color:var(--text-sub); font-size:0.62rem;">📅 Update: ${d.tanggalTxt}</span>
                     </div>
 
                     <div class="gauge-container">
@@ -1722,55 +1504,55 @@
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <span style="font-size:0.85rem; font-weight:900; color:var(--gold); margin-top:-8px;">${d.pointDash} (${d.ketPoint})</span>
+                        <span style="font-size:0.75rem; font-weight:900; color:var(--gold); margin-top:-10px;">${d.pointDash} (${d.ketPoint})</span>
                     </div>
 
-                    <div style="border-top:1px dashed var(--card-border); padding-top:8px; margin-top:8px;">
-                        <div style="color:var(--gold); font-weight:800;">💪 SALES HARIAN (${d.tglOnly})</div>
+                    <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
+                        <div style="color:var(--gold); font-weight:700;">💰 SALES HARIAN (${d.tglOnly})</div>
                         <div style="padding-left:6px;">Tahun Ini : Rp ${Number(d.sales2026).toLocaleString('id-ID')}</div>
                         <div style="padding-left:6px;">Tahun Lalu : Rp ${Number(d.sales2025).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px; color:var(--accent-green); font-weight:800;">📈 Growth : ${d.growthHarian >= 0 ? '+' : ''}${d.growthHarian.toFixed(1)}% ${d.growthHarian >= 0 ? '🟢' : '🔴'}</div>
+                        <div style="padding-left:6px; color:var(--accent-green); font-weight:700;">📈 Growth : ${d.growthHarian >= 0 ? '+' : ''}${d.growthHarian.toFixed(1)}% ${d.growthHarian >= 0 ? '🟢' : '🔴'}</div>
                     </div>
 
-                    <div style="border-top:1px dashed var(--card-border); padding-top:8px; margin-top:8px;">
-                        <div style="color:#38bdf8; font-weight:800;">📊 MTD SALES & PROYEKSI RUN-RATE</div>
+                    <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
+                        <div style="color:#38bdf8; font-weight:700;">📊 MTD SALES & PROYEKSI RUN-RATE</div>
                         <div style="padding-left:6px;">MTD Sales Real : Rp ${Number(d.mtd2026).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px; color:var(--gold); font-weight:800;">⚡ SPD Rata-rata : Rp ${Math.round(d.spd).toLocaleString('id-ID')}</div>
-                        <div style="padding-left:6px; color:#c7d2fe; font-size:0.65rem; margin-top:2px;">
+                        <div style="padding-left:6px; color:var(--gold); font-weight:700;">⚡ SPD Rata-rata : Rp ${Math.round(d.spd).toLocaleString('id-ID')}</div>
+                        <div style="padding-left:6px; color:#c7d2fe; font-size:0.62rem; margin-top:2px;">
                             🔮 <b>Proyeksi Akhir Bulan:</b> Rp ${Number(d.estimasiOmsetAkhirBulan || 0).toLocaleString('id-ID')} (Sisa ${d.sisaHari} Hari)
                         </div>
                     </div>
 
-                    <div style="border-top:1px dashed var(--card-border); padding-top:8px; margin-top:8px;">
-                        <div style="color:var(--accent-green); font-weight:800; margin-bottom:4px;">🛡️ IKT TOKO</div>
-                        <table style="width:100%; border-collapse:collapse; text-align:center; border:1px solid var(--card-border); font-size:0.68rem;">
+                    <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
+                        <div style="color:var(--accent-green); font-weight:700; margin-bottom:4px;">🎯 IKT TOKO</div>
+                        <table style="width:100%; border-collapse:collapse; text-align:center; border:1px solid var(--card-border); font-size:0.65rem;">
                             <tr style="background:rgba(255,255,255,0.05); color:var(--text-sub);">
-                                <th style="border:1px solid var(--card-border); padding:4px;">ACV NET SALES</th>
-                                <th style="border:1px solid var(--card-border); padding:4px;">ACV PROFIT</th>
-                                <th style="border:1px solid var(--card-border); padding:4px;">ACV GM%</th>
+                                <th style="border:1px solid var(--card-border); padding:3px;">ACV NET SALES</th>
+                                <th style="border:1px solid var(--card-border); padding:3px;">ACV PROFIT</th>
+                                <th style="border:1px solid var(--card-border); padding:3px;">ACV GM%</th>
                             </tr>
                             <tr style="font-weight:800; color:#fff;">
-                                <td style="border:1px solid var(--card-border); padding:5px; color:var(--accent-green);">${d.acvNetSales}</td>
-                                <td style="border:1px solid var(--card-border); padding:5px; color:${parseFloat(d.acvProfit)>=0?'var(--accent-green)':'#ef4444'};">${d.acvProfit}</td>
-                                <td style="border:1px solid var(--card-border); padding:5px; color:var(--gold);">${d.acvGM}</td>
+                                <td style="border:1px solid var(--card-border); padding:4px; color:var(--accent-green);">${d.acvNetSales}</td>
+                                <td style="border:1px solid var(--card-border); padding:4px; color:${parseFloat(d.acvProfit)>=0?'var(--accent-green)':'#ef4444'};">${d.acvProfit}</td>
+                                <td style="border:1px solid var(--card-border); padding:4px; color:var(--gold);">${d.acvGM}</td>
                             </tr>
                         </table>
                     </div>
 
-                    <div style="border-top:1px dashed var(--card-border); padding-top:8px; margin-top:8px;">
-                        <div style="color:#ef4444; font-weight:800; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="border-top:1px dashed var(--card-border); padding-top:6px; margin-top:6px;">
+                        <div style="color:#ef4444; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
                             <span>🚀 PENAWARAN LANGSUNG</span>
-                            <span style="color:var(--gold); font-size:0.65rem; background:rgba(245,158,11,0.15); padding:2px 8px; border-radius:6px; border:1px solid var(--gold);">🏆 RANK #${d.rankPenawaran || 1} DARI ${d.totalTokoArea || 18} TOKO</span>
+                            <span style="color:var(--gold); font-size:0.65rem; background:rgba(245,158,11,0.15); padding:2px 6px; border-radius:4px; border:1px solid var(--gold);">🏆 RANK #${d.rankPenawaran || 1} DARI ${d.totalTokoArea || 18} TOKO</span>
                         </div>
                         <div style="padding-left:6px; margin-top:4px;">Point Dashboard : <strong>${d.pointDash}</strong> (${d.ketPoint})</div>
-                        <div style="padding-left:6px; font-size:0.65rem; color:#cbd5e1; margin-top:2px;">
+                        <div style="padding-left:6px; font-size:0.62rem; color:#cbd5e1; margin-top:2px;">
                             PSM: ${d.psm} | PWP: ${d.pwp} | SERBA GRATIS: ${d.serbaGratis} | APC: ${d.apc}
                         </div>
                     </div>
 
-                    <div style="margin-top:14px; border-top:1px dashed var(--card-border); padding-top:10px;">
+                    <div style="margin-top:12px; border-top:1px dashed var(--card-border); padding-top:8px;">
                         <button onclick="downloadPerformaCardHD()" class="btn-copy-action">
-                            <i class="fa-solid fa-image" style="font-size:0.95rem;"></i> DOWNLOAD GAMBAR KARTU PERFORMA HD 🖼️
+                            <i class="fa-solid fa-image" style="font-size:0.9rem;"></i> DOWNLOAD GAMBAR KARTU PERFORMA HD 🖼️
                         </button>
                     </div>
                 </div>
@@ -1790,10 +1572,10 @@
             }
 
             const html = dashboardData.announcements.map(p => `
-                <div style="background:var(--bg-dark); padding:12px; border-radius:14px; border:1px solid var(--card-border); margin-bottom:8px; display:flex; gap:12px; align-items:center;">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" style="width:34px; height:34px;">
+                <div style="background:var(--bg-dark); padding:10px; border-radius:12px; border:1px solid var(--card-border); margin-bottom:8px; display:flex; gap:10px; align-items:center;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" style="width:32px; height:32px;">
                     <div>
-                        <p style="font-weight:bold; color:var(--gold); font-size:0.78rem;">${escapeHTML(p.Pengumuman || p.PENGUMUMAN || p.pengumuman || 'Pengumuman')}</p>
+                        <p style="font-weight:bold; color:var(--gold); font-size:0.75rem;">${escapeHTML(p.Pengumuman || p.PENGUMUMAN || p.pengumuman || 'Pengumuman')}</p>
                     </div>
                 </div>
             `).join("");
@@ -1864,7 +1646,7 @@
             } else {
                 btnAI.classList.add("active");
                 btnTeam.classList.remove("active");
-                title.innerHTML = `<i class="fa-solid fa-robot" style="color: var(--accent-green);"></i> Kacida AI (Groq Full Engine)`;
+                title.innerHTML = `<i class="fa-solid fa-robot" style="color: var(--accent-green);"></i> Kacida AI (Groq Engine)`;
                 if (chatAutoRefreshTimer) {
                     clearInterval(chatAutoRefreshTimer);
                     chatAutoRefreshTimer = null;
@@ -1877,14 +1659,16 @@
             if (chatRoomMode !== 'team') return;
             const chats = await apiCall("getChat");
             if (chats && Array.isArray(chats)) {
-                cachedChatList = chats;
+                // Pertahankan pesan pending di UI agar tidak hilang
+                const pendingChats = cachedChatList.filter(c => c.isPending);
+                cachedChatList = [...chats, ...pendingChats];
                 
                 if (isBackgroundRefresh && chats.length > previousChatCount && previousChatCount > 0) {
                     playChatSound();
                 }
                 previousChatCount = chats.length;
 
-                renderChatList(chats, isBackgroundRefresh);
+                renderChatList(cachedChatList, isBackgroundRefresh);
             }
         }
 
@@ -1900,6 +1684,7 @@
             box.innerHTML = chats.map(c => {
                 const isMe = String(c.NIK_PENGIRIM) === String(currentNik);
                 const timeFormatted = formatChatTime(c.TIMESTAMP);
+                const isPending = c.isPending === true;
 
                 return `
                     <div class="wa-bubble ${isMe ? 'me' : 'other'}">
@@ -1908,7 +1693,9 @@
                             <span>${escapeHTML(c.KODE_TOKO_PENGIRIM || '')}</span>
                         </div>
                         <div>${escapeHTML(c.ISI_PESAN || '')}</div>
-                        <div class="wa-time">${timeFormatted} ${isMe ? '<span style="color:#22c55e;">✓✓</span>' : ''}</div>
+                        <div class="wa-time">
+                            ${timeFormatted} ${isMe ? (isPending ? '<span style="color:#94a3b8;">✓</span>' : '<span style="color:#22c55e;">✓✓</span>') : ''}
+                        </div>
                     </div>
                 `;
             }).join("");
@@ -1968,29 +1755,30 @@
                 }
                 renderAIChatRoom();
             } else {
-                const box = document.getElementById("chatBox");
-                const tempId = "msg_" + Date.now();
                 const nowTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const tempMsgObj = {
+                    NIK_PENGIRIM: currentNik,
+                    NAMA_PENGIRIM: dashboardData?.user?.NAMA || "Saya",
+                    JABATAN: dashboardData?.user?.JABATAN || "Staff",
+                    KODE_TOKO_PENGIRIM: dashboardData?.user?.kodeToko || "",
+                    ISI_PESAN: msg,
+                    TIMESTAMP: nowTime,
+                    isPending: true
+                };
 
-                box.innerHTML += `
-                    <div class="wa-bubble me" id="${tempId}">
-                        <div class="wa-sender"><span>SAYA</span></div>
-                        <div>${escapeHTML(msg)}</div>
-                        <div class="wa-time">${nowTime} <span class="check-icon" style="color:#94a3b8;">✓</span></div>
-                    </div>
-                `;
-                box.scrollTop = box.scrollHeight;
+                // OPTIMISTIC RENDER: Pesan langsung muncul tanpa kedip
+                cachedChatList.push(tempMsgObj);
+                renderChatList(cachedChatList, true);
+
+                const box = document.getElementById("chatBox");
+                if (box) box.scrollTop = box.scrollHeight;
 
                 apiCall("sendChat", { pesan: msg, penerimaTipe: "All", penerimaKode: "ALL" }).then(() => {
-                    const el = document.getElementById(tempId);
-                    if (el) {
-                        const chk = el.querySelector(".check-icon");
-                        if (chk) {
-                            chk.innerHTML = "✓✓";
-                            chk.style.color = "#22c55e";
-                        }
-                    }
+                    tempMsgObj.isPending = false;
                     loadChat(true);
+                }).catch(() => {
+                    tempMsgObj.isPending = false;
+                    renderChatList(cachedChatList, true);
                 });
             }
         }
@@ -2050,7 +1838,6 @@
                 } else if (chatRoomMode === 'team') {
                     document.getElementById("chatBox").innerHTML = `
                         <div style="text-align:center; padding:30px; color:var(--text-sub); font-size:0.75rem;">
-                            <div class="spinner" style="margin:0 auto 10px auto;"></div>
                             Memuat Percakapan Tim...
                         </div>
                     `;
