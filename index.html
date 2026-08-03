@@ -62,7 +62,7 @@
         .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.95rem; color: #ffffff; letter-spacing: 0.4px; }
         .brand-icon { width: 32px; height: 32px; background: var(--accent-green-grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4); }
 
-        /* OCEAN 3D TRANSPARENT BADGE */
+        /* OCEAN 3D BADGE TRANSPARAN (TANPA BACKGROUND BIRU & TANPA KODE GANDA) */
         .ocean-3d-badge-transparent {
             display: inline-flex; align-items: center; gap: 5px;
             background: transparent; color: #a7f3d0;
@@ -507,7 +507,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEUnqmokqzybk_s0XjrjsMCRZ-jdnst0HFpApAKtkRUEz9Uk7es28sgkX8EqCZThSD/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwW4G3Y0Za-77vbgkHtMNIdR5J_k6ffTHKIDYRHFBUQsUYrh2LHFiz-Hvt6NTmT8f0_/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -543,7 +543,7 @@
             return "Selamat Malam 🌙";
         }
 
-        // DEVICE & OS DETECTOR DETIL UNTUK LOG AKTIVITAS
+        // DETEKSI PERANGKAT HP / OS SANGAT DETIL UNTUK LOG
         function getDetailedDeviceInfo() {
             const ua = navigator.userAgent;
             let os = "Android";
@@ -780,7 +780,7 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
-        // API CALL SAFE JSON PARSER (MENANGKAP RESPONS NON-JSON/HTML DENGAN HALUS)
+        // API CALL SAFE JSON PARSER (MENAMBATKAN RESPONS NON-JSON / HTML DENGAN SAFE PARSER)
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -816,7 +816,7 @@
                     try {
                         return JSON.parse(textStr);
                     } catch(jsonErr) {
-                        return { status: "error", message: "Respons Server Google Apps Script bermasalah (Server mengirim HTML Error). Silakan coba lagi!" };
+                        return { status: "error", message: "Koneksi Google Apps Script bermasalah (Server mengirim respons Non-JSON). Silakan coba lagi!" };
                     }
                 }
             } catch(err) {
@@ -1045,7 +1045,7 @@
             document.getElementById("userAvatarHeader").src = userAvatar;
             document.getElementById("profilFoto").src = userAvatar;
 
-            // FIX MENCEGAH KODE TOKO GANDA DI OCEAN BADGE TRANSPARAN
+            // FIX CLEAN STORE NAME DI OCEAN BADGE TRANSPARAN (TANPA KODE GANDA)
             let rawStore = data.user.namaToko || "ONLINE";
             let kode = data.user.kodeToko || "";
             let cleanStoreName = rawStore;
@@ -1262,7 +1262,7 @@
                 btnAlert.classList.add("active");
                 btnForm.classList.remove("active");
                 secAlert.classList.remove("hidden");
-                secForm.classList.add("hidden");
+                secAlert.classList.add("hidden");
             }
         }
 
@@ -1496,12 +1496,28 @@
             initDashboard(kodeToko);
         }
 
-        // UPGRADE MODAL SALES MTD DENGAN INLINE LOADING KETIKA PINTAH BULAN
+        // BUNDLE INSTAN 0-DETIK UNTUK MODAL SALES MTD + INLINE LOADING KETIKA PINDAH BULAN
         async function openSalesMTDModal(bulanPilihan = null) {
             const isModalOpen = !document.getElementById("customModalOverlay").classList.contains("hidden");
-            if (!isModalOpen) {
-                showLoading(bulanPilihan ? "Memuat Data Bulan " + bulanPilihan + "..." : "Memuat Sales MTD & Grafik Tren...");
-            } else {
+
+            // BUKA INSTAN (0 DETIK) JIKA MEMBUKA DEFAULT/BULAN BERJALAN DAN SUDAH ADA BUNDLE
+            if (!bulanPilihan && dashboardData?.mtdDetailData && dashboardData.mtdDetailData.status === "success" && !isModalOpen) {
+                currentMtdDetailData = dashboardData.mtdDetailData;
+                renderMtdModalView('semua');
+
+                // Silent Background Revalidation
+                apiCall("getDetailSalesMTD").then(res => {
+                    if (res && res.status === "success") {
+                        dashboardData.mtdDetailData = res;
+                        currentMtdDetailData = res;
+                        localStorage.setItem("CACHE_DASHBOARD_" + currentNik, JSON.stringify(dashboardData));
+                    }
+                });
+                return;
+            }
+
+            // JIKA PINDAH BULAN DI DALAM MODAL: GUNAKAN INLINE SPINNER TANPA COVER BERANDA
+            if (isModalOpen) {
                 const bodyContainer = document.getElementById("customModalBody");
                 if (bodyContainer) {
                     bodyContainer.innerHTML = `
@@ -1511,6 +1527,8 @@
                         </div>
                     `;
                 }
+            } else {
+                showLoading(bulanPilihan ? "Memuat Data Bulan " + bulanPilihan + "..." : "Memuat Sales MTD & Grafik Tren...");
             }
 
             const d = await apiCall("getDetailSalesMTD", { bulanPilihan: bulanPilihan });
@@ -1697,17 +1715,38 @@
             }, 150);
         }
 
-        // UPGRADE MODAL PERFORMA TOKO (100% PRESISI MOCKUP GAMBAR 3)
+        // BUNDLE INSTAN 0-DETIK UNTUK MODAL PERFORMA (100% PERSIS SEPERTI MOCKUP GAMBAR 3)
         async function openPerformaPopup() {
-            showLoading("Memuat Data Performance...");
-            const d = await apiCall("getPerforma");
-            hideLoading();
+            let d = dashboardData?.performaData;
 
-            if (!d || d.status === "error") {
-                Swal.fire({ icon: 'error', title: 'Gagal Memuat', text: d?.message || 'Koneksi terganggu', customClass: { popup: 'swal-dark-custom' } });
+            // TERBUKA SEKETIKA 0.00 DETIK DARI PRE-COMPUTED BUNDLE!
+            if (d && d.status === "success") {
+                renderPerformaModalView(d);
+
+                // Silent Background Revalidation
+                apiCall("getPerforma").then(res => {
+                    if (res && res.status === "success") {
+                        dashboardData.performaData = res;
+                        localStorage.setItem("CACHE_DASHBOARD_" + currentNik, JSON.stringify(dashboardData));
+                    }
+                });
                 return;
             }
 
+            showLoading("Memuat Data Performance...");
+            const res = await apiCall("getPerforma");
+            hideLoading();
+
+            if (!res || res.status === "error") {
+                Swal.fire({ icon: 'error', title: 'Gagal Memuat', text: res?.message || 'Koneksi terganggu', customClass: { popup: 'swal-dark-custom' } });
+                return;
+            }
+
+            if (dashboardData) dashboardData.performaData = res;
+            renderPerformaModalView(res);
+        }
+
+        function renderPerformaModalView(d) {
             const ptNum = parseFloat(String(d.pointDash).replace('%','').replace(',','.')) || 0;
             const gaugeRotation = Math.min(Math.max((ptNum / 150) * 180, 0), 180);
             const isHarianGrowth = d.growthHarian >= 0;
