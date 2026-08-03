@@ -218,7 +218,7 @@
             padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* STYLE MODAL PERFORMA (100% SAMA SEPERTI MOCKUP GAMBAR 3) */
+        /* STYLE MODAL PERFORMA (100% PERSIS SEPERTI MOCKUP GAMBAR 3) */
         .perf-card-neon {
             background: linear-gradient(135deg, #072613 0%, #031409 100%);
             border: 1px solid #00FF66; border-radius: 18px;
@@ -507,7 +507,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3R4xvD9ymDKK98ZkFz3l-jWJelsixwwJe1oEz12MuOLBtRn5c4tTRLid1rQdheDiR/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQ3AOShSSeDbNnzJeyGEeJO9XzPsAVkMftEZ65fxudyfYg80g5zkRJ7hKPoGliIUIp/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -751,6 +751,7 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
+        // PENANGANAN SINTAKS JSON ERROR SAFETY (FALLBACK RESPON NON-JSON)
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -782,7 +783,12 @@
                     Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
 
                     const res = await fetch(url);
-                    return await res.json();
+                    const textStr = await res.text();
+                    try {
+                        return JSON.parse(textStr);
+                    } catch(jsonErr) {
+                        return { status: "error", message: "Respons Server Google Apps Script bermasalah (Non-JSON/HTML page). Silakan coba lagi!" };
+                    }
                 }
             } catch(err) {
                 hideLoading();
@@ -1009,7 +1015,14 @@
             document.getElementById("userAvatarHeader").src = userAvatar;
             document.getElementById("profilFoto").src = userAvatar;
 
-            document.getElementById("hdrStoreOnlineName").innerText = (data.user.kodeToko || "TOKO") + " • " + (data.user.namaToko || "ONLINE");
+            // FIX CLEAN STORE NAME DI OCEAN BADGE (MENCEGAH KODE TOKO GANDA)
+            let rawStore = data.user.namaToko || "ONLINE";
+            let kode = data.user.kodeToko || "";
+            let cleanStoreName = rawStore;
+            if (kode && !rawStore.toUpperCase().includes(kode.toUpperCase())) {
+                cleanStoreName = kode + " - " + rawStore;
+            }
+            document.getElementById("hdrStoreOnlineName").innerText = cleanStoreName;
 
             document.getElementById("profilNama").innerText = data.user.NAMA || "-";
             document.getElementById("profilJabatan").innerText = data.user.JABATAN || "-";
@@ -1453,9 +1466,9 @@
             initDashboard(kodeToko);
         }
 
-        // UPGRADE MODAL SALES MTD DENGAN DROPDOWN FILTER BULAN (STAY DI BULAN BERJALAN)
+        // UPGRADE MODAL SALES MTD DENGAN DROPDOWN FILTER BULAN + INDIKATOR MEMUAT & METRIK DETIL
         async function openSalesMTDModal(bulanPilihan = null) {
-            showLoading("Memuat Sales MTD & Grafik Tren...");
+            showLoading(bulanPilihan ? "Memuat Data Bulan " + bulanPilihan + "..." : "Memuat Sales MTD & Grafik Tren...");
             const d = await apiCall("getDetailSalesMTD", { bulanPilihan: bulanPilihan });
             hideLoading();
 
@@ -1491,11 +1504,13 @@
             chartDataList.forEach(item => {
                 labels.push(item.day);
                 dataCurr.push(item.sales2026Num);
-                pointColors.push(item.isGrowth ? '#22c55e' : '#ef4444');
+                pointColors.push(item.isGrowth ? '#00FF66' : '#ef4444');
             });
 
             const isMtdGrowth = d.mtdGrowthTotal >= 0;
             const growthSign = isMtdGrowth ? '+' : '';
+            const stdGrowthSign = d.stdGrowthTotal >= 0 ? '+' : '';
+            const apcGrowthSign = d.apcGrowthTotal >= 0 ? '+' : '';
 
             let monthOptionsHtml = "";
             if (d.listBulanAvailable && d.listBulanAvailable.length > 0) {
@@ -1516,7 +1531,10 @@
                         <div>
                             <div style="font-size:0.95rem; font-weight:800; color:#fff;">${item.sales2026Formatted}</div>
                             <div style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">
-                                vs ${item.sales2025Formatted} | <span style="color:#cbd5e1;">STD: ${item.std2026}</span> | <span style="color:#38bdf8;">APC: ${item.apc2026}</span>
+                                vs ${item.sales2025Formatted}
+                            </div>
+                            <div style="font-size:0.6rem; color:#cbd5e1; margin-top:1px;">
+                                STD: <b>${item.std2026}</b> (vs ${item.std2025}) | APC: <b>${item.apc2026}</b>
                             </div>
                         </div>
                     </div>
@@ -1542,7 +1560,7 @@
                         </select>
                     </div>
 
-                    <!-- KARTU TOTAL SALES MTD -->
+                    <!-- KARTU TOTAL SALES MTD DENGAN METRIK STD & APC KOMPARASI DETIL -->
                     <div class="mtd-summary-card">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES MTD (s/d Tgl ${d.targetDay})</span>
@@ -1555,6 +1573,14 @@
                         <div class="mtd-sub-metric-row">
                             <span style="color:var(--text-sub);"><i class="fa-solid fa-bolt" style="color:var(--accent-green);"></i> Rata-Rata SPD</span>
                             <span style="font-weight:800; color:var(--accent-green);">Rp ${Number(d.spdAvg).toLocaleString('id-ID')} / Hari</span>
+                        </div>
+                        <div class="mtd-sub-metric-row">
+                            <span style="color:var(--text-sub);"><i class="fa-solid fa-receipt" style="color:#cbd5e1;"></i> Total STD (Struk)</span>
+                            <span style="font-weight:800; color:#fff;">${Number(d.totalStd2026||0).toLocaleString('id-ID')} Struk <small style="color:${d.stdGrowthTotal>=0?'#22c55e':'#ef4444'}; font-weight:800;">(${stdGrowthSign}${d.stdGrowthTotal.toFixed(1)}%)</small></span>
+                        </div>
+                        <div class="mtd-sub-metric-row">
+                            <span style="color:var(--text-sub);"><i class="fa-solid fa-basket-shopping" style="color:#38bdf8;"></i> Rata-Rata APC</span>
+                            <span style="font-weight:800; color:#38bdf8;">Rp ${Number(d.avgApc2026||0).toLocaleString('id-ID')} <small style="color:${d.apcGrowthTotal>=0?'#22c55e':'#ef4444'}; font-weight:800;">(${apcGrowthSign}${d.apcGrowthTotal.toFixed(1)}%)</small></span>
                         </div>
                         <div class="mtd-sub-metric-row" style="border:none; padding-top:2px;">
                             <span style="color:var(--text-sub);"><i class="fa-solid fa-crystal-ball" style="color:var(--gold);"></i> Proyeksi Akhir MTD</span>
@@ -1627,7 +1653,7 @@
             }, 150);
         }
 
-        // UPGRADE MODAL PERFORMA TOKO (100% PERSIS SEPERTI MOCKUP GAMBAR 3)
+        // UPGRADE MODAL PERFORMA TOKO (100% PRESISI MOCKUP GAMBAR 3)
         async function openPerformaPopup() {
             showLoading("Memuat Data Performance...");
             const d = await apiCall("getPerforma");
@@ -1646,15 +1672,15 @@
             const htmlBox = `
                 <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.78rem; line-height: 1.6; color: #fff;">
                     
-                    <!-- TOP TITLE BAR -->
+                    <!-- TOP LOCATION BAR -->
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--card-border);">
                         <span style="font-weight:800; color:var(--accent-green); font-size:0.85rem;"><i class="fa-solid fa-location-dot"></i> ${escapeHTML(d.namaToko)}</span>
                         <span style="font-size:0.65rem; color:var(--text-sub); background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:8px; border:1px solid var(--card-border);">📅 Update: ${d.tanggalTxt}</span>
                     </div>
 
-                    <!-- KARTU 1: GAUGE METER & SALES HARIAN -->
+                    <!-- KARTU 1: GAUGE METER & SALES HARIAN (100% PERSIS MOCKUP GAMBAR 3) -->
                     <div class="perf-card-neon" style="display:grid; grid-template-columns: 1fr 1.2fr; gap:12px; align-items:center;">
-                        <!-- GAUGE METER -->
+                        <!-- GAUGE METER PELANGI HARIAN -->
                         <div class="gauge-container">
                             <svg class="gauge-svg" viewBox="0 0 100 50">
                                 <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"/>
@@ -1668,13 +1694,13 @@
                                     </linearGradient>
                                 </defs>
                             </svg>
-                            <span style="font-size:0.95rem; font-weight:900; color:var(--accent-green); margin-top:-6px;">${d.pointDash}</span>
-                            <span style="font-size:0.62rem; font-weight:700; color:var(--gold);">(${d.ketPoint})</span>
+                            <span style="font-size:1rem; font-weight:900; color:var(--accent-green); margin-top:-6px;">${d.pointDash}</span>
+                            <span style="font-size:0.62rem; font-weight:800; color:var(--gold);">(${d.ketPoint})</span>
                         </div>
 
                         <!-- SALES HARIAN -->
                         <div style="border-left:1px dashed var(--card-border); padding-left:10px;">
-                            <div style="font-size:0.7rem; font-weight:800; color:var(--gold); margin-bottom:4px;">💪 SALES HARIAN (${d.tglOnly})</div>
+                            <div style="font-size:0.72rem; font-weight:800; color:var(--gold); margin-bottom:4px;">💪 SALES HARIAN (${d.tglOnly})</div>
                             <div style="font-size:0.68rem; margin-top:2px;">Tahun Ini : <strong style="color:#fff;">Rp ${Number(d.sales2026).toLocaleString('id-ID')}</strong></div>
                             <div style="font-size:0.68rem; color:var(--text-sub);">Tahun Lalu : Rp ${Number(d.sales2025).toLocaleString('id-ID')}</div>
                             
@@ -1706,7 +1732,7 @@
                             <svg width="60" height="50" viewBox="0 0 60 50">
                                 <rect x="5" y="30" width="10" height="20" rx="3" fill="rgba(34,197,94,0.3)"/>
                                 <rect x="20" y="20" width="10" height="30" rx="3" fill="rgba(34,197,94,0.6)"/>
-                                <rect x="35" y="10" width="10" height="40" rx="3" fill="#22c55e"/>
+                                <rect x="35" y="10" width="10" height="40" rx="3" fill="#00FF66"/>
                                 <path d="M 5 25 L 20 15 L 35 5 L 50 2" fill="none" stroke="#00FF66" stroke-width="2.5" stroke-linecap="round"/>
                             </svg>
                         </div>
@@ -1719,13 +1745,13 @@
                             <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:12px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.58rem; color:var(--text-sub); display:block;">ACV NET SALES</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-green);">${d.acvNetSales}</span>
-                                <svg width="100%" height="15" viewBox="0 0 50 15" style="margin-top:2px;"><path d="M 0 12 Q 15 2, 30 10 T 50 2" fill="none" stroke="#22c55e" stroke-width="1.5"/></svg>
+                                <svg width="100%" height="15" viewBox="0 0 50 15" style="margin-top:2px;"><path d="M 0 12 Q 15 2, 30 10 T 50 2" fill="none" stroke="#00FF66" stroke-width="1.5"/></svg>
                             </div>
 
                             <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:12px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.58rem; color:var(--text-sub); display:block;">ACV PROFIT</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:${parseFloat(d.acvProfit)>=0?'var(--accent-green)':'#ef4444'};">${d.acvProfit}</span>
-                                <svg width="100%" height="15" viewBox="0 0 50 15" style="margin-top:2px;"><path d="M 0 5 Q 20 14, 35 8 T 50 12" fill="none" stroke="${parseFloat(d.acvProfit)>=0?'#22c55e':'#ef4444'}" stroke-width="1.5"/></svg>
+                                <svg width="100%" height="15" viewBox="0 0 50 15" style="margin-top:2px;"><path d="M 0 5 Q 20 14, 35 8 T 50 12" fill="none" stroke="${parseFloat(d.acvProfit)>=0?'#00FF66':'#ef4444'}" stroke-width="1.5"/></svg>
                             </div>
 
                             <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:12px; border:1px solid var(--card-border);">
@@ -1758,7 +1784,7 @@
                     </div>
 
                     <!-- TOMBOL DOWNLOAD CARD HD -->
-                    <div style="margin-top:10px;">
+                    <div style="margin-top:14px;">
                         <button onclick="downloadPerformaCardHD()" class="btn-copy-action">
                             <i class="fa-solid fa-image" style="font-size:0.9rem;"></i> DOWNLOAD GAMBAR KARTU PERFORMA HD 🖼️
                         </button>
