@@ -62,7 +62,7 @@
         .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.95rem; color: #ffffff; letter-spacing: 0.4px; }
         .brand-icon { width: 32px; height: 32px; background: var(--accent-green-grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4); }
 
-        /* OCEAN 3D BADGE TRANSPARAN (TANPA BACKGROUND BIRU & TANPA KODE GANDA) */
+        /* OCEAN 3D BADGE TRANSPARAN */
         .ocean-3d-badge-transparent {
             display: inline-flex; align-items: center; gap: 5px;
             background: transparent; color: #a7f3d0;
@@ -507,7 +507,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwW4G3Y0Za-77vbgkHtMNIdR5J_k6ffTHKIDYRHFBUQsUYrh2LHFiz-Hvt6NTmT8f0_/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygzVIEjpSUyj95I2o9gOHzMS4G8fKZgSdb6sHVN5hp5PWWyk4N-J1A5v0caXbj1vk/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -780,7 +780,7 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
-        // API CALL SAFE JSON PARSER (MENAMBATKAN RESPONS NON-JSON / HTML DENGAN SAFE PARSER)
+        // API CALL SAFE JSON PARSER
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -816,7 +816,7 @@
                     try {
                         return JSON.parse(textStr);
                     } catch(jsonErr) {
-                        return { status: "error", message: "Koneksi Google Apps Script bermasalah (Server mengirim respons Non-JSON). Silakan coba lagi!" };
+                        return { status: "error", message: "Respons Server Google Apps Script bermasalah (Server mengirim HTML Error). Silakan coba lagi!" };
                     }
                 }
             } catch(err) {
@@ -1209,37 +1209,65 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
+        // UPGRADE MODAL CEKLIS EXPIRED DATE (PRESISI MOCKUP 2)
         function openCeklisExpiredModal() {
             showCustomModal("⚠️ MODUL CEKLIS EXPIRED DATE", `
                 <div style="font-size:0.75rem;">
-                    <div style="display:flex; gap:6px; margin-bottom:12px;">
-                        <button id="btnExpTabForm" class="sub-tab-btn active" onclick="switchExpiredSubTab('form')">➕ Input Barang</button>
-                        <button id="btnExpTabAlert" class="sub-tab-btn" onclick="switchExpiredSubTab('alert')">📋 Alert Expired Toko</button>
+                    <!-- HEADER ILUSTRASI MOCKUP 2 -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, #093318 0%, #041a0d 100%); padding:12px; border-radius:14px; border:1px solid var(--card-border); margin-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:38px; height:38px; background:rgba(245,158,11,0.15); border:1px solid var(--gold); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:var(--gold);">
+                                ⚠️
+                            </div>
+                            <div>
+                                <h3 style="font-size:0.85rem; font-weight:800; color:#fff;">MODUL CEKLIS <span style="color:var(--accent-green);">EXPIRED DATE</span></h3>
+                                <p style="font-size:0.62rem; color:var(--text-sub);">Monitoring & pencatatan expired date toko</p>
+                            </div>
+                        </div>
+                        <img src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png" style="width:40px; height:40px;">
                     </div>
 
-                    <div id="subTabExpForm">
-                        <label style="font-weight:700;">Kategori Rak / Barang:</label>
-                        <select id="expKategori" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
-                            <option value="Makanan">Makanan / Snack</option>
-                            <option value="Minuman">Minuman / Dairy</option>
-                            <option value="Kosmetik">Kosmetik & Personal Care</option>
-                            <option value="Non Food">Non-Food / Kebutuhan Rumah</option>
+                    <div style="display:flex; gap:6px; margin-bottom:12px;">
+                        <button id="btnExpTabForm" class="sub-tab-btn active" onclick="switchExpiredSubTab('form')">📦 Input Barang</button>
+                        <button id="btnExpTabAlert" class="sub-tab-btn" onclick="switchExpiredSubTab('alert')">🔔 Alert Expired Toko</button>
+                    </div>
+
+                    <div id="subTabExpForm" style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:14px;">
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">📦 Kategori Rak / Barang</label>
+                        <select id="expKategori" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
+                            <option value="Makanan / Snack">Makanan / Snack</option>
+                            <option value="Minuman / Dairy">Minuman / Dairy</option>
+                            <option value="Kosmetik & Personal Care">Kosmetik & Personal Care</option>
+                            <option value="Non-Food / Kebutuhan Rumah">Non-Food / Kebutuhan Rumah</option>
                         </select>
 
-                        <label style="font-weight:700;">Nama Barang / Produk:</label>
-                        <input type="text" id="expNamaBarang" placeholder="Contoh: Susu UHT Chocolate 250ml" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">🏷️ Nama Barang / Produk</label>
+                        <input type="text" id="expNamaBarang" placeholder="Contoh: Susu UHT Chocolate 250ml" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
 
-                        <label style="font-weight:700;">Jumlah Stok (Qty):</label>
-                        <input type="number" id="expStokQty" placeholder="Contoh: 12" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">🔢 Jumlah Stok (Qty)</label>
+                        <input type="number" id="expStokQty" placeholder="Contoh: 12" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
 
-                        <label style="font-weight:700;">Tanggal Expired Date:</label>
-                        <input type="date" id="expTanggal" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:8px; padding:8px; margin:4px 0 14px 0; outline:none;">
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">📅 Tanggal Expired Date</label>
+                        <input type="date" id="expTanggal" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:14px; outline:none;">
 
-                        <button onclick="handleExpiredSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:10px; border:none; cursor:pointer;">SIMPAN DATA EXPIRED</button>
+                        <button onclick="handleExpiredSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4);">💾 SIMPAN DATA EXPIRED</button>
                     </div>
 
                     <div id="subTabExpAlert" class="hidden">
                         <div id="expiredAlertListContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    </div>
+
+                    <!-- BOTTOM SHIELD SECURITY BADGE MOCKUP 2 -->
+                    <div style="margin-top:12px; background:rgba(0,0,0,0.3); border:1px solid var(--card-border); padding:10px 14px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:32px; height:32px; background:rgba(34,197,94,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--accent-green);">
+                                🛡️
+                            </div>
+                            <div>
+                                <p style="font-weight:bold; color:#fff; font-size:0.68rem;">Pastikan data yang diinput sudah benar dan sesuai.</p>
+                                <p style="font-size:0.58rem; color:var(--text-sub);">Data akan digunakan untuk monitoring expired date di toko Anda.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `);
@@ -1262,7 +1290,7 @@
                 btnAlert.classList.add("active");
                 btnForm.classList.remove("active");
                 secAlert.classList.remove("hidden");
-                secAlert.classList.add("hidden");
+                secForm.classList.add("hidden");
             }
         }
 
@@ -1325,6 +1353,7 @@
             }
         }
 
+        // UPGRADE FORM SERAH TERIMA SHIFT (PRESISI MOCKUP 1)
         function openSerahTerimaModal() {
             const currentHour = new Date().getHours();
             let autoShift = "Shift 1";
@@ -1332,43 +1361,91 @@
                 autoShift = "Shift 2";
             }
 
-            showCustomModal("🔄 FORM SERAH TERIMA SHIFT", `
+            showCustomModal("🔄 SERAH TERIMA SHIFT", `
                 <div style="font-size:0.75rem;">
-                    <label style="font-weight:700;">Shift Kerja Saat Ini:</label>
-                    <select id="stShiftVal" style="width:100%; background:var(--bg-dark); color:var(--accent-green); font-weight:bold; border:1px solid var(--card-border); border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
-                        <option value="Shift 1" ${autoShift === "Shift 1" ? 'selected' : ''}>Shift 1 (07:00 - 15:00 WIB)</option>
-                        <option value="Shift 2" ${autoShift === "Shift 2" ? 'selected' : ''}>Shift 2 (15:00 - 23:00 WIB)</option>
-                    </select>
-
-                    <label style="font-weight:700;">Pendapatan Sales Shift (Rp):</label>
-                    <input type="number" id="stSalesShift" placeholder="Contoh: 4500000" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
-
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                        <div>
-                            <label style="font-weight:700;">Actual PSM (Pcs):</label>
-                            <input type="number" id="stActPsm" placeholder="0" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 8px 0; outline:none;">
+                    <!-- HEADER ILUSTRASI MOCKUP 1 -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, #093318 0%, #041a0d 100%); padding:12px; border-radius:14px; border:1px solid var(--card-border); margin-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:38px; height:38px; background:rgba(0,255,102,0.15); border:1px solid var(--accent-green); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:var(--accent-green);">
+                                🤝
+                            </div>
+                            <div>
+                                <h3 style="font-size:0.85rem; font-weight:800; color:#fff;">FORM <span style="color:var(--accent-green);">SERAH TERIMA SHIFT</span></h3>
+                                <p style="font-size:0.62rem; color:var(--text-sub);">Catat laporan & serah terima shift kerja Anda</p>
+                            </div>
                         </div>
-                        <div>
-                            <label style="font-weight:700;">Actual Serba Gratis:</label>
-                            <input type="number" id="stActSerba" placeholder="0" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 8px 0; outline:none;">
-                        </div>
+                        <img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png" style="width:40px; height:40px;">
                     </div>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-                        <div>
-                            <label style="font-weight:700;">Actual PWP (Pcs):</label>
-                            <input type="number" id="stActPwp" placeholder="0" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
+                    <!-- FORM INPUTS MOCKUP 1 -->
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:14px; margin-bottom:12px;">
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;"><i class="fa-regular fa-clock" style="color:var(--accent-green);"></i> Shift Kerja Saat Ini</label>
+                        <select id="stShiftVal" style="width:100%; background:var(--bg-dark); color:var(--accent-green); font-weight:bold; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
+                            <option value="Shift 1" ${autoShift === "Shift 1" ? 'selected' : ''}>Shift 1 (07:00 - 15:00 WIB)</option>
+                            <option value="Shift 2" ${autoShift === "Shift 2" ? 'selected' : ''}>Shift 2 (15:00 - 23:00 WIB)</option>
+                        </select>
+
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;"><i class="fa-solid fa-sack-dollar" style="color:var(--accent-green);"></i> Pendapatan Sales Shift (Rp)</label>
+                        <div style="display:flex; align-items:center; background:var(--bg-dark); border:1px solid var(--card-border); border-radius:10px; overflow:hidden; margin-bottom:12px;">
+                            <span style="background:rgba(34,197,94,0.15); color:var(--accent-green); font-weight:800; padding:10px 12px; font-size:0.75rem;">Rp</span>
+                            <input type="number" id="stSalesShift" placeholder="Contoh: 4500000" style="width:100%; background:transparent; border:none; color:white; padding:10px; font-size:0.8rem; outline:none;">
                         </div>
-                        <div>
-                            <label style="font-weight:700;">Actual New Member:</label>
-                            <input type="number" id="stActMember" placeholder="0" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:8px; padding:8px; margin:4px 0 10px 0; outline:none;">
+
+                        <!-- GRID 2X2 MOCKUP 1 -->
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+                            <div style="background:var(--bg-dark); padding:10px; border-radius:12px; border:1px solid var(--card-border);">
+                                <label style="font-weight:700; font-size:0.65rem; color:#fff; display:block; margin-bottom:4px;"><i class="fa-solid fa-users" style="color:var(--accent-green);"></i> Actual PSM (Pcs)</label>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <input type="number" id="stActPsm" placeholder="0" style="width:60%; background:transparent; border:none; color:var(--accent-green); font-weight:800; font-size:0.9rem; outline:none;">
+                                    <span style="font-size:0.62rem; color:var(--text-sub);">pcs</span>
+                                </div>
+                            </div>
+
+                            <div style="background:var(--bg-dark); padding:10px; border-radius:12px; border:1px solid var(--card-border);">
+                                <label style="font-weight:700; font-size:0.65rem; color:#fff; display:block; margin-bottom:4px;"><i class="fa-solid fa-gift" style="color:#ef4444;"></i> Actual Serba Gratis</label>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <input type="number" id="stActSerba" placeholder="0" style="width:60%; background:transparent; border:none; color:var(--accent-green); font-weight:800; font-size:0.9rem; outline:none;">
+                                    <span style="font-size:0.62rem; color:var(--text-sub);">pcs</span>
+                                </div>
+                            </div>
+
+                            <div style="background:var(--bg-dark); padding:10px; border-radius:12px; border:1px solid var(--card-border);">
+                                <label style="font-weight:700; font-size:0.65rem; color:#fff; display:block; margin-bottom:4px;"><i class="fa-solid fa-cart-shopping" style="color:var(--gold);"></i> Actual PWP (Pcs)</label>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <input type="number" id="stActPwp" placeholder="0" style="width:60%; background:transparent; border:none; color:var(--accent-green); font-weight:800; font-size:0.9rem; outline:none;">
+                                    <span style="font-size:0.62rem; color:var(--text-sub);">pcs</span>
+                                </div>
+                            </div>
+
+                            <div style="background:var(--bg-dark); padding:10px; border-radius:12px; border:1px solid var(--card-border);">
+                                <label style="font-weight:700; font-size:0.65rem; color:#fff; display:block; margin-bottom:4px;"><i class="fa-solid fa-user-plus" style="color:#38bdf8;"></i> Actual New Member</label>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <input type="number" id="stActMember" placeholder="0" style="width:60%; background:transparent; border:none; color:var(--accent-green); font-weight:800; font-size:0.9rem; outline:none;">
+                                    <span style="font-size:0.62rem; color:var(--text-sub);">pcs</span>
+                                </div>
+                            </div>
                         </div>
+
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;"><i class="fa-regular fa-clipboard" style="color:var(--accent-green);"></i> Catatan / Kendala Shift</label>
+                        <textarea id="stCatatan" placeholder="Contoh: Kasir bersih, EDC aman..." style="width:100%; height:65px; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:8px; font-size:0.7rem; outline:none; resize:none; margin-bottom:14px;"></textarea>
+
+                        <button onclick="handleShiftSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4); display:flex; align-items:center; justify-content:center; gap:8px;">
+                            💾 SIMPAN & SERAH TERIMA ✦
+                        </button>
                     </div>
 
-                    <label style="font-weight:700;">Catatan / Kendala Shift:</label>
-                    <textarea id="stCatatan" placeholder="Contoh: Kasir bersih, EDC aman..." style="width:100%; height:60px; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:8px; padding:8px; font-size:0.7rem; outline:none; resize:none; margin-bottom:12px;"></textarea>
-
-                    <button onclick="handleShiftSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:10px; border:none; cursor:pointer;">SIMPAN & SERAH TERIMA</button>
+                    <!-- BOTTOM SHIELD SECURITY BADGE MOCKUP 1 -->
+                    <div style="background:rgba(0,0,0,0.3); border:1px solid var(--card-border); padding:10px 14px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:32px; height:32px; background:rgba(34,197,94,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--accent-green);">
+                                🛡️
+                            </div>
+                            <div>
+                                <p style="font-weight:bold; color:#fff; font-size:0.68rem;">Pastikan data yang diinput sudah benar</p>
+                                <p style="font-size:0.58rem; color:var(--text-sub);">Laporan serah terima akan tersimpan dan membantu monitoring performa toko.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `);
         }
@@ -1496,16 +1573,14 @@
             initDashboard(kodeToko);
         }
 
-        // BUNDLE INSTAN 0-DETIK UNTUK MODAL SALES MTD + INLINE LOADING KETIKA PINDAH BULAN
+        // BUNDLE INSTAN 0-DETIK UNTUK MODAL SALES MTD
         async function openSalesMTDModal(bulanPilihan = null) {
             const isModalOpen = !document.getElementById("customModalOverlay").classList.contains("hidden");
 
-            // BUKA INSTAN (0 DETIK) JIKA MEMBUKA DEFAULT/BULAN BERJALAN DAN SUDAH ADA BUNDLE
             if (!bulanPilihan && dashboardData?.mtdDetailData && dashboardData.mtdDetailData.status === "success" && !isModalOpen) {
                 currentMtdDetailData = dashboardData.mtdDetailData;
                 renderMtdModalView('semua');
 
-                // Silent Background Revalidation
                 apiCall("getDetailSalesMTD").then(res => {
                     if (res && res.status === "success") {
                         dashboardData.mtdDetailData = res;
@@ -1516,7 +1591,6 @@
                 return;
             }
 
-            // JIKA PINDAH BULAN DI DALAM MODAL: GUNAKAN INLINE SPINNER TANPA COVER BERANDA
             if (isModalOpen) {
                 const bodyContainer = document.getElementById("customModalBody");
                 if (bodyContainer) {
@@ -1614,7 +1688,7 @@
 
             const htmlBox = `
                 <div style="font-size: 0.78rem;">
-                    <!-- DROPDOWN FILTER BULAN (STAY DI BULAN BERJALAN) -->
+                    <!-- DROPDOWN FILTER BULAN -->
                     <div style="margin-bottom:12px; background:rgba(0,0,0,0.3); border:1px solid var(--card-border); padding:8px 12px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
                         <span style="font-size:0.72rem; font-weight:700; color:var(--accent-green);"><i class="fa-solid fa-calendar-days"></i> PILIH BULAN:</span>
                         <select onchange="changeMtdMonth(this.value)" style="background:var(--bg-dark); color:#fff; border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none; cursor:pointer;">
@@ -1622,7 +1696,7 @@
                         </select>
                     </div>
 
-                    <!-- KARTU TOTAL SALES MTD DENGAN METRIK STD & APC KOMPARASI DETIL -->
+                    <!-- KARTU TOTAL SALES MTD -->
                     <div class="mtd-summary-card">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES MTD (s/d Tgl ${d.targetDay})</span>
@@ -1719,11 +1793,9 @@
         async function openPerformaPopup() {
             let d = dashboardData?.performaData;
 
-            // TERBUKA SEKETIKA 0.00 DETIK DARI PRE-COMPUTED BUNDLE!
             if (d && d.status === "success") {
                 renderPerformaModalView(d);
 
-                // Silent Background Revalidation
                 apiCall("getPerforma").then(res => {
                     if (res && res.status === "success") {
                         dashboardData.performaData = res;
@@ -1988,12 +2060,40 @@
             }
         }
 
+        function insertQuickChatPrompt(promptText) {
+            const input = document.getElementById("inputChatMsg");
+            if (input) {
+                input.value = promptText + " - ";
+                input.focus();
+            }
+        }
+
+        // CHAT TIM WITH ROBOT MASCOT MOCKUP 5
         function renderChatList(chats, isBackgroundRefresh = false) {
             const box = document.getElementById("chatBox");
             if (!box) return;
 
             if (!chats || chats.length === 0) {
-                box.innerHTML = `<p style="font-size:0.7rem; color:var(--text-sub); text-align:center; margin-top:20px;">Belum ada percakapan tim. Ketik pesan untuk mulai!</p>`;
+                box.innerHTML = `
+                    <div style="text-align:center; padding:20px 10px; color:#fff;">
+                        <!-- ROBOT MASCOT MOCKUP 5 -->
+                        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width:80px; height:80px; margin:0 auto 10px auto; display:block; filter:drop-shadow(0 0 10px rgba(0,255,102,0.4));">
+                        <h3 style="font-size:0.9rem; font-weight:800; color:#fff;">Selamat datang di <span style="color:var(--accent-green);">Room Chat Tim Kacida!</span></h3>
+                        <p style="font-size:0.65rem; color:var(--text-sub); margin:6px 0 14px 0; line-height:1.4;">
+                            Diskusikan hal-hal penting seputar operasional toko, target, laporan, dan update terbaru.
+                        </p>
+
+                        <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:6px; margin-bottom:14px;">
+                            <button onclick="insertQuickChatPrompt('Diskusi Target')" style="background:rgba(255,255,255,0.05); border:1px solid var(--card-border); color:white; padding:6px 10px; border-radius:12px; font-size:0.62rem; font-weight:700; cursor:pointer;">💬 Diskusi Target</button>
+                            <button onclick="insertQuickChatPrompt('Update Sales')" style="background:rgba(255,255,255,0.05); border:1px solid var(--card-border); color:white; padding:6px 10px; border-radius:12px; font-size:0.62rem; font-weight:700; cursor:pointer;">📈 Update Sales</button>
+                            <button onclick="insertQuickChatPrompt('Laporan Shift')" style="background:rgba(255,255,255,0.05); border:1px solid var(--card-border); color:white; padding:6px 10px; border-radius:12px; font-size:0.62rem; font-weight:700; cursor:pointer;">📋 Laporan Shift</button>
+                        </div>
+
+                        <div style="background:rgba(34,197,94,0.1); border:1px solid var(--card-border); padding:8px 12px; border-radius:12px; display:inline-flex; align-items:center; gap:6px; font-size:0.62rem; color:var(--accent-green);">
+                            🛡️ Pesan di room ini hanya dapat dilihat oleh anggota tim toko
+                        </div>
+                    </div>
+                `;
                 return;
             }
 
@@ -2034,7 +2134,7 @@
                 const uName = dashboardData?.user?.NAMA || "Kak";
                 aiChatHistory.push({
                     sender: "AI",
-                    msg: `Halo ${escapeHTML(uName)}! 👋\nSaya **Asisten Kacida AI** (Groq Llama-3.3 70B Engine).\n\nSilakan tanyakan **apa saja**: data Sales, IKT, strategi penawaran kasir, SOP retail, hingga topik obrolan santai/luwes apapun!`
+                    msg: `Halo ${escapeHTML(uName)}! 👋\nSaya **Asisten Kacida AI** (Groq Llama-3.3 70B Engine).\n\nSilakan tanyakan **apa saja**: data Sales harian tanggal berapa pun, IKT, strategi penawaran kasir, SOP retail, hingga topik obrolan santai/luwes apapun!`
                 });
             }
 
