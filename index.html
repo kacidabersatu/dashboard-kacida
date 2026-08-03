@@ -507,7 +507,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQ3AOShSSeDbNnzJeyGEeJO9XzPsAVkMftEZ65fxudyfYg80g5zkRJ7hKPoGliIUIp/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwghRXMNGXpkYmCjasdE4XMNQFFnBvpDXmyVcE0B14Ir6aeeyrM5eA8zZ6f_am8XQkW/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -541,6 +541,35 @@
             if (hour >= 11 && hour < 15) return "Selamat Siang ☀️";
             if (hour >= 15 && hour < 18) return "Selamat Sore 🌆";
             return "Selamat Malam 🌙";
+        }
+
+        // PERANGKAT/DEVICE DETECTOR DETIL UNTUK LOG AKTIVITAS
+        function getDetailedDeviceInfo() {
+            const ua = navigator.userAgent;
+            let os = "Android";
+            let browser = "Chrome";
+
+            if (/android/i.test(ua)) {
+                const match = ua.match(/Android\s([0-9\.]+)/i);
+                os = "Android " + (match ? match[1] : "");
+            } else if (/iPhone|iPad|iPod/i.test(ua)) {
+                os = "iOS";
+            } else if (/Windows/i.test(ua)) {
+                os = "Windows";
+            } else if (/Mac/i.test(ua)) {
+                os = "MacOS";
+            }
+
+            if (/chrome|crios/i.test(ua) && !/edge|edg/i.test(ua) && !/opr/i.test(ua)) {
+                browser = "Chrome Mobile";
+            } else if (/safari/i.test(ua) && !/chrome|crios/i.test(ua)) {
+                browser = "Safari";
+            } else if (/firefox|fxios/i.test(ua)) {
+                browser = "Firefox";
+            }
+
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            return `${os} (${browser}) ${isPWA ? '[PWA Standalone]' : ''}`.trim();
         }
 
         // AVATAR MANUSIA REALISTIS 100%
@@ -676,7 +705,7 @@
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA" });
+                    apiCall("logActivity", { aktivitas: "Instal Aplikasi", detail: "User menginstal PWA", deviceDetail: getDetailedDeviceInfo() });
                 }
                 deferredPrompt = null;
                 const btn = document.getElementById('btnInstallPWA');
@@ -751,7 +780,7 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
-        // PENANGANAN SINTAKS JSON ERROR SAFETY (FALLBACK RESPON NON-JSON)
+        // API CALL SAFE JSON PARSER (MENAMBATKAN ERROR NON-JSON SILENTLY)
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -769,7 +798,7 @@
                         else if (action === "getDaftarTokoAll") r.getDaftarTokoAll();
                         else if (action === "claimMissionPoin") r.claimMissionPoin(currentNik, params.namaMenu);
                         else if (action === "readNotif") r.readNotif(currentNik, params.idNotif);
-                        else if (action === "logActivity") r.logAktivitasAPI(currentNik, params.aktivitas, params.detail);
+                        else if (action === "logActivity") r.logAktivitasAPI(currentNik, params.aktivitas, params.detail, params.deviceDetail || getDetailedDeviceInfo());
                         else if (action === "submitSurvey") r.submitSurveyData(currentNik, params.rating, params.saran);
                         else if (action === "submitShiftHandover") r.submitShiftHandover(currentNik, params);
                         else if (action === "submitExpiredCheck") r.submitExpiredCheck(currentNik, params);
@@ -787,7 +816,7 @@
                     try {
                         return JSON.parse(textStr);
                     } catch(jsonErr) {
-                        return { status: "error", message: "Respons Server Google Apps Script bermasalah (Non-JSON/HTML page). Silakan coba lagi!" };
+                        return { status: "error", message: "Koneksi Google Apps Script bermasalah (Server mengirim HTML Error). Silakan coba lagi!" };
                     }
                 }
             } catch(err) {
@@ -819,6 +848,7 @@
 
                 if (res.status === "success") {
                     localStorage.setItem("NIK_KACIDA", nik);
+                    apiCall("logActivity", { aktivitas: "Login Aplikasi", detail: `User NIK ${nik} berhasil login`, deviceDetail: getDetailedDeviceInfo() });
                     initDashboard();
                 } else {
                     Swal.fire({ icon: 'error', title: 'Login Gagal', text: res.message || 'NIK tidak terdaftar!', customClass: { popup: 'swal-dark-custom' } });
@@ -1015,7 +1045,7 @@
             document.getElementById("userAvatarHeader").src = userAvatar;
             document.getElementById("profilFoto").src = userAvatar;
 
-            // FIX CLEAN STORE NAME DI OCEAN BADGE (MENCEGAH KODE TOKO GANDA)
+            // FIX MENCEGAH KODE TOKO GANDA DI OCEAN BADGE TRANSPARAN
             let rawStore = data.user.namaToko || "ONLINE";
             let kode = data.user.kodeToko || "";
             let cleanStoreName = rawStore;
@@ -1466,11 +1496,25 @@
             initDashboard(kodeToko);
         }
 
-        // UPGRADE MODAL SALES MTD DENGAN DROPDOWN FILTER BULAN + INDIKATOR MEMUAT & METRIK DETIL
+        // UPGRADE MODAL SALES MTD DENGAN DROPDOWN FILTER BULAN (INLINE LOADING DI DALAM MODAL)
         async function openSalesMTDModal(bulanPilihan = null) {
-            showLoading(bulanPilihan ? "Memuat Data Bulan " + bulanPilihan + "..." : "Memuat Sales MTD & Grafik Tren...");
+            const isModalOpen = !document.getElementById("customModalOverlay").classList.contains("hidden");
+            if (!isModalOpen) {
+                showLoading(bulanPilihan ? "Memuat Data Bulan " + bulanPilihan + "..." : "Memuat Sales MTD & Grafik Tren...");
+            } else {
+                const bodyContainer = document.getElementById("customModalBody");
+                if (bodyContainer) {
+                    bodyContainer.innerHTML = `
+                        <div style="text-align:center; padding:40px; color:var(--accent-green);">
+                            <div class="spinner" style="margin:0 auto 12px auto; width:36px; height:36px; border:3px solid rgba(0,255,102,0.2); border-top:3px solid var(--accent-green); border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+                            <p style="font-weight:800; font-size:0.8rem;">Memuat Data Bulan ${bulanPilihan || ''}...</p>
+                        </div>
+                    `;
+                }
+            }
+
             const d = await apiCall("getDetailSalesMTD", { bulanPilihan: bulanPilihan });
-            hideLoading();
+            if (!isModalOpen) hideLoading();
 
             if (!d || d.status === "error") {
                 Swal.fire({ icon: 'error', title: 'Gagal Memuat', text: d?.message || 'Koneksi terganggu', customClass: { popup: 'swal-dark-custom' } });
@@ -1534,7 +1578,7 @@
                                 vs ${item.sales2025Formatted}
                             </div>
                             <div style="font-size:0.6rem; color:#cbd5e1; margin-top:1px;">
-                                STD: <b>${item.std2026}</b> (vs ${item.std2025}) | APC: <b>${item.apc2026}</b>
+                                STD: <b>${item.std2026}</b> (vs ${item.std2025}) | APC: <b>${item.apc2026}</b> (vs ${item.apc2025})
                             </div>
                         </div>
                     </div>
@@ -1606,9 +1650,9 @@
                         <button class="filter-pill-btn ${filterType==='decline'?'active':''}" onclick="renderMtdModalView('decline')">▼ Decline (Turun)</button>
                     </div>
 
-                    <!-- RINCIAN HARIAN LIST -->
+                    <!-- RINCIAN HARIAN LIST DENGAN KOMPARASI STD/APC DETAIL -->
                     <div style="margin-top:6px;">
-                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN</h4>
+                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN DENGAN KOMPARASI TAHUN LALU</h4>
                         ${rincianCardsHtml}
                     </div>
                 </div>
@@ -2127,6 +2171,7 @@
                 customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' }
             }).then((result) => {
                 if (result.isConfirmed) {
+                    apiCall("logActivity", { aktivitas: "Logout Aplikasi", detail: `User NIK ${currentNik} logout`, deviceDetail: getDetailedDeviceInfo() });
                     localStorage.clear();
                     location.reload();
                 }
@@ -2135,3 +2180,4 @@
     </script>
 </body>
 </html>
+
