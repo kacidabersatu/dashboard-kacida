@@ -507,7 +507,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwghRXMNGXpkYmCjasdE4XMNQFFnBvpDXmyVcE0B14Ir6aeeyrM5eA8zZ6f_am8XQkW/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEUnqmokqzybk_s0XjrjsMCRZ-jdnst0HFpApAKtkRUEz9Uk7es28sgkX8EqCZThSD/exec";
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -543,7 +543,7 @@
             return "Selamat Malam 🌙";
         }
 
-        // PERANGKAT/DEVICE DETECTOR DETIL UNTUK LOG AKTIVITAS
+        // DEVICE & OS DETECTOR DETIL UNTUK LOG AKTIVITAS
         function getDetailedDeviceInfo() {
             const ua = navigator.userAgent;
             let os = "Android";
@@ -780,7 +780,7 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
-        // API CALL SAFE JSON PARSER (MENAMBATKAN ERROR NON-JSON SILENTLY)
+        // API CALL SAFE JSON PARSER (MENANGKAP RESPONS NON-JSON/HTML DENGAN HALUS)
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -816,7 +816,7 @@
                     try {
                         return JSON.parse(textStr);
                     } catch(jsonErr) {
-                        return { status: "error", message: "Koneksi Google Apps Script bermasalah (Server mengirim HTML Error). Silakan coba lagi!" };
+                        return { status: "error", message: "Respons Server Google Apps Script bermasalah (Server mengirim HTML Error). Silakan coba lagi!" };
                     }
                 }
             } catch(err) {
@@ -1262,7 +1262,7 @@
                 btnAlert.classList.add("active");
                 btnForm.classList.remove("active");
                 secAlert.classList.remove("hidden");
-                secAlert.classList.add("hidden");
+                secForm.classList.add("hidden");
             }
         }
 
@@ -1496,7 +1496,7 @@
             initDashboard(kodeToko);
         }
 
-        // UPGRADE MODAL SALES MTD DENGAN DROPDOWN FILTER BULAN (INLINE LOADING DI DALAM MODAL)
+        // UPGRADE MODAL SALES MTD DENGAN INLINE LOADING KETIKA PINTAH BULAN
         async function openSalesMTDModal(bulanPilihan = null) {
             const isModalOpen = !document.getElementById("customModalOverlay").classList.contains("hidden");
             if (!isModalOpen) {
@@ -2180,4 +2180,3 @@
     </script>
 </body>
 </html>
-
