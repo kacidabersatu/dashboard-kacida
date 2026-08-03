@@ -62,7 +62,7 @@
         .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.95rem; color: #ffffff; letter-spacing: 0.4px; }
         .brand-icon { width: 32px; height: 32px; background: var(--accent-green-grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4); }
 
-        /* OCEAN 3D TRANSPARENT BADGE (TANPA BACKGROUND BIRU & KODE GANDA) */
+        /* OCEAN 3D TRANSPARENT BADGE */
         .ocean-3d-badge-transparent {
             display: inline-flex; align-items: center; gap: 5px;
             background: transparent; color: #a7f3d0;
@@ -190,6 +190,17 @@
             display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
         }
 
+        /* INLINE MODAL ALERT BANNERS (TERISOLASI 100% DI DALAM MODAL) */
+        .modal-alert-box {
+            background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171;
+            padding: 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 700;
+            margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+            animation: fadeInDown 0.3s ease forwards;
+        }
+        .modal-alert-box.success {
+            background: rgba(34, 197, 94, 0.15); border: 1px solid var(--accent-green); color: var(--accent-green);
+        }
+
         /* STYLE MODAL MTD HD */
         .mtd-summary-card {
             background: linear-gradient(135deg, #093318 0%, #041a0d 100%);
@@ -297,6 +308,7 @@
         <div class="menu-section-card" style="padding: 24px;">
             <label style="font-size: 0.75rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 8px;">NIK PENGGUNA</label>
             <input type="text" id="nikInput" placeholder="Masukkan NIK Anda" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px 16px; color: white; font-size: 0.85rem; margin-bottom: 16px; outline: none;">
+            <div id="loginInlineError" class="modal-alert-box hidden"></div>
             <button id="btnLoginBtn" onclick="handleLogin()" style="width: 100%; background: var(--accent-green-grad); color: #03170a; font-weight: 800; padding: 12px; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,255,102,0.3);">MASUK APLIKASI</button>
         </div>
     </div>
@@ -780,7 +792,7 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
-        // API CALL SAFE JSON PARSER (MENAMBATKAN RESPONS NON-JSON/HTML DENGAN SAFE PARSER)
+        // API CALL SAFE JSON PARSER (MENAMBATKAN RESPONS NON-JSON/HTML)
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -835,11 +847,17 @@
         async function handleLogin() {
             const nik = document.getElementById("nikInput").value.trim();
             const btn = document.getElementById("btnLoginBtn");
+            const errBox = document.getElementById("loginInlineError");
+
             if (!nik) {
-                Swal.fire({ icon: 'warning', title: 'NIK Kosong', text: 'Masukkan NIK Anda terlebih dahulu!', customClass: { popup: 'swal-dark-custom' } });
+                if (errBox) {
+                    errBox.innerHTML = `⚠️ Mohon masukkan NIK Anda terlebih dahulu!`;
+                    errBox.classList.remove("hidden");
+                }
                 return;
             }
             
+            if (errBox) errBox.classList.add("hidden");
             if (btn) btn.innerText = "Memuat...";
             currentNik = nik;
 
@@ -852,7 +870,10 @@
                     apiCall("logActivity", { aktivitas: "Login Aplikasi", detail: `User NIK ${nik} berhasil login`, deviceDetail: getDetailedDeviceInfo() });
                     initDashboard();
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Login Gagal', text: res.message || 'NIK tidak terdaftar!', customClass: { popup: 'swal-dark-custom' } });
+                    if (errBox) {
+                        errBox.innerHTML = `⚠️ ${escapeHTML(res.message || 'NIK tidak terdaftar!')}`;
+                        errBox.classList.remove("hidden");
+                    }
                 }
             } catch(e) {
                 if (btn) btn.innerText = "MASUK APLIKASI";
@@ -1022,13 +1043,10 @@
         async function handleSurveySubmit() {
             const saran = document.getElementById("txtSurveySaran").value.trim();
             if (!saran) {
-                Swal.fire({ icon: 'warning', title: 'Form Kosong', text: 'Mohon isi kolom Pesan dan Saran!', customClass: { popup: 'swal-dark-custom' } });
                 return;
             }
 
-            showLoading("Mengirim Survey...");
             const res = await apiCall("submitSurvey", { rating: selectedRatingStars, saran: saran });
-            hideLoading();
 
             if (res && res.status === "success") {
                 localStorage.setItem("SURVEY_DONE_" + currentNik, "TRUE");
@@ -1210,7 +1228,7 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        // UPGRADE MODAL CEKLIS EXPIRED DATE (PRESISI MOCKUP 2)
+        // UPGRADE MODAL CEKLIS EXPIRED DATE (PRESISI MOCKUP 2 WITH INLINE ALERTS)
         function openCeklisExpiredModal() {
             showCustomModal("⚠️ MODUL CEKLIS EXPIRED DATE", `
                 <div style="font-size:0.75rem;">
@@ -1251,7 +1269,10 @@
                         <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">📅 Tanggal Expired Date</label>
                         <input type="date" id="expTanggal" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:14px; outline:none;">
 
-                        <button onclick="handleExpiredSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4);">💾 SIMPAN DATA EXPIRED</button>
+                        <!-- INLINE WARNING BANNER TERISOLASI DI DALAM MODAL -->
+                        <div id="expInlineAlert" class="modal-alert-box hidden"></div>
+
+                        <button id="btnSubmitExp" onclick="handleExpiredSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4);">💾 SIMPAN DATA EXPIRED</button>
                     </div>
 
                     <div id="subTabExpAlert" class="hidden">
@@ -1291,7 +1312,7 @@
                 btnAlert.classList.add("active");
                 btnForm.classList.remove("active");
                 secAlert.classList.remove("hidden");
-                secAlert.classList.add("hidden");
+                secForm.classList.add("hidden");
             }
         }
 
@@ -1326,7 +1347,6 @@
                     dashboardData.expiredAlerts = dashboardData.expiredAlerts.filter(e => String(e.ID) !== String(idExpired));
                 }
                 renderExpiredAlertList();
-                Swal.fire({ icon: 'success', title: 'Berhasil', text: res.message, customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' } });
             }
         }
 
@@ -1335,20 +1355,34 @@
             const namaBarang = document.getElementById("expNamaBarang").value.trim();
             const stokQty = document.getElementById("expStokQty").value;
             const tglExpired = document.getElementById("expTanggal").value;
+            const alertBox = document.getElementById("expInlineAlert");
+            const btn = document.getElementById("btnSubmitExp");
 
             if (!namaBarang || !stokQty || !tglExpired) {
-                Swal.fire({ icon: 'warning', title: 'Form Belum Lengkap', text: 'Mohon lengkapi semua kolom!', customClass: { popup: 'swal-dark-custom' } });
+                if (alertBox) {
+                    alertBox.innerHTML = `⚠️ Form Belum Lengkap! Mohon lengkapi semua kolom.`;
+                    alertBox.classList.remove("hidden");
+                }
                 return;
             }
 
+            if (alertBox) alertBox.classList.add("hidden");
+            if (btn) btn.innerText = "Menyimpan...";
+
             const res = await apiCall("submitExpiredCheck", { kategori, namaBarang, stokQty, tglExpired });
+            if (btn) btn.innerText = "💾 SIMPAN DATA EXPIRED";
+
             if (res && res.status === "success") {
-                closeCustomModal();
-                Swal.fire({ icon: 'success', title: 'Berhasil', text: res.message, customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' } });
+                if (alertBox) {
+                    alertBox.className = "modal-alert-box success";
+                    alertBox.innerHTML = `✅ ${escapeHTML(res.message)}`;
+                    alertBox.classList.remove("hidden");
+                }
+                setTimeout(() => { closeCustomModal(); }, 1200);
             }
         }
 
-        // UPGRADE FORM SERAH TERIMA SHIFT (PRESISI MOCKUP 1)
+        // UPGRADE FORM SERAH TERIMA SHIFT (PRESISI MOCKUP 1 WITH INLINE ALERTS)
         function openSerahTerimaModal() {
             const currentHour = new Date().getHours();
             let autoShift = "Shift 1";
@@ -1424,7 +1458,10 @@
                         <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;"><i class="fa-regular fa-clipboard" style="color:var(--accent-green);"></i> Catatan / Kendala Shift</label>
                         <textarea id="stCatatan" placeholder="Contoh: Kasir bersih, EDC aman..." style="width:100%; height:65px; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:8px; font-size:0.7rem; outline:none; resize:none; margin-bottom:14px;"></textarea>
 
-                        <button onclick="handleShiftSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4); display:flex; align-items:center; justify-content:center; gap:8px;">
+                        <!-- INLINE WARNING BANNER TERISOLASI DI DALAM MODAL -->
+                        <div id="stInlineAlert" class="modal-alert-box hidden"></div>
+
+                        <button id="btnSubmitSt" onclick="handleShiftSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4); display:flex; align-items:center; justify-content:center; gap:8px;">
                             💾 SIMPAN & SERAH TERIMA ✦
                         </button>
                     </div>
@@ -1453,16 +1490,30 @@
             const actPwp = document.getElementById("stActPwp").value;
             const actNewMember = document.getElementById("stActMember").value;
             const catatan = document.getElementById("stCatatan").value.trim();
+            const alertBox = document.getElementById("stInlineAlert");
+            const btn = document.getElementById("btnSubmitSt");
 
             if (!salesShift) {
-                Swal.fire({ icon: 'warning', title: 'Form Kosong', text: 'Isi Pendapatan Sales Shift!', customClass: { popup: 'swal-dark-custom' } });
+                if (alertBox) {
+                    alertBox.innerHTML = `⚠️ Form Kosong! Mohon isi Pendapatan Sales Shift.`;
+                    alertBox.classList.remove("hidden");
+                }
                 return;
             }
 
+            if (alertBox) alertBox.classList.add("hidden");
+            if (btn) btn.innerText = "Menyimpan...";
+
             const res = await apiCall("submitShiftHandover", { shift, salesShift, actPsm, actSerbaGratis, actPwp, actNewMember, catatan });
+            if (btn) btn.innerText = "💾 SIMPAN & SERAH TERIMA ✦";
+
             if (res && res.status === "success") {
-                closeCustomModal();
-                Swal.fire({ icon: 'success', title: 'Serah Terima Berhasil', text: res.message, customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' } });
+                if (alertBox) {
+                    alertBox.className = "modal-alert-box success";
+                    alertBox.innerHTML = `✅ ${escapeHTML(res.message)}`;
+                    alertBox.classList.remove("hidden");
+                }
+                setTimeout(() => { closeCustomModal(); }, 1200);
             }
         }
 
@@ -1477,7 +1528,10 @@
                     </div>
 
                     <label style="font-weight:700;">Jawaban Penawaran Kamu (Kasir):</label>
-                    <textarea id="txtRoleplayInput" placeholder="Ketik penawaran PSM/PWP kamu di sini..." style="width:100%; height:70px; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:8px; padding:8px; font-size:0.72rem; outline:none; resize:none; margin:4px 0 12px 0;"></textarea>
+                    <textarea id="txtRoleplayInput" placeholder="Ketik penawaran PSM/PWP kamu di sini..." style="width:100%; height:70px; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:8px; padding:8px; font-size:0.72rem; outline:none; resize:none; margin:4px 0 8px 0;"></textarea>
+
+                    <!-- INLINE ALERT TERISOLASI DALAM MODAL ROLEPLAY -->
+                    <div id="roleplayInlineAlert" class="modal-alert-box hidden"></div>
 
                     <button onclick="handleRoleplaySubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:10px; border:none; cursor:pointer;">MINTA PENILAIAN AI 🤖</button>
 
@@ -1490,14 +1544,22 @@
 
         async function handleRoleplaySubmit() {
             const input = document.getElementById("txtRoleplayInput").value.trim();
+            const alertBox = document.getElementById("roleplayInlineAlert");
+
             if (!input) {
-                Swal.fire({ icon: 'warning', title: 'Teks Kosong', text: 'Ketik jawaban penawaran Anda dulu!', customClass: { popup: 'swal-dark-custom' } });
+                if (alertBox) {
+                    alertBox.innerHTML = `⚠️ Teks Kosong! Ketik jawaban penawaran Anda dulu.`;
+                    alertBox.classList.remove("hidden");
+                }
                 return;
             }
+
+            if (alertBox) alertBox.classList.add("hidden");
 
             const promptText = `Evaluasi penawaran kasir berikut kepada pembeli: "${input}". Berikan SKOR PENAWARAN (1-100) dan 2 kalimat evaluasi taktis singkat!`;
 
             const res = await apiCall("askAI", { pertanyaan: promptText });
+
             if (res && res.status === "success" && res.jawaban) {
                 const box = document.getElementById("roleplayScoreBox");
                 const msg = document.getElementById("roleplayScoreMsg");
@@ -1510,7 +1572,6 @@
             const cardElement = document.getElementById("customModalCard");
 
             if (!cardElement || typeof html2canvas === "undefined") {
-                Swal.fire({ icon: 'error', title: 'Gagal', text: 'Pustaka pencetak sedang memuat.', customClass: { popup: 'swal-dark-custom' } });
                 return;
             }
 
@@ -1531,16 +1592,41 @@
             if (!dashboardData) return;
             const u = dashboardData.user;
             showCustomModal("👤 KARTU PENGGUNA", `
-                <div style="text-align: center; padding: 10px;">
+                <div id="profileBriefContent" style="text-align: center; padding: 10px;">
                     <img src="${getRealisticHumanAvatar(u.NAMA, u["FOTO PROFIL"])}" style="width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin-bottom: 8px; box-shadow: 0 0 20px rgba(0,255,102,0.4);">
                     <h4 style="font-size: 1rem; font-weight: 800; color: white;">${escapeHTML(u.NAMA || '-')}</h4>
                     <p style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">${escapeHTML(u.JABATAN || '-')}</p>
                     <p style="font-size: 0.68rem; color: var(--text-sub);">${escapeHTML(u.namaToko || '-')}</p>
                     <p style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: ${u.NIK || '-'}</p>
                     <hr style="border-color: var(--card-border); margin: 12px 0;">
-                    <button onclick="handleLogout()" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 10px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; width: 100%;">LOGOUT</button>
+                    <button onclick="showInlineLogoutConfirm()" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 10px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; width: 100%;">LOGOUT</button>
                 </div>
             `);
+        }
+
+        // KONFIRMASI LOGOUT INLINE TERISOLASI DALAM MODAL PROFIL
+        function showInlineLogoutConfirm() {
+            const container = document.getElementById("profileBriefContent");
+            if (!container) return;
+
+            container.innerHTML = `
+                <div style="text-align:center; padding:15px;">
+                    <div style="font-size:2.5rem; margin-bottom:8px;">❓</div>
+                    <h3 style="color:#ef4444; font-weight:800; font-size:0.95rem; margin-bottom:6px;">KONFIRMASI LOGOUT</h3>
+                    <p style="color:var(--text-sub); font-size:0.72rem; margin-bottom:16px;">Apakah Anda yakin ingin keluar dari aplikasi Kacida Bersatu?</p>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="confirmLogoutAction()" style="flex:1; background:#ef4444; color:white; font-weight:800; padding:10px; border-radius:10px; border:none; cursor:pointer;">Ya, Logout</button>
+                        <button onclick="showBriefProfile()" style="flex:1; background:rgba(255,255,255,0.1); color:var(--text-sub); font-weight:700; padding:10px; border-radius:10px; border:none; cursor:pointer;">Batal</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function confirmLogoutAction() {
+            apiCall("logActivity", { aktivitas: "Logout Aplikasi", detail: `User NIK ${currentNik} logout`, deviceDetail: getDetailedDeviceInfo() });
+            localStorage.clear();
+            location.reload();
         }
 
         async function loadDaftarTokoAC() {
@@ -1556,11 +1642,10 @@
             initDashboard(kodeToko);
         }
 
-        // BUNDLE INSTAN 0-DETIK UNTUK MODAL SALES MTD
+        // INLINE LOADING MODAL SALES MTD
         async function openSalesMTDModal(bulanPilihan = null) {
             const isModalOpen = !document.getElementById("customModalOverlay").classList.contains("hidden");
 
-            // JIKA SUDAH ADA BUNDLE & BUKA PERTAMA KALI: TERBUKA SEKETIKA 0 DETIK
             if (!bulanPilihan && dashboardData?.mtdDetailData && dashboardData.mtdDetailData.status === "success" && !isModalOpen) {
                 currentMtdDetailData = dashboardData.mtdDetailData;
                 renderMtdModalView('semua');
@@ -1575,7 +1660,6 @@
                 return;
             }
 
-            // INDIKATOR LOADING ISOLASI DI DALAM MODAL (TIDAK MENUTUPI BERANDA)
             if (isModalOpen) {
                 const bodyContainer = document.getElementById("customModalBody");
                 if (bodyContainer) {
@@ -1598,7 +1682,10 @@
             const d = await apiCall("getDetailSalesMTD", { bulanPilihan: bulanPilihan });
 
             if (!d || d.status === "error") {
-                Swal.fire({ icon: 'error', title: 'Gagal Memuat', text: d?.message || 'Koneksi terganggu', customClass: { popup: 'swal-dark-custom' } });
+                const bodyContainer = document.getElementById("customModalBody");
+                if (bodyContainer) {
+                    bodyContainer.innerHTML = `<p style="color:#ef4444; text-align:center; padding:20px;">Gagal memuat data. Silakan coba lagi.</p>`;
+                }
                 return;
             }
 
@@ -1804,7 +1891,10 @@
             const res = await apiCall("getPerforma");
 
             if (!res || res.status === "error") {
-                Swal.fire({ icon: 'error', title: 'Gagal Memuat', text: res?.message || 'Koneksi terganggu', customClass: { popup: 'swal-dark-custom' } });
+                const bodyContainer = document.getElementById("customModalBody");
+                if (bodyContainer) {
+                    bodyContainer.innerHTML = `<p style="color:#ef4444; text-align:center; padding:20px;">Gagal memuat data performance.</p>`;
+                }
                 return;
             }
 
@@ -2294,21 +2384,8 @@
         }
 
         function handleLogout() {
-            Swal.fire({
-                title: 'Konfirmasi Logout',
-                text: "Apakah Anda yakin ingin keluar dari aplikasi?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Logout',
-                cancelButtonText: 'Batal',
-                customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    apiCall("logActivity", { aktivitas: "Logout Aplikasi", detail: `User NIK ${currentNik} logout`, deviceDetail: getDetailedDeviceInfo() });
-                    localStorage.clear();
-                    location.reload();
-                }
-            });
+            showBriefProfile();
+            showInlineLogoutConfirm();
         }
     </script>
 </body>
