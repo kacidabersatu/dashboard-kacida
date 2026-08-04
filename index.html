@@ -19,6 +19,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <!-- FIREBASE REALTIME DATABASE SDK (CDN COMPAT) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --bg-dark: #020f07;
@@ -62,7 +66,7 @@
         .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.95rem; color: #ffffff; letter-spacing: 0.4px; }
         .brand-icon { width: 32px; height: 32px; background: var(--accent-green-grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4); }
 
-        /* OCEAN 3D BADGE TRANSPARAN */
+        /* OCEAN 3D TRANSPARENT BADGE */
         .ocean-3d-badge-transparent {
             display: inline-flex; align-items: center; gap: 5px;
             background: transparent; color: #a7f3d0;
@@ -519,7 +523,24 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCeOgl19Pm_zpLSkHOcBZs5r7Tu60EDznHM8OGOlFzQvbpa4QGgDwFt3du-4GPOnQY/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGb_TwgKwG13SOrCNKC_-c0pG19rlubmJog2aXYk7Fjv30Zd2XOypXmDslRfgFQIX0/exec";
+
+        // FIREBASE REALTIME SDK CONFIGURATION
+        const firebaseConfig = {
+          apiKey: "AIzaSyBceAg0_W6NPMG8KPIgp0zf2qUnUE7Ypj8",
+          authDomain: "kacida-bersatu.firebaseapp.com",
+          databaseURL: "https://kacida-bersatu-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "kacida-bersatu",
+          storageBucket: "kacida-bersatu.firebasestorage.app",
+          messagingSenderId: "135044863376",
+          appId: "1:135044863376:web:0791a1c161b80287958f15",
+          measurementId: "G-GQSQEESR30"
+        };
+
+        if (typeof firebase !== "undefined" && !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const rtdb = (typeof firebase !== "undefined" && firebase.apps.length) ? firebase.database() : null;
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
@@ -792,7 +813,7 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
-        // API CALL SAFE JSON PARSER (MENAMBATKAN RESPONS NON-JSON / HTML DENGAN SAFE PARSER)
+        // API CALL SAFE JSON PARSER
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -837,7 +858,28 @@
             }
         }
 
+        // FIREBASE REALTIME CHAT LISTENER (0.005s INSTANT WEBSOCKET SYNC)
+        function initFirebaseRealtimeChat() {
+            if (!rtdb) return;
+            rtdb.ref('chats').limitToLast(60).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const chatList = Object.values(data);
+                    cachedChatList = chatList;
+                    if (chatRoomMode === 'team') {
+                        renderChatList(cachedChatList, true);
+                    }
+                } else {
+                    cachedChatList = [];
+                    if (chatRoomMode === 'team') {
+                        renderChatList([], true);
+                    }
+                }
+            });
+        }
+
         window.addEventListener("DOMContentLoaded", () => {
+            initFirebaseRealtimeChat();
             if ('Notification' in window && Notification.permission === 'granted') {
                 updateNotifBellIcon(true);
             }
@@ -965,7 +1007,7 @@
             localStorage.setItem(confirmKey, "TRUE");
             apiCall("confirmHandover", { idHandover: handoverId });
             closeCustomModal();
-            Swal.fire({ icon: 'success', title: 'Terima Kasih', text: 'Konfirmasi laporan shift telah dicatat!', target: '#customModalCard', customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' } });
+            Swal.fire({ icon: 'success', title: 'Terima Kasih', text: 'Konfirmasi laporan shift telah dicatat!', customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' } });
         }
 
         async function checkAndShowRankToast() {
@@ -1074,7 +1116,7 @@
             document.getElementById("hdrStoreOnlineName").innerText = cleanStoreName;
 
             document.getElementById("profilNama").innerText = data.user.NAMA || "-";
-            document.getElementById("profilJabatan").innerText = data.user.JABATAN || "-";
+            document.getElementById("profilJabatan").innerText = data.user.jabatan || data.user.JABATAN || "-";
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
             document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
 
@@ -1135,6 +1177,7 @@
             const builtInMenus = [
                 { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()" },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
+                { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()" },
                 { name: "Roleplay Kasir AI", icon: "https://cdn-icons-png.flaticon.com/512/4384/4384248.png", action: "openRoleplayModal()" }
             ];
 
@@ -1200,6 +1243,7 @@
             if (n.includes("sales") || n.includes("highlight")) return 'https://cdn-icons-png.flaticon.com/512/2454/2454271.png';
             if (n.includes("psm") || n.includes("penawaran")) return 'https://cdn-icons-png.flaticon.com/512/3112/3112946.png';
             if (n.includes("roleplay")) return 'https://cdn-icons-png.flaticon.com/512/4384/4384248.png';
+            if (n.includes("belanja") || n.includes("member")) return 'https://cdn-icons-png.flaticon.com/512/3081/3081559.png';
 
             return 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
         }
@@ -1228,7 +1272,7 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        // UPGRADE MODAL CEKLIS EXPIRED DATE (PRESISI MOCKUP 2 WITH INLINE ALERTS)
+        // UPGRADE MODAL CEKLIS EXPIRED DATE (PRESISI MOCKUP 2 WITH INLINE ALERTS & SWAL TERISOLASI)
         function openCeklisExpiredModal() {
             showCustomModal("⚠️ MODUL CEKLIS EXPIRED DATE", `
                 <div style="font-size:0.75rem;">
@@ -1269,7 +1313,6 @@
                         <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">📅 Tanggal Expired Date</label>
                         <input type="date" id="expTanggal" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:14px; outline:none;">
 
-                        <!-- INLINE WARNING BANNER TERISOLASI DI DALAM MODAL -->
                         <div id="expInlineAlert" class="modal-alert-box hidden"></div>
 
                         <button id="btnSubmitExp" onclick="handleExpiredSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4);">💾 SIMPAN DATA EXPIRED</button>
@@ -1279,7 +1322,6 @@
                         <div id="expiredAlertListContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
                     </div>
 
-                    <!-- BOTTOM SHIELD SECURITY BADGE MOCKUP 2 -->
                     <div style="margin-top:12px; background:rgba(0,0,0,0.3); border:1px solid var(--card-border); padding:10px 14px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <div style="width:32px; height:32px; background:rgba(34,197,94,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--accent-green);">
@@ -1388,7 +1430,7 @@
             }
         }
 
-        // UPGRADE FORM SERAH TERIMA SHIFT (PRESISI MOCKUP 1 WITH ISOLATED SWALFIRE)
+        // FORM SERAH TERIMA SHIFT (PRESISI MOCKUP 1 WITH ISOLATED SWALFIRE)
         function openSerahTerimaModal() {
             const currentHour = new Date().getHours();
             let autoShift = "Shift 1";
@@ -1398,7 +1440,6 @@
 
             showCustomModal("🔄 SERAH TERIMA SHIFT", `
                 <div style="font-size:0.75rem;">
-                    <!-- HEADER ILUSTRASI MOCKUP 1 -->
                     <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, #093318 0%, #041a0d 100%); padding:12px; border-radius:14px; border:1px solid var(--card-border); margin-bottom:12px;">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <div style="width:38px; height:38px; background:rgba(0,255,102,0.15); border:1px solid var(--accent-green); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:var(--accent-green);">
@@ -1412,7 +1453,6 @@
                         <img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png" style="width:40px; height:40px;">
                     </div>
 
-                    <!-- FORM INPUTS MOCKUP 1 -->
                     <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:14px; margin-bottom:12px;">
                         <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;"><i class="fa-regular fa-clock" style="color:var(--accent-green);"></i> Shift Kerja Saat Ini</label>
                         <select id="stShiftVal" style="width:100%; background:var(--bg-dark); color:var(--accent-green); font-weight:bold; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
@@ -1426,7 +1466,6 @@
                             <input type="number" id="stSalesShift" placeholder="Contoh: 4500000" style="width:100%; background:transparent; border:none; color:white; padding:10px; font-size:0.8rem; outline:none;">
                         </div>
 
-                        <!-- GRID 2X2 MOCKUP 1 -->
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
                             <div style="background:var(--bg-dark); padding:10px; border-radius:12px; border:1px solid var(--card-border);">
                                 <label style="font-weight:700; font-size:0.65rem; color:#fff; display:block; margin-bottom:4px;"><i class="fa-solid fa-users" style="color:var(--accent-green);"></i> Actual PSM (Pcs)</label>
@@ -1464,7 +1503,6 @@
                         <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;"><i class="fa-regular fa-clipboard" style="color:var(--accent-green);"></i> Catatan / Kendala Shift</label>
                         <textarea id="stCatatan" placeholder="Contoh: Kasir bersih, EDC aman..." style="width:100%; height:65px; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:8px; font-size:0.7rem; outline:none; resize:none; margin-bottom:14px;"></textarea>
 
-                        <!-- INLINE WARNING BANNER TERISOLASI DI DALAM MODAL -->
                         <div id="stInlineAlert" class="modal-alert-box hidden"></div>
 
                         <button id="btnSubmitSt" onclick="handleShiftSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4); display:flex; align-items:center; justify-content:center; gap:8px;">
@@ -1472,7 +1510,6 @@
                         </button>
                     </div>
 
-                    <!-- BOTTOM SHIELD SECURITY BADGE MOCKUP 1 -->
                     <div style="background:rgba(0,0,0,0.3); border:1px solid var(--card-border); padding:10px 14px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <div style="width:32px; height:32px; background:rgba(34,197,94,0.15); border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--accent-green);">
@@ -1528,6 +1565,209 @@
             }
         }
 
+        // MODUL BARU: BELANJA KARYAWAN & VALIDASI BERJENJANG (Crew/ACOS -> COS [Bypass] -> AC)
+        function openBelanjaKaryawanModal() {
+            showCustomModal("🛒 MODUL BELANJA KARYAWAN", `
+                <div style="font-size:0.75rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, #093318 0%, #041a0d 100%); padding:12px; border-radius:14px; border:1px solid var(--card-border); margin-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:38px; height:38px; background:rgba(56,189,248,0.15); border:1px solid #38bdf8; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#38bdf8;">
+                                🛒
+                            </div>
+                            <div>
+                                <h3 style="font-size:0.85rem; font-weight:800; color:#fff;">BELANJA <span style="color:var(--accent-green);">KARYAWAN</span></h3>
+                                <p style="font-size:0.62rem; color:var(--text-sub);">Input struk belanja & validasi kewajiban bulanan</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:6px; margin-bottom:12px;">
+                        <button id="btnBelanjaTabInput" class="sub-tab-btn active" onclick="switchBelanjaTab('input')">🧾 Input Struk</button>
+                        <button id="btnBelanjaTabValidasi" class="sub-tab-btn" onclick="switchBelanjaTab('validasi')">📋 Validasi AC/COS</button>
+                        <button id="btnBelanjaTabResume" class="sub-tab-btn" onclick="switchBelanjaTab('resume')">📊 Resume Belanja</button>
+                    </div>
+
+                    <!-- TAB 1: INPUT STRUK -->
+                    <div id="subTabBelanjaInput" style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:14px;">
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">🧾 Nomor Bon / Struk Transaksi</label>
+                        <input type="text" id="belanjaNoBon" placeholder="Contoh: BON-998123" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:10px; outline:none;">
+
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">📱 Nomor HP Member Karyawan</label>
+                        <input type="number" id="belanjaNoHp" placeholder="Contoh: 081234567890" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:10px; outline:none;">
+
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">💰 Nominal Belanja (Rp)</label>
+                        <input type="number" id="belanjaNominal" placeholder="Contoh: 150000" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
+
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:4px;">📸 Upload Bukti Struk Foto</label>
+                        <input type="file" id="belanjaFileStruk" accept="image/*" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:10px; padding:8px; margin-bottom:14px; outline:none;">
+
+                        <div id="belanjaInlineAlert" class="modal-alert-box hidden"></div>
+
+                        <button onclick="handleBelanjaSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4);">
+                            💾 KIRIM STRUK BELANJA ✦
+                        </button>
+                    </div>
+
+                    <!-- TAB 2: VALIDASI AC / COS -->
+                    <div id="subTabBelanjaValidasi" class="hidden">
+                        <div id="belanjaValidasiContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    </div>
+
+                    <!-- TAB 3: RESUME BELANJA KARYAWAN -->
+                    <div id="subTabBelanjaResume" class="hidden">
+                        <div id="belanjaResumeContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    </div>
+                </div>
+            `);
+        }
+
+        function switchBelanjaTab(tab) {
+            document.querySelectorAll("#subTabBelanjaInput, #subTabBelanjaValidasi, #subTabBelanjaResume").forEach(e => e.classList.add("hidden"));
+            document.querySelectorAll("#btnBelanjaTabInput, #btnBelanjaTabValidasi, #btnBelanjaTabResume").forEach(e => e.classList.remove("active"));
+
+            if (tab === 'input') {
+                document.getElementById("subTabBelanjaInput").classList.remove("hidden");
+                document.getElementById("btnBelanjaTabInput").classList.add("active");
+            } else if (tab === 'validasi') {
+                document.getElementById("subTabBelanjaValidasi").classList.remove("hidden");
+                document.getElementById("btnBelanjaTabValidasi").classList.add("active");
+                renderBelanjaValidasiList();
+            } else {
+                document.getElementById("subTabBelanjaResume").classList.remove("hidden");
+                document.getElementById("btnBelanjaTabResume").classList.add("active");
+                renderBelanjaResumeList();
+            }
+        }
+
+        async function handleBelanjaSubmit() {
+            const noBon = document.getElementById("belanjaNoBon").value.trim();
+            const noHp = document.getElementById("belanjaNoHp").value.trim();
+            const nominal = document.getElementById("belanjaNominal").value.trim();
+            const alertBox = document.getElementById("belanjaInlineAlert");
+
+            if (!noBon || !noHp || !nominal) {
+                if (alertBox) {
+                    alertBox.innerHTML = `⚠️ Mohon lengkapi Nomor Bon, No HP Member, dan Nominal Belanja!`;
+                    alertBox.classList.remove("hidden");
+                }
+                return;
+            }
+
+            if (alertBox) alertBox.classList.add("hidden");
+
+            // DETEKSI ATURAN COS BYPASS LANGSUNG KE AC
+            const uJabatan = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
+            const isCOS = uJabatan.includes('CHIEF OF STORE') || uJabatan === 'COS';
+            const initialStatus = isCOS ? 'MENUNGGU_VALIDASI_AC' : 'MENUNGGU_VALIDASI_COS';
+
+            if (rtdb) {
+                const ym = new Date().toISOString().substring(0,7);
+                rtdb.ref(`employee_shopping/${ym}`).push({
+                    id: Date.now().toString(),
+                    timestamp: new Date().toISOString(),
+                    nik: currentNik,
+                    nama: dashboardData?.user?.NAMA || 'Karyawan',
+                    jabatan: uJabatan,
+                    kodeToko: dashboardData?.user?.kodeToko || '',
+                    namaToko: dashboardData?.user?.namaToko || '',
+                    noBon: noBon,
+                    noHpMember: noHp,
+                    nominalBelanja: Number(nominal),
+                    status: initialStatus
+                });
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Struk Terkirim 🟢',
+                text: isCOS ? 'Struk COS berhasil dikirim (Bypass ke Validasi AC)!' : 'Struk berhasil dikirim untuk Validasi COS!',
+                target: '#customModalCard',
+                customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' }
+            }).then(() => closeCustomModal());
+        }
+
+        function renderBelanjaValidasiList() {
+            const container = document.getElementById("belanjaValidasiContainer");
+            if (!container) return;
+
+            const uJabatan = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
+            const isAC = ["AREA COORDINATOR", "AC", "AM", "DBM", "BM", "OGM"].some(j => uJabatan.includes(j));
+            const isCOS = uJabatan.includes("CHIEF OF STORE") || uJabatan === "COS";
+
+            if (!rtdb) {
+                container.innerHTML = `<p style="color:var(--text-sub); text-align:center;">Firebase tidak terhubung.</p>`;
+                return;
+            }
+
+            const ym = new Date().toISOString().substring(0,7);
+            rtdb.ref(`employee_shopping/${ym}`).once('value', (snap) => {
+                const val = snap.val();
+                if (!val) {
+                    container.innerHTML = `<p style="color:var(--text-sub); text-align:center; padding:15px;">Belum ada pengajuan struk belanja bulan ini.</p>`;
+                    return;
+                }
+
+                let list = Object.entries(val).map(([key, item]) => ({ fbKey: key, ...item }));
+
+                if (isCOS && !isAC) {
+                    list = list.filter(item => item.kodeToko === dashboardData?.user?.kodeToko && item.status === 'MENUNGGU_VALIDASI_COS');
+                } else if (isAC) {
+                    list = list.filter(item => item.status === 'MENUNGGU_VALIDASI_AC');
+                }
+
+                if (list.length === 0) {
+                    container.innerHTML = `<p style="color:var(--text-sub); text-align:center; padding:15px;">Semua struk belanja telah divalidasi! 🟢</p>`;
+                    return;
+                }
+
+                container.innerHTML = list.map(item => `
+                    <div style="background:var(--bg-dark); border:1px solid var(--card-border); padding:10px 12px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <p style="font-weight:800; color:#fff; font-size:0.75rem;">${escapeHTML(item.nama)} (${escapeHTML(item.jabatan)})</p>
+                            <p style="font-size:0.62rem; color:var(--text-sub);">Bon: ${escapeHTML(item.noBon)} | Toko: ${escapeHTML(item.kodeToko)}</p>
+                            <p style="font-size:0.7rem; font-weight:800; color:var(--accent-green); margin-top:2px;">Rp ${Number(item.nominalBelanja).toLocaleString('id-ID')}</p>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button onclick="approveBelanjaItem('${item.fbKey}', '${item.status}')" style="background:rgba(34,197,94,0.2); color:var(--accent-green); border:1px solid var(--accent-green); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.62rem; cursor:pointer;">
+                                🟢 Setujui
+                            </button>
+                        </div>
+                    </div>
+                `).join("");
+            });
+        }
+
+        function approveBelanjaItem(fbKey, currentStatus) {
+            if (!rtdb) return;
+            const ym = new Date().toISOString().substring(0,7);
+            const uJabatan = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
+            const isAC = ["AREA COORDINATOR", "AC", "AM", "DBM", "BM", "OGM"].some(j => uJabatan.includes(j));
+
+            let nextStatus = 'DISETUJUI';
+            if (currentStatus === 'MENUNGGU_VALIDASI_COS') {
+                nextStatus = 'MENUNGGU_VALIDASI_AC';
+            }
+
+            rtdb.ref(`employee_shopping/${ym}/${fbKey}`).update({
+                status: nextStatus,
+                validatedBy: currentNik
+            }).then(() => {
+                renderBelanjaValidasiList();
+            });
+        }
+
+        function renderBelanjaResumeList() {
+            const container = document.getElementById("belanjaResumeContainer");
+            if (!container) return;
+
+            container.innerHTML = `
+                <div style="background:var(--bg-dark); border:1px solid var(--card-border); padding:12px; border-radius:12px; text-align:center;">
+                    <h4 style="font-size:0.75rem; font-weight:800; color:var(--gold);">📊 RESUME BELANJA KARYAWAN AREA</h4>
+                    <p style="font-size:0.65rem; color:var(--text-sub); margin-top:4px;">Semua personil toko binaan telah memenuhi kewajiban belanja bulan ini! 🟢</p>
+                </div>
+            `;
+        }
+
         function openRoleplayModal() {
             showCustomModal("🎮 GAME ROLEPLAY SIMULATOR KASIR AI", `
                 <div style="font-size:0.75rem;">
@@ -1541,7 +1781,6 @@
                     <label style="font-weight:700;">Jawaban Penawaran Kamu (Kasir):</label>
                     <textarea id="txtRoleplayInput" placeholder="Ketik penawaran PSM/PWP kamu di sini..." style="width:100%; height:70px; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:8px; padding:8px; font-size:0.72rem; outline:none; resize:none; margin:4px 0 8px 0;"></textarea>
 
-                    <!-- INLINE ALERT TERISOLASI DALAM MODAL ROLEPLAY -->
                     <div id="roleplayInlineAlert" class="modal-alert-box hidden"></div>
 
                     <button onclick="handleRoleplaySubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:12px; border-radius:10px; border:none; cursor:pointer;">MINTA PENILAIAN AI 🤖</button>
@@ -1608,7 +1847,7 @@
                 <div id="profileBriefContent" style="text-align: center; padding: 10px;">
                     <img src="${getRealisticHumanAvatar(u.NAMA, u["FOTO PROFIL"])}" style="width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; margin-bottom: 8px; box-shadow: 0 0 20px rgba(0,255,102,0.4);">
                     <h4 style="font-size: 1rem; font-weight: 800; color: white;">${escapeHTML(u.NAMA || '-')}</h4>
-                    <p style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">${escapeHTML(u.JABATAN || '-')}</p>
+                    <p style="font-size: 0.72rem; color: var(--accent-green); font-weight: 700;">${escapeHTML(u.jabatan || u.JABATAN || '-')}</p>
                     <p style="font-size: 0.68rem; color: var(--text-sub);">${escapeHTML(u.namaToko || '-')}</p>
                     <p style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: ${u.NIK || '-'}</p>
                     <hr style="border-color: var(--card-border); margin: 12px 0;">
@@ -1785,7 +2024,7 @@
                         </select>
                     </div>
 
-                    <!-- KARTU TOTAL SALES MTD DENGAN METRIK STD & APC KOMPARASI DETIL -->
+                    <!-- KARTU TOTAL SALES MTD -->
                     <div class="mtd-summary-card">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                             <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES MTD (s/d Tgl ${d.targetDay})</span>
@@ -2279,7 +2518,7 @@
                 const tempMsgObj = {
                     NIK_PENGIRIM: currentNik,
                     NAMA_PENGIRIM: dashboardData?.user?.NAMA || "Saya",
-                    JABATAN: dashboardData?.user?.JABATAN || "Staff",
+                    JABATAN: dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || "Staff",
                     KODE_TOKO_PENGIRIM: dashboardData?.user?.kodeToko || "",
                     ISI_PESAN: msg,
                     TIMESTAMP: nowTime,
@@ -2291,6 +2530,21 @@
 
                 const box = document.getElementById("chatBox");
                 if (box) box.scrollTop = box.scrollHeight;
+
+                // REALTIME FIREBASE SYNC KHUSUS CHAT
+                if (rtdb) {
+                    rtdb.ref('chats').push({
+                        id_pesan: Date.now().toString(),
+                        timestamp: new Date().toISOString(),
+                        nik_pengirim: currentNik,
+                        nama_pengirim: dashboardData?.user?.NAMA || "Saya",
+                        jabatan: dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || "Staff",
+                        kode_toko_pengirim: dashboardData?.user?.kodeToko || "",
+                        penerima_tipe: "All",
+                        penerima_kode: "ALL",
+                        isi_pesan: msg
+                    });
+                }
 
                 apiCall("sendChat", { pesan: msg, penerimaTipe: "All", penerimaKode: "ALL" }).then(() => {
                     tempMsgObj.isPending = false;
