@@ -1,11 +1,12 @@
 {
-  "name": "Kacida Bersatu PWA",
+  "name": "Kacida Bersatu Pro",
   "short_name": "Kacida",
-  "description": "Portal Operasional & Dashboard Performa Retail Kacida Bersatu",
-  "start_url": "./",
+  "description": "Portal Performa & Operasional Retail Kacida Bersatu",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#03170a",
-  "theme_color": "#03170a",
+  "orientation": "portrait",
+  "background_color": "#020f07",
+  "theme_color": "#020f07",
   "icons": [
     {
       "src": "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
