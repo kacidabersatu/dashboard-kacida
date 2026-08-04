@@ -19,15 +19,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- FIREBASE REALTIME DATABASE SDK -->
+    <!-- FIREBASE REALTIME DATABASE SDK (COMPAT V9) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
         :root {
-            --bg-dark: #010b05;
-            --card-bg: linear-gradient(180deg, #082112 0%, #031409 100%);
-            --card-border: rgba(34, 197, 94, 0.4);
+            --bg-dark: #020f07;
+            --card-bg: linear-gradient(135deg, #0b2d18 0%, #051a0e 100%);
+            --card-border: rgba(34, 197, 94, 0.35);
             --accent-green: #00FF66;
             --accent-green-grad: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
             --accent-gold-grad: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
@@ -42,7 +42,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background: #010b05; 
+            background: linear-gradient(180deg, #020f07 0%, #061f10 50%, #031409 100%); 
             color: var(--text-white); 
             min-height: 100vh; 
             padding-top: env(safe-area-inset-top);
@@ -56,84 +56,107 @@
 
         .app-header {
             display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;
-            position: sticky; top: 0; z-index: 100; background: rgba(1, 11, 5, 0.96);
+            position: sticky; top: 0; z-index: 100; background: rgba(2, 15, 7, 0.95);
             backdrop-filter: blur(16px); border-bottom: 1px solid var(--card-border); width: 100%; max-width: 480px;
         }
-        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 8px; }
         .btn-hamburger { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: #fff; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
         .brand-title { display: flex; align-items: center; gap: 8px; }
-        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.95rem; color: var(--accent-green); letter-spacing: 0.4px; }
-        .brand-icon { width: 32px; height: 32px; background: var(--accent-green-grad); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--accent-green); font-weight: 900; color: #000; }
+        .brand-title-text { font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 0.95rem; color: #ffffff; letter-spacing: 0.4px; }
+        .brand-icon { width: 32px; height: 32px; background: var(--accent-green-grad); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4); }
+
+        .ocean-3d-badge-transparent { display: inline-flex; align-items: center; gap: 5px; background: transparent; color: #a7f3d0; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.3px; margin-top: 1px; }
+        .pulse-green-dot { width: 7px; height: 7px; background-color: #00FF66; border-radius: 50%; box-shadow: 0 0 10px #00FF66; animation: pulseDotAnim 1.4s infinite; }
+        @keyframes pulseDotAnim { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.7); } 70% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(0, 255, 102, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 102, 0); } }
 
         .header-right { display: flex; align-items: center; gap: 8px; }
-        .disket-badge, .notif-badge { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gold); }
-        .user-avatar-3d { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; box-shadow: 0 2px 10px rgba(0, 255, 102, 0.3); }
+        .disket-badge, .notif-badge { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--gold); }
+        .install-badge { background: rgba(34, 197, 94, 0.2); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 6px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 800; display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .user-avatar-3d { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--accent-green); object-fit: cover; cursor: pointer; box-shadow: 0 2px 10px rgba(0, 255, 102, 0.3); }
 
         .container { margin-top: 12px; width: 100%; }
 
-        /* HERO HEALTH INDEX CARD MD3 ELEVATED (PERSIS GAMBAR 1) */
-        .hero-health-card {
-            background: linear-gradient(180deg, #092615 0%, #03140a 100%); border: 1px solid rgba(0, 255, 102, 0.5);
-            border-radius: var(--md3-radius-card); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px;
-            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2); display: flex; flex-direction: column; gap: 14px;
-        }
-
-        .health-ring-wrapper { display: flex; align-items: center; gap: 16px; }
-        .health-circle {
-            width: 90px; height: 90px; border-radius: 50%; background: radial-gradient(circle, #082d14 60%, var(--accent-green) 100%);
-            border: 4px solid var(--accent-green); display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 0 25px rgba(0, 255, 102, 0.5); flex-shrink: 0;
-        }
-        .health-score-num { font-size: 1.8rem; font-weight: 900; color: #ffffff; line-height: 1; }
-        .health-score-lbl { font-size: 0.58rem; color: var(--text-sub); font-weight: 800; text-transform: uppercase; margin-top: 2px; }
-
-        /* DISKET INFO BAR IKON 3D FLATICON BESAR (PERSIS GAMBAR 1) */
+        /* DISKET INFO BAR DENGAN IKON 3D */
         .disket-info-bar {
-            background: linear-gradient(135deg, #082112 0%, #031409 100%); border: 1px solid var(--card-border); border-radius: var(--md3-radius-card); padding: 12px 14px; margin-bottom: 16px;
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, #0e3b1d 0%, #061a0d 100%); border: 1px solid var(--gold); border-radius: var(--md3-radius-card); padding: 12px 14px; margin-bottom: 14px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .disket-bar-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .disket-bar-item img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
-        .disket-bar-label { font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block; }
+        .disket-bar-item { display: flex; flex-direction: column; align-items: flex-start; cursor: pointer; padding: 2px 4px; }
+        .disket-bar-label { font-size: 0.65rem; color: var(--text-sub); display: flex; align-items: center; gap: 6px; }
+        .disket-bar-label img { width: 16px; height: 16px; object-fit: contain; }
         .disket-bar-val { font-size: 0.82rem; font-weight: 800; margin-top: 2px; }
-        .disket-divider { width: 1px; height: 32px; background: rgba(255, 255, 255, 0.12); }
+        .disket-divider { width: 1px; height: 28px; background: rgba(255, 255, 255, 0.12); }
 
-        /* METRICS GRID 3D CARDS (PERSIS GAMBAR 1) */
+        .hero-card {
+            background: linear-gradient(135deg, #0c421c 0%, #051d0b 100%); border: 1px solid rgba(34, 197, 94, 0.35);
+            border-radius: var(--md3-radius-card); padding: 18px; position: relative; overflow: hidden; margin-bottom: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 65%; }
+        .hero-title { font-size: 1.15rem; font-weight: 800; margin-top: 2px; line-height: 1.2; text-transform: uppercase; background: linear-gradient(135deg, #ffffff 0%, #a7f3d0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-sub { font-size: 0.7rem; color: var(--text-sub); margin-top: 6px; line-height: 1.3; }
+        .performance-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, 0.45); padding: 8px 12px; border-radius: 12px; margin-top: 12px; font-size: 0.7rem; font-weight: 600; border: 1px solid rgba(255,255,255,0.08); }
+        .hero-3d-illustration { position: absolute; right: -10px; bottom: -5px; width: 135px; z-index: 1; }
+
+        .banner-card { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-radius: var(--md3-radius-card); padding: 16px; color: #1e293b; margin-bottom: 6px; }
+        .banner-tag { background: #fed7aa; color: #c2410c; font-size: 0.65rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; display: inline-block; margin-bottom: 4px; }
+        .banner-heading { font-size: 1.3rem; font-weight: 900; color: #dc2626; line-height: 1.1; }
+        .banner-subtext { font-size: 0.7rem; font-weight: 700; color: #1e293b; margin-top: 2px; }
+        .banner-btn { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; margin-top: 10px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; cursor: pointer; }
+
+        /* METRICS GRID 3D ICONS */
         .metrics-scroll { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 16px; }
-        .metric-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 12px 4px; text-align: center; cursor: pointer; transition: transform 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .metric-card { position: relative; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 10px 4px; text-align: center; cursor: pointer; transition: transform 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .metric-card:active { transform: scale(0.92); }
-        .metric-icon-3d { width: 36px; height: 36px; margin: 0 auto 6px auto; display: block; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
-        .metric-title { font-size: 0.62rem; color: var(--text-sub); display: block; font-weight: 700; }
-        .metric-value { font-size: 0.85rem; font-weight: 800; }
-        .red-dot-badge { position: absolute; top: 4px; right: 4px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 900; padding: 1px 6px; border-radius: 10px; }
+        .metric-icon-3d { width: 28px; height: 28px; margin: 0 auto 4px auto; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .metric-title { font-size: 0.58rem; color: var(--text-sub); display: block; font-weight: 700; }
+        .metric-value { font-size: 0.8rem; font-weight: 800; }
+        .red-dot-badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .section-title { font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .btn-see-all { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); color: var(--accent-green); padding: 4px 10px; border-radius: 12px; font-size: 0.65rem; text-decoration: none; font-weight: 700; }
 
         .menu-section-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--md3-radius-card); padding: 16px; margin-bottom: 16px; position: relative; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
         .menu-grid-5 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; position: relative; z-index: 2; }
-        .menu-grid-4 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; position: relative; z-index: 2; }
+        .menu-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; position: relative; z-index: 2; }
 
-        /* MENU ITEM DENGAN KOTAK NATIVE PRO & IKON 3D BESAR (PERSIS GAMBAR 1) */
-        .menu-3d-item { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; cursor: pointer; transition: transform 0.15s; background: rgba(0,0,0,0.3); border: 1px solid var(--card-border); padding: 12px 6px; border-radius: 18px; }
+        .menu-3d-item { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; cursor: pointer; transition: transform 0.15s; }
         .menu-3d-item:active { transform: scale(0.92); }
-        .icon-box-3d { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
-        .icon-box-3d img { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6)); }
-        .menu-label { font-size: 0.7rem; font-weight: 800; color: var(--text-white); line-height: 1.2; }
-        .menu-sublabel { font-size: 0.58rem; color: var(--text-sub); margin-top: 2px; }
+        .icon-box-3d { width: 48px; height: 48px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .icon-box-3d img { width: 28px; height: 28px; object-fit: contain; }
+        .menu-label { font-size: 0.62rem; font-weight: 700; color: var(--text-white); line-height: 1.2; }
+        
+        .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
+
+        .chat-tab-wrapper { display: flex; gap: 8px; background: rgba(2, 15, 7, 0.9); padding: 6px; border-radius: 14px; border: 1px solid var(--card-border); margin-bottom: 12px; }
+        .chat-tab-pill { flex: 1; padding: 8px 12px; font-size: 0.72rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .chat-tab-pill.active { background: var(--accent-green-grad); color: #03170a; box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4); }
+
+        .wa-chat-container { background: linear-gradient(180deg, #05190c 0%, #031006 100%); border: 1px solid var(--card-border); border-radius: 16px; height: 50vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .wa-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.75rem; position: relative; line-height: 1.4; word-wrap: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .wa-bubble.me { align-self: flex-end; background: var(--wa-bubble-me); color: white; border-bottom-right-radius: 2px; }
+        .wa-bubble.other { align-self: flex-start; background: var(--wa-bubble-other); color: white; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05); }
+        .wa-bubble.ai { align-self: flex-start; background: linear-gradient(135deg, #0d381c 0%, #061c0d 100%); border: 1px solid var(--accent-green); color: white; width: 90%; }
+        .wa-sender { font-size: 0.62rem; font-weight: 800; color: var(--accent-green); margin-bottom: 2px; display: flex; justify-content: space-between; gap: 8px; }
+        .wa-time { font-size: 0.55rem; color: rgba(255,255,255,0.6); text-align: right; margin-top: 4px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
 
         .bottom-nav {
             position: fixed; bottom: calc(10px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; height: 65px; 
-            background: rgba(8, 30, 16, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 35px;
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            background: rgba(10, 33, 19, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 35px;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
-        .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-sub); font-size: 0.65rem; text-decoration: none; font-weight: 700; }
-        .nav-item.active { background: var(--accent-green-grad); color: #03170a !important; padding: 6px 18px; border-radius: 20px; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 255, 102, 0.4); }
+        .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-sub); font-size: 0.65rem; text-decoration: none; }
+        .nav-item.active { background: var(--accent-green-grad); color: #03170a !important; padding: 6px 16px; border-radius: 20px; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 255, 102, 0.35); }
         .nav-item.active i { color: #03170a !important; }
-        .fab-rocket { width: 52px; height: 52px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; margin-top: -28px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 20px rgba(34, 197, 94, 0.7); }
+        .nav-badge-count { position: absolute; top: -3px; right: 2px; background: #ef4444; color: white; font-size: 0.55rem; font-weight: 800; padding: 1px 5px; border-radius: 10px; border: 1px solid var(--bg-dark); }
+        .fab-rocket { width: 50px; height: 50px; background: linear-gradient(135deg, #22c55e, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-top: -28px; border: 4px solid var(--bg-dark); cursor: pointer; box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); }
 
-        /* ANDROID NATIVE FULL-SCREEN PAGE OVERLAY (100% PERSIS SEPERTI GAMBAR 2-8) */
+        /* ANDROID NATIVE FULL-SCREEN PAGE OVERLAY (MENUTUPI 100% SEPERTI TAB/ACTIVITY BARU) */
         .android-page-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(180deg, #04140a 0%, #010b05 100%);
+            background: linear-gradient(180deg, #04140a 0%, #020f07 100%);
             z-index: 12000; display: flex; flex-direction: column;
             transform: translateX(100%); transition: transform 0.28s cubic-bezier(0.1, 0.9, 0.2, 1);
             overflow: hidden;
@@ -142,10 +165,10 @@
         
         .android-page-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 16px; background: rgba(1, 11, 5, 0.96); backdrop-filter: blur(16px);
+            padding: 14px 16px; background: rgba(2, 15, 7, 0.95); backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--card-border); position: sticky; top: 0; z-index: 10;
         }
-        .android-page-header h3 { font-size: 0.95rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px; }
+        .android-page-header h3 { font-size: 0.95rem; font-weight: 800; color: var(--accent-green); display: flex; align-items: center; gap: 8px; }
         .android-page-body { flex: 1; padding: 16px; overflow-y: auto; color: white; }
 
         .android-btn-back {
@@ -156,15 +179,34 @@
 
         .hidden { display: none !important; }
 
-        /* CARD STYLES MD3 */
-        .mtd-summary-card { background: linear-gradient(135deg, #093318 0%, #041a0d 100%); border: 1px solid var(--accent-green); border-radius: 20px; padding: 16px; margin-bottom: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
-        .mtd-amount-hero { font-size: 1.6rem; font-weight: 800; color: var(--accent-green); letter-spacing: -0.5px; }
-        .growth-badge-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; }
+        /* CARD STYLES */
+        .mtd-summary-card { background: linear-gradient(135deg, #093318 0%, #041a0d 100%); border: 1px solid var(--accent-green); border-radius: 18px; padding: 16px; margin-bottom: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        .mtd-amount-hero { font-size: 1.5rem; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; }
+        .growth-badge-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; }
         .growth-badge-pill.up { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
+        .growth-badge-pill.down { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .mtd-sub-metric-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; padding: 6px 0; border-top: 1px dashed rgba(255,255,255,0.1); margin-top: 6px; }
 
-        .perf-card-neon { background: linear-gradient(135deg, #072613 0%, #031409 100%); border: 1px solid #00FF66; border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: 0 0 15px rgba(0, 255, 102, 0.25); }
+        .rincian-card-item { background: rgba(255,255,255,0.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* SWEETALERT CUSTOM DARK EMERALD (Z-INDEX 25000 MAX) */
+        .perf-card-neon { background: linear-gradient(135deg, #072613 0%, #031409 100%); border: 1px solid #00FF66; border-radius: 18px; padding: 16px; margin-bottom: 12px; box-shadow: 0 0 15px rgba(0, 255, 102, 0.25); }
+        .btn-copy-action { background: var(--accent-green-grad); color: #03170a; font-weight: 800; font-size: 0.75rem; padding: 10px 14px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 8px; box-shadow: 0 4px 15px rgba(0, 255, 102, 0.4); }
+
+        .toast-rank-popup { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px; z-index: 9998; padding: 12px 16px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
+        .toast-rank-popup.top-rank { background: rgba(5, 46, 22, 0.95); border: 2px solid var(--accent-green); color: #fff; }
+        .toast-rank-popup.flop-rank { background: rgba(69, 10, 10, 0.95); border: 2px solid #ef4444; color: #fff; }
+
+        .star-rating { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
+        .star-rating i { font-size: 1.6rem; color: #475569; cursor: pointer; }
+        .star-rating i.active { color: var(--gold); }
+
+        .gauge-container { display: flex; flex-direction: column; align-items: center; margin: 8px 0; }
+        .gauge-svg { width: 140px; height: 80px; }
+
+        .sub-tab-btn { flex: 1; padding: 8px; font-size: 0.7rem; font-weight: 700; border-radius: 8px; border: 1px solid var(--card-border); background: var(--bg-dark); color: var(--text-sub); cursor: pointer; text-align: center; }
+        .sub-tab-btn.active { background: var(--accent-green-grad); color: #03170a; border-color: var(--accent-green); }
+
+        /* SWEETALERT CUSTOM DARK EMERALD (PRIORITAS Z-INDEX MAX 25000) */
         .swal2-container { z-index: 25000 !important; }
         .swal2-popup.swal-dark-custom {
             background: linear-gradient(180deg, #092b15 0%, #041709 100%) !important;
@@ -174,18 +216,27 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.9) !important;
         }
         .swal2-title { color: var(--accent-green) !important; font-size: 1.1rem !important; font-weight: 800 !important; }
-        .swal2-html-container { color: #e2e8f0 !important; font-size: 0.8rem !important; }
+        .swal2-html-container { color: #e2e8f0 !important; font-size: 0.78rem !important; }
         .swal2-confirm.swal-btn-green { background: var(--accent-green-grad) !important; color: #03170a !important; font-weight: 800 !important; border-radius: 12px !important; padding: 10px 20px !important; }
+        .swal2-cancel.swal-btn-red { background: rgba(239, 68, 68, 0.2) !important; color: #f87171 !important; border: 1px solid #ef4444 !important; font-weight: 800 !important; border-radius: 12px !important; }
     </style>
 </head>
 <body>
 
-    <!-- ANDROID NATIVE FULL-SCREEN PAGE OVERLAY (100% PERSIS SEPERTI GAMBAR 2-8) -->
+    <!-- TOAST POPUP RANK LOGIN -->
+    <div id="toastRankPopup" class="toast-rank-popup hidden">
+        <div id="toastRankIcon" style="font-size: 1.5rem;">🏆</div>
+        <div>
+            <h4 id="toastRankTitle" style="font-size: 0.85rem; font-weight: 800;">STATUS TOKO</h4>
+            <p id="toastRankMsg" style="font-size: 0.68rem; opacity: 0.9;">Message...</p>
+        </div>
+    </div>
+
+    <!-- ANDROID NATIVE FULL-SCREEN PAGE OVERLAY (SUB-TAB FULL 100% LAYAR PENUH) -->
     <div id="androidPageOverlay" class="android-page-overlay">
         <div class="android-page-header">
+            <h3 id="androidPageTitle"><i class="fa-solid fa-layer-group"></i> Halaman</h3>
             <button onclick="closeAndroidPage()" class="android-btn-back"><i class="fa-solid fa-arrow-left"></i></button>
-            <h3 id="androidPageTitle">Halaman</h3>
-            <div id="androidPageRightBtn"><i class="fa-solid fa-ellipsis-vertical" style="color:var(--text-sub); font-size:1.1rem;"></i></div>
         </div>
         <div id="androidPageBody" class="android-page-body"></div>
     </div>
@@ -207,146 +258,149 @@
     <!-- MAIN APP CONTAINER -->
     <div id="appSection" class="hidden">
         
-        <!-- HEADER UTAMA (PERSIS GAMBAR 1) -->
         <header class="app-header">
             <div class="header-left">
                 <button class="btn-hamburger" onclick="openMenuSidebar()"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
-                    <div class="brand-icon">K</div>
+                    <div class="brand-icon">
+                        <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 24px; height: 24px; border-radius: 6px; object-fit: cover;">
+                    </div>
                     <div>
                         <span class="brand-title-text">KACIDA BERSATU</span>
                         <div class="ocean-3d-badge-transparent">
-                            <span id="hdrStoreOnlineName">T001 - TOKO ONLINE PRO</span>
+                            <span class="pulse-green-dot"></span>
+                            <span id="hdrStoreOnlineName">TOKO ONLINE</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="header-right">
-                <div class="disket-badge" onclick="openMenuSidebar()"><i class="fa-solid fa-gear"></i></div>
-                <div class="notif-badge" onclick="openNotifModal()"><i class="fa-regular fa-bell"></i></div>
+                <div id="btnInstallPWA" class="install-badge hidden" onclick="triggerPWAInstall()">
+                    <i class="fa-solid fa-download"></i> Instal
+                </div>
+
+                <div class="disket-badge" onclick="openPerformaPopup()" title="Rincian Data Performance">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </div>
+                
+                <div id="notifPermBtn" class="notif-badge" onclick="manageNotificationPermission()" title="Pengaturan Notifikasi HP">
+                    <i id="notifIconHeader" class="fa-regular fa-bell"></i>
+                </div>
+                
                 <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="user-avatar-3d" onclick="showBriefProfile()">
             </div>
         </header>
 
+        <div id="acDropdownContainer" class="hidden container">
+            <div class="menu-section-card" style="padding: 10px 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                <i class="fa-solid fa-store" style="color: var(--accent-green);"></i>
+                <select id="selectTokoAC" onchange="onACTokoChange(this.value)" style="background: transparent; border: none; color: var(--accent-green); font-weight: 700; font-size: 0.75rem; width: 100%; outline: none;"></select>
+            </div>
+        </div>
+
         <main id="tabBeranda" class="container">
-            
-            <!-- HERO HEALTH INDEX CARD (PERSIS GAMBAR 1) -->
-            <section class="hero-health-card">
-                <div class="health-ring-wrapper">
-                    <div class="health-circle">
-                        <span class="health-score-num" id="lblHealthScore">92</span>
-                        <span class="health-score-lbl">/100 HEALTH</span>
-                    </div>
-                    <div>
-                        <span style="font-size:0.65rem; color:var(--text-sub); font-weight:800; text-transform:uppercase;">SKOR KESEHATAN TOKO</span>
-                        <h2 style="font-size:0.95rem; font-weight:800; color:var(--accent-green); margin-top:2px;" id="lblHealthStatus">🟢 EXCELLENT STORE</h2>
-                        <p style="font-size:0.7rem; color:#e2e8f0; margin-top:4px;" id="lblHealthDetail">Status: Penawaran & Sales Achieved! 🔥</p>
-                    </div>
-                </div>
-
-                <div style="border-top:1px dashed var(--card-border); padding-top:10px; display:flex; flex-direction:column; gap:6px;">
-                    <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
-                        <span style="color:var(--text-sub);">💰 Sales SPD Harian :</span>
-                        <strong style="color:var(--accent-green);" id="lblSpdHarianVal">Rp 4.250.000 / Hari</strong>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.75rem;">
-                        <span style="color:var(--text-sub);">⚡ Target Run-Rate :</span>
-                        <strong style="color:var(--gold);" id="lblRunRateVal">Rp 2.125.000 / Shift</strong>
-                    </div>
-
-                    <div style="margin-top:4px;">
-                        <div style="display:flex; justify-content:space-between; font-size:0.68rem; margin-bottom:4px;">
-                            <span style="color:var(--text-sub);">Pencapaian MTD</span>
-                            <span style="color:var(--accent-green); font-weight:800;" id="lblProgressPct">85% Target MTD</span>
-                        </div>
-                        <div style="width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden;">
-                            <div id="barProgressMtd" style="width:85%; height:100%; background:var(--accent-green-grad); border-radius:10px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- DISKET INFO BAR IKON 3D FLATICON BESAR (PERSIS GAMBAR 1) -->
             <section class="disket-info-bar">
-                <div class="disket-bar-item" onclick="openSalesMTDModal()">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2454/2454271.png">
-                    <div>
-                        <span class="disket-bar-label">Sales SPD</span>
-                        <span class="disket-bar-val" id="valSales" style="color: var(--accent-green);">Rp 4.250.000</span>
-                    </div>
+                <div class="disket-bar-item" onclick="openSalesMTDModal()" title="Klik Rincian Sales Bulan Berjalan">
+                    <span class="disket-bar-label">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2454/2454271.png"> Sales SPD
+                    </span>
+                    <span class="disket-bar-val" id="valSales" style="color: var(--accent-green); font-size: 0.72rem;">Memuat...</span>
                 </div>
                 <div class="disket-divider"></div>
                 <div class="disket-bar-item" onclick="openPerformaPopup()">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3594/3594363.png">
-                    <div>
-                        <span class="disket-bar-label">IKT Toko</span>
-                        <span class="disket-bar-val" id="valIKT" style="color: var(--gold);">102.5%</span>
-                    </div>
+                    <span class="disket-bar-label">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3594/3594363.png"> IKT Toko
+                    </span>
+                    <span class="disket-bar-val" id="valIKT" style="color: var(--gold);">-</span>
                 </div>
                 <div class="disket-divider"></div>
                 <div class="disket-bar-item" onclick="openPerformaPopup()">
-                    <img src="https://cdn-icons-png.flaticon.com/512/785/785116.png">
-                    <div>
-                        <span class="disket-bar-label">Penawaran</span>
-                        <span class="disket-bar-val" id="valPenawaran" style="color: #ef4444;">Rank #1 Area</span>
+                    <span class="disket-bar-label">
+                        <img src="https://cdn-icons-png.flaticon.com/512/785/785116.png"> Penawaran
+                    </span>
+                    <span class="disket-bar-val" id="valPenawaran" style="color: #ef4444;">-</span>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="font-size: 0.8rem; color: var(--text-sub);" onclick="openPerformaPopup()"></i>
+            </section>
+            
+            <section class="hero-card">
+                <div class="hero-content">
+                    <span style="font-size: 0.7rem; color: var(--text-sub);" id="lblGreetingText">Selamat Pagi,</span>
+                    <h1 class="hero-title" id="lblUserName">USER! 👋</h1>
+                    <p class="hero-sub">Tetap semangat, layani dengan hati dan capai target performa!</p>
+                    <div class="performance-badge">
+                        <i class="fa-solid fa-star" style="color: var(--gold);"></i>
+                        <span>Performa hari ini <strong style="color: var(--accent-green);">Sangat Baik! 🔥</strong></span>
                     </div>
                 </div>
+                <img src="https://illustrations.popsy.co/emerald/work-from-home.svg" class="hero-3d-illustration" alt="Team">
             </section>
 
-            <!-- METRICS SCROLL 3D CARDS (PERSIS GAMBAR 1) -->
+            <div class="swiper mainCarousel rounded-2xl overflow-hidden mb-3 border border-[#1A3A2A]">
+                <div class="swiper-wrapper" id="carouselWrapper"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+
+            <!-- METRICS SCROLL 3D ICONS -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')">
-                    <span class="red-dot-badge">4</span>
                     <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d">
                     <span class="metric-title">Tugas</span>
-                    <span class="metric-value" id="valTasks">(4)</span>
+                    <span class="metric-value" id="valTasks">0</span>
                 </div>
                 
-                <div class="metric-card" onclick="openPengumumanModal()">
-                    <span class="red-dot-badge" style="background:#38bdf8;">2</span>
+                <div class="metric-card card-3d-announce" onclick="openPengumumanModal()">
+                    <span id="dotAnnounce" class="red-dot-badge hidden"></span>
                     <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d">
                     <span class="metric-title">Pengumuman</span>
-                    <span class="metric-value" id="valAnnounce">(2)</span>
+                    <span class="metric-value" id="valAnnounce">0</span>
                 </div>
 
-                <div class="metric-card" onclick="openNotifModal()">
-                    <span class="red-dot-badge" style="background:#f59e0b;">3</span>
+                <div class="metric-card card-3d-notif" onclick="openNotifModal()">
+                    <span id="dotNotif" class="red-dot-badge hidden"></span>
                     <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d">
                     <span class="metric-title">Notifikasi</span>
-                    <span class="metric-value" id="valNotifCount">(3)</span>
+                    <span class="metric-value" id="valNotifCount">0</span>
                 </div>
 
                 <div class="metric-card">
                     <img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d">
-                    <span class="metric-title">Poin</span>
-                    <span class="metric-value" id="valPoints" style="color: var(--gold);">1.250</span>
+                    <span class="metric-title">Point</span>
+                    <span class="metric-value" id="valPoints" style="color: var(--gold);">0</span>
                 </div>
                 
                 <div class="metric-card" onclick="switchTab('leaderboard')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="metric-icon-3d">
                     <span class="metric-title">Rank</span>
-                    <span class="metric-value" id="valRank" style="color: var(--accent-green);">#1</span>
+                    <span class="metric-value" id="valRank" style="color: var(--accent-green);">#-</span>
                 </div>
             </section>
 
-            <!-- MENU GRID UTAMA DENGAN KOTAK NATIVE PRO & IKON 3D BESAR (PERSIS GAMBAR 1) -->
+            <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
                 <div id="gridMenuUtama" class="menu-grid-5"></div>
+                <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket">
             </section>
 
-            <!-- LAYANAN LAINNYA DINAMIS SPREADSHEET -->
+            <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Lainnya')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
         <div id="tabChat" class="hidden container space-y-3">
             <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-green);"></i> Room Chat Tim Kacida</h2>
+            
             <div class="chat-tab-wrapper">
                 <button id="btnTabTeam" class="chat-tab-pill active" onclick="switchChatRoomMode('team')"><i class="fa-solid fa-users"></i> Chat Tim</button>
                 <button id="btnTabAI" class="chat-tab-pill" onclick="switchChatRoomMode('ai')"><i class="fa-solid fa-robot"></i> Kacida AI (Groq Engine)</button>
             </div>
+
             <div id="chatBox" class="wa-chat-container custom-scrollbar"></div>
+
             <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
                 <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') handleSendChatAction()" style="flex: 1; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.75rem; color: white; outline: none;">
+                
+                <button id="btnVoiceMic" onclick="startVoiceRecognition()" title="Voice Command Suara" style="background: rgba(255,255,255,0.1); border: 1px solid var(--card-border); color: var(--accent-green); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem;"><i class="fa-solid fa-microphone"></i></button>
+                
                 <button onclick="handleSendChatAction()" style="background: var(--accent-green-grad); color: #03170a; padding: 0 16px; height: 40px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
@@ -354,7 +408,8 @@
         <div id="tabAksiCepat" class="hidden container">
             <div class="menu-section-card">
                 <h2 class="section-title" style="color: var(--accent-green);"><i class="fa-solid fa-rocket"></i> Misi Hari Ini</h2>
-                <div id="misiList" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
+                <p style="font-size: 0.7rem; color: var(--text-sub); margin: 4px 0 12px 0;">Klik menu misi di bawah untuk mengumpulkan poin reward!</p>
+                <div id="misiList" style="display: flex; flex-direction: column; gap: 8px;"></div>
             </div>
         </div>
 
@@ -372,20 +427,50 @@
                 <p id="profilNik" style="font-size: 0.62rem; color: #64748b; margin-top: 2px;">NIK: -</p>
                 <button onclick="handleLogout()" style="margin-top: 12px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 6px 16px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">LOGOUT</button>
             </div>
+
+            <div class="menu-section-card">
+                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-green);"></i> Tim Personil Toko</h3>
+                <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+
+            <div class="menu-section-card">
+                <h3 class="section-title" style="margin-bottom: 12px;"><i class="fa-solid fa-sitemap" style="color: var(--accent-green);"></i> Bagan Struktur Organisasi</h3>
+                <div style="display: flex; flex-direction: column; gap: 6px; text-align: center; font-size: 0.72rem;">
+                    <div style="background: var(--bg-dark); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.6rem; color: var(--text-sub);">OGM (Operations General Manager)</p><p id="stOGM" style="font-weight:700;">HAIKAL (HKL)</p></div>
+                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
+                    <div style="background: var(--bg-dark); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.6rem; color: var(--text-sub);">BM (Branch Manager)</p><p id="stBM" style="font-weight:700;">PUTUT DESY SUSILO (PDS)</p></div>
+                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
+                    <div style="background: var(--bg-dark); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.6rem; color: var(--text-sub);">DBM (Deputy Branch Manager)</p><p id="stDBM" style="font-weight:700;">ROSI ERDIANSA (REA)</p></div>
+                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
+                    <div style="background: var(--bg-dark); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.6rem; color: var(--text-sub);">AM (Area Manager)</p><p id="stAM" style="font-weight:700;">MUHAMAD TAUFIK (MTK)</p></div>
+                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
+                    <div style="background: var(--bg-dark); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.6rem; color: var(--text-sub);">AC (Area Coordinator)</p><p id="stAC" style="font-weight:700;">AMED SUPRIADI</p></div>
+                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
+                    <div style="background: rgba(34, 197, 94, 0.15); border: 1px solid var(--accent-green); padding: 8px; border-radius: 10px; color: var(--accent-green);"><p style="font-size:0.6rem; font-weight:700;">SAYA (TOKO)</p><p id="stSaya" style="font-weight:800;">-</p></div>
+                </div>
+            </div>
         </div>
+
+        <button id="floatingAIMascot" class="hidden" onclick="switchChatRoomMode('ai')" style="position: fixed; bottom: 85px; right: 16px; z-index: 999; background: #0A2414; border: 2px solid var(--accent-green); padding: 10px; border-radius: 50%; box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); cursor: pointer;">
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" style="width: 32px; height: 32px; display: block;">
+        </button>
 
         <nav class="bottom-nav">
             <a href="#" onclick="switchTab('beranda')" id="navBeranda" class="nav-item active"><i class="fa-solid fa-house"></i><span>Beranda</span></a>
-            <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item"><i class="fa-solid fa-comment-dots"></i><span>Chat</span></a>
+            <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item">
+                <span id="navChatBadge" class="nav-badge-count hidden">0</span>
+                <i class="fa-solid fa-comment-dots"></i><span>Chat</span>
+            </a>
             <div class="fab-rocket" onclick="switchTab('aksiCepat')"><i class="fa-solid fa-rocket"></i></div>
-            <a href="#" onclick="switchTab('leaderboard')" id="navLeaderboard" class="nav-item"><i class="fa-solid fa-crown"></i><span>Rank</span></a>
+            <a href="#" onclick="switchTab('leaderboard')" id="navLeaderboard" class="nav-item"><i class="fa-solid fa-crown"></i><span>Leaderboard</span></a>
             <a href="#" onclick="switchTab('profil')" id="navProfil" class="nav-item"><i class="fa-solid fa-user"></i><span>Profil</span></a>
         </nav>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzGb_TwgKwG13SOrCNKC_-c0pG19rlubmJog2aXYk7Fjv30Zd2XOypXmDslRfgFQIX0/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCkD1uMtBjVvFBvZniVZjbr2CI29BRmXabzrNzEBEBf7QdHsqpT_s2S_p6ukjiGBoQ/exec";
 
+        // FIREBASE REALTIME SDK CONFIGURATION
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
           authDomain: "kacida-bersatu.firebaseapp.com",
@@ -402,30 +487,81 @@
         }
         const rtdb = (typeof firebase !== "undefined" && firebase.apps.length) ? firebase.database() : null;
 
-        let currentNik = localStorage.getItem("NIK_KACIDA") || "20249912";
+        let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let dashboardData = null;
-        let syncedSheetData = null;
+        let syncedSheetData = null; // Memory cache data langsung dari Firebase RTDB
         let selectedKodeTokoAC = null;
         let chatRoomMode = "team";
+        let aiChatHistory = [];
         let cachedChatList = [];
+        let readPengumuman = false;
+        let readNotifList = JSON.parse(localStorage.getItem("READ_NOTIFS_" + currentNik) || "[]");
+        let chatAutoRefreshTimer = null;
+        let deferredPrompt = null;
+        let selectedRatingStars = 5;
+        let previousChatCount = 0;
+        let salesChartInstance = null;
+        let swiperInstance = null;
+        let currentMtdDetailData = null;
+        let uploadedStrukBase64 = "";
 
+        // ============================================================
+        // VIBRASI NATIVE ANDROID (HAPTIC FEEDBACK SYSTEM)
+        // ============================================================
         function triggerAndroidHaptic(type = 'light') {
             if ('vibrate' in navigator) {
                 if (type === 'light') navigator.vibrate(12);
                 else if (type === 'medium') navigator.vibrate(25);
                 else if (type === 'success') navigator.vibrate([15, 50, 20]);
+                else if (type === 'error') navigator.vibrate([40, 60, 40]);
             }
         }
 
+        // ============================================================
+        // FIX SWALFIRE TERPUSAT (LENGKAP DENGAN EMERALD DARK THEME)
+        // ============================================================
         function showSwalSuccess(title, text, callback = null) {
             triggerAndroidHaptic('success');
             Swal.fire({
-                icon: 'success', title: title, text: text,
+                icon: 'success',
+                title: title,
+                text: text,
                 customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' },
                 buttonsStyling: false
             }).then(() => { if (callback) callback(); });
         }
 
+        function showSwalError(title, text) {
+            triggerAndroidHaptic('error');
+            Swal.fire({
+                icon: 'error', title: title, text: text,
+                customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' },
+                buttonsStyling: false
+            });
+        }
+
+        function showSwalWarning(title, text) {
+            triggerAndroidHaptic('medium');
+            Swal.fire({
+                icon: 'warning', title: title, text: text,
+                customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green' },
+                buttonsStyling: false
+            });
+        }
+
+        function showSwalConfirm(title, text, confirmText, onConfirm) {
+            triggerAndroidHaptic('medium');
+            Swal.fire({
+                icon: 'question', title: title, text: text,
+                showCancelButton: true, confirmButtonText: confirmText, cancelButtonText: 'Batal',
+                customClass: { popup: 'swal-dark-custom', confirmButton: 'swal-btn-green', cancelButton: 'swal-btn-red' },
+                buttonsStyling: false
+            }).then((result) => { if (result.isConfirmed) onConfirm(); });
+        }
+
+        // ============================================================
+        // NATIVE ANDROID FULL-SCREEN PAGE ROUTER
+        // ============================================================
         function openAndroidPage(title, htmlContent) {
             triggerAndroidHaptic('medium');
             document.getElementById("androidPageTitle").innerHTML = title;
@@ -443,6 +579,108 @@
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
+        function getTimeGreeting() {
+            const hour = new Date().getHours();
+            if (hour >= 3 && hour < 11) return "Selamat Pagi 🌅";
+            if (hour >= 11 && hour < 15) return "Selamat Siang ☀️";
+            if (hour >= 15 && hour < 18) return "Selamat Sore 🌆";
+            return "Selamat Malam 🌙";
+        }
+
+        function getDetailedDeviceInfo() {
+            const ua = navigator.userAgent;
+            let os = "Android";
+            let browser = "Chrome";
+            if (/android/i.test(ua)) {
+                const match = ua.match(/Android\s([0-9\.]+)/i);
+                os = "Android " + (match ? match[1] : "");
+            } else if (/iPhone|iPad|iPod/i.test(ua)) os = "iOS";
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            return `${os} (${browser}) ${isPWA ? '[PWA Standalone]' : ''}`.trim();
+        }
+
+        function getRealisticHumanAvatar(nama, fotoUrl) {
+            if (fotoUrl && String(fotoUrl).trim().length > 10) return fotoUrl;
+            if (!nama) return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80";
+
+            const n = String(nama).toUpperCase().trim();
+            const femaleKeywords = ["SITI", "YULIANTI", "ARINI", "REVA", "DESI", "RINA", "INDRI", "DEWI", "FITRI", "NUR", "ELSA", "SRI", "FANNY", "FAUZIA", "NURUL", "SINTA"];
+            const isFemale = femaleKeywords.some(kw => n.includes(kw));
+
+            const femaleAvatars = [
+                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=150&auto=format&fit=crop&q=80"
+            ];
+            const maleAvatars = [
+                "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"
+            ];
+
+            let charSum = 0;
+            for (let i = 0; i < n.length; i++) charSum += n.charCodeAt(i);
+            return isFemale ? femaleAvatars[charSum % femaleAvatars.length] : maleAvatars[charSum % maleAvatars.length];
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
+        }
+
+        function playChatSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (ctx.state === 'suspended') ctx.resume();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.2);
+            } catch(e) {}
+        }
+
+        function startVoiceRecognition() {
+            triggerAndroidHaptic('light');
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showSwalWarning('Fitur Tidak Didukung', 'Browser HP Anda belum mendukung Voice Command Suara.');
+                return;
+            }
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'id-ID';
+            recognition.start();
+
+            const micBtn = document.getElementById("btnVoiceMic");
+            if (micBtn) micBtn.style.color = "#ef4444";
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById("inputChatMsg").value = transcript;
+                if (micBtn) micBtn.style.color = "var(--accent-green)";
+                handleSendChatAction();
+            };
+            recognition.onerror = function() {
+                if (micBtn) micBtn.style.color = "var(--accent-green)";
+            };
+        }
+
+        function formatChatTime(rawTime) {
+            if (!rawTime) return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const str = String(rawTime).trim();
+            if (str === "" || str.toLowerCase().includes("invalid")) return new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(str)) {
+                const parts = str.split(":");
+                return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+            }
+            return str;
+        }
+
         async function apiCall(action, params = {}) {
             try {
                 const url = new URL(SCRIPT_URL);
@@ -453,13 +691,23 @@
 
                 const res = await fetch(url);
                 const textStr = await res.text();
-                try { return JSON.parse(textStr); } catch(jsonErr) { return { status: "error" }; }
-            } catch(err) { return { status: "error", message: err.toString() }; }
+                try {
+                    return JSON.parse(textStr);
+                } catch(jsonErr) {
+                    return { status: "error", message: "Respons Server Google Apps Script bermasalah." };
+                }
+            } catch(err) {
+                return { status: "error", message: err.toString() };
+            }
         }
 
+        // ============================================================
+        // FIREBASE REALTIME DATABASE LISTENERS (0-LATENCY DATA ENGINE)
+        // ============================================================
         function initFirebaseListeners() {
             if (!rtdb) return;
 
+            // 1. SYNCED SHEET DATA LISTENER (READ DIRECTLY FROM FIREBASE IN 0.02s)
             rtdb.ref('synced_sheet_data').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -467,22 +715,44 @@
                     if (currentNik) processFirebaseDashboardData(currentNik);
                 }
             });
+
+            // 2. CHAT LISTENER
+            rtdb.ref('chats').limitToLast(60).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    cachedChatList = Object.values(data);
+                    if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
+                }
+            });
+
+            // 3. EMERGENCY BROADCAST REALTIME POPUP
+            rtdb.ref('emergency_broadcast').limitToLast(1).on('child_added', (snapshot) => {
+                const broadcast = snapshot.val();
+                if (broadcast && broadcast.pesan && (Date.now() - broadcast.timestamp) < 15000) {
+                    showSwalWarning('🚨 PENGUMUMAN DARURAT AREA', broadcast.pesan);
+                }
+            });
         }
 
         function processFirebaseDashboardData(nik) {
             if (!syncedSheetData) return;
             const master = syncedSheetData.master_user || [];
-            const userLogin = master.find(u => String(u.NIK).trim() === String(nik).trim()) || { NAMA: "BUDIRAHARJO", NIK: nik, "NAMA TOKO": "T001 - TOKO ONLINE PRO", JABATAN: "Crew / Kasir", "POIN TOTAL": 1250 };
+            const userLogin = master.find(u => String(u.NIK).trim() === String(nik).trim());
+            if (!userLogin) return;
+
+            const userJabatan = String(userLogin.JABATAN || "Staff").trim();
+            const isAC = ["Area Coordinator", "Admin", "AC", "AM", "DBM", "BM", "OGM"].includes(userJabatan) || String(userLogin["NAMA TOKO"]).toUpperCase().includes("AREA");
+            const kodeToko = selectedKodeTokoAC || String(userLogin["NAMA TOKO"]).substring(0, 4);
 
             dashboardData = {
                 status: "success",
-                user: { ...userLogin, kodeToko: "T001", namaToko: userLogin["NAMA TOKO"], jabatan: userLogin.JABATAN },
-                badges: { tugas: 4, pengumuman: 2, notif: 3, point: userLogin["POIN TOTAL"] || 1250, rank: "1" },
+                user: { ...userLogin, kodeToko: kodeToko, namaToko: userLogin["NAMA TOKO"], isAC: isAC, jabatan: userJabatan },
+                dataH1: { sales: 0, salesPrev: 0, spdLabel: "Data Sales Online", iktNetSales: "100%", point: "100%" },
+                badges: { tugas: 4, pengumuman: (syncedSheetData.pengumuman || []).length, notif: (syncedSheetData.notifikasi || []).length, point: userLogin["POIN TOTAL"] || 0, rank: "1" },
                 banners: syncedSheetData.crousal || [],
-                menu: { 
-                    utama: (syncedSheetData.menu || []).filter(m => String(m.Kategori || m["Kategori"] || "").toLowerCase().includes("utama")),
-                    layanan: (syncedSheetData.menu || []).filter(m => String(m.Kategori || m["Kategori"] || "").toLowerCase().includes("lain"))
-                }
+                announcements: syncedSheetData.pengumuman || [],
+                notifications: syncedSheetData.notifikasi || [],
+                menu: { utama: (syncedSheetData.menu || []).filter(m => String(m.Kategori).includes("Utama")), layanan: (syncedSheetData.menu || []).filter(m => String(m.Kategori).includes("Lain")), misi: [] }
             };
 
             renderDashboard(dashboardData);
@@ -490,8 +760,29 @@
 
         window.addEventListener("DOMContentLoaded", () => {
             initFirebaseListeners();
-            initDashboard();
+            if (currentNik) initDashboard();
+
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('button, .nav-item, .metric-card, .menu-3d-item, .disket-info-bar')) {
+                    triggerAndroidHaptic('light');
+                }
+            });
         });
+
+        async function handleLogin() {
+            triggerAndroidHaptic('medium');
+            const nik = document.getElementById("nikInput").value.trim();
+            if (!nik) {
+                showSwalWarning('Form Kosong ⚠️', 'Mohon masukkan NIK Anda terlebih dahulu!');
+                return;
+            }
+            
+            currentNik = nik;
+            localStorage.setItem("NIK_KACIDA", nik);
+            showSwalSuccess('Login Berhasil! 🚀', `Selamat datang kembali di Kacida Bersatu!`, () => {
+                initDashboard();
+            });
+        }
 
         async function initDashboard() {
             document.getElementById("loginSection").classList.add("hidden");
@@ -500,58 +791,91 @@
             if (syncedSheetData) {
                 processFirebaseDashboardData(currentNik);
             } else {
-                processFirebaseDashboardData(currentNik);
+                const res = await apiCall("getDashboard");
+                if (res && res.status === "success") {
+                    dashboardData = res;
+                    renderDashboard(res);
+                }
             }
         }
 
         function renderDashboard(data) {
-            document.getElementById("hdrStoreOnlineName").innerText = data.user.namaToko || "T001 - TOKO ONLINE PRO";
-            document.getElementById("profilNama").innerText = data.user.NAMA || "BUDIRAHARJO";
-            document.getElementById("profilJabatan").innerText = data.user.jabatan || "Crew / Kasir";
-            document.getElementById("profilToko").innerText = data.user.namaToko || "T001 - TOKO ONLINE PRO";
+            document.getElementById("lblGreetingText").innerText = getTimeGreeting() + ",";
+            document.getElementById("lblUserName").innerText = (escapeHTML(data.user.NAMA) || "USER") + "! 👋";
+            
+            const userAvatar = getRealisticHumanAvatar(data.user.NAMA, data.user["FOTO PROFIL"]);
+            document.getElementById("userAvatarHeader").src = userAvatar;
+            document.getElementById("profilFoto").src = userAvatar;
 
+            document.getElementById("hdrStoreOnlineName").innerText = data.user.namaToko || "TOKO ONLINE";
+            document.getElementById("profilNama").innerText = data.user.NAMA || "-";
+            document.getElementById("profilJabatan").innerText = data.user.jabatan || data.user.JABATAN || "-";
+            document.getElementById("profilToko").innerText = data.user.namaToko || "-";
+            document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
+
+            document.getElementById("valTasks").innerText = data.badges.tugas;
+            document.getElementById("valAnnounce").innerText = data.badges.pengumuman;
+            document.getElementById("valNotifCount").innerText = data.badges.notif;
+            document.getElementById("valPoints").innerText = Number(data.badges.point).toLocaleString("id-ID");
+            document.getElementById("valRank").innerText = "#" + data.badges.rank;
+
+            renderCarousel(data.banners, data.user.namaToko);
             renderCombinedMenuUtama(data.menu.utama || []);
             renderMenuGrid("gridMenuLainnya", data.menu.layanan || []);
         }
 
-        // AMBIL MENU NAVIGASI DINAMIS SPREADSHEET + BUILT-IN (PERSIS GAMBAR 1)
-        function renderCombinedMenuUtama(sheetUtamaMenus = []) {
+        function renderCombinedMenuUtama(sheetUtamaMenus) {
             const container = document.getElementById("gridMenuUtama");
             const builtInMenus = [
-                { name: "Ceklis Exp", sub: "Checklist & Eksekusi", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()" },
-                { name: "Serah Terima", sub: "Operasional Handover", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
-                { name: "Belanja Kary", sub: "Pengajuan Barang Toko", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openResumeBelanjaModal()" },
-                { name: "Roleplay AI", sub: "Simulasi Interaktif", icon: "https://cdn-icons-png.flaticon.com/512/4712/4712109.png", action: "openRoleplayModal()" },
-                { name: "Laporan Sales", sub: "Analisis & Performance", icon: "https://cdn-icons-png.flaticon.com/512/2454/2454271.png", action: "openSalesMTDModal()" },
-                { name: "Area Map", sub: "Monitoring Wilayah", icon: "https://cdn-icons-png.flaticon.com/512/684/684908.png", action: "openRekapAreaModal()" }
+                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()" },
+                { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
+                { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()" },
+                { name: "Roleplay Kasir AI", icon: "https://cdn-icons-png.flaticon.com/512/4384/4384248.png", action: "openRoleplayModal()" }
             ];
 
             let html = builtInMenus.map(m => `
                 <div class="menu-3d-item" onclick="${m.action}">
                     <div class="icon-box-3d"><img src="${m.icon}"></div>
                     <span class="menu-label">${m.name}</span>
-                    <span class="menu-sublabel">${m.sub}</span>
                 </div>
             `).join("");
 
-            if (sheetUtamaMenus && sheetUtamaMenus.length > 0) {
-                html += sheetUtamaMenus.map(m => `
-                    <div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"] || m.namaMenu)}', '${m["Link Tujuan"] || m.linkTujuan || '#'}')">
-                        <div class="icon-box-3d"><img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}"></div>
-                        <span class="menu-label">${escapeHTML(m["Nama Menu"] || m.namaMenu)}</span>
-                        <span class="menu-sublabel">External Link</span>
-                    </div>
-                `).join("");
-            }
+            html += sheetUtamaMenus.map(m => `
+                <div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')">
+                    <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
+                    <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
+                </div>
+            `).join("");
 
             container.innerHTML = html;
         }
 
+        function renderCarousel(banners, namaToko) {
+            const wrapper = document.getElementById("carouselWrapper");
+            if (!wrapper) return;
+            if (swiperInstance) swiperInstance.destroy(true, true);
+
+            wrapper.innerHTML = `
+                <div class="swiper-slide banner-card">
+                    <span class="banner-tag">${escapeHTML(namaToko || "PROMO DUKUNGAN")}</span>
+                    <h2 class="banner-heading">PIC SAPA</h2>
+                    <p class="banner-subtext">(SIAP ANTAR PESANAN ANDA)</p>
+                    <a href="#" class="banner-btn">Lihat Selengkapnya <i class="fa-solid fa-chevron-right"></i></a>
+                </div>
+            `;
+            swiperInstance = new Swiper(".mainCarousel", { autoplay: { delay: 5000 }, loop: true, pagination: { el: ".swiper-pagination", clickable: true } });
+        }
+
+        function getSmart3DIcon(menuName, defaultIcon) {
+            if (defaultIcon && defaultIcon.trim().length > 10) return defaultIcon;
+            return 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
+        }
+
         function renderMenuGrid(elementId, items) {
             document.getElementById(elementId).innerHTML = items.map(m => `
-                <div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"] || m.namaMenu)}', '${m["Link Tujuan"] || m.linkTujuan || '#'}')">
-                    <div class="icon-box-3d"><img src="${m["Icon URL"] || 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png'}"></div>
-                    <span class="menu-label">${escapeHTML(m["Nama Menu"] || m.namaMenu)}</span>
+                <div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')">
+                    <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
+                    <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
                 </div>
             `).join("");
         }
@@ -562,362 +886,187 @@
         }
 
         // ============================================================
-        // 1. FULL-SCREEN PAGE: CEKLIS EXPIRED DATE (100% PERSIS GAMBAR 2)
+        // FULL-SCREEN MODUL CEKLIS EXPIRED DATE (ALERT FIX 100%)
         // ============================================================
         function openCeklisExpiredModal() {
-            openAndroidPage("CEKLIS EXPIRED DATE", `
+            openAndroidPage("⚠️ MODUL CEKLIS EXPIRED DATE", `
                 <div style="font-size:0.78rem;">
                     <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, #093318 0%, #041a0d 100%); padding:14px; border-radius:18px; border:1px solid var(--card-border); margin-bottom:14px;">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png" style="width:48px; height:48px;">
-                            <div>
-                                <span style="font-size:0.68rem; color:var(--accent-green); font-weight:800;">SUMMARY STATUS EXPIRED RAK TOKO</span>
-                                <div style="display:flex; gap:16px; margin-top:4px;">
-                                    <span style="font-size:0.95rem; font-weight:800; color:#ef4444;">🔴 3 <small style="font-size:0.68rem; color:#fff;">Produk Mendekati Expired</small></span>
-                                    <span style="font-size:0.95rem; font-weight:800; color:var(--accent-green);">🟢 120 <small style="font-size:0.68rem; color:#fff;">Produk Aman</small></span>
-                                </div>
-                            </div>
+                        <div>
+                            <h3 style="font-size:0.95rem; font-weight:800; color:#fff;">MODUL CEKLIS <span style="color:var(--accent-green);">EXPIRED DATE</span></h3>
+                            <p style="font-size:0.65rem; color:var(--text-sub);">Monitoring & pencatatan kedaluwarsa barang toko</p>
                         </div>
+                        <img src="https://cdn-icons-png.flaticon.com/512/7518/7518748.png" style="width:45px; height:45px;">
                     </div>
 
                     <div style="display:flex; gap:8px; margin-bottom:14px;">
-                        <button id="btnExpTabForm" class="sub-tab-btn active" onclick="openJadwalRakModal()">📦 Form Input Expired</button>
-                        <button id="btnExpTabAlert" class="sub-tab-btn" onclick="openJadwalRakModal()">🔔 Alert Peringatan (3)</button>
+                        <button id="btnExpTabForm" class="sub-tab-btn active" onclick="switchExpiredSubTab('form')">📦 Input Barang Expired</button>
+                        <button id="btnExpTabAlert" class="sub-tab-btn" onclick="switchExpiredSubTab('alert')">🔔 Alert Expired Toko</button>
                     </div>
 
-                    <!-- CARD KRITIS 1 (GAMBAR 2) -->
-                    <div style="background:rgba(239, 68, 68, 0.12); border:2px solid #ef4444; border-radius:20px; padding:16px; margin-bottom:14px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                            <span style="background:#ef4444; color:white; font-size:0.68rem; font-weight:800; padding:4px 10px; border-radius:8px;">⚠️ KRITIS</span>
-                            <span style="color:#f87171; font-weight:800; font-size:0.68rem;">🕒 Sisa 11 Hari!</span>
-                        </div>
-                        <div style="display:flex; gap:14px; align-items:center;">
-                            <img src="https://cdn-icons-png.flaticon.com/512/3050/3050148.png" style="width:75px; height:75px; object-fit:contain;">
-                            <div>
-                                <h4 style="font-size:0.95rem; font-weight:800; color:#fff;">Susu UHT Chocolate 250ml</h4>
-                                <p style="font-size:0.7rem; color:var(--text-sub); margin-top:4px;">Rak: <span style="color:var(--accent-green); font-weight:700;">Minuman & Dairy</span></p>
-                                <p style="font-size:0.7rem; color:var(--text-sub);">Sisa Stok: <strong style="color:#fff;">12 Pcs</strong></p>
-                                <p style="font-size:0.7rem; color:#f87171; font-weight:800; margin-top:2px;">Tgl Exp: 15 Agustus 2026 (Sisa 11 Hari!)</p>
-                            </div>
-                        </div>
-                        <div style="display:flex; gap:8px; margin-top:14px;">
-                            <button onclick="showSwalSuccess('Foto Upload', 'Foto berhasil diupload!')" style="flex:1; background:rgba(255,255,255,0.08); border:1px solid var(--card-border); color:white; padding:10px; border-radius:12px; font-weight:800; font-size:0.72rem; cursor:pointer;">📷 Upload Foto Bukti</button>
-                            <button onclick="showSwalSuccess('Konfirmasi', 'Penanganan berhasil dicatat!')" style="flex:1; background:var(--accent-green-grad); color:#03170a; border:none; padding:10px; border-radius:12px; font-weight:800; font-size:0.72rem; cursor:pointer;">✅ Konfirmasi Penanganan</button>
-                        </div>
+                    <div id="subTabExpForm" style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:16px;">
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:6px;">📦 Kategori Rak / Barang</label>
+                        <select id="expKategori" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:12px; padding:12px; margin-bottom:14px; outline:none;">
+                            <option value="Makanan / Snack">Makanan / Snack</option>
+                            <option value="Minuman / Dairy">Minuman / Dairy</option>
+                            <option value="Kosmetik & Personal Care">Kosmetik & Personal Care</option>
+                            <option value="Non-Food / Kebutuhan Rumah">Non-Food / Kebutuhan Rumah</option>
+                        </select>
+
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:6px;">🏷️ Nama Barang / Produk</label>
+                        <input type="text" id="expNamaBarang" placeholder="Contoh: Susu UHT Chocolate 250ml" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:12px; padding:12px; margin-bottom:14px; outline:none;">
+
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:6px;">🔢 Jumlah Stok (Qty)</label>
+                        <input type="number" id="expStokQty" placeholder="Contoh: 12" style="width:100%; background:var(--bg-dark); border:1px solid var(--card-border); color:white; border-radius:12px; padding:12px; margin-bottom:14px; outline:none;">
+
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:6px;">📅 Tanggal Expired Date</label>
+                        <input type="date" id="expTanggal" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:12px; padding:12px; margin-bottom:18px; outline:none;">
+
+                        <button id="btnSubmitExp" onclick="handleExpiredSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:14px; border-radius:14px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4);">💾 SIMPAN DATA EXPIRED</button>
                     </div>
 
-                    <!-- CARD WARNING 2 (GAMBAR 2) -->
-                    <div style="background:rgba(245, 158, 11, 0.12); border:2px solid var(--gold); border-radius:20px; padding:16px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                            <span style="background:var(--gold); color:#000; font-size:0.68rem; font-weight:800; padding:4px 10px; border-radius:8px;">⚠️ WARNING</span>
-                            <span style="color:var(--gold); font-weight:800; font-size:0.68rem;">🕒 Sisa 24 Hari</span>
-                        </div>
-                        <div style="display:flex; gap:14px; align-items:center;">
-                            <img src="https://cdn-icons-png.flaticon.com/512/2553/2553691.png" style="width:75px; height:75px; object-fit:contain;">
-                            <div>
-                                <h4 style="font-size:0.95rem; font-weight:800; color:#fff;">Snack Roti Cokelat 60g</h4>
-                                <p style="font-size:0.7rem; color:var(--text-sub); margin-top:4px;">Rak: <span style="color:var(--accent-green); font-weight:700;">Makanan / Snack</span></p>
-                                <p style="font-size:0.7rem; color:var(--text-sub);">Sisa Stok: <strong style="color:#fff;">24 Pcs</strong></p>
-                                <p style="font-size:0.7rem; color:var(--gold); font-weight:800; margin-top:2px;">Tgl Exp: 28 Agustus 2026</p>
-                            </div>
-                        </div>
-                        <div style="display:flex; gap:8px; margin-top:14px;">
-                            <button onclick="showSwalSuccess('Foto Upload', 'Foto berhasil diupload!')" style="flex:1; background:rgba(255,255,255,0.08); border:1px solid var(--card-border); color:white; padding:10px; border-radius:12px; font-weight:800; font-size:0.72rem; cursor:pointer;">📷 Upload Foto Bukti</button>
-                            <button onclick="showSwalSuccess('Konfirmasi', 'Penanganan berhasil dicatat!')" style="flex:1; background:var(--accent-green-grad); color:#03170a; border:none; padding:10px; border-radius:12px; font-weight:800; font-size:0.72rem; cursor:pointer;">✅ Konfirmasi Penanganan</button>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-
-        // ============================================================
-        // 2. FULL-SCREEN PAGE: RINCIAN SALES MTD (100% PERSIS GAMBAR 3)
-        // ============================================================
-        function openSalesMTDModal() {
-            openAndroidPage("RINCIAN SALES MTD", `
-                <div style="font-size:0.78rem;">
-                    <div class="mtd-summary-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-size:0.72rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES MTD (s/d Tgl 04)</span>
-                            <span class="growth-badge-pill up">▲ +12.5% vs 2025</span>
-                        </div>
-                        <div class="mtd-amount-hero" style="color:var(--accent-green); margin-top:4px;">Rp 125.450.000</div>
-                        
-                        <div class="mtd-sub-metric-row">
-                            <span style="color:var(--text-sub);">⚡ Rata-Rata SPD</span>
-                            <span style="font-weight:800; color:var(--accent-green);">Rp 4.181.666 / Hari</span>
-                        </div>
-                        <div class="mtd-sub-metric-row">
-                            <span style="color:var(--text-sub);">🧾 Total STD (Struk)</span>
-                            <span style="font-weight:800; color:#38bdf8;">1.250 Struk (+8.2%)</span>
-                        </div>
-                        <div class="mtd-sub-metric-row">
-                            <span style="color:var(--text-sub);">🛒 Rata-Rata APC</span>
-                            <span style="font-weight:800; color:#38bdf8;">Rp 32.500 (+3.5%)</span>
-                        </div>
-                        <div class="mtd-sub-metric-row" style="border:none;">
-                            <span style="color:var(--text-sub);">🔮 Proyeksi Akhir MTD</span>
-                            <span style="font-weight:800; color:var(--gold);">Rp 129.631.646 (Target Reached)</span>
-                        </div>
-                    </div>
-
-                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; padding:14px; margin-bottom:14px;">
-                        <span style="font-weight:800; color:#fff; font-size:0.8rem;"><i class="fa-solid fa-chart-line" style="color:var(--accent-green);"></i> GRAFIK TREN SALES HARIAN</span>
-                        <div style="height:150px; margin-top:8px;">
-                            <canvas id="chartSalesTrendFull" style="width:100%; height:150px;"></canvas>
-                        </div>
-                    </div>
-
-                    <div style="margin-top:12px;">
-                        <h4 style="font-size:0.78rem; font-weight:800; color:var(--text-sub); margin-bottom:10px;">📋 LIST RINCIAN HARIAN (KOMPARASI 2026 VS 2025)</h4>
-                        
-                        <div class="rincian-card-item">
-                            <div>
-                                <p style="font-size:1rem; font-weight:800; color:var(--accent-green);">Rp 4.250.000 <small style="font-size:0.65rem; color:var(--text-sub);">(Tahun 2026)</small></p>
-                                <p style="font-size:0.68rem; color:var(--text-sub);">vs Rp 3.688.000 (Tahun 2025)</p>
-                                <p style="font-size:0.65rem; color:#38bdf8; margin-top:2px;">STD: 130 Struk | APC: Rp 32.692</p>
-                            </div>
-                            <span class="growth-badge-pill up">▲ +15.2% Growth</span>
-                        </div>
-
-                        <div class="rincian-card-item">
-                            <div>
-                                <p style="font-size:1rem; font-weight:800; color:var(--accent-green);">Rp 4.120.000 <small style="font-size:0.65rem; color:var(--text-sub);">(Tahun 2026)</small></p>
-                                <p style="font-size:0.68rem; color:var(--text-sub);">vs Rp 3.742.000 (Tahun 2025)</p>
-                                <p style="font-size:0.65rem; color:#38bdf8; margin-top:2px;">STD: 125 Struk | APC: Rp 32.960</p>
-                            </div>
-                            <span class="growth-badge-pill up">▲ +10.1% Growth</span>
-                        </div>
+                    <div id="subTabExpAlert" class="hidden">
+                        <div id="expiredAlertListContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
                     </div>
                 </div>
             `);
 
-            setTimeout(() => {
-                const ctx = document.getElementById('chartSalesTrendFull');
-                if (ctx && typeof Chart !== "undefined") {
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: ['Tgl 1', 'Tgl 2', 'Tgl 3', 'Tgl 4'],
-                            datasets: [{
-                                label: 'Sales (Rp)', data: [3.45, 4.05, 3.95, 4.25],
-                                borderColor: '#00FF66', borderWidth: 2, backgroundColor: 'rgba(0,255,102,0.12)', fill: true, tension: 0.3
-                            }]
-                        },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-                    });
-                }
-            }, 100);
+            renderExpiredAlertList();
         }
 
-        // ============================================================
-        // 3. FULL-SCREEN PAGE: PERFORMA IKT & PENAWARAN (100% PERSIS GAMBAR 4)
-        // ============================================================
-        function openPerformaPopup() {
-            openAndroidPage("PERFORMA IKT & PENAWARAN", `
-                <div style="font-size:0.78rem;">
-                    <div style="background:rgba(0,0,0,0.3); padding:10px 14px; border-radius:14px; border:1px solid var(--card-border); margin-bottom:14px; display:flex; justify-content:space-between;">
-                        <span style="color:var(--accent-green); font-weight:800;">📍 T001 - TOKO ONLINE PRO</span>
-                        <span style="color:var(--text-sub); font-size:0.68rem;">📅 Update: 04 AGU 2026</span>
-                    </div>
+        function switchExpiredSubTab(tab) {
+            triggerAndroidHaptic('light');
+            if (tab === 'form') {
+                document.getElementById("btnExpTabForm").classList.add("active");
+                document.getElementById("btnExpTabAlert").classList.remove("active");
+                document.getElementById("subTabExpForm").classList.remove("hidden");
+                document.getElementById("subTabExpAlert").classList.add("hidden");
+            } else {
+                document.getElementById("btnExpTabAlert").classList.add("active");
+                document.getElementById("btnExpTabForm").classList.remove("active");
+                document.getElementById("subTabExpAlert").classList.remove("hidden");
+                document.getElementById("subTabExpForm").classList.add("hidden");
+            }
+        }
 
-                    <div class="perf-card-neon">
-                        <div style="display:flex; align-items:center; gap:16px;">
-                            <div class="gauge-container">
-                                <div style="width:80px; height:80px; border-radius:50%; border:4px solid var(--accent-green); display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:900; color:var(--accent-green);">102.5%</div>
-                                <span style="font-size:0.65rem; color:var(--accent-green); font-weight:800; margin-top:4px;">SANGAT BAIK ✅</span>
-                            </div>
-                            <div>
-                                <h4 style="color:var(--gold); font-weight:800;">📈 SALES HARIAN (04 AGU)</h4>
-                                <p style="font-size:0.72rem;">Tahun Ini : <strong style="color:var(--accent-green);">Rp 4.250.000</strong></p>
-                                <p style="font-size:0.72rem; color:var(--text-sub);">Tahun Lalu : Rp 3.688.000</p>
-                                <span class="growth-badge-pill up" style="margin-top:4px;">📈 Growth +15.2% 🟢</span>
-                            </div>
-                        </div>
-                    </div>
+        function renderExpiredAlertList() {
+            const container = document.getElementById("expiredAlertListContainer");
+            if (!container) return;
 
-                    <div class="perf-card-neon">
-                        <h4 style="color:var(--accent-green); font-weight:800; margin-bottom:10px;">2. IKT TOKO (INDEX KINERJA TOKO)</h4>
-                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center;">
-                            <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:12px;">
-                                <span style="font-size:0.6rem; color:var(--text-sub);">ACV NET SALES</span>
-                                <span style="font-size:0.95rem; font-weight:800; color:var(--accent-green); display:block; margin-top:2px;">102.5%</span>
-                            </div>
-                            <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:12px;">
-                                <span style="font-size:0.6rem; color:var(--text-sub);">ACV PROFIT</span>
-                                <span style="font-size:0.95rem; font-weight:800; color:var(--accent-green); display:block; margin-top:2px;">98.2%</span>
-                            </div>
-                            <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:12px;">
-                                <span style="font-size:0.6rem; color:var(--text-sub);">ACV GM%</span>
-                                <span style="font-size:0.95rem; font-weight:800; color:var(--accent-green); display:block; margin-top:2px;">101.1%</span>
-                            </div>
-                        </div>
+            container.innerHTML = `
+                <div style="background:rgba(239, 68, 68, 0.15); border:1px solid #ef4444; border-radius:14px; padding:14px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <p style="font-weight:800; color:#fff; font-size:0.8rem;">🚨 Susu UHT Chocolate 250ml</p>
+                        <p style="font-size:0.65rem; color:var(--text-sub);">Rak: Minuman / Dairy | Stok: 12 Pcs</p>
+                        <p style="font-size:0.65rem; color:#f87171; font-weight:800; margin-top:2px;">📅 Tanggal Expired: 15 Agustus 2026</p>
                     </div>
-
-                    <div class="perf-card-neon">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                            <h4 style="color:#ef4444; font-weight:800;">3. PENAWARAN LANGSUNG KASIR</h4>
-                            <span style="background:rgba(245,158,11,0.2); color:var(--gold); padding:4px 8px; border-radius:8px; font-weight:800; font-size:0.65rem;">🏆 RANK #1 DARI 18 TOKO</span>
-                        </div>
-                        <p style="font-size:0.75rem;">Point Dashboard: <strong style="color:var(--accent-green);">102.5% (SANGAT BAIK ✅)</strong></p>
-                        <div style="font-size:0.7rem; margin-top:8px; display:flex; flex-direction:column; gap:4px;">
-                            <div>PSM (Produk Spesial) : <strong style="color:var(--accent-green);">105.2%</strong></div>
-                            <div>PWP (Purchase W/ Purch) : <strong style="color:#38bdf8;">101.8%</strong></div>
-                            <div>SERBA GRATIS : <strong style="color:var(--gold);">100.0%</strong></div>
-                            <div>APC (Average Per Customer) : <strong style="color:var(--accent-green);">102.1%</strong></div>
-                        </div>
-                    </div>
+                    <button onclick="showSwalSuccess('Konfirmasi Dicatat', 'Penanganan barang expired telah dikonfirmasi!')" style="background:rgba(34,197,94,0.2); color:var(--accent-green); border:1px solid var(--accent-green); padding:8px 12px; border-radius:10px; font-weight:800; font-size:0.65rem; cursor:pointer;">
+                        ✅ Selesaikan
+                    </button>
                 </div>
-            `);
+            `;
+        }
+
+        async function handleExpiredSubmit() {
+            triggerAndroidHaptic('medium');
+            const namaBarang = document.getElementById("expNamaBarang").value.trim();
+            const stokQty = document.getElementById("expStokQty").value;
+            const tglExpired = document.getElementById("expTanggal").value;
+
+            if (!namaBarang || !stokQty || !tglExpired) {
+                showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi nama barang, stok, dan tanggal expired!');
+                return;
+            }
+
+            closeAndroidPage();
+            showSwalSuccess('Berhasil Disimpan 📦', 'Data expired date barang berhasil dicatat!');
         }
 
         // ============================================================
-        // 4. FULL-SCREEN PAGE: CEKLIS EXPIRED & JADWAL RAK (100% PERSIS GAMBAR 5)
+        // FULL-SCREEN MODUL BELANJA KARYAWAN (UPLOAD FOTO STRUK)
         // ============================================================
-        function openJadwalRakModal() {
-            openAndroidPage("CEKLIS EXPIRED & JADWAL RAK", `
+        function openBelanjaKaryawanModal() {
+            uploadedStrukBase64 = "";
+            openAndroidPage("🛒 MODUL BELANJA KARYAWAN", `
                 <div style="font-size:0.78rem;">
-                    <div style="background:linear-gradient(135deg, #093318 0%, #041a0d 100%); padding:16px; border-radius:20px; border:1px solid var(--card-border); margin-bottom:14px;">
-                        <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-green);">📊 RINGKASAN PROGRESS & PEMBAGIAN JADWAL HARI INI</h4>
-                        <p style="font-size:0.75rem; margin-top:6px;">Progress Hari Ini: <strong style="color:var(--accent-green);">6 Dari 10 Rak Selesai Diperiksa (60%)</strong></p>
-                        
-                        <div style="font-size:0.7rem; color:#cbd5e1; margin-top:10px; border-top:1px dashed var(--card-border); padding-top:8px;">
-                            • Budi (Crew) : 3 Rak (2 Selesai, 1 Belum)<br/>
-                            • Ani (ACOS)  : 3 Rak (3 Selesai 🟢)<br/>
-                            • Siti (Crew) : 4 Rak (1 Selesai, 3 Belum)
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(135deg, #093318 0%, #041a0d 100%); padding:14px; border-radius:18px; border:1px solid var(--card-border); margin-bottom:14px;">
+                        <div>
+                            <h3 style="font-size:0.95rem; font-weight:800; color:#fff;">BELANJA <span style="color:var(--accent-green);">KARYAWAN</span></h3>
+                            <p style="font-size:0.65rem; color:var(--text-sub);">Input struk belanja & upload foto bukti</p>
                         </div>
+                        <img src="https://cdn-icons-png.flaticon.com/512/3081/3081559.png" style="width:45px; height:45px;">
                     </div>
 
-                    <div style="display:flex; gap:8px; margin-bottom:14px;">
-                        <button onclick="showSwalSuccess('Rak Ditambahkan', 'Rak baru berhasil ditambahkan!')" style="flex:1; background:rgba(255,255,255,0.08); border:1px solid var(--card-border); color:white; padding:12px; border-radius:14px; font-weight:800; font-size:0.72rem; cursor:pointer;">➕ TAMBAH RAK MANUAL</button>
-                        <button onclick="showSwalSuccess('Jadwal Diregenerate', 'Jadwal telah dibagi merata!')" style="flex:1; background:var(--accent-green-grad); color:#03170a; border:none; padding:12px; border-radius:14px; font-weight:800; font-size:0.72rem; cursor:pointer;">🔄 REGENERATE JADWAL</button>
-                    </div>
+                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:16px;">
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:6px;">🧾 Nomor Bon / Struk Transaksi</label>
+                        <input type="text" id="belanjaNoBon" placeholder="Contoh: BON-998123" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:12px; padding:12px; margin-bottom:12px; outline:none;">
 
-                    <!-- CARD RAK 1 (GAMBAR 5) -->
-                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:20px; padding:16px; margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                            <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-green);">RAK AA1 - MINUMAN & DAIRY</h4>
-                            <span style="color:var(--accent-green); font-weight:800; font-size:0.68rem;">Target: Shift 1</span>
-                        </div>
-                        <p style="font-size:0.7rem; color:var(--text-sub);">Lokasi: Cooler Depan | PIC: Budi (Crew / Kasir)</p>
-                        
-                        <div style="margin-top:10px; background:rgba(34,197,94,0.15); border:1px solid var(--accent-green); padding:10px; border-radius:12px;">
-                            <p style="color:var(--accent-green); font-weight:800; font-size:0.75rem;">✅ TANDA PENGERJAAN: SELESAI</p>
-                            <p style="font-size:0.68rem; color:#e2e8f0; margin-top:2px;">• Diperiksa oleh : Budi Raharjo (Shift 1)</p>
-                            <p style="font-size:0.68rem; color:#e2e8f0;">• Waktu Selesai  : Hari ini, Pukul 10:15 WIB</p>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:6px;">📱 Nomor HP Member Karyawan</label>
+                        <input type="number" id="belanjaNoHp" placeholder="Contoh: 081234567890" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:12px; padding:12px; margin-bottom:12px; outline:none;">
 
-        // ============================================================
-        // 5. FULL-SCREEN PAGE: VALIDASI STRUK BELANJA (100% PERSIS GAMBAR 6)
-        // ============================================================
-        function openBelanjaValidasiModal() {
-            openAndroidPage("VALIDASI STRUK BELANJA", `
-                <div style="font-size:0.78rem;">
-                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:14px; margin-bottom:14px;">
-                        <p style="font-size:0.8rem; font-weight:800; color:var(--accent-green);">🏬 Toko: T001 - TOKO ONLINE PRO</p>
-                        <p style="font-size:0.72rem; color:#cbd5e1; margin-top:2px;">Realisasi Staff: 8 Dari 10 Personil Sudah Belanja (80% 🟢)</p>
-                        <p style="font-size:0.78rem; font-weight:800; color:var(--gold); margin-top:2px;">💰 Total Belanja : Rp 1.450.000</p>
-                    </div>
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:6px;">💰 Nominal Belanja (Rp)</label>
+                        <input type="number" id="belanjaNominal" placeholder="Contoh: 150000" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:12px; padding:12px; margin-bottom:12px; outline:none;">
 
-                    <div style="background:rgba(0,0,0,0.3); border:1px solid var(--card-border); border-radius:18px; padding:14px; margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                            <h4 style="font-weight:800; color:#fff;">BUDIRAHARJO <small style="color:var(--accent-green);">(Crew / Kasir)</small></h4>
-                            <span style="font-size:0.65rem; color:var(--text-sub);">04 Agu, 14:20</span>
-                        </div>
-                        <p style="font-size:0.7rem; color:var(--text-sub);">NIK: 20249912 | Bon: BON-20260804-09823</p>
-                        <p style="font-size:0.8rem; font-weight:800; color:var(--accent-green); margin-top:2px;">Nominal: Rp 150.000</p>
-                        
-                        <div style="display:flex; gap:8px; margin-top:12px;">
-                            <button onclick="showSwalError('Struk Ditolak', 'Struk belanja ditolak!')" style="flex:1; background:rgba(239, 68, 68, 0.2); color:#f87171; border:1px solid #ef4444; padding:10px; border-radius:10px; font-weight:800; font-size:0.7rem; cursor:pointer;">❌ TOLAK</button>
-                            <button onclick="showSwalSuccess('Struk Disetujui 🟢', 'Validasi belanja karyawan berhasil!')" style="flex:1; background:var(--accent-green-grad); color:#03170a; border:none; padding:10px; border-radius:10px; font-weight:800; font-size:0.7rem; cursor:pointer;">✅ SETUJUI (APPROVE)</button>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
+                        <label style="font-weight:700; color:#fff; display:block; margin-bottom:6px;">📸 Upload Bukti Foto Struk Belanja</label>
+                        <input type="file" id="belanjaFileStruk" accept="image/*" onchange="previewStrukPhoto(event)" style="width:100%; background:var(--bg-dark); color:white; border:1px solid var(--card-border); border-radius:12px; padding:10px; margin-bottom:12px; outline:none;">
 
-        // ============================================================
-        // 6. FULL-SCREEN PAGE: RESUME BELANJA KARYAWAN (100% PERSIS GAMBAR 7 - TANPA WA)
-        // ============================================================
-        function openResumeBelanjaModal() {
-            openAndroidPage("RESUME BELANJA KARYAWAN", `
-                <div style="font-size:0.78rem;">
-                    <div style="background:linear-gradient(135deg, #093318 0%, #041a0d 100%); padding:14px; border-radius:18px; border:1px solid var(--card-border); margin-bottom:14px;">
-                        <p style="font-size:0.72rem; color:var(--accent-green); font-weight:800;">📅 PERIODE AKTIF : 25 JULI 2026 - 24 AGUSTUS 2026</p>
-                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">SCOPE AKSES : VIEW AREA COORDINATOR (18 TOKO BINAAN)</p>
-                    </div>
+                        <div id="strukPreviewBox" class="hidden" style="margin-bottom:14px; text-align:center;">
+                            <img id="imgStrukPreview" src="" style="max-width:100%; max-height:180px; border-radius:12px; border:2px solid var(--accent-green); object-fit:cover;">
+                        </div>
 
-                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px; text-align:center;">
-                        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:14px; border:1px solid var(--card-border);">
-                            <span style="font-size:0.6rem; color:var(--text-sub);">TOTAL SALES</span>
-                            <span style="font-size:0.85rem; font-weight:800; color:#38bdf8; display:block; margin-top:2px;">Rp 38.500.000</span>
-                        </div>
-                        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:14px; border:1px solid var(--card-border);">
-                            <span style="font-size:0.6rem; color:var(--text-sub);">SUDAH BELANJA</span>
-                            <span style="font-size:0.85rem; font-weight:800; color:var(--accent-green); display:block; margin-top:2px;">162 Staff</span>
-                        </div>
-                        <div style="background:rgba(0,0,0,0.3); padding:12px; border-radius:14px; border:1px solid var(--card-border);">
-                            <span style="font-size:0.6rem; color:var(--text-sub);">BELUM BELANJA</span>
-                            <span style="font-size:0.85rem; font-weight:800; color:#ef4444; display:block; margin-top:2px;">18 Staff</span>
-                        </div>
-                    </div>
-
-                    <div style="display:flex; gap:8px; margin-bottom:14px;">
-                        <button class="sub-tab-btn active">🔴 Belum Belanja (18)</button>
-                        <button class="sub-tab-btn" onclick="openRekapAreaModal()">🏬 Rekap Toko</button>
-                    </div>
-
-                    <!-- CARD LIST PERSONIL BELUM BELANJA (REVISI USER: TANPA TOMBOL WA 100%) -->
-                    <div style="background:rgba(239, 68, 68, 0.12); border:1.5px solid #ef4444; border-radius:18px; padding:14px; margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <h4 style="font-size:0.9rem; font-weight:800; color:#fff;">SITI AMINAH <small style="color:var(--text-sub);">(Crew / Kasir)</small></h4>
-                            <span style="font-size:0.65rem; color:#f87171; font-weight:800;">NIK: 20248819</span>
-                        </div>
-                        <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">Toko: T001 - TOKO ONLINE PRO</p>
-                        <p style="font-size:0.68rem; color:#f87171; font-weight:800; margin-top:4px;">❌ STATUS: BELUM MEMENUHI KEWAJIBAN BELANJA PERIODE INI</p>
-                        
-                        <!-- REVISI USER: HANYA TOMBOL INPUTKAN STRUK BELANJA (TOMBOL WA DIBUANG) -->
-                        <button onclick="showSwalSuccess('Input Struk', 'Membuka form input belanjaan!')" style="width:100%; margin-top:10px; background:var(--accent-gold-grad); color:#03170a; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">
-                            🛒 INPUTKAN STRUK BELANJA
+                        <button onclick="handleBelanjaSubmit()" style="width:100%; background:var(--accent-green-grad); color:#03170a; font-weight:800; padding:14px; border-radius:14px; border:none; cursor:pointer; box-shadow:0 4px 15px rgba(0,255,102,0.4);">
+                            💾 KIRIM STRUK BELANJA ✦
                         </button>
                     </div>
                 </div>
             `);
         }
 
-        // ============================================================
-        // 7. FULL-SCREEN PAGE: REKAPITULASI SE-AREA (100% PERSIS GAMBAR 8)
-        // ============================================================
-        function openRekapAreaModal() {
-            openAndroidPage("REKAPITULASI PERSENTASE SE-AREA", `
-                <div style="font-size:0.78rem;">
-                    <h4 style="font-size:0.88rem; font-weight:800; color:var(--accent-green); margin-bottom:14px;">📊 REKAPITULASI PERSENTASE BELANJA KARYAWAN SE-AREA</h4>
-
-                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:16px; margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <h4 style="font-weight:800; color:#fff;">T001 - TOKO ONLINE PRO</h4>
-                            <span style="background:rgba(34,197,94,0.2); color:var(--accent-green); padding:3px 10px; border-radius:8px; font-weight:800; font-size:0.68rem;">80% DONE 🟢</span>
-                        </div>
-                        <p style="font-size:0.72rem; color:var(--accent-green); margin-top:8px;">• Sudah Belanja : 8/10 Personil (Total Rp 1.850.000)</p>
-                        <p style="font-size:0.72rem; color:#f87171;">• Belum Belanja : 2 Personil (Siti, Agus)</p>
-                    </div>
-
-                    <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:16px; margin-bottom:12px;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <h4 style="font-weight:800; color:#fff;">T002 - KACIDA DEPAN</h4>
-                            <span style="background:rgba(34,197,94,0.2); color:var(--accent-green); padding:3px 10px; border-radius:8px; font-weight:800; font-size:0.68rem;">100% DONE 🟢</span>
-                        </div>
-                        <p style="font-size:0.72rem; color:var(--accent-green); margin-top:8px;">• Sudah Belanja : 10/10 Personil (Total Rp 2.400.000)</p>
-                        <p style="font-size:0.72rem; color:var(--accent-green);">• Belum Belanja : 0 Personil (Lengkap!)</p>
-                    </div>
-                </div>
-            `);
+        function previewStrukPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedStrukBase64 = e.target.result;
+                    document.getElementById("imgStrukPreview").src = uploadedStrukBase64;
+                    document.getElementById("strukPreviewBox").classList.remove("hidden");
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
+        async function handleBelanjaSubmit() {
+            triggerAndroidHaptic('medium');
+            const noBon = document.getElementById("belanjaNoBon").value.trim();
+            const noHp = document.getElementById("belanjaNoHp").value.trim();
+            const nominal = document.getElementById("belanjaNominal").value.trim();
+
+            if (!noBon || !noHp || !nominal) {
+                showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi Nomor Bon, No HP, dan Nominal Belanja!');
+                return;
+            }
+
+            if (rtdb) {
+                const ym = new Date().toISOString().substring(0,7);
+                rtdb.ref(`employee_shopping/${ym}`).push({
+                    id: Date.now().toString(),
+                    timestamp: new Date().toISOString(),
+                    nik: currentNik,
+                    nama: dashboardData?.user?.NAMA || 'Karyawan',
+                    kodeToko: dashboardData?.user?.kodeToko || '',
+                    noBon: noBon,
+                    noHpMember: noHp,
+                    nominalBelanja: Number(nominal),
+                    fotoStruk: uploadedStrukBase64,
+                    status: 'MENUNGGU_VALIDASI_AC'
+                });
+            }
+
+            closeAndroidPage();
+            showSwalSuccess('Struk & Foto Terkirim 🛒', 'Bukti struk belanja karyawan berhasil dikirim ke Firebase!');
+        }
+
+        // FULL-SCREEN SERAH TERIMA SHIFT
         function openSerahTerimaModal() {
             openAndroidPage("🔄 SERAH TERIMA SHIFT", `
                 <div style="font-size:0.78rem;">
@@ -947,9 +1096,47 @@
             `);
         }
 
-        function openPengumumanModal() { openAndroidPage("📢 PENGUMUMAN RESMI AREA", `<p style="color:var(--text-sub);">Tidak ada pengumuman baru saat ini.</p>`); }
-        function openNotifModal() { openAndroidPage("🔔 NOTIFIKASI APLIKASI", `<p style="color:var(--text-sub);">Tidak ada notifikasi baru saat ini.</p>`); }
-        function showBriefProfile() { openAndroidPage("👤 PROFIL PENGGUNA", `<p style="text-align:center; padding:20px;">NIK: ${currentNik}</p>`); }
+        function openSalesMTDModal() {
+            openAndroidPage("📈 RINCIAN SALES MTD", `
+                <div style="font-size:0.78rem;">
+                    <div class="mtd-summary-card">
+                        <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES MTD</span>
+                        <div class="mtd-amount-hero">Rp 125.450.000</div>
+                        <div class="mtd-sub-metric-row"><span style="color:var(--text-sub);">Rata-Rata SPD</span><span style="font-weight:800; color:var(--accent-green);">Rp 4.181.666 / Hari</span></div>
+                    </div>
+                </div>
+            `);
+        }
+
+        function openPerformaPopup() {
+            openAndroidPage("📊 DATA PERFORMANCE TOKO", `
+                <div style="font-size:0.78rem;">
+                    <div class="perf-card-neon">
+                        <h4 style="color:var(--accent-green); font-weight:800;">PERFORMA IKT & PENAWARAN</h4>
+                        <p style="margin-top:4px;">Rank Penawaran: <strong>#1 Dari 18 Toko</strong></p>
+                    </div>
+                </div>
+            `);
+        }
+
+        function openPengumumanModal() {
+            openAndroidPage("📢 PENGUMUMAN RESMI AREA", `<p style="color:var(--text-sub);">Tidak ada pengumuman baru saat ini.</p>`);
+        }
+
+        function openNotifModal() {
+            openAndroidPage("🔔 NOTIFIKASI APLIKASI", `<p style="color:var(--text-sub);">Tidak ada notifikasi baru saat ini.</p>`);
+        }
+
+        function showBriefProfile() {
+            openAndroidPage("👤 PROFIL PENGGUNA", `<p style="text-align:center; padding:20px;">NIK: ${currentNik}</p>`);
+        }
+
+        function handleLogout() {
+            showSwalConfirm('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar dari aplikasi Kacida Bersatu?', 'Ya, Logout', () => {
+                localStorage.clear();
+                location.reload();
+            });
+        }
 
         function switchTab(tabName) {
             triggerAndroidHaptic('light');
