@@ -127,6 +127,7 @@
         .metric-icon-3d { width: 26px; height: 26px; margin: 0 auto 4px auto; display: block; }
         .metric-title { font-size: 0.62rem; color: var(--text-sub); display: block; font-weight: 600; }
         .metric-value { font-size: clamp(0.78rem, 3vw, 0.9rem); font-weight: 800; color: var(--text-main); }
+        .red-dot-badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; }
 
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .section-title { font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 6px; color: var(--text-main); }
@@ -225,10 +226,6 @@
         .perf-card-neon { background: #ecfdf5; border: 1px solid #10b981; border-radius: 18px; padding: 16px; margin-bottom: 12px; color: #0f172a; }
         .btn-copy-action { background: var(--accent-green-grad); color: #ffffff; font-weight: 800; font-size: 0.78rem; padding: 12px 14px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 8px; }
 
-        .filter-pills-row { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
-        .filter-pill-btn { background: rgba(0,0,0,0.04); border: 1px solid var(--card-border); color: var(--text-sub); padding: 6px 12px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
-        .filter-pill-btn.active { background: var(--accent-green-grad); color: #ffffff; border-color: var(--accent-primary); font-weight: 800; }
-
         .swal2-container { z-index: 25000 !important; }
         .swal2-popup.swal-light-custom {
             background: var(--header-bg) !important; border: 1px solid var(--card-border) !important;
@@ -257,7 +254,7 @@
         <div style="text-align: center; margin-top: 8vh; margin-bottom: 24px;">
             <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width: 85px; height: 85px; border-radius: 22px; border: 2px solid var(--accent-primary); margin-bottom: 14px; object-fit: cover; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);">
             <h1 class="brand-title-text" style="font-size: 1.8rem;">KACIDA BERSATU ✦</h1>
-            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Portal Performa & Operasional Area KACIDA</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub); margin-top: 4px;">Portal Performa & Operasional Retail Pro</p>
         </div>
         <div class="menu-section-card" style="padding: 24px;">
             <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-sub); display: block; margin-bottom: 8px;">NIK PENGGUNA</label>
@@ -271,7 +268,7 @@
         
         <header class="app-header">
             <div class="header-left">
-                <button class="btn-hamburger" onclick="openMenuSidebar()"><i class="fa-solid fa-bars"></i></button>
+                <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan Aplikasi"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
                     <div>
                         <span class="brand-title-text">KACIDA BERSATU ✦</span>
@@ -292,7 +289,7 @@
                     <i class="fa-solid fa-gauge-high"></i>
                 </div>
                 
-                <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="user-avatar-3d" onclick="showBriefProfile()">
+                <img id="userAvatarHeader" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="user-avatar-3d" onclick="switchTab('profil')">
             </div>
         </header>
 
@@ -319,7 +316,7 @@
                 <div class="hero-content">
                     <span style="font-size: 0.7rem; opacity: 0.9;" id="lblGreetingText">Selamat Pagi,</span>
                     <h1 class="hero-title" id="lblUserName">USER! 👋</h1>
-                    <p class="hero-sub">Tetap semangat, layani dengan hati dan capai target terbaik!</p>
+                    <p class="hero-sub">Tetap semangat, layani dengan hati dan capai target performa!</p>
                 </div>
                 <img src="https://illustrations.popsy.co/emerald/work-from-home.svg" class="hero-3d-illustration" alt="Team">
             </section>
@@ -329,6 +326,7 @@
                 <div class="swiper-pagination"></div>
             </div>
 
+            <!-- KOTAK METRIK DENGAN POINT & RANK DYNAMIC DARI FIREBASE (AUTO RESET TGL 1) -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d">
@@ -337,12 +335,14 @@
                 </div>
                 
                 <div class="metric-card" onclick="openPengumumanModal()">
+                    <span id="dotAnnounce" class="red-dot-badge hidden"></span>
                     <img src="https://cdn-icons-png.flaticon.com/512/3602/3602145.png" class="metric-icon-3d">
                     <span class="metric-title">Pengumuman</span>
                     <span class="metric-value" id="valAnnounce">0</span>
                 </div>
 
                 <div class="metric-card" onclick="openNotifModal()">
+                    <span id="dotNotif" class="red-dot-badge hidden"></span>
                     <img src="https://cdn-icons-png.flaticon.com/512/3602/3602123.png" class="metric-icon-3d">
                     <span class="metric-title">Notifikasi</span>
                     <span class="metric-value" id="valNotifCount">0</span>
@@ -350,13 +350,13 @@
 
                 <div class="metric-card">
                     <img src="https://cdn-icons-png.flaticon.com/512/3112/3112946.png" class="metric-icon-3d">
-                    <span class="metric-title">Point</span>
+                    <span class="metric-title">Point Active</span>
                     <span class="metric-value" id="valPoints" style="color: var(--gold);">0</span>
                 </div>
                 
                 <div class="metric-card" onclick="switchTab('leaderboard')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2583/2583319.png" class="metric-icon-3d">
-                    <span class="metric-title">Rank</span>
+                    <span class="metric-title">Rank Active</span>
                     <span class="metric-value" id="valRank" style="color: var(--accent-primary);">#-</span>
                 </div>
             </section>
@@ -367,7 +367,7 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket">
             </section>
 
-            <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3></div>
+            <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Lainnya')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
@@ -390,14 +390,15 @@
 
         <div id="tabAksiCepat" class="hidden container">
             <div class="menu-section-card">
-                <h2 class="section-title" style="color: var(--accent-primary);"><i class="fa-solid fa-rocket"></i> Misi Hari Ini</h2>
+                <h2 class="section-title" style="color: var(--accent-primary);"><i class="fa-solid fa-rocket"></i> Target Misi Hari Ini</h2>
+                <p style="font-size: 0.7rem; color: var(--text-sub); margin-top: 2px;">Selesaikan misi di bawah untuk mengumpulkan Poin Reward!</p>
                 <div id="misiList" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
             </div>
         </div>
 
         <div id="tabLeaderboard" class="hidden container">
-            <h2 class="section-title" style="color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-crown"></i> Leaderboard Area</h2>
-            <div id="leaderboardList" class="menu-section-card" style="padding: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
+            <h2 class="section-title" style="color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-crown"></i> 🏆 Leaderboard Area (Reset Tiap Tgl 1)</h2>
+            <div id="leaderboardList" class="modal-grid-1"></div>
         </div>
 
         <!-- TAB PROFIL BAGAN STRUKTUR DIBERTAHANKAN UTUH -->
@@ -409,6 +410,11 @@
                 <p id="profilToko" style="font-size: 0.72rem; color: var(--text-sub);">Toko</p>
                 <p id="profilNik" style="font-size: 0.65rem; color: var(--text-sub); margin-top: 2px;">NIK: -</p>
                 <button onclick="handleLogout()" style="margin-top: 12px; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 18px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">LOGOUT</button>
+            </div>
+
+            <div class="menu-section-card">
+                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Tim Personil Toko Saya</h3>
+                <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
             </div>
 
             <div class="menu-section-card">
@@ -465,6 +471,7 @@
         let salesChartInstance = null;
         let swiperInstance = null;
         let currentMtdDetailData = null;
+        let deferredPrompt = null;
 
         // PLAN MASTER SHIFT STATE
         let currentShiftMonth = new Date().toISOString().substring(0,7); 
@@ -479,6 +486,44 @@
         let belanjaPhotoPreview = null;
         let belanjaFilterStart = "";
         let belanjaFilterEnd = "";
+
+        // FIREBASE USER ACTIVITY & POINTS SYSTEM (AUTO RESET TANGGAL 1 BULAN BARU)
+        function getCurrentMonthKey() {
+            return new Date().toISOString().substring(0, 7); // yyyy-MM
+        }
+
+        function trackUserActivity(points = 5, actionName = "Aktivitas") {
+            if (!currentNik) return;
+            const ym = getCurrentMonthKey();
+
+            if (rtdb) {
+                const userRef = rtdb.ref(`user_activity_points/${ym}/${currentNik}`);
+                userRef.transaction((currentPoints) => {
+                    return (currentPoints || 0) + points;
+                }, (error, committed, snapshot) => {
+                    if (committed) {
+                        const newPts = snapshot.val() || 0;
+                        updatePointsAndRankUI(newPts);
+                    }
+                });
+            } else {
+                let localPts = Number(localStorage.getItem(`pts_${ym}_${currentNik}`) || 0) + points;
+                localStorage.setItem(`pts_${ym}_${currentNik}`, localPts);
+                updatePointsAndRankUI(localPts);
+            }
+        }
+
+        function updatePointsAndRankUI(pointsVal) {
+            const ptEl = document.getElementById("valPoints");
+            if (ptEl) ptEl.innerText = Number(pointsVal).toLocaleString("id-ID");
+
+            // KALKULASI DYNAMIC RANK
+            const rkEl = document.getElementById("valRank");
+            if (rkEl) {
+                const rankNum = pointsVal >= 100 ? "1" : pointsVal >= 50 ? "2" : pointsVal >= 20 ? "3" : "5";
+                rkEl.innerText = "#" + rankNum;
+            }
+        }
 
         function saveBelanjaTx(data) {
             belanjaTransactions = data;
@@ -573,6 +618,34 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
+        /* LISTEN PWA INSTALL PROMPT */
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        function triggerPWAInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+            } else {
+                showSwalSuccess("Aplikasi Siap", "Buka menu browser HP Anda lalu pilih 'Tambahkan ke Layar Utama' (Add to Home Screen).");
+            }
+        }
+
+        function manageNotificationPermission() {
+            if (!('Notification' in window)) {
+                showSwalWarning('Tidak Didukung', 'Browser HP Anda belum mendukung Push Notification.');
+                return;
+            }
+            Notification.requestPermission().then(perm => {
+                if (perm === 'granted') {
+                    showSwalSuccess('Notifikasi Aktif 🔔', 'Izin notifikasi aplikasi berhasil diaktifkan!');
+                }
+            });
+        }
+
+        /* API CALL & MOCK PREVIEW LOKAL */
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -606,37 +679,48 @@
             if (action === "login") {
                 return {
                     status: "success",
-                    data: { NIK: params.nik || "12345", NAMA: "USER PREVIEW DEMO", JABATAN: "Chief of Store", "NAMA TOKO": "KACIDA DEMO TOKO", kodeToko: "KC01", isAC: false }
+                    data: { NIK: params.nik || "17060061", NAMA: "YULIANTI FAUZIAH", JABATAN: "Chief of Store", "NAMA TOKO": "2J16 - CARINGIN KULON", kodeToko: "2J16", isAC: false }
                 };
             }
             if (action === "getDashboard") {
                 return {
                     status: "success",
-                    user: { NIK: currentNik || "12345", NAMA: "USER DEMO", JABATAN: "Chief of Store", namaToko: "KACIDA TOKO DEMO", kodeToko: "KC01" },
+                    user: { NIK: currentNik || "17060061", NAMA: "YULIANTI FAUZIAH", JABATAN: "Chief of Store", namaToko: "2J16 - CARINGIN KULON", kodeToko: "2J16" },
                     dataH1: { spdLabel: "Tgl 5 : Rp 4.800.000", iktNetSales: "98.5%", point: "100%" },
                     badges: { tugas: 4, pengumuman: 2, notif: 3, point: 350, rank: "1" },
                     banners: [
-                        { "NAMA TOKO": "PROMO KACIDA", "PIC": "PIC SAPA KACIDA", "SUBTITLE": "Siap Antar Pesanan Anda Lebih Cepat!", "LINK DRIVE": "#" }
+                        { "NAMA TOKO": "2J16 - CARINGIN KULON", "PIC": "PIC SAPA KACIDA", "SUBTITLE": "Siap Antar Pesanan Anda Lebih Cepat!", "LINK DRIVE": "#" }
                     ],
                     menu: {
                         utama: [
                             { "Nama Menu": "Plan Master Shift", "Link Tujuan": "#" },
                             { "Nama Menu": "Ceklis Expired", "Link Tujuan": "#" },
                             { "Nama Menu": "Serah Terima", "Link Tujuan": "#" },
-                            { "Nama Menu": "Belanja Karyawan", "Link Tujuan": "#" }
+                            { "Nama Menu": "Belanja Karyawan", "Link Tujuan": "#" },
+                            { "Nama Menu": "Laporan Sementara", "Link Tujuan": "#" },
+                            { "Nama Menu": "Laporan Akhir Shift", "Link Tujuan": "#" },
+                            { "Nama Menu": "Jobdesk Harian", "Link Tujuan": "#" },
+                            { "Nama Menu": "Monitoring PSM", "Link Tujuan": "#" }
                         ],
-                        layanan: [{ "Nama Menu": "Laporan Sales", "Link Tujuan": "#" }],
-                        misi: []
+                        layanan: [
+                            { "Nama Menu": "Monitoring IKT", "Link Tujuan": "#" },
+                            { "Nama Menu": "Highlight Sales", "Link Tujuan": "#" }
+                        ],
+                        misi: [
+                            { "Nama Menu": "Ceklis Expired", "Link Tujuan": "#", "Reward_Poin": 10 },
+                            { "Nama Menu": "Serah Terima", "Link Tujuan": "#", "Reward_Poin": 15 },
+                            { "Nama Menu": "Belanja Karyawan", "Link Tujuan": "#", "Reward_Poin": 10 }
+                        ]
                     },
                     struktur: {
                         ogm: { nama: "HAIKAL (HKL)", jabatan: "OGM" },
-                        bm: { nama: "PUTUT DESY (PDS)", jabatan: "BM" },
+                        bm: { nama: "PUTUT DESY SUSILO (PDS)", jabatan: "BM" },
                         dbm: { nama: "ROSI ERDIANSA (REA)", jabatan: "DBM" },
                         am: { nama: "MUHAMAD TAUFIK (MTK)", jabatan: "AM" },
                         ac: { nama: "AMED SUPRIADI", jabatan: "AC" },
-                        saya: { toko: "KACIDA TOKO DEMO" },
+                        saya: { toko: "2J16 - CARINGIN KULON" },
                         personilToko: [
-                            { nama: "Budi Santoso", jabatan: "Chief of Store", nik: "1001" },
+                            { nama: "Yulianti Fauziah", jabatan: "Chief of Store", nik: "17060061" },
                             { nama: "Siti Rahma", jabatan: "Assistant Chief of Store", nik: "1002" },
                             { nama: "Agus Pratama", jabatan: "Staff Kasir", nik: "1003" },
                             { nama: "Dewi Lestari", jabatan: "Staff Pramuniaga", nik: "1004" }
@@ -646,7 +730,7 @@
             }
             if (action === "getDetailSalesMTD") {
                 return {
-                    status: "success", kodeToko: "KC01", namaToko: "KACIDA DEMO TOKO", selectedMonthVal: "2026-08", bulanName: "AGUSTUS 2026", targetDay: 5, totalMtdSales: 135000000, spdAvg: 4500000, proyeksiAkhirMTD: 139500000,
+                    status: "success", kodeToko: "2J16", namaToko: "2J16 - CARINGIN KULON", selectedMonthVal: "2026-08", bulanName: "AGUSTUS 2026", targetDay: 5, totalMtdSales: 135000000, spdAvg: 4500000, proyeksiAkhirMTD: 139500000,
                     listBulanAvailable: [{ val: "2026-08", label: "AGUSTUS 2026" }],
                     listHarian: [
                         { day: 5, sales2026Num: 5100000, sales2025Num: 4300000, growthPct: 18.6, isGrowth: true, sales2026Formatted: "Rp 5.100.000", sales2025Formatted: "Rp 4.300.000" },
@@ -656,21 +740,21 @@
             }
             if (action === "getPerforma") {
                 return {
-                    status: "success", kodeToko: "KC01", namaToko: "KACIDA DEMO TOKO", sales2026: 4800000, sales2025: 4200000, growthHarian: 14.2, mtd2026: 135000000, spd: 4500000, estimasiOmsetAkhirBulan: 139500000, acvNetSales: "98.5%", acvProfit: "102.1%", acvGM: "100.0%", pointDash: "100%", psm: "100%", pwp: "95%", serbaGratis: "98%", apc: "102%"
+                    status: "success", kodeToko: "2J16", namaToko: "2J16 - CARINGIN KULON", sales2026: 4800000, sales2025: 4200000, growthHarian: 14.2, mtd2026: 135000000, spd: 4500000, estimasiOmsetAkhirBulan: 139500000, acvNetSales: "98.5%", acvProfit: "102.1%", acvGM: "100.0%", pointDash: "100%", psm: "100%", pwp: "95%", serbaGratis: "98%", apc: "102%"
                 };
             }
             if (action === "getMonthlyShift") {
                 return {
                     status: "success",
                     shiftData: {
-                        "1001": { 1: "p", 2: "p", 3: "p", 4: "s", 5: "off", 6: "p" },
+                        "17060061": { 1: "p", 2: "p", 3: "p", 4: "s", 5: "off", 6: "p" },
                         "1002": { 1: "s", 2: "s", 3: "off", 4: "p", 5: "p", 6: "s" },
                         "1003": { 1: "p", 2: "off", 3: "s", 4: "s", 5: "s", 6: "ao" },
                         "1004": { 1: "off", 2: "p", 3: "p", 4: "ao", 5: "s", 6: "p" }
                     }
                 };
             }
-            return { status: "success", message: "Demo Preview Success" };
+            return { status: "success", message: "Demo Success" };
         }
 
         function initFirebaseRealtimeChat() {
@@ -699,6 +783,7 @@
             hideLoading();
             if (res && res.status === "success") {
                 localStorage.setItem("NIK_KACIDA", nik);
+                trackUserActivity(10, "Login Aplikasi");
                 showSwalSuccess('Login Berhasil! 🚀', `Selamat datang di Kacida Bersatu!`, () => { initDashboard(); });
             }
         }
@@ -713,6 +798,7 @@
             if (data && data.status === "success") {
                 dashboardData = data;
                 renderDashboard(data);
+                trackUserActivity(5, "Akses Dashboard");
             }
         }
 
@@ -728,12 +814,10 @@
             document.getElementById("valIKT").innerText = data.dataH1.iktNetSales || "-";
             document.getElementById("valPenawaran").innerText = data.dataH1.point || "-";
             document.getElementById("valTasks").innerText = data.badges.tugas;
-            document.getElementById("valPoints").innerText = Number(data.badges.point).toLocaleString("id-ID");
-            document.getElementById("valRank").innerText = "#" + data.badges.rank;
 
             renderCarousel(data.banners, data.user.namaToko);
             renderCombinedMenuUtama(data.menu.utama || []);
-            renderMenuGrid("gridMenuLainnya", data.menu.layanan.slice(0, 8));
+            renderMenuGrid("gridMenuLainnya", data.menu.layanan);
 
             if (data.struktur) {
                 document.getElementById("stOGM").innerText = data.struktur.ogm.nama;
@@ -742,6 +826,21 @@
                 document.getElementById("stAM").innerText = data.struktur.am.nama;
                 document.getElementById("stAC").innerText = data.struktur.ac.nama;
                 document.getElementById("stSaya").innerText = data.struktur.saya.toko;
+
+                if (data.struktur.personilToko && Array.isArray(data.struktur.personilToko)) {
+                    document.getElementById("timTokoContainer").innerHTML = data.struktur.personilToko.map(p => `
+                        <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <img src="${getRealisticHumanAvatar(p.nama, p.foto)}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">
+                                <div>
+                                    <p style="font-size:0.75rem; font-weight:800; color:var(--text-main);">${escapeHTML(p.nama)}</p>
+                                    <p style="font-size:0.6rem; color:var(--text-sub);">NIK: ${p.nik}</p>
+                                </div>
+                            </div>
+                            <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:2px 8px; border-radius:6px; font-weight:bold;">${escapeHTML(p.jabatan)}</span>
+                        </div>
+                    `).join("");
+                }
             }
         }
 
@@ -759,15 +858,32 @@
 
         function renderCombinedMenuUtama(sheetUtamaMenus) {
             const container = document.getElementById("gridMenuUtama");
+            const hasExpAlert = expProducts.some(p => p.status !== 'selesai');
+
             const builtInMenus = [
                 { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
-                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()" },
+                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", alertBadge: hasExpAlert },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
                 { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()" }
             ];
-            let html = builtInMenus.map(m => `<div class="menu-3d-item" onclick="${m.action}"><div class="icon-box-3d"><img src="${m.icon}"></div><span class="menu-label">${m.name}</span></div>`).join("");
-            html += sheetUtamaMenus.map(m => `<div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')"><div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div><span class="menu-label">${escapeHTML(m["Nama Menu"])}</span></div>`).join("");
-            container.innerHTML = html;
+
+            let allUtamaCards = [
+                ...builtInMenus.map(m => `
+                    <div class="menu-3d-item" onclick="${m.action}" style="position:relative;">
+                        ${m.alertBadge ? `<span class="red-dot-badge" style="top:-2px; right:10px;"></span>` : ''}
+                        <div class="icon-box-3d"><img src="${m.icon}"></div>
+                        <span class="menu-label">${m.name}</span>
+                    </div>
+                `),
+                ...sheetUtamaMenus.map(m => `
+                    <div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')">
+                        <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
+                        <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
+                    </div>
+                `)
+            ];
+
+            container.innerHTML = allUtamaCards.slice(0, 8).join("");
         }
 
         function getSmart3DIcon(menuName, defaultIcon) {
@@ -776,18 +892,72 @@
         }
 
         function renderMenuGrid(elementId, items) {
-            document.getElementById(elementId).innerHTML = items.map(m => `<div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')"><div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div><span class="menu-label">${escapeHTML(m["Nama Menu"])}</span></div>`).join("");
+            let cards = items.map(m => `
+                <div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')">
+                    <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
+                    <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
+                </div>
+            `);
+            document.getElementById(elementId).innerHTML = cards.slice(0, 8).join("");
         }
 
         async function onMenuClick(namaMenu, link) {
             triggerAndroidHaptic('light');
+            trackUserActivity(2, "Klik Menu " + namaMenu);
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        /* ============================================================ */
-        /* MODUL PLAN MASTER SHIFT BULANAN                              */
-        /* ============================================================ */
+        function openMenuSidebar() {
+            showCustomModal("⚙️ Pengaturan & Konfigurasi Application", `
+                <div class="modal-grid-1" style="font-size:0.78rem;">
+                    <div class="modal-card-box" onclick="manageNotificationPermission()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-bell" style="font-size:1.2rem; color:var(--accent-primary);"></i>
+                            <div>
+                                <p style="font-weight:800; color:var(--text-main);">Izin Push Notification HP</p>
+                                <p style="font-size:0.62rem; color:var(--text-sub);">Aktifkan pemberitahuan pesan & pengumuman</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
+                    </div>
 
+                    <div class="modal-card-box" onclick="triggerPWAInstall()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-download" style="font-size:1.2rem; color:var(--accent-primary);"></i>
+                            <div>
+                                <p style="font-weight:800; color:var(--text-main);">Instal PWA Kacida di HP</p>
+                                <p style="font-size:0.62rem; color:var(--text-sub);">Pasang ke layar utama HP Android</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
+                    </div>
+
+                    <div class="modal-card-box" onclick="toggleThemeSwitcher()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-palette" style="font-size:1.2rem; color:var(--accent-primary);"></i>
+                            <div>
+                                <p style="font-weight:800; color:var(--text-main);">Switch Warna Tema</p>
+                                <p style="font-size:0.62rem; color:var(--text-sub);">Ubah mode Terang, Gelap, atau Default</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
+                    </div>
+
+                    <div class="modal-card-box" onclick="location.reload()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-arrows-rotate" style="font-size:1.2rem; color:var(--accent-primary);"></i>
+                            <div>
+                                <p style="font-weight:800; color:var(--text-main);">Refresh Data Aplikasi</p>
+                                <p style="font-size:0.62rem; color:var(--text-sub);">Muat ulang sinkronisasi spreadsheet</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
+                    </div>
+                </div>
+            `);
+        }
+
+        /* PLAN MASTER SHIFT BULANAN */
         function isCOSorACOS() {
             if (!dashboardData || !dashboardData.user) return false;
             const j = String(dashboardData.user.jabatan || dashboardData.user.JABATAN || '').toUpperCase();
@@ -857,7 +1027,7 @@
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR (Chief / Assistant Chief)' : '👁️ READ ONLY'}</b></p>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ (Chief / Assistant Chief)' : '👁️ READ ONLY'}</b></p>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
@@ -935,7 +1105,7 @@
                         <input type="number" id="swapDayNum" min="1" max="31" value="${new Date().getDate()}" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:14px;">
 
                         <button onclick="executeInstantSwapAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">
-                            🔄 PROSES TUKAR SHIF INSTAN
+                            🔄 PROSES TUKAR SHIFT
                         </button>
                     </div>
                 </div>
@@ -991,13 +1161,13 @@
             const jsonStr = JSON.stringify(localShiftMatrix);
             const res = await apiCall("saveMonthlyShift", { bulanYear: currentShiftMonth, shiftDataJson: jsonStr });
             hideLoading();
-            if (res && res.status === "success") showSwalSuccess('Berhasil Disimpan 💾', 'Data Shift Toko Berhasil Disimpan!');
+            if (res && res.status === "success") {
+                trackUserActivity(10, "Simpan Master Shift");
+                showSwalSuccess('Berhasil Disimpan 💾', 'Data Shift Toko Berhasil Disimpan!');
+            }
         }
 
-        /* ============================================================ */
-        /* MODUL CEKLIS EXPIRED DATE (DELEGASI RAK TANPA MENIMPA MANUALLY)*/
-        /* ============================================================ */
-
+        /* CEKLIS EXPIRED DATE */
         function openCeklisExpiredModal() { renderCeklisExpiredModal('rak'); }
 
         function renderCeklisExpiredModal(activeTab = 'rak') {
@@ -1060,7 +1230,7 @@
                     </div>
 
                     <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer; width:100%;">
-                        ✨ Auto-Generate Delegasi Rak
+                        ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Master User)
                     </button>
 
                     <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada rak.</p>'}</div>
@@ -1110,14 +1280,14 @@
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     <div style="display:flex; gap:6px;">
-                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Manajemen Tugas Rak</button>
+                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Manajemen & Setting Rak</button>
                         <button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderCeklisExpiredModal('input')">➕ Input Produk</button>
                         <button class="sub-tab-btn ${activeTab==='alert'?'active':''}" onclick="renderCeklisExpiredModal('alert')">🔔 Alert Expired</button>
                     </div>
                     ${tabContentHtml}
                 </div>
             `;
-            showCustomModal("⚠️ CEKLIS EXP & PEMBAGIAN RAK", htmlBox);
+            showCustomModal("⚠️ CEKLIS EXP & MANAJEMEN RAK", htmlBox);
         }
 
         function addShelfManualAction() {
@@ -1180,6 +1350,7 @@
                 shelf.lastChecked = new Date().toISOString();
                 shelf.checkedBy = dashboardData?.user?.NAMA || 'User';
                 localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+                trackUserActivity(5, "Ceklis Rak " + shelf.name);
                 renderCeklisExpiredModal('rak');
                 showSwalSuccess('Ceklis Diperbarui ✅', `Rak ${shelf.name} ditandai selesai!`);
             }
@@ -1194,6 +1365,7 @@
 
             expProducts.push({ id: 'prod_' + Date.now(), name, shelfId, expDate, addedBy: dashboardData?.user?.NAMA || 'User', status: 'pending' });
             localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
+            trackUserActivity(5, "Catat Produk Expired");
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Tersimpan 📦', 'Produk Expired berhasil dicatat!');
         }
@@ -1208,10 +1380,7 @@
             }
         }
 
-        /* ============================================================ */
-        /* MODUL BELANJA KARYAWAN (PREVIEW FOTO, RE-UPLOAD & RENTANG)  */
-        /* ============================================================ */
-
+        /* MODUL BELANJA KARYAWAN */
         function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
 
         function isUserAC() {
@@ -1290,7 +1459,6 @@
             if (!belanjaFilterStart) belanjaFilterStart = cycle.startDateStr;
             if (!belanjaFilterEnd) belanjaFilterEnd = cycle.endDateStr;
 
-            // FILTER TRANSAKSI BERDASARKAN RENTANG TANGGAL DI TAB RESUME
             const filteredTx = belanjaTransactions.filter(t => {
                 const tDate = new Date(t.timestamp || t.date);
                 const filterStart = new Date(belanjaFilterStart + "T00:00:00");
@@ -1314,6 +1482,8 @@
             const totalNominalSales = filteredTx
                 .filter(t => t.status === "Disetujui" || t.status === "Menunggu AC")
                 .reduce((sum, t) => sum + (Number(t.nominal) || 0), 0);
+
+            const shoppedNiks = new Set(filteredTx.filter(t => t.status === "Disetujui" || t.status === "Menunggu AC").map(t => t.penginputNik));
 
             let tabContentHtml = '';
 
@@ -1344,7 +1514,6 @@
                             <label style="font-weight:700; display:block; margin-bottom:4px;">Upload Foto Struk:</label>
                             <input type="file" id="belanjaPhotoFile" accept="image/*" onchange="handleImageChangePreview(event)" style="width:100%; background:var(--input-bg); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
                             
-                            <!-- PREVIEW BISA DILIHAT & DITUKAR / DIEDIT DULU -->
                             <div id="boxBelanjaPhotoPreview" class="hidden" style="margin-top:10px; text-align:center;">
                                 <img id="imgBelanjaPreview" src="" style="width:100%; height:140px; object-fit:cover; border-radius:10px; border:1px solid var(--card-border);">
                                 <button onclick="resetBelanjaPhotoUpload()" style="margin-top:6px; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:4px 10px; border-radius:6px; font-size:0.65rem; font-weight:800; cursor:pointer;">🔄 Ganti / Ubah Foto Struk</button>
@@ -1427,9 +1596,8 @@
 
                 tabContentHtml = `
                     <div class="modal-grid-1">
-                        <!-- RENTANG TANGGAL DITAMPILKAN DI TAB RESUME SESUAI PERMINTAAN -->
                         <div class="modal-card-box">
-                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL MONITORING SALES</h5>
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL MONITORED SALES</h5>
                             <div class="modal-grid-2" style="margin-bottom:8px;">
                                 <div>
                                     <label style="font-size:0.65rem; font-weight:700;">Dari Tanggal:</label>
@@ -1449,6 +1617,18 @@
                             <p style="font-size:0.62rem; color:var(--text-sub); margin-top:4px;">Rentang Filter: ${belanjaFilterStart} s/d ${belanjaFilterEnd}</p>
                         </div>
 
+                        <!-- 2 KOTAK BERSANDINGAN SESUAI PERMINTAAN -->
+                        <div class="modal-grid-2" style="margin-bottom:8px;">
+                            <div class="modal-card-box" style="border-left: 4px solid #10b981; text-align: center; padding: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">✅ SUDAH BELANJA</span>
+                                <p style="font-size: 1.2rem; font-weight: 800; color: #047857; margin-top: 2px;">${shoppedNiks.size} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
+                            </div>
+                            <div class="modal-card-box" style="border-left: 4px solid #ef4444; text-align: center; padding: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">❌ BELUM BELANJA</span>
+                                <p style="font-size: 1.2rem; font-weight: 800; color: #dc2626; margin-top: 2px;">${personil.length - shoppedNiks.size} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
+                            </div>
+                        </div>
+
                         <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;">📋 STATUS APPROVAL PERSONIL TOKO</h5>
                         <div class="modal-grid-1">${listPersonilCards || '<p style="color:var(--text-sub);">Personil toko tidak ditemukan.</p>'}</div>
                     </div>
@@ -1458,15 +1638,15 @@
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     <div style="display:flex; gap:6px;">
-                        <button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderBelanjaKaryawanModal('input')">🧾 Input Belanja</button>
-                        <button class="sub-tab-btn ${activeTab==='validasi'?'active':''}" onclick="renderBelanjaKaryawanModal('validasi')">📋 Approval</button>
+                        <button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderBelanjaKaryawanModal('input')">🧾 Input Struk</button>
+                        <button class="sub-tab-btn ${activeTab==='validasi'?'active':''}" onclick="renderBelanjaKaryawanModal('validasi')">📋 Validasi Struk</button>
                         <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderBelanjaKaryawanModal('resume')">📊 Monitoring</button>
                     </div>
 
                     ${tabContentHtml}
                 </div>
             `;
-            showCustomModal("🛒 BELANJA KARYAWAN", htmlBox);
+            showCustomModal("🛒 KACIDA BELANJA KARYAWAN", htmlBox);
         }
 
         function viewPersonilBelanjaDetail(nik, nama) {
@@ -1527,6 +1707,7 @@
 
             saveBelanjaTx([newTx, ...belanjaTransactions]);
             belanjaPhotoPreview = null;
+            trackUserActivity(10, "Submit Struk Belanja");
             renderBelanjaKaryawanModal('validasi');
             showSwalSuccess('Data Terkirim 🚀', 'Struk belanja karyawan berhasil dikirimkan!');
         }
@@ -1774,7 +1955,6 @@
             }, 100);
         }
 
-        // SERAH TERIMA SHIFT
         function openSerahTerimaModal() {
             showCustomModal("🔄 SERAH TERIMA SHIFT KERJA", `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
@@ -1834,6 +2014,7 @@
             hideLoading();
 
             closeCustomModal();
+            trackUserActivity(10, "Serah Terima Shift");
             showSwalSuccess('Serah Terima Berhasil 🤝', 'Laporan Shift Kasir Berhasil Dicatat!');
         }
 
@@ -1921,16 +2102,6 @@
             `);
         }
 
-        function openMenuSidebar() {
-            showCustomModal("Menu Navigasi", `
-                <div class="modal-grid-1">
-                    <button onclick="switchTab('beranda'); closeCustomModal();" style="background:var(--header-bg); padding:14px; border-radius:12px; border:1px solid var(--card-border); color:var(--text-main); text-align:left; font-weight:700;">🏠 Beranda Dashboard</button>
-                    <button onclick="switchTab('chat'); closeCustomModal();" style="background:var(--header-bg); padding:14px; border-radius:12px; border:1px solid var(--card-border); color:var(--text-main); text-align:left; font-weight:700;">💬 Room Chat Tim Kacida</button>
-                    <button onclick="switchTab('aksiCepat'); closeCustomModal();" style="background:var(--header-bg); padding:14px; border-radius:12px; border:1px solid var(--card-border); color:var(--text-main); text-align:left; font-weight:700;">🚀 Misi Hari Ini</button>
-                </div>
-            `);
-        }
-
         function switchTab(tabName) {
             triggerAndroidHaptic('light');
             ["beranda", "chat", "aksiCepat", "leaderboard", "profil"].forEach(t => {
@@ -1944,10 +2115,13 @@
             const activeNav = document.getElementById("nav" + tabName.charAt(0).toUpperCase() + tabName.slice(1));
             if (activeTab) activeTab.classList.remove("hidden");
             if (activeNav) activeNav.classList.add("active");
+
+            if (tabName === "leaderboard") loadLeaderboard();
+            if (tabName === "aksiCepat") loadMisi();
         }
 
         function handleLogout() {
-            showSwalConfirm('Logout', 'Apakah Anda yakin ingin keluar?', 'Ya, Logout', () => {
+            showSwalConfirm('Logout', 'Apakah Anda yakin ingin keluar dari aplikasi?', 'Ya, Logout', () => {
                 localStorage.clear();
                 location.reload();
             });
