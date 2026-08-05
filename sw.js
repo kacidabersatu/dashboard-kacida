@@ -1,9 +1,9 @@
-const CACHE_NAME = 'kacida-pwa-v2.5';
+const CACHE_NAME = 'kacida-bersatu-pwa-v3.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap',
+  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800;900&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css',
   'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js',
@@ -12,24 +12,22 @@ const ASSETS_TO_CACHE = [
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
 ];
 
-// INSTALL EVENT
+// 1. INSTALL EVENT - PRE-CACHE UTAMA
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Caching essential static assets');
       return cache.addAll(ASSETS_TO_CACHE);
     }).then(() => self.skipWaiting())
   );
 });
 
-// ACTIVATE EVENT
+// 2. ACTIVATE EVENT - HAPUS CACHE LAMA
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            console.log('[SW] Removing old cache:', cache);
             return caches.delete(cache);
           }
         })
@@ -38,34 +36,76 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// FETCH EVENT (Network First with Cache Fallback)
+// 3. FETCH EVENT - METODE NETWORK FIRST DENGAN FALLBACK CACHE
 self.addEventListener('fetch', (event) => {
-  // Abaikan request Firebase WebSocket & Google Apps Script API agar selalu live
-  if (event.request.url.includes('firebase') || event.request.url.includes('script.google.com') || event.request.url.includes('groq.com')) {
-    return;
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // ABAIKAN CACHE UNTUK REQUEST APPS SCRIPT API & FIREBASE REALTIME DB (AGAR DATA SALES SELALU DINAMIS)
+  if (url.hostname.includes('script.google.com') || 
+      url.hostname.includes('firebasedatabase.app') || 
+      url.hostname.includes('firebaseio.com') ||
+      req.method !== 'GET') {
+    return; // Request live langsung ke server/database
   }
 
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
+    caches.match(req).then((cachedResponse) => {
+      return fetch(req).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(req, responseToCache);
+          });
         }
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-        return response;
-      })
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          if (event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('./index.html');
-          }
-        });
-      })
+        return networkResponse;
+      }).catch(() => {
+        return cachedResponse || caches.match('./index.html');
+      });
+    })
+  );
+});
+
+// 4. PUSH NOTIFICATION EVENT
+self.addEventListener('push', (event) => {
+  let data = { title: 'KACIDA BERSATU ✦', body: 'Ada pemberitahuan baru di aplikasi!' };
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: 'https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ',
+    badge: 'https://cdn-icons-png.flaticon.com/512/3602/3602123.png',
+    vibrate: [100, 50, 100],
+    data: { url: data.url || './index.html' }
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'KACIDA BERSATU ✦', options)
+  );
+});
+
+// 5. NOTIFICATION CLICK EVENT
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || './index.html';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (let i = 0; i < clientList.length; i++) {
+        let client = clientList[i];
+        if (client.url.includes('index.html') && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
   );
 });
