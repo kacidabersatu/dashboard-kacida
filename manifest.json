@@ -1,12 +1,7 @@
 {
-  "name": "Kacida Bersatu Pro",
-  "short_name": "Kacida",
-  "description": "Portal Performa & Operasional Retail Kacida Bersatu",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#020f07",
-  "theme_color": "#020f07",
+  "short_name": "Kacida Pro",
+  "name": "Kacida Bersatu - Portal Performa & Operasional Retail Pro",
+  "description": "Aplikasi PWA Performa & Operasional Retail Terpadu Kacida Bersatu",
   "icons": [
     {
       "src": "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
@@ -19,6 +14,56 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "./",
+  "lang": "id-ID",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "shortcuts": [
+    {
+      "name": "Plan Master Shift",
+      "short_name": "Master Shift",
+      "description": "Buka Jadwal Shift Bulanan Toko",
+      "url": "./index.html?open=shift",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/512/3652/3652191.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ceklis Expired Date",
+      "short_name": "Cek Expired",
+      "description": "Manajemen & Ceklis Expired Rak Toko",
+      "url": "./index.html?open=expired",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/512/7518/7518748.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Belanja Karyawan",
+      "short_name": "Belanja",
+      "description": "Validasi Struk Belanja Karyawan Toko",
+      "url": "./index.html?open=belanja",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/512/3081/3081559.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
