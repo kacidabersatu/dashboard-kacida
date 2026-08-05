@@ -56,11 +56,13 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { 
+        /* DISABLE NATIVE FULL PULL-TO-REFRESH */
+        html, body { 
+            overscroll-behavior-y: none;
             background: var(--bg-main); color: var(--text-main); min-height: 100vh; width: 100%;
             padding-top: env(safe-area-inset-top); padding-bottom: calc(85px + env(safe-area-inset-bottom)); 
             display: flex; flex-direction: column; align-items: center; -webkit-font-smoothing: antialiased; 
-            overscroll-behavior-y: contain; transition: background 0.3s ease, color 0.3s ease;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         #loginSection, #appSection { width: 100%; max-width: 600px; margin: 0 auto; padding: 0 12px; }
@@ -273,6 +275,7 @@
         
         <header class="app-header">
             <div class="header-left">
+                <!-- ICON HAMBURGER DIKOMAN MENJADI DRAWER KONFIGURASI PENGATURAN -->
                 <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan Aplikasi"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
                     <div>
@@ -299,7 +302,7 @@
         </header>
 
         <main id="tabBeranda" class="container">
-            <!-- DISKET INFO BAR DENGAN STATUS SYNC LIVE -->
+            <!-- DISKET INFO BAR DENGAN TOMBOL REFRESH LIVE DATA -->
             <section class="disket-info-bar">
                 <div class="disket-bar-item" onclick="openSalesMTDModal()">
                     <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-primary);"></i> Sales SPD</span>
@@ -369,7 +372,7 @@
                 </div>
             </section>
 
-            <!-- LAYOUT MENU UTAMA DIBATASI PRESISI 4 KOLOM x 2 BARIS (MAKSIMAL 8 MENU) -->
+            <!-- LAYOUT MENU UTAMA DIBATASI MAKSIMAL 8 MENU (4 KOLOM x 2 BARIS) -->
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
                 <div id="gridMenuUtama" class="menu-grid-4"></div>
@@ -380,7 +383,7 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT NAVBAR -->
+        <!-- TAB CHAT NAVBAR UTUH -->
         <div id="tabChat" class="hidden container">
             <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-primary);"></i> Room Chat Tim Kacida</h2>
             
@@ -406,7 +409,7 @@
             </div>
         </div>
 
-        <!-- TAB LEADERBOARD AREA (MEMBACA USER & POIN DARI MASTER_USER) -->
+        <!-- TAB LEADERBOARD AREA (BISA DI-SWITCH & DI-LOAD ALL MASTER_USER) -->
         <div id="tabLeaderboard" class="hidden container">
             <h2 class="section-title" style="color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-crown"></i> 🏆 Leaderboard Area</h2>
             <div id="leaderboardList" class="modal-grid-1"></div>
@@ -423,6 +426,7 @@
                 <button onclick="handleLogout()" style="margin-top: 12px; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 18px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">LOGOUT / GANTI NIK</button>
             </div>
 
+            <!-- BAGAN PERSONIL TOKO BINAAN -->
             <div class="menu-section-card">
                 <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Tim Personil Toko Saya</h3>
                 <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -456,7 +460,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQpr-_1lAUnrICnssQtP9XitiOY5JUGI8DX5Eq0ZKztLELHYFdhITv3KTzKJTu_8LB/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxUCWxmXN-1L4Kw49bqfKW0fxDz0UeSKlwUni7UhObuw0bReBJc1NZRabHkOahSYEm/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -655,7 +659,7 @@
             });
         }
 
-        /* MODE DEMO MOCK DIHAPUS TOTAL (PURE LIVE CONNECTED TO BACKEND) */
+        /* PURE API CALL KE APPS SCRIPT BACKEND (NO MOCK DEMO FALLBACK) */
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -1059,7 +1063,7 @@
             }
         }
 
-        /* MODUL CEKLIS EXPIRED DATE (DILENGKAPI BADGE & FITUR HAPUS ITEM ALERT) */
+        /* CEKLIS EXPIRED DATE (ALUR KONFIRMASI DULU BARU TAMPIL TOMBOL HAPUS) */
         function openCeklisExpiredModal() { renderCeklisExpiredModal('rak'); }
 
         function renderCeklisExpiredModal(activeTab = 'rak') {
@@ -1107,7 +1111,7 @@
                     </div>
 
                     <div class="modal-card-box">
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK MANUALLY</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK </h5>
                         <div class="modal-grid-2" style="margin-bottom:8px;">
                             <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
                             <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
@@ -1162,12 +1166,16 @@
                                 <p style="font-size:0.68rem; color:var(--text-sub);">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
                             </div>
                             <div style="display:flex; gap:6px;">
-                                <button onclick="markExpProductHandled('${p.id}')" style="background:${isDone ? '#f1f5f9' : '#d1fae5'}; color:${isDone ? '#64748b' : '#047857'}; border:1px solid var(--card-border); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                    ${isDone ? '✅ Selesai' : 'Tandai Selesai'}
-                                </button>
-                                <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                    🗑️ Hapus
-                                </button>
+                                ${!isDone ? `
+                                    <button onclick="markExpProductHandled('${p.id}')" style="background:#d1fae5; color:#047857; border:1px solid var(--accent-primary); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                        ✅ Konfirmasi
+                                    </button>
+                                ` : `
+                                    <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
+                                    <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                        🗑️ Hapus
+                                    </button>
+                                `}
                             </div>
                         </div>
                     `;
@@ -1288,7 +1296,7 @@
             }
         }
 
-        /* MODUL BELANJA KARYAWAN (BADGE VALIDASI & RESUME TANGGAL 25) */
+        /* MODAL BELANJA KARYAWAN */
         function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
 
         function isUserAC() {
@@ -1557,7 +1565,7 @@
                     ${tabContentHtml}
                 </div>
             `;
-            showCustomModal("🛒 BELANJA KARYAWAN", htmlBox);
+            showCustomModal("🛒 KACIDA BELANJA KARYAWAN", htmlBox);
         }
 
         function viewPersonilBelanjaDetail(nik, nama) {
@@ -1575,7 +1583,7 @@
 
             Swal.fire({
                 title: `Detail Belanja: ${nama}`,
-                html: txHtml || `<p style="font-size:0.75rem; color:var(--text-sub);">Belum ada riwayat transaksi belanja pada Periode ini.</p>`,
+                html: txHtml || `<p style="font-size:0.75rem; color:var(--text-sub);">Belum ada riwayat transaksi belanja pada rentang aktif ini.</p>`,
                 confirmButtonText: 'Tutup',
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             });
@@ -1639,7 +1647,7 @@
             showSwalSuccess('Status Diperbarui', `Transaksi diubah menjadi: ${newStatus}`);
         }
 
-        /* MODAL PERFORMA & SALES MTD UTUH RESTORED */
+        /* MODAL PERFORMA DENGAN BACAAN RANK SPREADSHEET */
         async function openPerformaPopup() {
             showLoading("Memuat Performance Toko...");
             const res = await apiCall("getPerforma");
@@ -1674,6 +1682,9 @@
                         </div>
 
                         <div style="border-left:1px dashed var(--card-border); padding-left:10px;">
+                            <div style="font-size:0.72rem; color:var(--text-sub); font-weight:800; margin-bottom:2px;">
+                                🏆 RANK PENAWARAN: <b style="color:var(--gold);">#${d.rankPenawaran || 1}</b> / ${d.totalTokoArea || 18} TOKO
+                            </div>
                             <div style="font-size:0.75rem; font-weight:800; color:var(--gold); margin-bottom:4px;">💪 SALES HARIAN</div>
                             <div style="font-size:0.7rem;">Real : <strong style="color:#0f172a;">Rp ${Number(d.sales2026||0).toLocaleString('id-ID')}</strong></div>
                             <div style="font-size:0.7rem; color:var(--text-sub);">Prev : Rp ${Number(d.sales2025||0).toLocaleString('id-ID')}</div>
@@ -2041,7 +2052,7 @@
             `);
         }
 
-        /* LEADERBOARD PERBAIKAN DENGAN MEMBACA API & MASTER USER */
+        /* LEADERBOARD DIPERBAIKI DENGAN MEMBACA API & MASTER USER ALL PARTICIPANTS */
         async function loadLeaderboard() {
             const listEl = document.getElementById("leaderboardList");
             if (!listEl) return;
@@ -2057,14 +2068,14 @@
             }
 
             if (users && Array.isArray(users) && users.length > 0) {
-                users.sort((a,b) => Number(b["POIN TOTAL"]||0) - Number(a["POIN TOTAL"]||0));
+                users.sort((a,b) => Number(b["POIN TOTAL"]||b.poin||0) - Number(a["POIN TOTAL"]||a.poin||0));
                 listEl.innerHTML = users.map((u, idx) => `
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; border-left:4px solid ${idx===0 ? 'var(--gold)' : 'var(--card-border)'};">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <span style="font-weight:800; font-size:1rem; color:${idx===0?'var(--gold)':idx===1?'#94a3b8':'var(--text-sub)'}; font-family:monospace;">#${idx+1}</span>
-                            <img src="${getRealisticHumanAvatar(u.NAMA, u["FOTO PROFIL"])}" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+                            <img src="${getRealisticHumanAvatar(u.NAMA || u.nama, u["FOTO PROFIL"] || u.foto)}" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
                             <div>
-                                <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(u.NAMA || u.Nama)}</p>
+                                <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(u.NAMA || u.nama)}</p>
                                 <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(u["NAMA TOKO"] || u.namaToko || '-')}</p>
                             </div>
                         </div>
@@ -2120,7 +2131,7 @@
             if (tabName === "aksiCepat") loadMisi();
         }
 
-        /* DUA ARAH PERBAIKAN LOGOUT: BERSIHKAN LOKAL DAN KEMBALI KE LOGIN FORM */
+        /* PERBAIKAN LOGOUT: CLEAR DUA ARAH & RESTAR DARI HALAMAN LOGIN NIK */
         function handleLogout() {
             showSwalConfirm('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar dan mengganti NIK?', 'Ya, Logout', () => {
                 localStorage.clear();
