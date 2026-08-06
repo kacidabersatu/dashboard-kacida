@@ -85,6 +85,8 @@
 
         .ocean-3d-badge-transparent { display: inline-flex; align-items: center; gap: 5px; color: var(--accent-primary); font-size: 0.65rem; font-weight: 800; margin-top: 1px; }
         .pulse-green-dot { width: 7px; height: 7px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+        .pulse-red-dot { width: 7px; height: 7px; background-color: #ef4444; border-radius: 50%; box-shadow: 0 0 8px #ef4444; animation: pulseRed 1.5s infinite; }
+        @keyframes pulseRed { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
         .header-right { display: flex; align-items: center; gap: 8px; }
 
@@ -97,6 +99,10 @@
         .user-avatar-3d { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover; cursor: pointer; }
 
         .container { margin-top: 12px; width: 100%; }
+
+        /* METRIK RATA-RATA AREA COORDINATOR */
+        .ac-metrics-card { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid var(--accent-primary); border-radius: 20px; padding: 14px; margin-bottom: 12px; }
+        .ac-metric-box { background: var(--header-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 8px 4px; }
 
         .disket-info-bar {
             background: var(--card-bg); border: 1px solid var(--gold); border-radius: 20px; padding: 12px 14px; margin-bottom: 14px;
@@ -229,14 +235,6 @@
         .growth-badge-pill.up { background: #d1fae5; color: #047857; border: 1px solid #10b981; }
         .growth-badge-pill.down { background: #fee2e2; color: #b91c1c; border: 1px solid #ef4444; }
 
-        .rincian-card-item { background: #ffffff; border: 1px solid var(--card-border); border-radius: 14px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-        .perf-card-neon { background: #ecfdf5; border: 1px solid #10b981; border-radius: 18px; padding: 16px; margin-bottom: 12px; color: #0f172a; }
-        .btn-copy-action { background: var(--accent-green-grad); color: #ffffff; font-weight: 800; font-size: 0.78rem; padding: 12px 14px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 8px; }
-
-        .filter-pills-row { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
-        .filter-pill-btn { background: rgba(0,0,0,0.04); border: 1px solid var(--card-border); color: var(--text-sub); padding: 6px 12px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
-        .filter-pill-btn.active { background: var(--accent-green-grad); color: #ffffff; border-color: var(--accent-primary); font-weight: 800; }
-
         .star-rating-box { display: flex; justify-content: center; gap: 8px; margin: 10px 0; font-size: 1.8rem; color: #cbd5e1; cursor: pointer; }
         .star-rating-box .fa-star.active { color: var(--gold); }
 
@@ -286,9 +284,9 @@
                 <div class="brand-title">
                     <div>
                         <span class="brand-title-text">KACIDA BERSATU ✦</span>
-                        <div class="ocean-3d-badge-transparent">
+                        <div class="ocean-3d-badge-transparent" id="hdrOnlineBadgeStatus">
                             <span class="pulse-green-dot"></span>
-                            <span id="hdrStoreOnlineName">TOKO ONLINE</span>
+                            <span id="hdrStoreOnlineName">ONLINE 🟢</span>
                         </div>
                     </div>
                 </div>
@@ -307,6 +305,28 @@
         </header>
 
         <main id="tabBeranda" class="container">
+            <!-- RATA-RATA AREA COORDINATOR METRICS CARD -->
+            <div id="acSummaryContainer" class="ac-metrics-card hidden">
+                <div style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fa-solid fa-chart-line"></i> RATA-RATA SE-AREA COORDINATOR</span>
+                    <span style="font-size:0.6rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px;" id="acStoreCountBadge">0 Toko</span>
+                </div>
+                <div class="modal-grid-3" style="text-align:center;">
+                    <div class="ac-metric-box">
+                        <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">AVG SALES</span>
+                        <span style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);" id="acAvgSalesVal">Rp 0</span>
+                    </div>
+                    <div class="ac-metric-box">
+                        <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">AVG STD</span>
+                        <span style="font-size:0.8rem; font-weight:800; color:var(--gold);" id="acAvgSTDVal">0 Struk</span>
+                    </div>
+                    <div class="ac-metric-box">
+                        <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">AVG APC</span>
+                        <span style="font-size:0.8rem; font-weight:800; color:#ef4444;" id="acAvgAPCVal">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- DISKET INFO BAR -->
             <section class="disket-info-bar">
                 <div class="disket-bar-item" onclick="openSalesMTDModal()">
@@ -429,7 +449,7 @@
 
             <!-- BAGAN PERSONIL TOKO BINAAN -->
             <div class="menu-section-card">
-                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Tim Personil Toko Saya</h3>
+                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Tim Personil </h3>
                 <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
             </div>
 
@@ -461,7 +481,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzSixJ6V8TL4VC44TNAZla6eo3awMc8ZQ99y7mnH2lS8aMSyRqwov42vT0przBRjMyD/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwR7OggL62GSVDOsSLZ1NM04RE1doDUTzHrEwEDsmC7_hwd9J2xlbxgNno8CKR4W6M1/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -510,11 +530,24 @@
             return new Date().toISOString().substring(0, 7);
         }
 
+        // REVISI 8: LOGGING AKTIVITAS LENGKAP KE FIREBASE & POIN
         function trackUserActivity(points = 5, actionName = "Aktivitas") {
             if (!currentNik) return;
             const ym = getCurrentMonthKey();
+            const uNama = dashboardData?.user?.NAMA || 'User';
+            const uToko = dashboardData?.user?.namaToko || '-';
 
             if (rtdb) {
+                // LOG SEMUA AKTIVITAS KE PATH /activity_logs FIREBASE
+                rtdb.ref('activity_logs').push({
+                    nik: currentNik,
+                    nama: uNama,
+                    toko: uToko,
+                    action: actionName,
+                    timestamp: new Date().toISOString()
+                });
+
+                // POINT TRANSAKSI
                 const userRef = rtdb.ref(`user_activity_points/${ym}/${currentNik}`);
                 userRef.transaction((currentPoints) => {
                     return (currentPoints || 0) + points;
@@ -529,6 +562,9 @@
                 localStorage.setItem(`pts_${ym}_${currentNik}`, localPts);
                 updatePointsAndRankUI(localPts);
             }
+
+            // BACKEND ASYNC LOG
+            apiCall("logActivity", { nama: uNama, namaToko: uToko, aksi: actionName }).catch(()=>{});
         }
 
         function updatePointsAndRankUI(pointsVal) {
@@ -628,6 +664,23 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
+        // REVISI 7: MONITOR STATUS OFFLINE / ONLINE DI HEADER + INDICATOR BERGERAK
+        function setupOnlineOfflineListener() {
+            const updateStatus = () => {
+                const el = document.getElementById("hdrOnlineBadgeStatus");
+                if (el) {
+                    if (navigator.onLine) {
+                        el.innerHTML = `<span class="pulse-green-dot"></span> <span style="color:var(--accent-primary); font-weight:800;">ONLINE 🟢</span>`;
+                    } else {
+                        el.innerHTML = `<span class="pulse-red-dot"></span> <span style="color:#ef4444; font-weight:800;">OFFLINE 🔴</span>`;
+                    }
+                }
+            };
+            window.addEventListener('online', updateStatus);
+            window.addEventListener('offline', updateStatus);
+            updateStatus();
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -670,6 +723,7 @@
                         else if (action === "submitSurvey") r.submitSurveyData(currentNik, params.rating, params.saran);
                         else if (action === "getLeaderboard") r.getLeaderboard();
                         else if (action === "getDaftarToko") r.getDaftarToko(currentNik);
+                        else if (action === "logActivity") r.logUserActivityToFirebase(currentNik, params.nama, params.namaToko, params.aksi);
                     });
                 } else {
                     const url = new URL(SCRIPT_URL);
@@ -683,8 +737,7 @@
                 }
             } catch(err) {
                 hideLoading();
-                showSwalWarning('Koneksi Terputus ⚠️', 'Gagal terhubung ke server. Silakan periksa koneksi internet Anda.');
-                return { status: "error", message: err.toString() };
+                return { status: "offline", message: err.toString() };
             }
         }
 
@@ -699,9 +752,25 @@
             });
         }
 
+        // REVISI 1: INSTANT STARTUP (0 DETIK) MENGGUNAKAN LOCAL CACHE & SYNC SILENT DIBELAKANG LAYAR
         window.addEventListener("DOMContentLoaded", () => {
             applyTheme(currentTheme);
-            if (currentNik) initDashboard(null, true);
+            setupOnlineOfflineListener();
+
+            // RENDER INSTAN JIKA SUDAH ADA DATA LOKAL CACHE
+            const localCache = localStorage.getItem("kacida_cached_dashboard");
+            if (localCache && currentNik) {
+                try {
+                    dashboardData = JSON.parse(localCache);
+                    document.getElementById("loginSection").classList.add("hidden");
+                    document.getElementById("appSection").classList.remove("hidden");
+                    renderDashboard(dashboardData);
+                } catch(e) {}
+            }
+
+            if (currentNik) {
+                initDashboard(null, true); // SILENT BACKGROUND SYNC
+            }
 
             if (window.visualViewport) {
                 window.visualViewport.addEventListener('resize', () => {
@@ -714,28 +783,28 @@
             }
         });
 
+        // REVISI 6: LOGIN KILAT (0-4 DETIK)
         async function handleLogin() {
             triggerAndroidHaptic('medium');
             const nik = document.getElementById("nikInput").value.trim();
             if (!nik) { showSwalWarning('Form Kosong ⚠️', 'Mohon masukkan NIK Anda!'); return; }
-            showLoading("Proses Login Pengguna...");
+            showLoading("Proses Login Kilat...");
             currentNik = nik;
             const res = await apiCall("login", { nik: nik });
             hideLoading();
             if (res && res.status === "success") {
                 localStorage.setItem("NIK_KACIDA", nik);
                 trackUserActivity(10, "Login Aplikasi");
-                showSwalSuccess('Login Berhasil! 🚀', `Selamat datang di Kacida Bersatu!`, () => { initDashboard(); });
+                document.getElementById("loginSection").classList.add("hidden");
+                document.getElementById("appSection").classList.remove("hidden");
+                initDashboard(null, false);
             } else {
                 showSwalWarning('Login Gagal ⚠️', res?.message || 'NIK Tidak Terdaftar di Sistem.');
             }
         }
 
         async function initDashboard(kodeTokoPilihan = null, isSilent = false) {
-            document.getElementById("loginSection").classList.add("hidden");
-            document.getElementById("appSection").classList.remove("hidden");
-            
-            if (!isSilent) showLoading("Memuat Data...");
+            if (!isSilent && !dashboardData) showLoading("Memuat Data...");
             if (kodeTokoPilihan) selectedKodeTokoAC = kodeTokoPilihan;
             
             const data = await apiCall("getDashboard");
@@ -743,6 +812,10 @@
             
             if (data && data.status === "success") {
                 dashboardData = data;
+                localStorage.setItem("kacida_cached_dashboard", JSON.stringify(data));
+                
+                document.getElementById("loginSection").classList.add("hidden");
+                document.getElementById("appSection").classList.remove("hidden");
                 renderDashboard(data);
                 trackUserActivity(5, "Akses Dashboard");
             }
@@ -759,6 +832,13 @@
             return j.includes("AC") || j.includes("AREA") || j.includes("AM") || j.includes("DBM") || j.includes("BM") || j.includes("OGM");
         }
 
+        // REVISI 3: KHUSUS CHIEF / ACOS YANG BISA EDIT SHIFT (USER AC HANYA LIHAT)
+        function canEditShift() {
+            if (!dashboardData || !dashboardData.user) return false;
+            const j = String(dashboardData.user.jabatan || dashboardData.user.JABATAN || '').toUpperCase();
+            return (j.includes("CHIEF") || j.includes("COS") || j.includes("ACOS") || j.includes("ASSISTANT")) && !isUserAC();
+        }
+
         function isUserCOS() {
             const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
             return j.includes("CHIEF") || j.includes("COS");
@@ -767,7 +847,7 @@
         function renderDashboard(data) {
             document.getElementById("lblGreetingText").innerText = getTimeGreeting() + ",";
             document.getElementById("lblUserName").innerText = (escapeHTML(data.user.NAMA) || "USER") + "! 👋";
-            document.getElementById("hdrStoreOnlineName").innerText = data.user.namaToko || "ONLINE";
+            document.getElementById("hdrStoreOnlineName").innerText = data.user.namaToko || "ONLINE 🟢";
             document.getElementById("profilNama").innerText = data.user.NAMA || "-";
             document.getElementById("profilJabatan").innerText = data.user.jabatan || data.user.JABATAN || "-";
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
@@ -776,6 +856,17 @@
             document.getElementById("valIKT").innerText = data.dataH1.iktNetSales || "-";
             document.getElementById("valPenawaran").innerText = data.dataH1.point || "-";
             document.getElementById("valTasks").innerText = data.badges.tugas;
+
+            // REVISI 2: METRIK RATA-RATA AREA COORDINATOR (SALES, STD, APC)
+            if (isUserAC() && data.acMetrics) {
+                document.getElementById("acSummaryContainer").classList.remove("hidden");
+                document.getElementById("acStoreCountBadge").innerText = `${data.acMetrics.totalStoreCount} Toko`;
+                document.getElementById("acAvgSalesVal").innerText = `Rp ${Number(data.acMetrics.avgSales).toLocaleString('id-ID')}`;
+                document.getElementById("acAvgSTDVal").innerText = `${Number(data.acMetrics.avgSTD).toLocaleString('id-ID')} Struk`;
+                document.getElementById("acAvgAPCVal").innerText = `Rp ${Number(data.acMetrics.avgAPC).toLocaleString('id-ID')}`;
+            } else {
+                document.getElementById("acSummaryContainer").classList.add("hidden");
+            }
 
             renderCarousel(data.banners, data.user.namaToko);
             renderCombinedMenuUtama(data.menu.utama || []);
@@ -821,8 +912,8 @@
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-book-open"></i> README & TATA CARA APLIKASI</h4>
                         <div style="font-size:0.72rem; color:var(--text-main); line-height:1.5;">
                             <p><b>1. Fitur Sales SPD & MTD:</b> Klik baris Sales di beranda untuk melihat rincian performa harian beserta filter bulan aktif & toko.</p>
-                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS/AC dapat mengatur pola shift bulanan dan menukar shift secara instan per toko.</p>
-                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Pantau rak toko dan catat barang yang mendekati expired. User AC dapat memantau seluruh toko.</p>
+                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS dapat mengedit pola shift bulanan. User AC dapat memantau seluruh toko.</p>
+                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Pantau rak toko dan catat barang yang mendekati expired dalam format Resume Toko.</p>
                             <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Unggah struk belanja untuk dikonfirmasi COS & disetujui AC secara real-time seluruh toko.</p>
                         </div>
                     </div>
@@ -951,13 +1042,6 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        function isCOSorACOS() {
-            if (!dashboardData || !dashboardData.user) return false;
-            if (isUserAC()) return true;
-            const j = String(dashboardData.user.jabatan || dashboardData.user.JABATAN || '').toUpperCase();
-            return j.includes("CHIEF") || j.includes("COS") || j.includes("ACOS") || j.includes("ASSISTANT") || j.includes("AM") || j.includes("AC") || j.includes("ADMIN");
-        }
-
         function isDatePassed(yearMonthStr, dayNum) {
             const today = new Date();
             today.setHours(0,0,0,0);
@@ -966,7 +1050,7 @@
             return targetDate < today;
         }
 
-        /* 3. REVISI PLAN JADWAL SHIFT (USER AREA COORDINATOR BISA LIHAT SEMUA TOKO) */
+        // REVISI 3: USER AREA COORDINATOR BISA LIHAT SEMUA TOKO, PROSES EDIT HANYA CHIEF / ACOS
         async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
             const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko;
@@ -984,7 +1068,7 @@
         }
 
         function renderPlanMasterShiftModal() {
-            const canEdit = isCOSorACOS();
+            const canEdit = canEditShift();
             const userAC = isUserAC();
             const daftarToko = dashboardData?.daftarToko || [];
             
@@ -1027,7 +1111,7 @@
                     dayCellsHtml += `
                         <td style="padding:3px; text-align:center; border:1px solid var(--card-border);">
                             <div class="shift-pill ${pillClass} ${passed ? 'shift-locked' : ''}" 
-                                 onclick="${(canEdit && !passed) ? `openShiftPickerModal('${p.nik}', ${d}, '${shiftCode}')` : (passed ? `showSwalWarning('Tanggal Terkunci 🔒', 'Tanggal ini telah berlalu. Gunakan Tukar Instan jika perlu penyesuaian.')` : '')}">
+                                 onclick="${(canEdit && !passed) ? `openShiftPickerModal('${p.nik}', ${d}, '${shiftCode}')` : (passed ? `showSwalWarning('Tanggal Terkunci 🔒', 'Tanggal ini telah berlalu.')` : `showSwalWarning('Read Only 👁️', 'Mode Lihat Hanya Khusus Area Coordinator.')`)}">
                                 ${labelTxt}
                             </div>
                         </td>
@@ -1056,7 +1140,7 @@
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR (Chief / AC / AM)' : '👁️ READ ONLY'}</b></p>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ (Chief / Assistant Chief)' : '👁️ READ ONLY (Area Coordinator)'}</b></p>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
@@ -1205,13 +1289,8 @@
             }
         }
 
-        /* 4. REVISI CEKLIS EXPIRED (TAB ALERT EXP USER AREA COORDINATOR BISA CEK SEMUA TOKO) */
+        // REVISI 5: ALERT EXP KHUSUS USER AC TANPA FILTER, TAMPIL RESUME TOKO DENGAN BADGE ANGKA & DETAIL EKSEKUSI
         function openCeklisExpiredModal() { renderCeklisExpiredModal('rak'); }
-
-        function changeExpAlertStore(val) {
-            selectedExpAlertStore = val;
-            renderCeklisExpiredModal('alert');
-        }
 
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const totalRak = expShelves.length;
@@ -1278,7 +1357,7 @@
                     </div>
 
                     <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer; width:100%;">
-                        ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Master User)
+                        ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Personil)
                     </button>
 
                     <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada rak.</p>'}</div>
@@ -1306,57 +1385,66 @@
                     </div>
                 `;
             } else if (activeTab === 'alert') {
-                let filteredProducts = expProducts;
-                if (selectedExpAlertStore !== "ALL") {
-                    filteredProducts = expProducts.filter(p => p.kodeToko === selectedExpAlertStore);
-                }
-
-                let alertListHtml = filteredProducts.map(p => {
-                    const shelf = expShelves.find(s => s.id === p.shelfId);
-                    const isDone = p.status === 'selesai';
-                    return `
-                        <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <div style="display:flex; align-items:center; gap:6px;">
-                                    <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
-                                    <span style="font-size:0.58rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(p.namaToko || p.kodeToko || 'TOKO')}</span>
-                                </div>
-                                <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
-                            </div>
-                            <div style="display:flex; gap:6px;">
-                                ${!isDone ? `
-                                    <button onclick="markExpProductHandled('${p.id}')" style="background:#d1fae5; color:#047857; border:1px solid var(--accent-primary); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                        ✅ Konfirmasi
-                                    </button>
-                                ` : `
-                                    <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
-                                    <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                        🗑️ Hapus
-                                    </button>
-                                `}
-                            </div>
-                        </div>
-                    `;
-                }).join("");
-
-                let storeFilterHtml = '';
                 if (userAC && daftarToko.length > 0) {
-                    const opts = daftarToko.map(t => `<option value="${t.kodeToko}" ${selectedExpAlertStore === t.kodeToko ? 'selected' : ''}>🏪 ${escapeHTML(t.namaToko)} (${t.kodeToko})</option>`).join("");
-                    storeFilterHtml = `
-                        <div class="modal-card-box" style="margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;">
-                            <span style="font-size:0.72rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-filter"></i> FILTER TOKO (AC):</span>
-                            <select onchange="changeExpAlertStore(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 10px; border-radius:10px;">
-                                <option value="ALL" ${selectedExpAlertStore === "ALL" ? 'selected' : ''}>🌐 Semua Toko Area</option>
-                                ${opts}
-                            </select>
-                        </div>
-                    `;
-                }
+                    // RESUME TOKO UNTUK USER AC (TANPA FILTER DROPDOWN)
+                    const storeExpCards = daftarToko.map(toko => {
+                        const storeItems = expProducts.filter(p => p.kodeToko === toko.kodeToko);
+                        const pendingCount = storeItems.filter(p => p.status !== 'selesai').length;
+                        const doneCount = storeItems.filter(p => p.status === 'selesai').length;
 
-                tabContentHtml = `
-                    ${storeFilterHtml}
-                    <div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>
-                `;
+                        return `
+                            <div class="modal-card-box" onclick="viewStoreExpDetail('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid ${pendingCount > 0 ? '#ef4444' : '#10b981'};" title="Klik untuk lihat rincian produk">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
+                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">
+                                            Status: <b style="color:#10b981;">${doneCount} Dieksekusi</b> | <b style="color:#ef4444;">${pendingCount} Belum</b>
+                                        </p>
+                                    </div>
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        ${pendingCount > 0 ? `<span style="background:#ef4444; color:#fff; font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:10px;">${pendingCount} Harus Dieksekusi</span>` : `<span style="background:#d1fae5; color:#047857; font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:10px;">Aman ✅</span>`}
+                                        <span style="font-size:0.6rem; color:var(--gold);">Detail ➔</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+
+                    tabContentHtml = `
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO (AREA COORDINATOR)</h5>
+                        <div class="modal-grid-1">${storeExpCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada data toko.</p>'}</div>
+                    `;
+                } else {
+                    let alertListHtml = expProducts.map(p => {
+                        const shelf = expShelves.find(s => s.id === p.shelfId);
+                        const isDone = p.status === 'selesai';
+                        return `
+                            <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
+                                        <span style="font-size:0.58rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(p.namaToko || p.kodeToko || 'TOKO')}</span>
+                                    </div>
+                                    <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
+                                </div>
+                                <div style="display:flex; gap:6px;">
+                                    ${!isDone ? `
+                                        <button onclick="markExpProductHandled('${p.id}')" style="background:#d1fae5; color:#047857; border:1px solid var(--accent-primary); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                            ✅ Konfirmasi
+                                        </button>
+                                    ` : `
+                                        <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
+                                        <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                            🗑️ Hapus
+                                        </button>
+                                    `}
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+
+                    tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
+                }
             }
 
             const htmlBox = `
@@ -1372,6 +1460,33 @@
                 </div>
             `;
             showCustomModal("⚠️ CEKLIS EXP & MANAJEMEN RAK", htmlBox);
+        }
+
+        function viewStoreExpDetail(kodeToko, namaToko) {
+            triggerAndroidHaptic('light');
+            const storeItems = expProducts.filter(p => p.kodeToko === kodeToko);
+
+            let html = storeItems.map(p => {
+                const isDone = p.status === 'selesai';
+                return `
+                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(p.name)}</p>
+                            <p style="font-size:0.62rem; color:var(--text-sub);">Exp: <b style="color:#ef4444;">${p.expDate}</b> | Penginput: ${escapeHTML(p.addedBy || 'Staff')}</p>
+                        </div>
+                        <span style="font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; ${isDone ? 'background:#d1fae5; color:#047857;' : 'background:#fee2e2; color:#dc2626;'}">
+                            ${isDone ? '✅ Sudah Dieksekusi' : '⚠️ Belum Dieksekusi'}
+                        </span>
+                    </div>
+                `;
+            }).join("");
+
+            Swal.fire({
+                title: `Detail Expired: ${namaToko}`,
+                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Tidak ada catatan produk expired di toko ini.</p>`,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
         }
 
         function addShelfManualAction() {
@@ -1481,7 +1596,6 @@
             }
         }
 
-        /* 1. REVISI BELANJA KARYAWAN (TAB RESUME TOKO UNTUK AREA COORDINATOR BISA LIHAT SEMUA TOKO) */
         function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
 
         function getBelanjaCutoffCycle() {
@@ -1667,6 +1781,25 @@
                 let resumeTokoSectionHtml = '';
 
                 if (userAC && daftarToko.length > 0) {
+                    // REVISI 4: KOTAK TOTAL SUDAH BELANJA DAN BELUM BELANJA BERDAMPINGAN UNTUK AREA COORDINATOR
+                    const totalPersonilArea = allMaster.length;
+                    const shoppedNiksArea = new Set(filteredTx.filter(t => t.status === "Disetujui" || t.status === "Menunggu AC").map(t => t.penginputNik));
+                    const totalSudahBelanjaArea = shoppedNiksArea.size;
+                    const totalBelumBelanjaArea = Math.max(0, totalPersonilArea - totalSudahBelanjaArea);
+
+                    const acSummaryBoxesHtml = `
+                        <div class="modal-grid-2" style="margin-bottom:12px;">
+                            <div class="modal-card-box" style="border-left: 4px solid #10b981; text-align: center; padding: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">✅ TOTAL SUDAH BELANJA</span>
+                                <p style="font-size: 1.2rem; font-weight: 800; color: #047857; margin-top: 2px;">${totalSudahBelanjaArea} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
+                            </div>
+                            <div class="modal-card-box" style="border-left: 4px solid #ef4444; text-align: center; padding: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">❌ TOTAL BELUM BELANJA</span>
+                                <p style="font-size: 1.2rem; font-weight: 800; color: #dc2626; margin-top: 2px;">${totalBelumBelanjaArea} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
+                            </div>
+                        </div>
+                    `;
+
                     const storeCards = daftarToko.map(toko => {
                         const storePersonil = allMaster.filter(u => u.kodeToko === toko.kodeToko);
                         
@@ -1696,7 +1829,8 @@
                     }).join("");
 
                     resumeTokoSectionHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:10px;">🏪 REKAP SALES PER-TOKO (AREA COORDINATOR)</h5>
+                        ${acSummaryBoxesHtml}
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;">🏪 REKAP SALES PER-TOKO (AREA COORDINATOR)</h5>
                         <div class="modal-grid-1">${storeCards}</div>
                     `;
                 } else {
@@ -1738,7 +1872,7 @@
                             </div>
                         </div>
 
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 STATUS APPROVAL PERSONIL TOKO</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 STATUS APPROVAL PERSONIL </h5>
                         <div class="modal-grid-1">${listPersonilCards || '<p style="color:var(--text-sub);">Personil toko tidak ditemukan.</p>'}</div>
                     `;
                 }
@@ -1746,7 +1880,7 @@
                 tabContentHtml = `
                     <div class="modal-grid-1">
                         <div class="modal-card-box">
-                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL MONITORED SALES</h5>
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL SALES</h5>
                             <div class="modal-grid-2" style="margin-bottom:8px;">
                                 <div>
                                     <label style="font-size:0.65rem; font-weight:700;">Dari Tanggal:</label>
@@ -2005,7 +2139,6 @@
             showCustomModal("📊 DATA PERFORMANCE", htmlBox);
         }
 
-        /* 2. REVISI MTD SALES (USER AREA COORDINATOR BISA LIHAT SEMUA TOKO DI SHEET MASTER_USER) */
         async function openSalesMTDModal(bulanPilihan = null) {
             showLoading("Memuat Data MTD...");
             const d = await apiCall("getDetailSalesMTD", { bulanPilihan: bulanPilihan });
@@ -2401,6 +2534,7 @@
             if (tabName === "aksiCepat") loadMisi();
         }
 
+        // REVISI 6: LOGOUT KILAT INSTAN LOKAL CACHE CLEAR
         function handleLogout() {
             Swal.fire({
                 title: 'Konfirmasi Logout',
@@ -2413,6 +2547,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     localStorage.removeItem("NIK_KACIDA");
+                    localStorage.removeItem("kacida_cached_dashboard");
                     currentNik = "";
                     dashboardData = null;
                     document.getElementById("appSection").classList.add("hidden");
