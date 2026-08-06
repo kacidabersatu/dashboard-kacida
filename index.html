@@ -237,7 +237,6 @@
         .filter-pill-btn { background: rgba(0,0,0,0.04); border: 1px solid var(--card-border); color: var(--text-sub); padding: 6px 12px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
         .filter-pill-btn.active { background: var(--accent-green-grad); color: #ffffff; border-color: var(--accent-primary); font-weight: 800; }
 
-        /* RATING BINTANG STYLES */
         .star-rating-box { display: flex; justify-content: center; gap: 8px; margin: 10px 0; font-size: 1.8rem; color: #cbd5e1; cursor: pointer; }
         .star-rating-box .fa-star.active { color: var(--gold); }
 
@@ -283,7 +282,6 @@
         
         <header class="app-header">
             <div class="header-left">
-                <!-- ICON HAMBURGER MEMBUKA SIDEBAR CONFIG, README & SURVEY -->
                 <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan & Fitur Aplikasi"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
                     <div>
@@ -296,7 +294,6 @@
                 </div>
             </div>
             <div class="header-right">
-                <!-- SYNC MANUAL REPLANTED TO HEADER -->
                 <button class="sync-hdr-btn" onclick="refreshLiveDashboardData()" title="Refresh Data Live">
                     <i class="fa-solid fa-arrows-rotate"></i> <span>Sync</span>
                 </button>
@@ -377,7 +374,6 @@
                 </div>
             </section>
 
-            <!-- LAYOUT MENU UTAMA DIBATASI MAKSIMAL 8 MENU -->
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
                 <div id="gridMenuUtama" class="menu-grid-4"></div>
@@ -388,7 +384,7 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT NAVBAR UTUH (DENGAN KEYBOARD DYNAMIC ADJUSTMENT) -->
+        <!-- TAB CHAT NAVBAR UTUH -->
         <div id="tabChat" class="hidden container">
             <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-primary);"></i> Room Chat Tim Kacida</h2>
             
@@ -465,7 +461,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0QB9Xb9kVa8Eb8GyVKDfW6d6VLyowMdismsmC9-J4EAX47sgFor9K65hNIC2ST7Ad/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzSixJ6V8TL4VC44TNAZla6eo3awMc8ZQ99y7mnH2lS8aMSyRqwov42vT0przBRjMyD/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -486,6 +482,8 @@
         let currentTheme = localStorage.getItem("KACIDA_THEME") || "default";
         let dashboardData = null;
         let selectedKodeTokoAC = null;
+        let selectedShiftKodeToko = null;
+        let selectedExpAlertStore = "ALL";
         let chatRoomMode = "team";
         let cachedChatList = [];
         let salesChartInstance = null;
@@ -630,7 +628,6 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
-        /* LISTEN PWA INSTALL PROMPT */
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -657,7 +654,6 @@
             });
         }
 
-        /* API CALL KE APPS SCRIPT BACKEND */
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -668,11 +664,12 @@
                         else if (action === "getPerforma") r.getPerformaPopup(currentNik, selectedKodeTokoAC);
                         else if (action === "getDetailSalesMTD") r.getDetailSalesMTD(currentNik, selectedKodeTokoAC, params.bulanPilihan);
                         else if (action === "askAI") r.askKacidaAI(currentNik, params.pertanyaan);
-                        else if (action === "getMonthlyShift") r.getMonthlyShiftData(currentNik, dashboardData?.user?.kodeToko, params.bulanYear);
-                        else if (action === "saveMonthlyShift") r.saveMonthlyShiftData(currentNik, dashboardData?.user?.kodeToko, params.bulanYear, params.shiftDataJson);
+                        else if (action === "getMonthlyShift") r.getMonthlyShiftData(currentNik, params.kodeToko || dashboardData?.user?.kodeToko, params.bulanYear);
+                        else if (action === "saveMonthlyShift") r.saveMonthlyShiftData(currentNik, params.kodeToko || dashboardData?.user?.kodeToko, params.bulanYear, params.shiftDataJson);
                         else if (action === "submitShiftHandover") r.submitShiftHandover(currentNik, params);
                         else if (action === "submitSurvey") r.submitSurveyData(currentNik, params.rating, params.saran);
                         else if (action === "getLeaderboard") r.getLeaderboard();
+                        else if (action === "getDaftarToko") r.getDaftarToko(currentNik);
                     });
                 } else {
                     const url = new URL(SCRIPT_URL);
@@ -706,7 +703,6 @@
             applyTheme(currentTheme);
             if (currentNik) initDashboard(null, true);
 
-            // KEYBOARD DYNAMIC HEIGHT HANDLER UNTUK CHAT MOBILE
             if (window.visualViewport) {
                 window.visualViewport.addEventListener('resize', () => {
                     const tabChat = document.getElementById("tabChat");
@@ -735,7 +731,6 @@
             }
         }
 
-        // INIT DASHBOARD: PARAMETER isSilent MENCEGAH MODAL LOADING SAAT AWAL BUKA APLIKASI
         async function initDashboard(kodeTokoPilihan = null, isSilent = false) {
             document.getElementById("loginSection").classList.add("hidden");
             document.getElementById("appSection").classList.remove("hidden");
@@ -756,6 +751,17 @@
         function refreshLiveDashboardData() {
             showLoading("Sinkronisasi Data...");
             initDashboard(selectedKodeTokoAC, false);
+        }
+
+        function isUserAC() {
+            if (dashboardData?.user?.isAC) return true;
+            const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
+            return j.includes("AC") || j.includes("AREA") || j.includes("AM") || j.includes("DBM") || j.includes("BM") || j.includes("OGM");
+        }
+
+        function isUserCOS() {
+            const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
+            return j.includes("CHIEF") || j.includes("COS");
         }
 
         function renderDashboard(data) {
@@ -800,7 +806,6 @@
             }
         }
 
-        /* DRAWER MENU DRAWER / CONFIG / README / SURVEY */
         function openMenuSidebar() {
             triggerAndroidHaptic('medium');
             const htmlContent = `
@@ -815,10 +820,10 @@
                     <div class="modal-card-box">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-book-open"></i> README & TATA CARA APLIKASI</h4>
                         <div style="font-size:0.72rem; color:var(--text-main); line-height:1.5;">
-                            <p><b>1. Fitur Sales SPD & MTD:</b> Klik baris Sales di beranda untuk melihat rincian performa harian beserta filter bulan aktif.</p>
-                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS dapat mengatur pola shift bulanan dan menukar shift secara instan.</p>
-                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Pantau rak toko dan catat barang yang mendekati expired untuk menghindari kerugian.</p>
-                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Unggah struk belanja untuk dikonfirmasi COS & disetujui AC secara real-time.</p>
+                            <p><b>1. Fitur Sales SPD & MTD:</b> Klik baris Sales di beranda untuk melihat rincian performa harian beserta filter bulan aktif & toko.</p>
+                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS/AC dapat mengatur pola shift bulanan dan menukar shift secara instan per toko.</p>
+                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Pantau rak toko dan catat barang yang mendekati expired. User AC dapat memantau seluruh toko.</p>
+                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Unggah struk belanja untuk dikonfirmasi COS & disetujui AC secara real-time seluruh toko.</p>
                         </div>
                     </div>
 
@@ -948,6 +953,7 @@
 
         function isCOSorACOS() {
             if (!dashboardData || !dashboardData.user) return false;
+            if (isUserAC()) return true;
             const j = String(dashboardData.user.jabatan || dashboardData.user.JABATAN || '').toUpperCase();
             return j.includes("CHIEF") || j.includes("COS") || j.includes("ACOS") || j.includes("ASSISTANT") || j.includes("AM") || j.includes("AC") || j.includes("ADMIN");
         }
@@ -960,18 +966,38 @@
             return targetDate < today;
         }
 
-        async function openPlanMasterShiftModal() {
+        /* 3. REVISI PLAN JADWAL SHIFT (USER AREA COORDINATOR BISA LIHAT SEMUA TOKO) */
+        async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
-            const res = await apiCall("getMonthlyShift", { bulanYear: currentShiftMonth });
+            const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko;
+            selectedShiftKodeToko = targetKode;
+
+            const res = await apiCall("getMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth });
             hideLoading();
             if (res && res.shiftData) localShiftMatrix = res.shiftData;
             else localShiftMatrix = {};
             renderPlanMasterShiftModal();
         }
 
+        function changeShiftStore(kodeToko) {
+            openPlanMasterShiftModal(kodeToko);
+        }
+
         function renderPlanMasterShiftModal() {
             const canEdit = isCOSorACOS();
-            const personil = dashboardData?.struktur?.personilToko || [];
+            const userAC = isUserAC();
+            const daftarToko = dashboardData?.daftarToko || [];
+            
+            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
+
+            let personil = [];
+            if (dashboardData?.allMasterUsers) {
+                personil = dashboardData.allMasterUsers.filter(u => u.kodeToko === targetKode);
+            }
+            if (personil.length === 0 && targetKode === dashboardData?.user?.kodeToko) {
+                personil = dashboardData?.struktur?.personilToko || [];
+            }
+
             const [yr, mo] = currentShiftMonth.split("-");
             const daysInMonth = new Date(parseInt(yr, 10), parseInt(mo, 10), 0).getDate();
             const dayNamesShort = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
@@ -1010,12 +1036,27 @@
                 return `<tr><td style="padding:8px; font-weight:800; border:1px solid var(--card-border); position:sticky; left:0; background:var(--header-bg); z-index:2; min-width:130px;"><div>${escapeHTML(p.nama)}</div><div style="font-size:0.6rem; color:var(--text-sub);">${escapeHTML(p.jabatan)}</div></td>${dayCellsHtml}</tr>`;
             }).join("");
 
+            let storeSelectHtml = '';
+            if (userAC && daftarToko.length > 0) {
+                const options = daftarToko.map(t => `<option value="${t.kodeToko}" ${t.kodeToko === targetKode ? 'selected' : ''}>🏪 ${escapeHTML(t.namaToko)} (${t.kodeToko})</option>`).join("");
+                storeSelectHtml = `
+                    <div class="modal-card-box" style="margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
+                        <span style="font-size:0.72rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-store"></i> PILIH TOKO (AREA AC):</span>
+                        <select onchange="changeShiftStore(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 10px; border-radius:10px;">
+                            ${options}
+                        </select>
+                    </div>
+                `;
+            }
+
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
+                    ${storeSelectHtml}
+
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ (Chief / Assistant Chief)' : '👁️ READ ONLY'}</b></p>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR (Chief / AC / AM)' : '👁️ READ ONLY'}</b></p>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
@@ -1034,7 +1075,7 @@
                     <div style="overflow-x:auto; border:1px solid var(--card-border); border-radius:14px; background:var(--header-bg);">
                         <table style="width:100%; border-collapse:collapse; text-align:left;">
                             <thead><tr style="background:var(--input-bg);"><th style="padding:8px; border:1px solid var(--card-border); font-size:0.7rem; position:sticky; left:0; background:var(--input-bg); z-index:3;">Personil Toko</th>${shiftHeaderColsHtml}</tr></thead>
-                            <tbody>${personilRowsHtml}</tbody>
+                            <tbody>${personilRowsHtml || '<tr><td colspan="32" style="text-align:center; padding:12px; color:var(--text-sub);">Personil toko tidak ditemukan.</td></tr>'}</tbody>
                         </table>
                     </div>
 
@@ -1071,7 +1112,11 @@
 
         function openInstantSwapModal() {
             triggerAndroidHaptic('medium');
-            const personil = dashboardData?.struktur?.personilToko || [];
+            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
+            let personil = [];
+            if (dashboardData?.allMasterUsers) personil = dashboardData.allMasterUsers.filter(u => u.kodeToko === targetKode);
+            if (personil.length === 0) personil = dashboardData?.struktur?.personilToko || [];
+
             if (personil.length < 2) { showSwalWarning('Data Kurang', 'Minimal harus ada 2 personil toko.'); return; }
 
             const personilOptions = personil.map(p => `<option value="${p.nik}">${escapeHTML(p.nama)} (${p.jabatan})</option>`).join("");
@@ -1129,7 +1174,11 @@
         function changeShiftMonth(val) { currentShiftMonth = val; openPlanMasterShiftModal(); }
 
         function autoGenerateMonthlyShift() {
-            const personil = dashboardData?.struktur?.personilToko || [];
+            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
+            let personil = [];
+            if (dashboardData?.allMasterUsers) personil = dashboardData.allMasterUsers.filter(u => u.kodeToko === targetKode);
+            if (personil.length === 0) personil = dashboardData?.struktur?.personilToko || [];
+
             const [yr, mo] = currentShiftMonth.split("-");
             const daysInMonth = new Date(parseInt(yr, 10), parseInt(mo, 10), 0).getDate();
             const shifts = ['p', 's', 'm', 'ao'];
@@ -1146,8 +1195,9 @@
 
         async function saveMonthlyShiftDataAction() {
             showLoading("Menyimpan Master Shift...");
+            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
             const jsonStr = JSON.stringify(localShiftMatrix);
-            const res = await apiCall("saveMonthlyShift", { bulanYear: currentShiftMonth, shiftDataJson: jsonStr });
+            const res = await apiCall("saveMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth, shiftDataJson: jsonStr });
             hideLoading();
             if (res && res.status === "success") {
                 trackUserActivity(10, "Simpan Master Shift");
@@ -1155,13 +1205,22 @@
             }
         }
 
+        /* 4. REVISI CEKLIS EXPIRED (TAB ALERT EXP USER AREA COORDINATOR BISA CEK SEMUA TOKO) */
         function openCeklisExpiredModal() { renderCeklisExpiredModal('rak'); }
+
+        function changeExpAlertStore(val) {
+            selectedExpAlertStore = val;
+            renderCeklisExpiredModal('alert');
+        }
 
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const totalRak = expShelves.length;
             const todayStr = new Date().toDateString();
             const selesaiRak = expShelves.filter(s => s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr).length;
             const belumRak = totalRak - selesaiRak;
+
+            const userAC = isUserAC();
+            const daftarToko = dashboardData?.daftarToko || [];
 
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
 
@@ -1247,14 +1306,22 @@
                     </div>
                 `;
             } else if (activeTab === 'alert') {
-                let alertListHtml = expProducts.map(p => {
+                let filteredProducts = expProducts;
+                if (selectedExpAlertStore !== "ALL") {
+                    filteredProducts = expProducts.filter(p => p.kodeToko === selectedExpAlertStore);
+                }
+
+                let alertListHtml = filteredProducts.map(p => {
                     const shelf = expShelves.find(s => s.id === p.shelfId);
                     const isDone = p.status === 'selesai';
                     return `
                         <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
-                                <p style="font-size:0.68rem; color:var(--text-sub);">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
+                                    <span style="font-size:0.58rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(p.namaToko || p.kodeToko || 'TOKO')}</span>
+                                </div>
+                                <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
                             </div>
                             <div style="display:flex; gap:6px;">
                                 ${!isDone ? `
@@ -1272,7 +1339,24 @@
                     `;
                 }).join("");
 
-                tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
+                let storeFilterHtml = '';
+                if (userAC && daftarToko.length > 0) {
+                    const opts = daftarToko.map(t => `<option value="${t.kodeToko}" ${selectedExpAlertStore === t.kodeToko ? 'selected' : ''}>🏪 ${escapeHTML(t.namaToko)} (${t.kodeToko})</option>`).join("");
+                    storeFilterHtml = `
+                        <div class="modal-card-box" style="margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;">
+                            <span style="font-size:0.72rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-filter"></i> FILTER TOKO (AC):</span>
+                            <select onchange="changeExpAlertStore(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 10px; border-radius:10px;">
+                                <option value="ALL" ${selectedExpAlertStore === "ALL" ? 'selected' : ''}>🌐 Semua Toko Area</option>
+                                ${opts}
+                            </select>
+                        </div>
+                    `;
+                }
+
+                tabContentHtml = `
+                    ${storeFilterHtml}
+                    <div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>
+                `;
             }
 
             const htmlBox = `
@@ -1370,7 +1454,17 @@
 
             if (!shelfId || !name || !expDate) { showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi semua data.'); return; }
 
-            expProducts.push({ id: 'prod_' + Date.now(), name, shelfId, expDate, addedBy: dashboardData?.user?.NAMA || 'User', status: 'pending' });
+            expProducts.push({
+                id: 'prod_' + Date.now(),
+                name,
+                shelfId,
+                expDate,
+                addedBy: dashboardData?.user?.NAMA || 'User',
+                status: 'pending',
+                kodeToko: dashboardData?.user?.kodeToko || 'TOKO',
+                namaToko: dashboardData?.user?.namaToko || 'Toko'
+            });
+
             localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
             trackUserActivity(5, "Catat Produk Expired");
             renderCeklisExpiredModal('alert');
@@ -1387,17 +1481,8 @@
             }
         }
 
+        /* 1. REVISI BELANJA KARYAWAN (TAB RESUME TOKO UNTUK AREA COORDINATOR BISA LIHAT SEMUA TOKO) */
         function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
-
-        function isUserAC() {
-            const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
-            return j.includes("AC") || j.includes("AM") || j.includes("DBM") || j.includes("BM") || j.includes("OGM");
-        }
-
-        function isUserCOS() {
-            const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
-            return j.includes("CHIEF") || j.includes("COS");
-        }
 
         function getBelanjaCutoffCycle() {
             const now = new Date();
@@ -1459,7 +1544,6 @@
         }
 
         function renderBelanjaKaryawanModal(activeTab = 'input') {
-            const personil = dashboardData?.struktur?.personilToko || [];
             const cycle = getBelanjaCutoffCycle();
             
             if (!belanjaFilterStart) belanjaFilterStart = cycle.startDateStr;
@@ -1467,6 +1551,8 @@
 
             const userCOS = isUserCOS();
             const userAC = isUserAC();
+            const daftarToko = dashboardData?.daftarToko || [];
+            const allMaster = dashboardData?.allMasterUsers || [];
 
             const pendingValidasiCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
 
@@ -1493,8 +1579,6 @@
             const totalNominalSales = filteredTx
                 .filter(t => t.status === "Disetujui" || t.status === "Menunggu AC")
                 .reduce((sum, t) => sum + (Number(t.nominal) || 0), 0);
-
-            const shoppedNiks = new Set(filteredTx.filter(t => t.status === "Disetujui" || t.status === "Menunggu AC").map(t => t.penginputNik));
 
             let tabContentHtml = '';
 
@@ -1554,6 +1638,7 @@
                         <div class="modal-card-box">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
                                 <div>
+                                    <span style="font-size:0.62rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800; margin-bottom:2px; display:inline-block;">${escapeHTML(tx.namaToko || tx.kodeToko || 'TOKO')}</span>
                                     <p style="font-size:0.65rem; color:var(--text-sub);">${tx.date}</p>
                                     <h4 style="font-size:1.1rem; font-weight:800; color:var(--accent-primary);">Rp ${Number(tx.nominal).toLocaleString('id-ID')}</h4>
                                 </div>
@@ -1579,28 +1664,84 @@
 
                 tabContentHtml = `<div class="modal-grid-1">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada data transaksi.</p>'}</div>`;
             } else if (activeTab === 'resume') {
-                let listPersonilCards = personil.map(p => {
-                    const statusTxt = nikStatusMap[p.nik] || "❌ Belum Belanja";
-                    let isApproved = statusTxt.includes("Disetujui");
-                    let isPending = statusTxt.includes("Menunggu");
+                let resumeTokoSectionHtml = '';
 
-                    return `
-                        <div class="modal-card-box" onclick="viewPersonilBelanjaDetail('${p.nik}', '${escapeHTML(p.nama)}')" style="border-left: 4px solid ${isApproved ? '#10b981' : (isPending ? '#f59e0b' : '#ef4444')}; cursor:pointer;" title="Klik untuk lihat detail transaksi">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <p style="font-weight:800; color:var(--text-main); font-size:0.78rem;">${escapeHTML(p.nama)}</p>
-                                    <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(p.jabatan)}</p>
-                                </div>
-                                <div style="text-align:right;">
-                                    <span style="font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:6px; ${isApproved ? 'background:#d1fae5; color:#047857;' : (isPending ? 'background:#fef3c7; color:#b45309;' : 'background:#fee2e2; color:#dc2626;')}">
-                                        ${statusTxt}
-                                    </span>
-                                    <p style="font-size:0.55rem; color:var(--accent-primary); margin-top:2px;">Lihat Detail ➔</p>
+                if (userAC && daftarToko.length > 0) {
+                    const storeCards = daftarToko.map(toko => {
+                        const storePersonil = allMaster.filter(u => u.kodeToko === toko.kodeToko);
+                        
+                        const storeTxList = filteredTx.filter(t => {
+                            const pNikMatch = storePersonil.some(sp => sp.nik === t.penginputNik);
+                            const pStoreMatch = t.kodeToko === toko.kodeToko;
+                            return (pNikMatch || pStoreMatch) && (t.status === "Disetujui" || t.status === "Menunggu AC");
+                        });
+
+                        const storeSalesNominal = storeTxList.reduce((sum, t) => sum + (Number(t.nominal) || 0), 0);
+                        const shoppedPersonilCount = new Set(storeTxList.map(t => t.penginputNik)).size;
+
+                        return `
+                            <div class="modal-card-box" onclick="viewStoreBelanjaDetail('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid var(--accent-primary);" title="Klik untuk lihat detail personil toko">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
+                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">Sudah Belanja: <b style="color:#047857;">${shoppedPersonilCount} / ${storePersonil.length || '-'} Personil</b></p>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <span style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">Rp ${storeSalesNominal.toLocaleString('id-ID')}</span>
+                                        <p style="font-size:0.58rem; color:var(--gold); margin-top:2px;">Lihat Rincian Toko ➔</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        `;
+                    }).join("");
+
+                    resumeTokoSectionHtml = `
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:10px;">🏪 REKAP SALES PER-TOKO (AREA COORDINATOR)</h5>
+                        <div class="modal-grid-1">${storeCards}</div>
                     `;
-                }).join("");
+                } else {
+                    const personil = dashboardData?.struktur?.personilToko || [];
+                    const shoppedNiks = new Set(filteredTx.filter(t => t.status === "Disetujui" || t.status === "Menunggu AC").map(t => t.penginputNik));
+
+                    let listPersonilCards = personil.map(p => {
+                        const statusTxt = nikStatusMap[p.nik] || "❌ Belum Belanja";
+                        let isApproved = statusTxt.includes("Disetujui");
+                        let isPending = statusTxt.includes("Menunggu");
+
+                        return `
+                            <div class="modal-card-box" onclick="viewPersonilBelanjaDetail('${p.nik}', '${escapeHTML(p.nama)}')" style="border-left: 4px solid ${isApproved ? '#10b981' : (isPending ? '#f59e0b' : '#ef4444')}; cursor:pointer;" title="Klik untuk lihat detail transaksi">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <p style="font-weight:800; color:var(--text-main); font-size:0.78rem;">${escapeHTML(p.nama)}</p>
+                                        <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(p.jabatan)}</p>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <span style="font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:6px; ${isApproved ? 'background:#d1fae5; color:#047857;' : (isPending ? 'background:#fef3c7; color:#b45309;' : 'background:#fee2e2; color:#dc2626;')}">
+                                            ${statusTxt}
+                                        </span>
+                                        <p style="font-size:0.55rem; color:var(--accent-primary); margin-top:2px;">Lihat Detail ➔</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+
+                    resumeTokoSectionHtml = `
+                        <div class="modal-grid-2" style="margin-top:8px;">
+                            <div class="modal-card-box" style="border-left: 4px solid #10b981; text-align: center; padding: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">✅ SUDAH BELANJA</span>
+                                <p style="font-size: 1.2rem; font-weight: 800; color: #047857; margin-top: 2px;">${shoppedNiks.size} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
+                            </div>
+                            <div class="modal-card-box" style="border-left: 4px solid #ef4444; text-align: center; padding: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">❌ BELUM BELANJA</span>
+                                <p style="font-size: 1.2rem; font-weight: 800; color: #dc2626; margin-top: 2px;">${personil.length - shoppedNiks.size} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
+                            </div>
+                        </div>
+
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 STATUS APPROVAL PERSONIL TOKO</h5>
+                        <div class="modal-grid-1">${listPersonilCards || '<p style="color:var(--text-sub);">Personil toko tidak ditemukan.</p>'}</div>
+                    `;
+                }
 
                 tabContentHtml = `
                     <div class="modal-grid-1">
@@ -1620,24 +1761,12 @@
                         </div>
 
                         <div class="mtd-summary-card">
-                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN</span>
+                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN AREA</span>
                             <div class="mtd-amount-hero">Rp ${totalNominalSales.toLocaleString('id-ID')}</div>
                             <p style="font-size:0.62rem; color:var(--text-sub); margin-top:4px;">Rentang Filter: ${belanjaFilterStart} s/d ${belanjaFilterEnd}</p>
                         </div>
 
-                        <div class="modal-grid-2" style="margin-bottom:8px;">
-                            <div class="modal-card-box" style="border-left: 4px solid #10b981; text-align: center; padding: 10px;">
-                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">✅ SUDAH BELANJA</span>
-                                <p style="font-size: 1.2rem; font-weight: 800; color: #047857; margin-top: 2px;">${shoppedNiks.size} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
-                            </div>
-                            <div class="modal-card-box" style="border-left: 4px solid #ef4444; text-align: center; padding: 10px;">
-                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">❌ BELUM BELANJA</span>
-                                <p style="font-size: 1.2rem; font-weight: 800; color: #dc2626; margin-top: 2px;">${personil.length - shoppedNiks.size} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
-                            </div>
-                        </div>
-
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;">📋 STATUS APPROVAL PERSONIL TOKO</h5>
-                        <div class="modal-grid-1">${listPersonilCards || '<p style="color:var(--text-sub);">Personil toko tidak ditemukan.</p>'}</div>
+                        ${resumeTokoSectionHtml}
                     </div>
                 `;
             }
@@ -1649,13 +1778,47 @@
                         <button class="sub-tab-btn ${activeTab==='validasi'?'active':''}" onclick="renderBelanjaKaryawanModal('validasi')">
                             📋 Validasi Struk ${pendingValidasiCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingValidasiCount}</span>` : ''}
                         </button>
-                        <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderBelanjaKaryawanModal('resume')">📊 Resume Toko</button>
+                        <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderBelanjaKaryawanModal('resume')">📊 Monitoring</button>
                     </div>
 
                     ${tabContentHtml}
                 </div>
             `;
             showCustomModal("🛒 BELANJA KARYAWAN", htmlBox);
+        }
+
+        function viewStoreBelanjaDetail(kodeToko, namaToko) {
+            triggerAndroidHaptic('light');
+            const allMaster = dashboardData?.allMasterUsers || [];
+            const storePersonil = allMaster.filter(u => u.kodeToko === kodeToko);
+
+            const storeTx = belanjaTransactions.filter(t => {
+                const pNikMatch = storePersonil.some(sp => sp.nik === t.penginputNik);
+                return pNikMatch || t.kodeToko === kodeToko;
+            });
+
+            let txHtml = storePersonil.map(sp => {
+                const pTxList = storeTx.filter(t => t.penginputNik === sp.nik);
+                const approvedTx = pTxList.find(t => t.status === "Disetujui" || t.status === "Menunggu AC");
+                const statusTxt = approvedTx ? `✅ Disetujui (Rp ${Number(approvedTx.nominal).toLocaleString('id-ID')})` : "❌ Belum Belanja";
+
+                return `
+                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <p style="font-weight:800; font-size:0.78rem; color:var(--text-main);">${escapeHTML(sp.nama)}</p>
+                            <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(sp.jabatan)}</p>
+                        </div>
+                        <span style="font-size:0.68rem; font-weight:800; color:${approvedTx ? '#047857' : '#dc2626'};">${statusTxt}</span>
+                    </div>
+                `;
+            }).join("");
+
+            Swal.fire({
+                title: `Rincian Toko: ${namaToko}`,
+                html: txHtml || `<p style="font-size:0.75rem; color:var(--text-sub);">Data personil toko tidak ditemukan.</p>`,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
         }
 
         function viewPersonilBelanjaDetail(nik, nama) {
@@ -1711,7 +1874,9 @@
                 photoUrl: belanjaPhotoPreview || '',
                 status: initialStatus,
                 date: new Date().toLocaleString('id-ID'),
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                kodeToko: dashboardData?.user?.kodeToko || 'TOKO',
+                namaToko: dashboardData?.user?.namaToko || 'Toko'
             };
 
             saveBelanjaTx([newTx, ...belanjaTransactions]);
@@ -1840,6 +2005,7 @@
             showCustomModal("📊 DATA PERFORMANCE", htmlBox);
         }
 
+        /* 2. REVISI MTD SALES (USER AREA COORDINATOR BISA LIHAT SEMUA TOKO DI SHEET MASTER_USER) */
         async function openSalesMTDModal(bulanPilihan = null) {
             showLoading("Memuat Data MTD...");
             const d = await apiCall("getDetailSalesMTD", { bulanPilihan: bulanPilihan });
@@ -1851,9 +2017,17 @@
 
         function changeMtdMonth(val) { openSalesMTDModal(val); }
 
+        function changeMtdStore(kodeToko) {
+            selectedKodeTokoAC = kodeToko;
+            openSalesMTDModal(currentMtdDetailData?.selectedMonthVal);
+        }
+
         function renderMtdModalView(filterType = 'semua') {
             const d = currentMtdDetailData;
             if (!d) return;
+
+            const userAC = isUserAC();
+            const daftarToko = dashboardData?.daftarToko || [];
 
             let filteredList = d.listHarian || [];
             if (filterType === 'growth') filteredList = filteredList.filter(item => item.isGrowth);
@@ -1869,6 +2043,20 @@
             let monthOptionsHtml = (d.listBulanAvailable && d.listBulanAvailable.length > 0) ? d.listBulanAvailable.map(m => `
                 <option value="${m.val}" ${m.val === d.selectedMonthVal ? 'selected' : ''}>🗓️ ${m.label}</option>
             `).join("") : `<option value="${d.selectedMonthVal}">${d.bulanName}</option>`;
+
+            let storeSelectHtml = '';
+            if (userAC && daftarToko.length > 0) {
+                const currentKode = d.kodeToko || selectedKodeTokoAC || dashboardData?.user?.kodeToko;
+                const opts = daftarToko.map(t => `<option value="${t.kodeToko}" ${t.kodeToko === currentKode ? 'selected' : ''}>🏪 ${escapeHTML(t.namaToko)} (${t.kodeToko})</option>`).join("");
+                storeSelectHtml = `
+                    <div style="background:#ffffff; border:1px solid var(--card-border); padding:8px 12px; border-radius:14px; display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-size:0.72rem; font-weight:700; color:var(--accent-primary);"><i class="fa-solid fa-store"></i> PILIH TOKO (AC):</span>
+                        <select onchange="changeMtdStore(this.value)" style="background:#f8fafc; color:#0f172a; border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none;">
+                            ${opts}
+                        </select>
+                    </div>
+                `;
+            }
 
             let rincianCardsHtml = filteredList.map(item => `
                 <div class="rincian-card-item">
@@ -1891,6 +2079,8 @@
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
+                    ${storeSelectHtml}
+
                     <div style="background:#ffffff; border:1px solid var(--card-border); padding:8px 12px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
                         <span style="font-size:0.72rem; font-weight:700; color:var(--accent-primary);"><i class="fa-solid fa-calendar-days"></i> PILIH BULAN:</span>
                         <select onchange="changeMtdMonth(this.value)" style="background:#f8fafc; color:#0f172a; border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none;">
@@ -2211,7 +2401,6 @@
             if (tabName === "aksiCepat") loadMisi();
         }
 
-        /* PERBAIKAN LOGOUT: CLEAR LOCALSTORAGE & KEMBALI KE HALAMAN LOGIN NIK */
         function handleLogout() {
             Swal.fire({
                 title: 'Konfirmasi Logout',
