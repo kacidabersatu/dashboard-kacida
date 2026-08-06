@@ -56,7 +56,7 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* DISABLE NATIVE PULL-TO-REFRESH */
+        /* DISABLE NATIVE FULL PULL-TO-REFRESH */
         html, body { 
             overscroll-behavior-y: none;
             background: var(--bg-main); color: var(--text-main); min-height: 100vh; width: 100%;
@@ -153,9 +153,7 @@
         .chat-tab-pill { flex: 1; padding: 8px 12px; font-size: 0.75rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .chat-tab-pill.active { background: var(--accent-green-grad); color: #ffffff; }
 
-        /* RESPONSIVE CHAT LAYOUT ELASTIS */
-        #tabChat { display: flex; flex-direction: column; height: calc(100dvh - 120px); max-height: calc(100dvh - 120px); }
-        .wa-chat-container { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 16px; flex: 1; min-height: 250px; max-height: calc(100dvh - 220px); overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .wa-chat-container { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 16px; height: 50vh; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
         .wa-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.78rem; position: relative; line-height: 1.4; word-wrap: break-word; }
         .wa-bubble.me { align-self: flex-end; background: var(--wa-bubble-me); color: white; border-bottom-right-radius: 2px; }
         .wa-bubble.other { align-self: flex-start; background: var(--wa-bubble-other); color: var(--text-main); border-bottom-left-radius: 2px; border: 1px solid var(--card-border); }
@@ -277,8 +275,8 @@
         
         <header class="app-header">
             <div class="header-left">
-                <!-- REVISI 1: GARIS 3 (HAMBURGER) UNTUK PUSAT KONFIGURASI APLIKASI -->
-                <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan & Konfigurasi"><i class="fa-solid fa-bars"></i></button>
+                <!-- ICON HAMBURGER DIKOMAN MENJADI DRAWER KONFIGURASI PENGATURAN -->
+                <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan Aplikasi"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
                     <div>
                         <span class="brand-title-text">KACIDA BERSATU ✦</span>
@@ -304,6 +302,7 @@
         </header>
 
         <main id="tabBeranda" class="container">
+            <!-- DISKET INFO BAR DENGAN TOMBOL REFRESH LIVE DATA -->
             <section class="disket-info-bar">
                 <div class="disket-bar-item" onclick="openSalesMTDModal()">
                     <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-primary);"></i> Sales SPD</span>
@@ -319,7 +318,7 @@
                     <span class="disket-bar-label"><i class="fa-solid fa-fire" style="color: #ef4444;"></i> Penawaran</span>
                     <span class="disket-bar-val" id="valPenawaran" style="color: #ef4444;">-</span>
                 </div>
-                <button onclick="refreshLiveDashboardData()" style="background:var(--input-bg); border:1px solid var(--card-border); color:var(--accent-primary); padding:6px 10px; border-radius:12px; font-size:0.65rem; font-weight:800; cursor:pointer;" title="Sync Live Data">
+                <button onclick="refreshLiveDashboardData()" style="background:var(--input-bg); border:1px solid var(--card-border); color:var(--accent-primary); padding:6px 10px; border-radius:12px; font-size:0.65rem; font-weight:800; cursor:pointer;" title="Refresh Data Live">
                     🔄 Sync
                 </button>
             </section>
@@ -338,7 +337,7 @@
                 <div class="swiper-pagination"></div>
             </div>
 
-            <!-- METRIK AKTIFA POIN & RANK -->
+            <!-- KOTAK METRIK SUMMARY UTAMA -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d">
@@ -373,7 +372,7 @@
                 </div>
             </section>
 
-            <!-- REVISI 7: LAYOUT MENU 4 x 2 = 8 ITEMS MAX -->
+            <!-- LAYOUT MENU UTAMA DIBATASI MAKSIMAL 8 MENU (4 KOLOM x 2 BARIS) -->
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
                 <div id="gridMenuUtama" class="menu-grid-4"></div>
@@ -384,7 +383,7 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT NAVBAR REVISI 6: LAYOUT ELASTIS KEYBOARD -->
+        <!-- TAB CHAT NAVBAR UTUH -->
         <div id="tabChat" class="hidden container">
             <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-primary);"></i> Room Chat Tim Kacida</h2>
             
@@ -395,12 +394,13 @@
 
             <div id="chatBox" class="wa-chat-container"></div>
 
-            <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center; width: 100%;">
+            <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
                 <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') handleSendChatAction()" style="flex: 1; background: var(--header-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.78rem; color: var(--text-main); outline: none;">
                 <button onclick="handleSendChatAction()" style="background: var(--accent-green-grad); color: #ffffff; padding: 0 16px; height: 40px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
 
+        <!-- TAB MISI HARI INI -->
         <div id="tabAksiCepat" class="hidden container">
             <div class="menu-section-card">
                 <h2 class="section-title" style="color: var(--accent-primary);"><i class="fa-solid fa-rocket"></i> Target Misi Hari Ini</h2>
@@ -409,13 +409,13 @@
             </div>
         </div>
 
-        <!-- REVISI 3: NAVBAR TAB "LEADERBOARD" BACA SEMUA USER MASTER_USER -->
+        <!-- TAB LEADERBOARD AREA (BISA DI-SWITCH & DI-LOAD ALL MASTER_USER) -->
         <div id="tabLeaderboard" class="hidden container">
             <h2 class="section-title" style="color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-crown"></i> 🏆 Leaderboard Area</h2>
             <div id="leaderboardList" class="modal-grid-1"></div>
         </div>
 
-        <!-- TAB PROFIL & BAGAN STRUKTUR DIBERTAHANKAN UTUH -->
+        <!-- TAB PROFIL BAGAN STRUKTUR DIBERTAHANKAN UTUH -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover; margin: 0 auto 8px auto;">
@@ -423,10 +423,10 @@
                 <p id="profilJabatan" style="font-size: 0.75rem; color: var(--accent-primary); font-weight: 700;">Jabatan</p>
                 <p id="profilToko" style="font-size: 0.72rem; color: var(--text-sub);">Toko</p>
                 <p id="profilNik" style="font-size: 0.65rem; color: var(--text-sub); margin-top: 2px;">NIK: -</p>
-                <!-- REVISI 5: TOMBOL LOGOUT FIX -->
                 <button onclick="handleLogout()" style="margin-top: 12px; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 18px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">LOGOUT / GANTI NIK</button>
             </div>
 
+            <!-- BAGAN PERSONIL TOKO BINAAN -->
             <div class="menu-section-card">
                 <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Tim Personil Toko Saya</h3>
                 <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -450,7 +450,6 @@
             </div>
         </div>
 
-        <!-- NAVBAR BOTTOM REVISI 3: NAMA NAVBAR RANK DIGANTI JADI LEADERBOARD -->
         <nav class="bottom-nav">
             <a href="#" onclick="switchTab('beranda')" id="navBeranda" class="nav-item active"><i class="fa-solid fa-house"></i><span>Beranda</span></a>
             <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item"><i class="fa-solid fa-comment-dots"></i><span>Chat</span></a>
@@ -660,7 +659,7 @@
             });
         }
 
-        /* PURE LIVE API CALL KE APPS SCRIPT BACKEND */
+        /* PURE API CALL KE APPS SCRIPT BACKEND (NO MOCK DEMO FALLBACK) */
         async function apiCall(action, params = {}) {
             try {
                 if (typeof google !== "undefined" && google.script && google.script.run) {
@@ -674,7 +673,6 @@
                         else if (action === "getMonthlyShift") r.getMonthlyShiftData(currentNik, dashboardData?.user?.kodeToko, params.bulanYear);
                         else if (action === "saveMonthlyShift") r.saveMonthlyShiftData(currentNik, dashboardData?.user?.kodeToko, params.bulanYear, params.shiftDataJson);
                         else if (action === "submitShiftHandover") r.submitShiftHandover(currentNik, params);
-                        else if (action === "submitSurvey") r.submitSurveyData(currentNik, params.rating, params.saran);
                         else if (action === "getLeaderboard") r.getLeaderboard();
                     });
                 } else {
@@ -689,7 +687,7 @@
                 }
             } catch(err) {
                 hideLoading();
-                showSwalWarning('Koneksi Terputus ⚠️', 'Gagal terhubung ke server. Silakan periksa jaringan internet Anda.');
+                showSwalWarning('Koneksi Terputus ⚠️', 'Gagal terhubung ke server. Silakan periksa koneksi internet Anda.');
                 return { status: "error", message: err.toString() };
             }
         }
@@ -727,36 +725,17 @@
             }
         }
 
-        /* REVISI 1: INSTANT LOAD CACHE TANPA BLOCKING SPINNER + BACKGROND SYNC */
         async function initDashboard(kodeTokoPilihan = null) {
             document.getElementById("loginSection").classList.add("hidden");
             document.getElementById("appSection").classList.remove("hidden");
-
+            showLoading("Memuat Dashboard...");
             if (kodeTokoPilihan) selectedKodeTokoAC = kodeTokoPilihan;
-
-            // BACA CACHE INSTAN DARI LOCALSTORAGE
-            const cachedDash = localStorage.getItem("CACHE_DASHBOARD_" + currentNik);
-            if (cachedDash) {
-                try {
-                    dashboardData = JSON.parse(cachedDash);
-                    renderDashboard(dashboardData);
-                } catch(e) {}
-            } else {
-                showLoading("Memuat Dashboard...");
-            }
-
-            // AMBIL DATA LIVE TERBARU DI BELAKANG LAYAR
-            try {
-                const data = await apiCall("getDashboard");
-                hideLoading();
-                if (data && data.status === "success") {
-                    dashboardData = data;
-                    localStorage.setItem("CACHE_DASHBOARD_" + currentNik, JSON.stringify(data));
-                    renderDashboard(data);
-                    trackUserActivity(5, "Akses Dashboard");
-                }
-            } catch(e) {
-                hideLoading();
+            const data = await apiCall("getDashboard");
+            hideLoading();
+            if (data && data.status === "success") {
+                dashboardData = data;
+                renderDashboard(data);
+                trackUserActivity(5, "Akses Dashboard");
             }
         }
 
@@ -874,299 +853,801 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        /* REVISI 1 & 2: PUSAT KONFIGURASI DRAWER (HAMBURGER LINE 3) LENGKAP DENGAN SURVEY & README */
-        function openMenuSidebar() {
-            showCustomModal("⚙️ Pengaturan & Konfigurasi Application", `
-                <div class="modal-grid-1" style="font-size:0.78rem;">
-                    <div class="modal-card-box" onclick="toggleThemeSwitcher()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <i class="fa-solid fa-palette" style="font-size:1.2rem; color:var(--accent-primary);"></i>
-                            <div>
-                                <p style="font-weight:800; color:var(--text-main);">Pilih Warna Tema Aplikasi</p>
-                                <p style="font-size:0.62rem; color:var(--text-sub);">Ubah mode Terang, Gelap, atau Default</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
-                    </div>
-
-                    <div class="modal-card-box" onclick="openSurveyModal()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <i class="fa-solid fa-star" style="font-size:1.2rem; color:var(--gold);"></i>
-                            <div>
-                                <p style="font-weight:800; color:var(--text-main);">⭐ Survey Pengguna Aplikasi</p>
-                                <p style="font-size:0.62rem; color:var(--text-sub);">Beri nilai bintang & masukan aplikasi</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
-                    </div>
-
-                    <div class="modal-card-box" onclick="openReadmeModal()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <i class="fa-solid fa-book-open" style="font-size:1.2rem; color:var(--accent-primary);"></i>
-                            <div>
-                                <p style="font-weight:800; color:var(--text-main);">📖 Readme & Panduan Aplikasi</p>
-                                <p style="font-size:0.62rem; color:var(--text-sub);">Petunjuk lengkap penggunaan modul</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
-                    </div>
-
-                    <div class="modal-card-box" onclick="manageNotificationPermission()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <i class="fa-solid fa-bell" style="font-size:1.2rem; color:var(--accent-primary);"></i>
-                            <div>
-                                <p style="font-weight:800; color:var(--text-main);">Izin Push Notification HP</p>
-                                <p style="font-size:0.62rem; color:var(--text-sub);">Aktifkan pemberitahuan pesan & pengumuman</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
-                    </div>
-
-                    <div class="modal-card-box" onclick="triggerPWAInstall()" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <i class="fa-solid fa-download" style="font-size:1.2rem; color:var(--accent-primary);"></i>
-                            <div>
-                                <p style="font-weight:800; color:var(--text-main);">Instal PWA Kacida di HP</p>
-                                <p style="font-size:0.62rem; color:var(--text-sub);">Pasang ke layar utama HP Android</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
-                    </div>
-
-                    <div class="modal-card-box" onclick="refreshLiveDashboardData(); closeCustomModal();" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <i class="fa-solid fa-arrows-rotate" style="font-size:1.2rem; color:var(--accent-primary);"></i>
-                            <div>
-                                <p style="font-weight:800; color:var(--text-main);">Sync Data Live Server</p>
-                                <p style="font-size:0.62rem; color:var(--text-sub);">Muat ulang data spreadsheet terbaru</p>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right" style="color:var(--text-sub);"></i>
-                    </div>
-                </div>
-            `);
+        /* PLAN MASTER SHIFT BULANAN */
+        function isCOSorACOS() {
+            if (!dashboardData || !dashboardData.user) return false;
+            const j = String(dashboardData.user.jabatan || dashboardData.user.JABATAN || '').toUpperCase();
+            return j.includes("CHIEF") || j.includes("COS") || j.includes("ACOS") || j.includes("ASSISTANT") || j.includes("AM") || j.includes("AC") || j.includes("ADMIN");
         }
 
-        /* MODAL SURVEY PENGGUNA */
-        let selectedSurveyStars = 5;
-        function openSurveyModal() {
-            showCustomModal("⭐ SURVEY PENGGUNA APLIKASI", `
-                <div class="modal-grid-1" style="font-size:0.78rem; text-align:center;">
-                    <div class="modal-card-box">
-                        <p style="font-size:0.75rem; color:var(--text-sub);">Mohon berikan penilaian dan masukan Anda untuk pengembangan aplikasi:</p>
-                        
-                        <div class="star-rating" id="starRatingBox" style="display:flex; justify-content:center; gap:8px; margin:12px 0;">
-                            <i class="fa-solid fa-star active" onclick="setSurveyRating(1)" style="font-size:1.6rem; color:var(--gold); cursor:pointer;"></i>
-                            <i class="fa-solid fa-star active" onclick="setSurveyRating(2)" style="font-size:1.6rem; color:var(--gold); cursor:pointer;"></i>
-                            <i class="fa-solid fa-star active" onclick="setSurveyRating(3)" style="font-size:1.6rem; color:var(--gold); cursor:pointer;"></i>
-                            <i class="fa-solid fa-star active" onclick="setSurveyRating(4)" style="font-size:1.6rem; color:var(--gold); cursor:pointer;"></i>
-                            <i class="fa-solid fa-star active" onclick="setSurveyRating(5)" style="font-size:1.6rem; color:var(--gold); cursor:pointer;"></i>
+        function isDatePassed(yearMonthStr, dayNum) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const targetDate = new Date(`${yearMonthStr}-${String(dayNum).padStart(2,'0')}`);
+            targetDate.setHours(0,0,0,0);
+            return targetDate < today;
+        }
+
+        async function openPlanMasterShiftModal() {
+            showLoading("Memuat Jadwal Master Shift...");
+            const res = await apiCall("getMonthlyShift", { bulanYear: currentShiftMonth });
+            hideLoading();
+            if (res && res.shiftData) localShiftMatrix = res.shiftData;
+            else localShiftMatrix = {};
+            renderPlanMasterShiftModal();
+        }
+
+        function renderPlanMasterShiftModal() {
+            const canEdit = isCOSorACOS();
+            const personil = dashboardData?.struktur?.personilToko || [];
+            const [yr, mo] = currentShiftMonth.split("-");
+            const daysInMonth = new Date(parseInt(yr, 10), parseInt(mo, 10), 0).getDate();
+            const dayNamesShort = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+
+            let shiftHeaderColsHtml = '';
+            for (let d = 1; d <= daysInMonth; d++) {
+                const passed = isDatePassed(currentShiftMonth, d);
+                const dt = new Date(parseInt(yr, 10), parseInt(mo, 10) - 1, d);
+                const dayName = dayNamesShort[dt.getDay()];
+
+                shiftHeaderColsHtml += `
+                    <th style="padding:4px; min-width:38px; text-align:center; font-size:0.6rem; border:1px solid var(--card-border); ${passed ? 'background:#e2e8f0; color:#64748b;' : ''}">
+                        <div>${d}</div>
+                        <div style="font-size:0.52rem; opacity:0.8;">${dayName}</div>
+                    </th>
+                `;
+            }
+
+            let personilRowsHtml = personil.map(p => {
+                let dayCellsHtml = '';
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const shiftCode = localShiftMatrix[p.nik]?.[d] || 'off';
+                    const pillClass = `shift-${shiftCode}`;
+                    const labelTxt = shiftCode.toUpperCase();
+                    const passed = isDatePassed(currentShiftMonth, d);
+
+                    dayCellsHtml += `
+                        <td style="padding:3px; text-align:center; border:1px solid var(--card-border);">
+                            <div class="shift-pill ${pillClass} ${passed ? 'shift-locked' : ''}" 
+                                 onclick="${(canEdit && !passed) ? `openShiftPickerModal('${p.nik}', ${d}, '${shiftCode}')` : (passed ? `showSwalWarning('Tanggal Terkunci 🔒', 'Tanggal ini telah berlalu. Gunakan Tukar Instan jika perlu penyesuaian.')` : '')}">
+                                ${labelTxt}
+                            </div>
+                        </td>
+                    `;
+                }
+                return `<tr><td style="padding:8px; font-weight:800; border:1px solid var(--card-border); position:sticky; left:0; background:var(--header-bg); z-index:2; min-width:130px;"><div>${escapeHTML(p.nama)}</div><div style="font-size:0.6rem; color:var(--text-sub);">${escapeHTML(p.jabatan)}</div></td>${dayCellsHtml}</tr>`;
+            }).join("");
+
+            const htmlBox = `
+                <div class="modal-grid-1" style="font-size:0.78rem;">
+                    <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR (Chief / Assistant Chief)' : '👁️ READ ONLY'}</b></p>
                         </div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
+                            <input type="month" value="${currentShiftMonth}" onchange="changeShiftMonth(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:6px; border-radius:8px; outline:none; font-weight:700; font-size:0.75rem;">
+                        </div>
+                    </div>
 
-                        <label style="font-weight:700; display:block; text-align:left; margin-bottom:4px;">MASUKAN & SARAN (WAJIB):</label>
-                        <textarea id="txtSurveySaran" placeholder="Tuliskan masukan atau kendala Anda..." style="width:100%; height:75px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:8px; font-size:0.72rem; outline:none; resize:none; margin-bottom:12px;"></textarea>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                        <span class="shift-pill shift-p">P (Pagi)</span>
+                        <span class="shift-pill shift-s">S (Siang)</span>
+                        <span class="shift-pill shift-m">M (Malam)</span>
+                        <span class="shift-pill shift-ao">AO (Add Off)</span>
+                        <span class="shift-pill shift-off">OFF (Libur)</span>
+                    </div>
 
-                        <button onclick="handleSurveySubmitAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">
-                            KIRIM SURVEY PENGGUNA
+                    <div style="overflow-x:auto; border:1px solid var(--card-border); border-radius:14px; background:var(--header-bg);">
+                        <table style="width:100%; border-collapse:collapse; text-align:left;">
+                            <thead><tr style="background:var(--input-bg);"><th style="padding:8px; border:1px solid var(--card-border); font-size:0.7rem; position:sticky; left:0; background:var(--input-bg); z-index:3;">Personil Toko</th>${shiftHeaderColsHtml}</tr></thead>
+                            <tbody>${personilRowsHtml}</tbody>
+                        </table>
+                    </div>
+
+                    ${canEdit ? `
+                        <div class="modal-grid-3">
+                            <button onclick="openInstantSwapModal()" style="background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe; font-weight:800; padding:12px; border-radius:12px; cursor:pointer;">🔄 Tukar Instan</button>
+                            <button onclick="autoGenerateMonthlyShift()" style="background:#fef3c7; color:#b45309; border:1px solid #fcd34d; font-weight:800; padding:12px; border-radius:12px; cursor:pointer;">✨ Auto-Generate</button>
+                            <button onclick="saveMonthlyShiftDataAction()" style="background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">💾 SIMPAN SHIFT</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            showCustomModal("Plan Master Shift Toko", htmlBox);
+        }
+
+        function openShiftPickerModal(nik, dayNum, currentCode) {
+            triggerAndroidHaptic('light');
+            Swal.fire({
+                title: `Pilih Shift (Tgl ${dayNum})`,
+                input: 'select',
+                inputOptions: { 'p': 'P - Shift Pagi', 's': 'S - Shift Siang', 'm': 'M - Shift Malam', 'ao': 'AO - Add Off', 'off': 'OFF - Libur' },
+                inputValue: currentCode,
+                showCancelButton: true,
+                confirmButtonText: 'Terapkan',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    if (!localShiftMatrix[nik]) localShiftMatrix[nik] = {};
+                    localShiftMatrix[nik][dayNum] = result.value;
+                    renderPlanMasterShiftModal();
+                }
+            });
+        }
+
+        function openInstantSwapModal() {
+            triggerAndroidHaptic('medium');
+            const personil = dashboardData?.struktur?.personilToko || [];
+            if (personil.length < 2) { showSwalWarning('Data Kurang', 'Minimal harus ada 2 personil toko.'); return; }
+
+            const personilOptions = personil.map(p => `<option value="${p.nik}">${escapeHTML(p.nama)} (${p.jabatan})</option>`).join("");
+
+            const htmlContent = `
+                <div class="modal-grid-1" style="font-size:0.78rem;">
+                    <div class="modal-card-box">
+                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Pilih Karyawan Pertama (A):</label>
+                        <select id="swapNikA" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:10px;">
+                            ${personilOptions}
+                        </select>
+
+                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Pilih Karyawan Kedua (B):</label>
+                        <select id="swapNikB" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:10px;">
+                            ${personilOptions}
+                        </select>
+
+                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Tanggal Penukaran (Hari Ke-):</label>
+                        <input type="number" id="swapDayNum" min="1" max="31" value="${new Date().getDate()}" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:14px;">
+
+                        <button onclick="executeInstantSwapAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">
+                            🔄 PROSES TUKAR INSTAN NOW
                         </button>
                     </div>
                 </div>
-            `);
+            `;
+
+            showCustomModal("🔄 Tukar Shift Instan", htmlContent);
         }
 
-        function setSurveyRating(starCount) {
-            selectedSurveyStars = starCount;
-            const stars = document.querySelectorAll("#starRatingBox i");
-            stars.forEach((s, idx) => {
-                if (idx < starCount) s.style.color = "var(--gold)";
-                else s.style.color = "#cbd5e1";
-            });
-        }
+        function executeInstantSwapAction() {
+            const nikA = document.getElementById("swapNikA").value;
+            const nikB = document.getElementById("swapNikB").value;
+            const dayNum = parseInt(document.getElementById("swapDayNum").value, 10);
 
-        async function handleSurveySubmitAction() {
-            const saran = document.getElementById("txtSurveySaran").value.trim();
-            if (!saran) { showSwalWarning('Form Belum Lengkap', 'Mohon isi pesan dan saran Anda terlebih dahulu.'); return; }
-
-            showLoading("Mengirim Survey...");
-            const res = await apiCall("submitSurvey", { rating: selectedSurveyStars, saran: saran });
-            hideLoading();
-
-            closeCustomModal();
-            showSwalSuccess('Survey Terkirim ⭐', 'Terima kasih banyak atas partisipasi survey Anda!');
-        }
-
-        /* MODAL README PANDUAN APLIKASI */
-        function openReadmeModal() {
-            showCustomModal("📖 README & PANDUAN APLIKASI", `
-                <div class="modal-grid-1" style="font-size:0.75rem; line-height:1.6;">
-                    <div class="modal-card-box">
-                        <h4 style="font-size:0.85rem; font-weight:800; color:var(--accent-primary); margin-bottom:6px;">🚀 KACIDA BERSATU PRO</h4>
-                        <p style="color:var(--text-sub);">Aplikasi PWA Performa & Operasional Retail Terpadu berbasis Google Apps Script & Firebase Realtime DB.</p>
-                    </div>
-
-                    <div class="modal-card-box">
-                        <h5 style="font-size:0.78rem; font-weight:800; color:var(--gold); margin-bottom:4px;">📋 MODUL PENTING:</h5>
-                        <ul style="padding-left:16px; color:var(--text-main);">
-                            <li><b>Plan Master Shift:</b> Jadwal shift bulanan terintegrasi role COS/ACOS & Date Lock.</li>
-                            <li><b>Ceklis Expired:</b> Manajemen rak, auto-delegasi ke Master_User, & alert kedaluwarsa.</li>
-                            <li><b>Belanja Karyawan:</b> Reset otomatis siklus tgl 25, foto preview, approval COS/AC, & resume omset.</li>
-                            <li><b>Serah Terima Shift:</b> Laporan serah terima shift kasir & pencatatan sales shift.</li>
-                            <li><b>Kacida AI:</b> Asisten cerdas pemrosesan data sales & obrolan interaktif.</li>
-                        </ul>
-                    </div>
-                </div>
-            `);
-        }
-
-        /* SMART KACIDA AI CHAT ENGINE */
-        async function handleSendChatAction() {
-            triggerAndroidHaptic('light');
-            const input = document.getElementById("inputChatMsg");
-            const msg = input.value.trim();
-            if (!msg) return;
-            input.value = "";
-
-            const box = document.getElementById("chatBox");
-
-            if (chatRoomMode === 'ai') {
-                box.innerHTML += `<div class="wa-bubble me"><div>${escapeHTML(msg)}</div></div>`;
-                const tempAiId = "ai_msg_" + Date.now();
-                box.innerHTML += `<div class="wa-bubble ai" id="${tempAiId}"><div>🤖 Kacida AI sedang berpikir...</div></div>`;
-                box.scrollTop = box.scrollHeight;
-
-                const res = await apiCall("askAI", { pertanyaan: msg });
-                const aiBubble = document.getElementById(tempAiId);
-
-                let replyTxt = "";
-                if (res && res.status === "success" && res.jawaban) {
-                    replyTxt = res.jawaban;
-                } else {
-                    replyTxt = generateSmartAIFallback(msg);
-                }
-
-                if (aiBubble) {
-                    aiBubble.innerHTML = `<div>${escapeHTML(replyTxt)}</div>`;
-                }
-                box.scrollTop = box.scrollHeight;
-            } else {
-                if (rtdb) {
-                    rtdb.ref('chats').push({
-                        timestamp: new Date().toISOString(), nik_pengirim: currentNik, nama_pengirim: dashboardData?.user?.NAMA || "Saya", isi_pesan: msg
-                    });
-                }
-            }
-        }
-
-        function generateSmartAIFallback(msg) {
-            const m = msg.toLowerCase();
-            const uName = dashboardData?.user?.NAMA || "Kak";
-            
-            if (m.includes("hallo") || m.includes("halo") || m.includes("hai")) {
-                return `Halo juga ${uName}! 👋 Ada yang bisa saya bantu hari ini? Mau cek sales harian, IKT toko, atau mau cerita-cerita aja nih? 😄`;
-            }
-            if (m.includes("sales") || m.includes("kemarin") || m.includes("omset")) {
-                return `Siap ${uName}! 📊 Sales H-1 toko ${dashboardData?.user?.namaToko || ''} tercapai bagus! SPD rata-rata saat ini berkisar Rp 4.500.000 / hari. Semangat terus kejar omset MTD! 🔥`;
-            }
-            if (m.includes("lucu") || m.includes("canda") || m.includes("pantun") || m.includes("humor")) {
-                return `Beli kue putu di Caringin Kulon, Karyawan Kacida kerjanya jempolan! 😎 Hahaha, jangan terlalu tegang Kak ${uName}, kerja keras boleh tapi jangan lupa senyum ya! 🚀`;
-            }
-            return `Halo Kak ${uName}! 🤖 Saya asisten pintar Kacida AI. Saya siap membantu memberikan informasi sales harian, strategi penawaran PSM/PWP, hingga mendukung operasional toko Anda!`;
-        }
-
-        /* REVISI 3: LEADERBOARD DISPLAY ALL MASTER_USER PARTICIPANTS */
-        async function loadLeaderboard() {
-            const listEl = document.getElementById("leaderboardList");
-            if (!listEl) return;
-            listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">Memuat Leaderboard...</div>`;
-
-            let users = await apiCall("getLeaderboard");
-            if (!users || !Array.isArray(users) || users.length === 0) {
-                if (dashboardData && dashboardData.struktur && dashboardData.struktur.personilToko) {
-                    users = dashboardData.struktur.personilToko.map((p, i) => ({
-                        NAMA: p.nama, JABATAN: p.jabatan, "NAMA TOKO": dashboardData.user.namaToko, "POIN TOTAL": 100 - (i * 15), "FOTO PROFIL": p.foto
-                    }));
-                }
-            }
-
-            if (users && Array.isArray(users) && users.length > 0) {
-                users.sort((a,b) => Number(b["POIN TOTAL"]||b.poin||0) - Number(a["POIN TOTAL"]||a.poin||0));
-                listEl.innerHTML = users.map((u, idx) => `
-                    <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; border-left:4px solid ${idx===0 ? 'var(--gold)' : 'var(--card-border)'};">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="font-weight:800; font-size:1rem; color:${idx===0?'var(--gold)':idx===1?'#94a3b8':'var(--text-sub)'}; font-family:monospace;">#${idx+1}</span>
-                            <img src="${getRealisticHumanAvatar(u.NAMA || u.nama, u["FOTO PROFIL"] || u.foto)}" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
-                            <div>
-                                <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(u.NAMA || u.nama)}</p>
-                                <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(u["NAMA TOKO"] || u.namaToko || '-')}</p>
-                            </div>
-                        </div>
-                        <span style="font-weight:800; font-size:0.85rem; color:var(--accent-primary); font-family:monospace;">${Number(u["POIN TOTAL"]||u.poin||0).toLocaleString('id-ID')} Pts</span>
-                    </div>
-                `).join("");
-            } else {
-                listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">Belum ada data leaderboard.</div>`;
-            }
-        }
-
-        /* REVISI 4: LOAD MISI DINAMIS DARI MENU_NAVIGASI (STATUS MISI = YA) */
-        function loadMisi() {
-            const container = document.getElementById("misiList");
-            if (!container) return;
-
-            const misiMenus = dashboardData?.menu?.misi || [];
-            if (misiMenus.length === 0) {
-                container.innerHTML = `<div class="modal-card-box" style="text-align:center; color:var(--text-sub);">Belum ada misi aktif hari ini.</div>`;
+            if (nikA === nikB) {
+                showSwalWarning('Error Swap', 'Pilih dua karyawan yang berbeda untuk ditukar!');
                 return;
             }
 
-            container.innerHTML = misiMenus.map(m => `
-                <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div class="icon-box-3d" style="width:42px; height:42px;"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}" style="width:24px; height:24px;"></div>
-                        <div>
-                            <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(m["Nama Menu"])}</p>
-                            <p style="font-size:0.62rem; color:var(--gold); font-weight:700;">🎁 Reward: +${m.Reward_Poin || 5} Poin</p>
+            if (!localShiftMatrix[nikA]) localShiftMatrix[nikA] = {};
+            if (!localShiftMatrix[nikB]) localShiftMatrix[nikB] = {};
+
+            const shiftA = localShiftMatrix[nikA][dayNum] || 'off';
+            const shiftB = localShiftMatrix[nikB][dayNum] || 'off';
+
+            localShiftMatrix[nikA][dayNum] = shiftB;
+            localShiftMatrix[nikB][dayNum] = shiftA;
+
+            closeCustomModal();
+            renderPlanMasterShiftModal();
+            showSwalSuccess('Swap Berhasil 🔄', `Berhasil menukar shift Tgl ${dayNum} antara kedua karyawan!`);
+        }
+
+        function changeShiftMonth(val) { currentShiftMonth = val; openPlanMasterShiftModal(); }
+
+        function autoGenerateMonthlyShift() {
+            const personil = dashboardData?.struktur?.personilToko || [];
+            const [yr, mo] = currentShiftMonth.split("-");
+            const daysInMonth = new Date(parseInt(yr, 10), parseInt(mo, 10), 0).getDate();
+            const shifts = ['p', 's', 'm', 'ao'];
+
+            personil.forEach((p, pIdx) => {
+                localShiftMatrix[p.nik] = {};
+                for (let d = 1; d <= daysInMonth; d++) {
+                    localShiftMatrix[p.nik][d] = (d % 6 === 0) ? 'off' : shifts[(pIdx + d) % shifts.length];
+                }
+            });
+            renderPlanMasterShiftModal();
+            showSwalSuccess('Jadwal Digenerate ✨', 'Jadwal shift bulanan berhasil disusun!');
+        }
+
+        async function saveMonthlyShiftDataAction() {
+            showLoading("Menyimpan Master Shift...");
+            const jsonStr = JSON.stringify(localShiftMatrix);
+            const res = await apiCall("saveMonthlyShift", { bulanYear: currentShiftMonth, shiftDataJson: jsonStr });
+            hideLoading();
+            if (res && res.status === "success") {
+                trackUserActivity(10, "Simpan Master Shift");
+                showSwalSuccess('Berhasil Disimpan 💾', 'Data Shift Toko Berhasil Disimpan!');
+            }
+        }
+
+        /* CEKLIS EXPIRED DATE (ALUR KONFIRMASI DULU BARU TAMPIL TOMBOL HAPUS) */
+        function openCeklisExpiredModal() { renderCeklisExpiredModal('rak'); }
+
+        function renderCeklisExpiredModal(activeTab = 'rak') {
+            const totalRak = expShelves.length;
+            const todayStr = new Date().toDateString();
+            const selesaiRak = expShelves.filter(s => s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr).length;
+            const belumRak = totalRak - selesaiRak;
+
+            const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
+
+            let tabContentHtml = '';
+
+            if (activeTab === 'rak') {
+                let rakListCards = expShelves.map(s => {
+                    const isDone = s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr;
+                    return `
+                        <div class="modal-card-box" style="border-left: 4px solid ${isDone ? '#10b981' : '#f59e0b'};">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <h4 style="font-weight:800; font-size:0.9rem; color:var(--text-main);">${escapeHTML(s.name)}</h4>
+                                    <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">
+                                        No. Rak: <b>${escapeHTML(s.noRak || '-')}</b> | Kategori: <b>${escapeHTML(s.category)}</b><br/>
+                                        Penanggung Jawab: <b style="color:var(--accent-primary);">${escapeHTML(s.assignedName || 'Belum Didelegasikan')}</b>
+                                    </p>
+                                </div>
+                                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                                    <span style="font-size:0.65rem; padding:3px 8px; border-radius:6px; font-weight:800; ${isDone ? 'background:#d1fae5; color:#047857;' : 'background:#fef3c7; color:#b45309;'}">
+                                        ${isDone ? '✅ Selesai' : '⏳ Pending'}
+                                    </span>
+                                    <button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:2px 6px; border-radius:6px; font-size:0.6rem; cursor:pointer;">Hapus</button>
+                                </div>
+                            </div>
+                            <button onclick="markShelfCheckAction('${s.id}')" style="margin-top:10px; width:100%; background:${isDone ? '#ffffff' : 'var(--accent-green-grad)'}; color:${isDone ? '#047857' : '#ffffff'}; border:${isDone ? '1px solid #10b981' : 'none'}; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
+                                ${isDone ? 'Update Ceklis Ulang' : 'Tandai Selesai Dikerjakan'}
+                            </button>
+                        </div>
+                    `;
+                }).join("");
+
+                tabContentHtml = `
+                    <div class="modal-grid-3">
+                        <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">TOTAL RAK</span><p style="font-size:1.1rem; font-weight:800;">${totalRak}</p></div>
+                        <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">SELESAI</span><p style="font-size:1.1rem; font-weight:800; color:#10b981;">${selesaiRak}</p></div>
+                        <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">PENDING</span><p style="font-size:1.1rem; font-weight:800; color:#f59e0b;">${belumRak}</p></div>
+                    </div>
+
+                    <div class="modal-card-box">
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK </h5>
+                        <div class="modal-grid-2" style="margin-bottom:8px;">
+                            <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                            <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                        </div>
+                        <div class="modal-grid-2" style="margin-bottom:10px;">
+                            <select id="addCatRakInput" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                <option value="Makanan">Makanan</option>
+                                <option value="Minuman">Minuman</option>
+                                <option value="Kosmetik">Kosmetik</option>
+                                <option value="Kebutuhan">Non-Food</option>
+                            </select>
+                            <button onclick="addShelfManualAction()" style="background:var(--accent-green-grad); color:#fff; font-weight:800; padding:8px; border-radius:8px; border:none; cursor:pointer;">+ Tambah Rak</button>
                         </div>
                     </div>
-                    <button onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')" style="background:var(--accent-green-grad); color:#fff; border:none; padding:8px 14px; border-radius:10px; font-weight:800; font-size:0.7rem; cursor:pointer;">
-                        Selesaikan ➔
+
+                    <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer; width:100%;">
+                        ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Master User)
                     </button>
+
+                    <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada rak.</p>'}</div>
+                `;
+            } else if (activeTab === 'input') {
+                const shelfOptionsHtml = expShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
+                tabContentHtml = `
+                    <div class="modal-card-box">
+                        <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;">➕ INPUT PRODUK EXPIRED</h4>
+                        <div style="margin-bottom:10px;">
+                            <label style="font-weight:700; display:block; margin-bottom:4px;">Pilih Rak Penempatan:</label>
+                            <select id="expShelfIdInput" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:10px; border-radius:10px;">
+                                ${shelfOptionsHtml || '<option value="">-- Belum Ada Rak --</option>'}
+                            </select>
+                        </div>
+                        <div style="margin-bottom:10px;">
+                            <label style="font-weight:700; display:block; margin-bottom:4px;">Nama Produk:</label>
+                            <input type="text" id="expProductNameInput" placeholder="Contoh: Susu UHT 250ml" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:10px; border-radius:10px;">
+                        </div>
+                        <div style="margin-bottom:14px;">
+                            <label style="font-weight:700; display:block; margin-bottom:4px;">Tanggal Expired:</label>
+                            <input type="date" id="expDateInput" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:10px; border-radius:10px;">
+                        </div>
+                        <button onclick="saveExpProductAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">💾 SIMPAN PRODUK EXP</button>
+                    </div>
+                `;
+            } else if (activeTab === 'alert') {
+                let alertListHtml = expProducts.map(p => {
+                    const shelf = expShelves.find(s => s.id === p.shelfId);
+                    const isDone = p.status === 'selesai';
+                    return `
+                        <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
+                                <p style="font-size:0.68rem; color:var(--text-sub);">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
+                            </div>
+                            <div style="display:flex; gap:6px;">
+                                ${!isDone ? `
+                                    <button onclick="markExpProductHandled('${p.id}')" style="background:#d1fae5; color:#047857; border:1px solid var(--accent-primary); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                        ✅ Konfirmasi
+                                    </button>
+                                ` : `
+                                    <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
+                                    <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                        🗑️ Hapus
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+                tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
+            }
+
+            const htmlBox = `
+                <div class="modal-grid-1" style="font-size:0.78rem;">
+                    <div style="display:flex; gap:6px;">
+                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Manajemen & Setting Rak</button>
+                        <button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderCeklisExpiredModal('input')">➕ Input Produk</button>
+                        <button class="sub-tab-btn ${activeTab==='alert'?'active':''}" onclick="renderCeklisExpiredModal('alert')">
+                            🔔 Alert Expired ${pendingExpCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingExpCount}</span>` : ''}
+                        </button>
+                    </div>
+                    ${tabContentHtml}
+                </div>
+            `;
+            showCustomModal("⚠️ CEKLIS EXP & MANAJEMEN RAK", htmlBox);
+        }
+
+        function addShelfManualAction() {
+            const noRak = document.getElementById("addNoRakInput").value.trim();
+            const name = document.getElementById("addNamaRakInput").value.trim();
+            const cat = document.getElementById("addCatRakInput").value;
+
+            if (!name) { showSwalWarning('Form Kosong', 'Mohon masukkan nama rak!'); return; }
+
+            const newShelf = {
+                id: 'shelf_' + Date.now(),
+                noRak: noRak || 'R-0' + (expShelves.length + 1),
+                name: name,
+                category: cat,
+                assignedNik: '',
+                assignedName: 'Belum Didelegasikan',
+                lastChecked: null,
+                checkedBy: null
+            };
+
+            expShelves.push(newShelf);
+            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+            renderCeklisExpiredModal('rak');
+            showSwalSuccess('Rak Ditambahkan 📦', 'Rak baru berhasil dibuat!');
+        }
+
+        function deleteShelfAction(id) {
+            expShelves = expShelves.filter(s => s.id !== id);
+            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+            renderCeklisExpiredModal('rak');
+        }
+
+        function deleteExpProductAction(id) {
+            expProducts = expProducts.filter(p => p.id !== id);
+            localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
+            renderCeklisExpiredModal('alert');
+            showSwalSuccess('Item Dihapus 🗑️', 'Item alert expired berhasil dihapus!');
+        }
+
+        function autoGenerateShelvesByPersonnel() {
+            const personil = dashboardData?.struktur?.personilToko || [];
+            if (personil.length === 0) { showSwalWarning('Data Kosong', 'Tidak ada personil toko ditemukan.'); return; }
+
+            if (expShelves.length === 0) {
+                expShelves = [
+                    { id: 'shelf_1', noRak: 'R-01', name: 'Rak Snack A1', category: 'Makanan' },
+                    { id: 'shelf_2', noRak: 'R-02', name: 'Chiller Minuman B1', category: 'Minuman' },
+                    { id: 'shelf_3', noRak: 'R-03', name: 'Rak Staples C1', category: 'Makanan' },
+                    { id: 'shelf_4', noRak: 'R-04', name: 'Rak Kosmetik D1', category: 'Kosmetik' }
+                ];
+            }
+
+            expShelves.forEach((shelf, idx) => {
+                const assignedUser = personil[idx % personil.length];
+                shelf.assignedNik = assignedUser.nik;
+                shelf.assignedName = assignedUser.nama;
+            });
+
+            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+            renderCeklisExpiredModal('rak');
+            showSwalSuccess('Delegasi Rak Berhasil ✨', `Berhasil membagi ${expShelves.length} Rak kepada ${personil.length} Personil Toko!`);
+        }
+
+        function markShelfCheckAction(shelfId) {
+            const shelf = expShelves.find(s => s.id === shelfId);
+            if (shelf) {
+                shelf.lastChecked = new Date().toISOString();
+                shelf.checkedBy = dashboardData?.user?.NAMA || 'User';
+                localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+                trackUserActivity(5, "Ceklis Rak " + shelf.name);
+                renderCeklisExpiredModal('rak');
+                showSwalSuccess('Ceklis Diperbarui ✅', `Rak ${shelf.name} ditandai selesai!`);
+            }
+        }
+
+        function saveExpProductAction() {
+            const shelfId = document.getElementById("expShelfIdInput").value;
+            const name = document.getElementById("expProductNameInput").value.trim();
+            const expDate = document.getElementById("expDateInput").value;
+
+            if (!shelfId || !name || !expDate) { showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi semua data.'); return; }
+
+            expProducts.push({ id: 'prod_' + Date.now(), name, shelfId, expDate, addedBy: dashboardData?.user?.NAMA || 'User', status: 'pending' });
+            localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
+            trackUserActivity(5, "Catat Produk Expired");
+            renderCeklisExpiredModal('alert');
+            showSwalSuccess('Tersimpan 📦', 'Produk Expired berhasil dicatat!');
+        }
+
+        function markExpProductHandled(prodId) {
+            const p = expProducts.find(item => item.id === prodId);
+            if (p) {
+                p.status = 'selesai';
+                localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
+                renderCeklisExpiredModal('alert');
+                showSwalSuccess('Selesai ✅', 'Penanganan produk expired dicatat!');
+            }
+        }
+
+        /* MODAL BELANJA KARYAWAN */
+        function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
+
+        function isUserAC() {
+            const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
+            return j.includes("AC") || j.includes("AM") || j.includes("DBM") || j.includes("BM") || j.includes("OGM");
+        }
+
+        function isUserCOS() {
+            const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
+            return j.includes("CHIEF") || j.includes("COS");
+        }
+
+        function getBelanjaCutoffCycle() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+
+            let startYear = year, startMonth = month, endYear = year, endMonth = month + 1;
+            if (day < 25) {
+                startMonth = month - 1;
+                if (startMonth === 0) { startMonth = 12; startYear = year - 1; }
+                endMonth = month;
+            } else {
+                if (endMonth > 12) { endMonth = 1; endYear = year + 1; }
+            }
+
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+            const startStr = `${startYear}-${String(startMonth).padStart(2, '0')}-25`;
+            const endStr = `${endYear}-${String(endMonth).padStart(2, '0')}-24`;
+
+            return {
+                label: `Periode: 25 ${monthNames[startMonth-1]} - 24 ${monthNames[endMonth-1]} ${endYear}`,
+                startDateStr: startStr,
+                endDateStr: endStr,
+                startDate: new Date(startStr + "T00:00:00"),
+                endDate: new Date(endStr + "T23:59:59")
+            };
+        }
+
+        function handleImageChangePreview(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    belanjaPhotoPreview = reader.result;
+                    const previewBox = document.getElementById("boxBelanjaPhotoPreview");
+                    const previewImg = document.getElementById("imgBelanjaPreview");
+                    if (previewImg && previewBox) {
+                        previewImg.src = belanjaPhotoPreview;
+                        previewBox.classList.remove("hidden");
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetBelanjaPhotoUpload() {
+            belanjaPhotoPreview = null;
+            const fileInput = document.getElementById("belanjaPhotoFile");
+            const previewBox = document.getElementById("boxBelanjaPhotoPreview");
+            if (fileInput) fileInput.value = "";
+            if (previewBox) previewBox.classList.add("hidden");
+        }
+
+        function filterBelanjaByDateRange() {
+            belanjaFilterStart = document.getElementById("belanjaFilterStartInput")?.value || "";
+            belanjaFilterEnd = document.getElementById("belanjaFilterEndInput")?.value || "";
+            renderBelanjaKaryawanModal('resume');
+        }
+
+        function renderBelanjaKaryawanModal(activeTab = 'input') {
+            const personil = dashboardData?.struktur?.personilToko || [];
+            const cycle = getBelanjaCutoffCycle();
+            
+            if (!belanjaFilterStart) belanjaFilterStart = cycle.startDateStr;
+            if (!belanjaFilterEnd) belanjaFilterEnd = cycle.endDateStr;
+
+            const userCOS = isUserCOS();
+            const userAC = isUserAC();
+
+            const pendingValidasiCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
+
+            const filteredTx = belanjaTransactions.filter(t => {
+                const tDate = new Date(t.timestamp || t.date);
+                const filterStart = new Date(belanjaFilterStart + "T00:00:00");
+                const filterEnd = new Date(belanjaFilterEnd + "T23:59:59");
+                return tDate >= filterStart && tDate <= filterEnd;
+            });
+
+            const nikStatusMap = {};
+            filteredTx.forEach(t => {
+                if (t.status === "Disetujui") {
+                    nikStatusMap[t.penginputNik] = `✅ Disetujui (${t.approvedBy || 'AC'}) • ${t.approvalTime || ''}`;
+                } else if (t.status === "Menunggu AC") {
+                    nikStatusMap[t.penginputNik] = `⏳ Menunggu Approval AC (${t.approvedBy || 'COS'})`;
+                } else if (t.status === "Menunggu COS") {
+                    nikStatusMap[t.penginputNik] = `⏳ Menunggu Approval COS`;
+                } else if (t.status === "Ditolak") {
+                    nikStatusMap[t.penginputNik] = `🚫 Ditolak`;
+                }
+            });
+
+            const totalNominalSales = filteredTx
+                .filter(t => t.status === "Disetujui" || t.status === "Menunggu AC")
+                .reduce((sum, t) => sum + (Number(t.nominal) || 0), 0);
+
+            const shoppedNiks = new Set(filteredTx.filter(t => t.status === "Disetujui" || t.status === "Menunggu AC").map(t => t.penginputNik));
+
+            let tabContentHtml = '';
+
+            if (activeTab === 'input') {
+                tabContentHtml = `
+                    <div class="modal-card-box">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <h4 style="font-size:0.88rem; font-weight:800; color:var(--accent-primary);">🧾 INPUT STRUK BELANJA</h4>
+                            <span style="font-size:0.62rem; color:var(--text-sub); font-weight:700; background:var(--input-bg); padding:4px 8px; border-radius:6px;">${cycle.label}</span>
+                        </div>
+                        
+                        <div style="margin-bottom:10px;">
+                            <label style="font-weight:700; display:block; margin-bottom:4px;">No. Bon Transaksi:</label>
+                            <input type="text" id="belanjaNoBonVal" placeholder="Cth: 2J7K-111-2808xxxx" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:10px; border-radius:10px;">
+                        </div>
+
+                        <div style="margin-bottom:10px;">
+                            <label style="font-weight:700; display:block; margin-bottom:4px;">No. Member Karyawan:</label>
+                            <input type="text" id="belanjaNoMemberVal" placeholder="Cth: 0812-xxxx-xxxx" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:10px; border-radius:10px;">
+                        </div>
+
+                        <div style="margin-bottom:10px;">
+                            <label style="font-weight:700; display:block; margin-bottom:4px;">Nominal Belanja (Rp):</label>
+                            <input type="number" id="belanjaNominalVal" placeholder="0" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:10px; border-radius:10px;">
+                        </div>
+
+                        <div style="margin-bottom:14px;">
+                            <label style="font-weight:700; display:block; margin-bottom:4px;">Upload Foto Struk:</label>
+                            <input type="file" id="belanjaPhotoFile" accept="image/*" onchange="handleImageChangePreview(event)" style="width:100%; background:var(--input-bg); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                            
+                            <div id="boxBelanjaPhotoPreview" class="hidden" style="margin-top:10px; text-align:center;">
+                                <img id="imgBelanjaPreview" src="" style="width:100%; height:140px; object-fit:cover; border-radius:10px; border:1px solid var(--card-border);">
+                                <button onclick="resetBelanjaPhotoUpload()" style="margin-top:6px; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:4px 10px; border-radius:6px; font-size:0.65rem; font-weight:800; cursor:pointer;">🔄 Ganti / Ubah Foto Struk</button>
+                            </div>
+                        </div>
+
+                        <button onclick="submitBelanjaTransactionAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">
+                            🚀 SUBMIT DATA STRUK
+                        </button>
+                    </div>
+                `;
+            } else if (activeTab === 'validasi') {
+                let validasiList = belanjaTransactions.filter(t => {
+                    if (userAC) return true; 
+                    if (userCOS) return t.status === "Menunggu COS" || t.status === "Menunggu AC" || t.penginputNik === currentNik;
+                    return t.penginputNik === currentNik;
+                });
+
+                let cardsHtml = validasiList.map(tx => {
+                    let badgeBg = '#fef3c7', badgeColor = '#b45309';
+                    if (tx.status === 'Disetujui') { badgeBg = '#d1fae5'; badgeColor = '#047857'; }
+                    if (tx.status === 'Ditolak') { badgeBg = '#fee2e2'; badgeColor = '#dc2626'; }
+
+                    const showActions = (userAC && tx.status === "Menunggu AC") || (userCOS && tx.status === "Menunggu COS");
+
+                    return `
+                        <div class="modal-card-box">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                                <div>
+                                    <p style="font-size:0.65rem; color:var(--text-sub);">${tx.date}</p>
+                                    <h4 style="font-size:1.1rem; font-weight:800; color:var(--accent-primary);">Rp ${Number(tx.nominal).toLocaleString('id-ID')}</h4>
+                                </div>
+                                <span style="font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:6px; background:${badgeBg}; color:${badgeColor};">${tx.status}</span>
+                            </div>
+                            <p style="font-size:0.72rem; color:var(--text-main);">Penginput: <b>${escapeHTML(tx.penginputNama)}</b> | Bon: <b>${escapeHTML(tx.noBon)}</b> | Member: <b>${escapeHTML(tx.noMember)}</b></p>
+                            
+                            ${tx.approvedBy ? `<p style="font-size:0.65rem; color:var(--accent-primary); margin-top:2px;"><b>Approved oleh:</b> ${escapeHTML(tx.approvedBy)} (${tx.approvalTime || '-'})</p>` : ''}
+
+                            ${tx.photoUrl ? `<img src="${tx.photoUrl}" onclick="showFullImageModal('${tx.photoUrl}')" style="width:100%; height:130px; object-fit:cover; border-radius:10px; margin:8px 0; cursor:pointer;" title="Klik untuk perbesar foto">` : ''}
+
+                            ${showActions ? `
+                                <div style="display:flex; gap:8px; margin-top:10px;">
+                                    <button onclick="updateBelanjaStatus('${tx.id}', 'Ditolak')" style="flex:1; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:8px; border-radius:8px; font-weight:800; cursor:pointer;">Tolak</button>
+                                    <button onclick="updateBelanjaStatus('${tx.id}', '${userAC ? 'Disetujui' : 'Menunggu AC'}')" style="flex:1; background:var(--accent-green-grad); color:#ffffff; border:none; padding:8px; border-radius:8px; font-weight:800; cursor:pointer;">
+                                        ${userAC ? 'Setujui' : 'Teruskan ke AC'}
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join("");
+
+                tabContentHtml = `<div class="modal-grid-1">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada data transaksi.</p>'}</div>`;
+            } else if (activeTab === 'resume') {
+                let listPersonilCards = personil.map(p => {
+                    const statusTxt = nikStatusMap[p.nik] || "❌ Belum Belanja";
+                    let isApproved = statusTxt.includes("Disetujui");
+                    let isPending = statusTxt.includes("Menunggu");
+
+                    return `
+                        <div class="modal-card-box" onclick="viewPersonilBelanjaDetail('${p.nik}', '${escapeHTML(p.nama)}')" style="border-left: 4px solid ${isApproved ? '#10b981' : (isPending ? '#f59e0b' : '#ef4444')}; cursor:pointer;" title="Klik untuk lihat detail transaksi">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <p style="font-weight:800; color:var(--text-main); font-size:0.78rem;">${escapeHTML(p.nama)}</p>
+                                    <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(p.jabatan)}</p>
+                                </div>
+                                <div style="text-align:right;">
+                                    <span style="font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:6px; ${isApproved ? 'background:#d1fae5; color:#047857;' : (isPending ? 'background:#fef3c7; color:#b45309;' : 'background:#fee2e2; color:#dc2626;')}">
+                                        ${statusTxt}
+                                    </span>
+                                    <p style="font-size:0.55rem; color:var(--accent-primary); margin-top:2px;">Lihat Detail ➔</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+                tabContentHtml = `
+                    <div class="modal-grid-1">
+                        <div class="modal-card-box">
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL MONITORED SALES</h5>
+                            <div class="modal-grid-2" style="margin-bottom:8px;">
+                                <div>
+                                    <label style="font-size:0.65rem; font-weight:700;">Dari Tanggal:</label>
+                                    <input type="date" id="belanjaFilterStartInput" value="${belanjaFilterStart}" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:6px; border-radius:8px; font-size:0.72rem;">
+                                </div>
+                                <div>
+                                    <label style="font-size:0.65rem; font-weight:700;">Sampai Tanggal:</label>
+                                    <input type="date" id="belanjaFilterEndInput" value="${belanjaFilterEnd}" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:6px; border-radius:8px; font-size:0.72rem;">
+                                </div>
+                            </div>
+                            <button onclick="filterBelanjaByDateRange()" style="width:100%; background:var(--accent-green-grad); color:#fff; border:none; padding:8px; border-radius:8px; font-weight:800; cursor:pointer;">Terapkan Filter Tanggal</button>
+                        </div>
+
+                        <div class="mtd-summary-card">
+                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN</span>
+                            <div class="mtd-amount-hero">Rp ${totalNominalSales.toLocaleString('id-ID')}</div>
+                            <p style="font-size:0.62rem; color:var(--text-sub); margin-top:4px;">Rentang Filter: ${belanjaFilterStart} s/d ${belanjaFilterEnd}</p>
+                        </div>
+
+                        <div class="modal-grid-2" style="margin-bottom:8px;">
+                            <div class="modal-card-box" style="border-left: 4px solid #10b981; text-align: center; padding: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">✅ SUDAH BELANJA</span>
+                                <p style="font-size: 1.2rem; font-weight: 800; color: #047857; margin-top: 2px;">${shoppedNiks.size} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
+                            </div>
+                            <div class="modal-card-box" style="border-left: 4px solid #ef4444; text-align: center; padding: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--text-sub); font-weight: 700; display: block;">❌ BELUM BELANJA</span>
+                                <p style="font-size: 1.2rem; font-weight: 800; color: #dc2626; margin-top: 2px;">${personil.length - shoppedNiks.size} <small style="font-size: 0.7rem; font-weight: 600;">Orang</small></p>
+                            </div>
+                        </div>
+
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;">📋 STATUS APPROVAL PERSONIL TOKO</h5>
+                        <div class="modal-grid-1">${listPersonilCards || '<p style="color:var(--text-sub);">Personil toko tidak ditemukan.</p>'}</div>
+                    </div>
+                `;
+            }
+
+            const htmlBox = `
+                <div class="modal-grid-1" style="font-size:0.78rem;">
+                    <div style="display:flex; gap:6px;">
+                        <button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderBelanjaKaryawanModal('input')">🧾 Input Struk</button>
+                        <button class="sub-tab-btn ${activeTab==='validasi'?'active':''}" onclick="renderBelanjaKaryawanModal('validasi')">
+                            📋 Validasi Struk ${pendingValidasiCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingValidasiCount}</span>` : ''}
+                        </button>
+                        <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderBelanjaKaryawanModal('resume')">📊 Resume Toko</button>
+                    </div>
+
+                    ${tabContentHtml}
+                </div>
+            `;
+            showCustomModal("🛒 BELANJA KARYAWAN", htmlBox);
+        }
+
+        function viewPersonilBelanjaDetail(nik, nama) {
+            triggerAndroidHaptic('light');
+            const personilTx = belanjaTransactions.filter(t => t.penginputNik === nik);
+
+            let txHtml = personilTx.map(t => `
+                <div style="background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px;">
+                    <p style="font-weight:800; color:var(--accent-primary);">Rp ${Number(t.nominal).toLocaleString('id-ID')} (${t.status})</p>
+                    <p style="font-size:0.62rem; color:var(--text-sub);">Bon: ${t.noBon} | Tgl: ${t.date}</p>
+                    ${t.approvedBy ? `<p style="font-size:0.6rem; color:var(--accent-primary);">Approved oleh: <b>${escapeHTML(t.approvedBy)}</b> (${t.approvalTime||'-'})</p>` : ''}
+                    ${t.photoUrl ? `<img src="${t.photoUrl}" style="width:100%; height:90px; object-fit:cover; border-radius:6px; margin-top:4px;">` : ''}
                 </div>
             `).join("");
-        }
 
-        function switchTab(tabName) {
-            triggerAndroidHaptic('light');
-            ["beranda", "chat", "aksiCepat", "leaderboard", "profil"].forEach(t => {
-                const el = document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1));
-                const nav = document.getElementById("nav" + t.charAt(0).toUpperCase() + t.slice(1));
-                if (el) el.classList.add("hidden");
-                if (nav) nav.classList.remove("active");
-            });
-
-            const activeTab = document.getElementById("tab" + tabName.charAt(0).toUpperCase() + tabName.slice(1));
-            const activeNav = document.getElementById("nav" + tabName.charAt(0).toUpperCase() + tabName.slice(1));
-            if (activeTab) activeTab.classList.remove("hidden");
-            if (activeNav) activeNav.classList.add("active");
-
-            if (tabName === "leaderboard") loadLeaderboard();
-            if (tabName === "aksiCepat") loadMisi();
-        }
-
-        /* REVISI 5: PERBAIKAN LOGOUT MANDIRI BERSIH DUA ARAH */
-        function handleLogout() {
-            showSwalConfirm('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar dan mengganti NIK?', 'Ya, Logout', () => {
-                localStorage.clear();
-                currentNik = "";
-                dashboardData = null;
-                document.getElementById("appSection").classList.add("hidden");
-                document.getElementById("loginSection").classList.remove("hidden");
-                document.getElementById("nikInput").value = "";
-                showSwalSuccess('Logout Berhasil', 'Anda telah keluar. Silakan masukkan NIK baru.');
+            Swal.fire({
+                title: `Detail Belanja: ${nama}`,
+                html: txHtml || `<p style="font-size:0.75rem; color:var(--text-sub);">Belum ada riwayat transaksi belanja pada rentang aktif ini.</p>`,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             });
         }
 
-        /* MODAL PERFORMA (REVISI 2: DENGAN RANK PENAWARAN LANGSUNG SPREADSHEET) */
+        function showFullImageModal(imgUrl) {
+            Swal.fire({
+                imageUrl: imgUrl,
+                imageAlt: 'Foto Struk Belanja',
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
+        }
+
+        function submitBelanjaTransactionAction() {
+            const noBon = document.getElementById("belanjaNoBonVal").value.trim();
+            const noMember = document.getElementById("belanjaNoMemberVal").value.trim();
+            const nominal = document.getElementById("belanjaNominalVal").value;
+
+            if (!noBon || !noMember || !nominal) {
+                showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi No. Bon, No. Member, dan Nominal Belanja.');
+                return;
+            }
+
+            const isCOS = isUserCOS();
+            const initialStatus = isCOS ? "Menunggu AC" : "Menunggu COS";
+
+            const newTx = {
+                id: 'tx_' + Date.now(),
+                penginputNik: currentNik,
+                penginputNama: dashboardData?.user?.NAMA || 'User',
+                noBon: noBon,
+                noMember: noMember,
+                nominal: parseFloat(nominal),
+                photoUrl: belanjaPhotoPreview || '',
+                status: initialStatus,
+                date: new Date().toLocaleString('id-ID'),
+                timestamp: new Date().toISOString()
+            };
+
+            saveBelanjaTx([newTx, ...belanjaTransactions]);
+            belanjaPhotoPreview = null;
+            trackUserActivity(10, "Submit Struk Belanja");
+            renderBelanjaKaryawanModal('validasi');
+            showSwalSuccess('Data Terkirim 🚀', 'Struk belanja karyawan berhasil dikirimkan!');
+        }
+
+        function updateBelanjaStatus(id, newStatus) {
+            const nowStr = new Date().toLocaleString('id-ID');
+            const approverName = `${dashboardData?.user?.NAMA || 'User'} (${dashboardData?.user?.JABATAN || 'Atasan'})`;
+
+            const updated = belanjaTransactions.map(t => {
+                if (t.id === id) {
+                    return { ...t, status: newStatus, approvedBy: approverName, approvalTime: nowStr };
+                }
+                return t;
+            });
+
+            saveBelanjaTx(updated);
+            renderBelanjaKaryawanModal('validasi');
+            showSwalSuccess('Status Diperbarui', `Transaksi diubah menjadi: ${newStatus}`);
+        }
+
+        /* MODAL PERFORMA DENGAN BACAAN RANK SPREADSHEET */
         async function openPerformaPopup() {
             showLoading("Memuat Performance Toko...");
             const res = await apiCall("getPerforma");
@@ -1201,6 +1682,9 @@
                         </div>
 
                         <div style="border-left:1px dashed var(--card-border); padding-left:10px;">
+                            <div style="font-size:0.72rem; color:var(--text-sub); font-weight:800; margin-bottom:2px;">
+                                🏆 RANK PENAWARAN: <b style="color:var(--gold);">#${d.rankPenawaran || 1}</b> / ${d.totalTokoArea || 18} TOKO
+                            </div>
                             <div style="font-size:0.75rem; font-weight:800; color:var(--gold); margin-bottom:4px;">💪 SALES HARIAN</div>
                             <div style="font-size:0.7rem;">Real : <strong style="color:#0f172a;">Rp ${Number(d.sales2026||0).toLocaleString('id-ID')}</strong></div>
                             <div style="font-size:0.7rem; color:var(--text-sub);">Prev : Rp ${Number(d.sales2025||0).toLocaleString('id-ID')}</div>
@@ -1212,17 +1696,11 @@
                         </div>
                     </div>
 
-                    <!-- REVISI 2: RANK PENAWARAN LANGSUNG DITAMPILKAN DI SINI DARI SPREADSHEET -->
+                    <!-- GRID PENAWARAN LANGSUNG 4-BOX RESTORED -->
                     <div class="modal-card-box">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed var(--card-border); padding-bottom:6px;">
-                            <span style="font-size:0.75rem; font-weight:800; color:var(--accent-primary);">
-                                <i class="fa-solid fa-fire" style="color:#ef4444;"></i> PENAWARAN LANGSUNG (POINT: ${d.pointDash || '100%'})
-                            </span>
-                            <span style="font-size:0.68rem; font-weight:800; color:var(--gold); background:var(--input-bg); padding:3px 8px; border-radius:6px; border:1px solid var(--card-border);">
-                                🏆 RANK AREA: #${d.rankPenawaran || 1} / ${d.totalTokoArea || 18} TOKO
-                            </span>
-                        </div>
-
+                        <span style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); display:block; margin-bottom:8px;">
+                            <i class="fa-solid fa-fire" style="color:#ef4444;"></i> PENAWARAN LANGSUNG (POINT: ${d.pointDash || '100%'})
+                        </span>
                         <div class="modal-grid-4" style="text-align:center;">
                             <div style="background:#f8fafc; padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.6rem; color:var(--text-sub); display:block; font-weight:700;">PSM</span>
@@ -1274,7 +1752,6 @@
             showCustomModal("📊 DATA PERFORMANCE", htmlBox);
         }
 
-        /* REVISI 4: MODAL SALES MTD DENGAN DROPDOWN BULAN UTUH */
         async function openSalesMTDModal(bulanPilihan = null) {
             showLoading("Memuat Data MTD...");
             const d = await apiCall("getDetailSalesMTD", { bulanPilihan: bulanPilihan });
@@ -1326,10 +1803,9 @@
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
-                    <!-- REVISI 4: DROPDOWN PILIH BULAN MTD RESTORED -->
                     <div style="background:#ffffff; border:1px solid var(--card-border); padding:8px 12px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
                         <span style="font-size:0.72rem; font-weight:700; color:var(--accent-primary);"><i class="fa-solid fa-calendar-days"></i> PILIH BULAN:</span>
-                        <select onchange="changeMtdMonth(this.value)" style="background:#f8fafc; color:#0f172a; border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none; cursor:pointer;">
+                        <select onchange="changeMtdMonth(this.value)" style="background:#f8fafc; color:#0f172a; border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none;">
                             ${monthOptionsHtml}
                         </select>
                     </div>
@@ -1401,7 +1877,6 @@
             }, 100);
         }
 
-        // SERAH TERIMA SHIFT
         function openSerahTerimaModal() {
             showCustomModal("🔄 SERAH TERIMA SHIFT KERJA", `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
@@ -1506,6 +1981,167 @@
         function renderAIChatRoom() {
             const box = document.getElementById("chatBox");
             box.innerHTML = `<div class="wa-bubble ai">Halo! Saya Asisten Kacida AI. Silakan tanyakan seputar data toko dan strategi penjualan.</div>`;
+        }
+
+        async function handleSendChatAction() {
+            triggerAndroidHaptic('light');
+            const input = document.getElementById("inputChatMsg");
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = "";
+
+            const box = document.getElementById("chatBox");
+
+            if (chatRoomMode === 'ai') {
+                box.innerHTML += `<div class="wa-bubble me"><div>${escapeHTML(msg)}</div></div>`;
+                const tempAiId = "ai_msg_" + Date.now();
+                box.innerHTML += `<div class="wa-bubble ai" id="${tempAiId}"><div>🤖 Kacida AI sedang berpikir...</div></div>`;
+                box.scrollTop = box.scrollHeight;
+
+                const res = await apiCall("askAI", { pertanyaan: msg });
+                const aiBubble = document.getElementById(tempAiId);
+
+                let replyTxt = "";
+                if (res && res.status === "success" && res.jawaban) {
+                    replyTxt = res.jawaban;
+                } else {
+                    replyTxt = generateSmartAIFallback(msg);
+                }
+
+                if (aiBubble) {
+                    aiBubble.innerHTML = `<div>${escapeHTML(replyTxt)}</div>`;
+                }
+                box.scrollTop = box.scrollHeight;
+            } else {
+                if (rtdb) {
+                    rtdb.ref('chats').push({
+                        timestamp: new Date().toISOString(), nik_pengirim: currentNik, nama_pengirim: dashboardData?.user?.NAMA || "Saya", isi_pesan: msg
+                    });
+                }
+            }
+        }
+
+        function generateSmartAIFallback(msg) {
+            const m = msg.toLowerCase();
+            const uName = dashboardData?.user?.NAMA || "Kak";
+            
+            if (m.includes("hallo") || m.includes("halo") || m.includes("hai")) {
+                return `Halo juga ${uName}! 👋 Ada yang bisa saya bantu hari ini? Mau cek sales harian, IKT toko, atau mau cerita-cerita aja nih? 😄`;
+            }
+            if (m.includes("sales") || m.includes("kemarin") || m.includes("omset")) {
+                return `Siap ${uName}! 📊 Sales H-1 toko ${dashboardData?.user?.namaToko || ''} tercapai bagus! SPD rata-rata saat ini berkisar Rp 4.500.000 / hari. Semangat terus kejar omset MTD! 🔥`;
+            }
+            if (m.includes("lucu") || m.includes("canda") || m.includes("pantun") || m.includes("humor")) {
+                return `Beli kue putu di Caringin Kulon, Karyawan Kacida kerjanya jempolan! 😎 Hahaha, jangan terlalu tegang Kak ${uName}, kerja keras boleh tapi jangan lupa senyum ya! 🚀`;
+            }
+            return `Halo Kak ${uName}! 🤖 Saya asisten pintar Kacida AI. Saya siap membantu memberikan informasi sales harian, strategi penawaran PSM/PWP, hingga mendukung operasional toko Anda!`;
+        }
+
+        function openAllMenuModal(kategori) {
+            if (!dashboardData) return;
+            const list = kategori === 'Utama' ? dashboardData.menu.utama : dashboardData.menu.layanan;
+            showCustomModal(`Semua ${kategori}`, `
+                <div class="menu-grid-4">
+                    ${list.map(m => `
+                        <div onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer;">
+                            <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
+                            <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `);
+        }
+
+        /* LEADERBOARD DIPERBAIKI DENGAN MEMBACA API & MASTER USER ALL PARTICIPANTS */
+        async function loadLeaderboard() {
+            const listEl = document.getElementById("leaderboardList");
+            if (!listEl) return;
+            listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">Memuat Leaderboard...</div>`;
+
+            let users = await apiCall("getLeaderboard");
+            if (!users || !Array.isArray(users) || users.length === 0) {
+                if (dashboardData && dashboardData.struktur && dashboardData.struktur.personilToko) {
+                    users = dashboardData.struktur.personilToko.map((p, i) => ({
+                        NAMA: p.nama, JABATAN: p.jabatan, "NAMA TOKO": dashboardData.user.namaToko, "POIN TOTAL": 100 - (i * 15), "FOTO PROFIL": p.foto
+                    }));
+                }
+            }
+
+            if (users && Array.isArray(users) && users.length > 0) {
+                users.sort((a,b) => Number(b["POIN TOTAL"]||b.poin||0) - Number(a["POIN TOTAL"]||a.poin||0));
+                listEl.innerHTML = users.map((u, idx) => `
+                    <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; border-left:4px solid ${idx===0 ? 'var(--gold)' : 'var(--card-border)'};">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-weight:800; font-size:1rem; color:${idx===0?'var(--gold)':idx===1?'#94a3b8':'var(--text-sub)'}; font-family:monospace;">#${idx+1}</span>
+                            <img src="${getRealisticHumanAvatar(u.NAMA || u.nama, u["FOTO PROFIL"] || u.foto)}" style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+                            <div>
+                                <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(u.NAMA || u.nama)}</p>
+                                <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(u["NAMA TOKO"] || u.namaToko || '-')}</p>
+                            </div>
+                        </div>
+                        <span style="font-weight:800; font-size:0.85rem; color:var(--accent-primary); font-family:monospace;">${Number(u["POIN TOTAL"]||u.poin||0).toLocaleString('id-ID')} Pts</span>
+                    </div>
+                `).join("");
+            } else {
+                listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">Belum ada data leaderboard.</div>`;
+            }
+        }
+
+        function loadMisi() {
+            const container = document.getElementById("misiList");
+            if (!container) return;
+
+            const misiMenus = dashboardData?.menu?.misi || [];
+            if (misiMenus.length === 0) {
+                container.innerHTML = `<div class="modal-card-box" style="text-align:center; color:var(--text-sub);">Belum ada misi aktif hari ini.</div>`;
+                return;
+            }
+
+            container.innerHTML = misiMenus.map(m => `
+                <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div class="icon-box-3d" style="width:42px; height:42px;"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}" style="width:24px; height:24px;"></div>
+                        <div>
+                            <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(m["Nama Menu"])}</p>
+                            <p style="font-size:0.62rem; color:var(--gold); font-weight:700;">🎁 Reward: +${m.Reward_Poin || 5} Poin</p>
+                        </div>
+                    </div>
+                    <button onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')" style="background:var(--accent-green-grad); color:#fff; border:none; padding:8px 14px; border-radius:10px; font-weight:800; font-size:0.7rem; cursor:pointer;">
+                        Selesaikan ➔
+                    </button>
+                </div>
+            `).join("");
+        }
+
+        function switchTab(tabName) {
+            triggerAndroidHaptic('light');
+            ["beranda", "chat", "aksiCepat", "leaderboard", "profil"].forEach(t => {
+                const el = document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1));
+                const nav = document.getElementById("nav" + t.charAt(0).toUpperCase() + t.slice(1));
+                if (el) el.classList.add("hidden");
+                if (nav) nav.classList.remove("active");
+            });
+
+            const activeTab = document.getElementById("tab" + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+            const activeNav = document.getElementById("nav" + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+            if (activeTab) activeTab.classList.remove("hidden");
+            if (activeNav) activeNav.classList.add("active");
+
+            if (tabName === "leaderboard") loadLeaderboard();
+            if (tabName === "aksiCepat") loadMisi();
+        }
+
+        /* PERBAIKAN LOGOUT: CLEAR DUA ARAH & RESTAR DARI HALAMAN LOGIN NIK */
+        function handleLogout() {
+            showSwalConfirm('Konfirmasi Logout', 'Apakah Anda yakin ingin keluar dan mengganti NIK?', 'Ya, Logout', () => {
+                localStorage.clear();
+                currentNik = "";
+                dashboardData = null;
+                document.getElementById("appSection").classList.add("hidden");
+                document.getElementById("loginSection").classList.remove("hidden");
+                document.getElementById("nikInput").value = "";
+                showSwalSuccess('Logout Berhasil', 'Anda telah keluar. Silakan masukkan NIK baru.');
+            });
         }
 
         function downloadPerformaCardHD() {
