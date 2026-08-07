@@ -314,7 +314,7 @@
             </div>
         </header>
 
-        <!-- REVISI 4: RUNNING TEXT 3D MARQUEE PENGUMUMAN SUPERVISI -->
+        <!-- RUNNING TEXT 3D MARQUEE PENGUMUMAN SUPERVISI -->
         <div id="runningTextHeaderBar" class="hidden" style="width:100%; max-width:600px; background:linear-gradient(135deg, #10b981 0%, #047857 100%); color:#ffffff; font-size:0.7rem; font-weight:800; padding:6px 12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-bottom:1px solid rgba(255,255,255,0.2);">
             <marquee id="marqueeTextContent" scrollamount="5">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
         </div>
@@ -431,7 +431,6 @@
             <div id="chatBox" class="wa-chat-container"></div>
 
             <div class="chat-input-bar">
-                <!-- REVISI 4: BAR REPRY CHAT WA-STYLE -->
                 <div id="chatReplyBar" class="hidden" style="background:var(--card-bg); border-left:4px solid var(--accent-primary); padding:6px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <p style="font-size:0.6rem; font-weight:800; color:var(--accent-primary);" id="replySenderName">Membalas Pesan</p>
@@ -764,7 +763,6 @@
             });
         }
 
-        // PERBAIKAN 4: FIREBASE REALTIME PENGUMUMAN LISTENER & 3D RUNNING TEXT
         function initFirebaseAnnouncementsListener() {
             if (!rtdb) return;
             rtdb.ref('announcements').on('value', (snapshot) => {
@@ -808,12 +806,18 @@
             updateNotifikasiBadgeCount();
         }
 
-        // PERBAIKAN 5: BADGE ANGKA DINAMIS KOTAK NOTIFIKASI
+        // PERBAIKAN 3: KOTAK NOTIFIKASI HANYA MENAMPILKAN BADGE VALIDASI SESUAI HAK AKSES ROLE USER
         function updateNotifikasiBadgeCount() {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
 
-            const pendingBelanjaCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
+            let pendingBelanjaCount = 0;
+            if (userAC) {
+                pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu AC").length;
+            } else if (userCOS) {
+                pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu COS").length;
+            }
+
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
             const announceCount = activeAnnouncementsList.length;
 
@@ -1219,7 +1223,7 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        // PERBAIKAN 1: PROTEKSI FAIL-SAFE MASTER SHIFT MODAL DENGAN TRY...FINALLY AGAR TIDAK PERNAH STUCK SPINNER
+        // PERBAIKAN 1: PROTEKSI MODAL PLAN MASTER SHIFT DENGAN FAIL-SAFE DUA ARAH (100% BEBAS STUCK/SPINNER)
         async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
             const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "TOKO";
@@ -1249,10 +1253,13 @@
             const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
 
             let personil = [];
-            if (dashboardData?.allMasterUsers) {
+            if (targetKode === dashboardData?.user?.kodeToko && dashboardData?.struktur?.personilToko) {
+                personil = dashboardData.struktur.personilToko;
+            } else if (dashboardData?.allMasterUsers) {
                 personil = dashboardData.allMasterUsers.filter(u => u.kodeToko === targetKode);
             }
-            if (personil.length === 0 && targetKode === dashboardData?.user?.kodeToko) {
+
+            if (!personil || personil.length === 0) {
                 personil = dashboardData?.struktur?.personilToko || [];
             }
 
@@ -1314,7 +1321,7 @@
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR' : '👁️ READ ONLY'}</b></p>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR ' : '👁️ READ ONLY'}</b></p>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
@@ -1829,6 +1836,7 @@
             renderBelanjaKaryawanModal('resume');
         }
 
+        // PERBAIKAN 2: TAB VALIDASI STRUK BELANJA DITAMPILKAN KHUSUS CHIEF OF STORE (COS) DAN AREA COORDINATOR (AC)
         function renderBelanjaKaryawanModal(activeTab = 'input') {
             const cycle = getBelanjaCutoffCycle();
             
@@ -1837,6 +1845,13 @@
 
             const userCOS = isUserCOS();
             const userAC = isUserAC();
+            const canValidate = userCOS || userAC;
+
+            // JIKA CREW/ACOS COBA AKSES VALIDASI, DIALIHKAN KE INPUT
+            if (!canValidate && activeTab === 'validasi') {
+                activeTab = 'input';
+            }
+
             const daftarToko = dashboardData?.daftarToko || [];
             const allMaster = dashboardData?.allMasterUsers || [];
 
@@ -2043,7 +2058,7 @@
                             </div>
                         </div>
 
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 STATUS APPROVAL</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 DETAIL PERSONIL</h5>
                         <div class="modal-grid-1">${listPersonilCards || '<p style="color:var(--text-sub);">Personil toko tidak ditemukan.</p>'}</div>
                     `;
                 }
@@ -2066,7 +2081,7 @@
                         </div>
 
                         <div class="mtd-summary-card">
-                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN</span>
+                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN AREA</span>
                             <div class="mtd-amount-hero">Rp ${totalNominalSales.toLocaleString('id-ID')}</div>
                             <p style="font-size:0.62rem; color:var(--text-sub); margin-top:4px;">Rentang Filter: ${belanjaFilterStart} s/d ${belanjaFilterEnd}</p>
                         </div>
@@ -2080,9 +2095,11 @@
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     <div style="display:flex; gap:6px;">
                         <button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderBelanjaKaryawanModal('input')">🧾 Input Struk</button>
-                        <button class="sub-tab-btn ${activeTab==='validasi'?'active':''}" onclick="renderBelanjaKaryawanModal('validasi')">
-                            📋 Validasi Struk ${pendingValidasiCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingValidasiCount}</span>` : ''}
-                        </button>
+                        ${canValidate ? `
+                            <button class="sub-tab-btn ${activeTab==='validasi'?'active':''}" onclick="renderBelanjaKaryawanModal('validasi')">
+                                📋 Validasi Struk ${pendingValidasiCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingValidasiCount}</span>` : ''}
+                            </button>
+                        ` : ''}
                         <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderBelanjaKaryawanModal('resume')">📊 Monitoring</button>
                     </div>
 
@@ -2147,7 +2164,6 @@
             });
         }
 
-        // PERBAIKAN 2: FOTO STRUK BELANJA DENGAN TOMBOL TUTUP KHUSUS DAN DUKUNGAN PREVIEW MODAL
         function showFullImageModal(imgUrl) {
             Swal.fire({
                 imageUrl: imgUrl,
@@ -2329,7 +2345,6 @@
             openSalesMTDModal(currentMtdDetailData?.selectedMonthVal);
         }
 
-        // PERBAIKAN 3: RINCIAN HARIAN MODAL MTD TAMPIL DALAM GRID KOTAK 2-KOLOM DENGAN DESAIN RAPI
         function renderMtdModalView(filterType = 'semua') {
             const d = currentMtdDetailData;
             if (!d) return;
@@ -2704,7 +2719,6 @@
             `);
         }
 
-        // PERBAIKAN 4: PUSAT SUPERVISI PENGUMUMAN DENGAN REALTIME FIREBASE + EDIT & HAPUS
         function openPengumumanModal() {
             const canManage = isUserCOS() || isUserAC();
             const daftarToko = dashboardData?.daftarToko || [];
@@ -2716,7 +2730,7 @@
 
                 managerFormHtml = `
                     <div class="modal-card-box" style="border-left:4px solid var(--gold); margin-bottom:12px;">
-                        <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:8px;"><i class="fa-solid fa-bullhorn"></i> BUAT PENGUMUMAN</h4>
+                        <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:8px;"><i class="fa-solid fa-bullhorn"></i> PUSAT SUPERVISI (BUAT PENGUMUMAN)</h4>
                         
                         <div style="margin-bottom:8px;">
                             <label style="font-weight:700; font-size:0.68rem;">Target Penerima Info:</label>
@@ -2807,14 +2821,37 @@
             }
         }
 
-        // PERBAIKAN 5: MODAL NOTIFIKASI DENGAN BADGE ANGKA & PINTASAN HAK AKSES VALIDASI
         function openNotifModal() {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
+            const canValidate = userCOS || userAC;
 
-            const pendingBelanjaCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
+            let pendingBelanjaCount = 0;
+            if (userAC) {
+                pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu AC").length;
+            } else if (userCOS) {
+                pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu COS").length;
+            }
+
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
             const announceCount = activeAnnouncementsList.length;
+
+            let belanjaNotifCardHtml = '';
+            if (canValidate) {
+                belanjaNotifCardHtml = `
+                    <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingBelanjaCount > 0 ? '#ef4444' : '#10b981'};">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h5 style="font-weight:800; font-size:0.8rem;">Struk Belanja Karyawan</h5>
+                                <p style="font-size:0.65rem; color:var(--text-sub);">${pendingBelanjaCount} Struk Menunggu Validasi Anda</p>
+                            </div>
+                            <button onclick="closeCustomModal(); openBelanjaKaryawanModal();" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                👉 Validasi Struk (${pendingBelanjaCount})
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
@@ -2822,17 +2859,7 @@
                         <h4 style="font-size:0.88rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;"><i class="fa-solid fa-bell"></i> PUSAT TUGAS & VALIDASI AKTIF</h4>
                         <p style="font-size:0.7rem; color:var(--text-sub); margin-bottom:12px;">Berikut tugas dan item yang memerlukan konfirmasi/validasi Anda saat ini:</p>
 
-                        <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingBelanjaCount > 0 ? '#ef4444' : '#10b981'};">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <h5 style="font-weight:800; font-size:0.8rem;">Struk Belanja Karyawan</h5>
-                                    <p style="font-size:0.65rem; color:var(--text-sub);">${pendingBelanjaCount} Struk Menunggu Validasi</p>
-                                </div>
-                                <button onclick="closeCustomModal(); openBelanjaKaryawanModal();" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                    👉 Validasi Struk (${pendingBelanjaCount})
-                                </button>
-                            </div>
-                        </div>
+                        ${belanjaNotifCardHtml}
 
                         <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingExpCount > 0 ? '#f59e0b' : '#10b981'};">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -2849,7 +2876,7 @@
                         <div class="modal-card-box" style="border-left:4px solid ${announceCount > 0 ? 'var(--gold)' : '#10b981'};">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <h5 style="font-weight:800; font-size:0.8rem;">Info Pengumuman Supervisi</h5>
+                                    <h5 style="font-size:0.8rem;">Info Pengumuman Supervisi</h5>
                                     <p style="font-size:0.65rem; color:var(--text-sub);">${announceCount} Informasi Aktif</p>
                                 </div>
                                 <button onclick="closeCustomModal(); openPengumumanModal();" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
@@ -2982,3 +3009,4 @@
     </script>
 </body>
 </html>
+            
