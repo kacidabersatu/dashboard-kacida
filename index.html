@@ -1,3 +1,7 @@
+Berikut adalah kode perbaikan lengkap dan tuntas untuk FILE 2: index.html.
+
+FILE 2: index.html (Frontend Full & Lengkap)
+
 <!DOCTYPE html>
 <html lang="id" data-theme="default">
 <head>
@@ -100,7 +104,7 @@
 
         .container { margin-top: 12px; width: 100%; }
 
-        /* REVISI 3: DESAIN MEWAH 3D RUNNING TEXT BAR */
+        /* DESAIN MEWAH 3D RUNNING TEXT BAR */
         .running-text-container {
             width: 100%; max-width: 600px;
             background: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%);
@@ -260,7 +264,7 @@
 </head>
 <body>
 
-    <!-- SPLASH SCREEN ANDROID NATIVE (DURASI 1.5 DETIK) -->
+    <!-- SPLASH SCREEN ANDROID NATIVE (0-2 DETIK) -->
     <div id="splashScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-main); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
         <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width:100px; height:100px; border-radius:24px; margin-bottom:16px; border:2px solid var(--accent-primary); box-shadow:0 8px 25px rgba(16,185,129,0.3);">
         <h1 class="brand-title-text" style="font-size:1.8rem; margin-bottom:6px;">KACIDA BERSATU ✦</h1>
@@ -300,7 +304,8 @@
         
         <header class="app-header">
             <div class="header-left">
-                <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan & Fitur Aplikasi"><i class="fa-solid fa-bars"></i></button>
+                <!-- REVISI 3: HAMBURGER BUTTON MENUKA DRAWER KONFIGURASI PENGATURAN LENGKAP -->
+                <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan & Konfigurasi Aplikasi"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
                     <div>
                         <span class="brand-title-text">KACIDA BERSATU ✦</span>
@@ -324,7 +329,7 @@
             </div>
         </header>
 
-        <!-- REVISI 3: RUNNING TEXT 3D MEWAH DI BAWAH HEADER -->
+        <!-- RUNNING TEXT 3D MARQUEE PENGUMUMAN SUPERVISI -->
         <div id="runningTextHeaderBar" class="running-text-container hidden">
             <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap;">🔥 INFO SUPERVISI</span>
             <marquee id="marqueeTextContent" scrollamount="6" style="flex:1;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
@@ -334,7 +339,7 @@
             <!-- RATA-RATA AREA COORDINATOR METRICS CARD -->
             <div id="acSummaryContainer" class="ac-metrics-card hidden">
                 <div style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <span><i class="fa-solid fa-chart-line"></i> RATA-RATA SALES AREA</span>
+                    <span><i class="fa-solid fa-chart-line"></i> RATA-RATA SE-AREA COORDINATOR</span>
                     <span style="font-size:0.6rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px;" id="acStoreCountBadge">0 Toko</span>
                 </div>
                 <div class="modal-grid-3" style="text-align:center;">
@@ -472,7 +477,7 @@
             <div id="leaderboardList" class="modal-grid-1"></div>
         </div>
 
-        <!-- TAB PROFIL BAGAN STRUKTUR -->
+        <!-- TAB PROFIL BAGAN STRUKTUR PER-TOKO -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover; margin: 0 auto 8px auto;">
@@ -500,7 +505,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmWrcrEOB73vOnlhPg_vdaGhWRpChzLS8L4QhKfVSnCaN7B26-ouN6HaYDjvvuHAMd/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ0OJu3RqVhcwQJb86F8tkH30Zdw7H8pqopd1RqkjnXgY1I9rgxN7kDAG6cL8nVe1N/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -960,13 +965,13 @@
         function isUserAC() {
             if (dashboardData?.user?.isAC) return true;
             const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
-            return j.includes("AC") || j.includes("AREA") || j.includes("AM") || j.includes("DBM") || j.includes("BM") || j.includes("OGM");
+            return j.includes("AC") || j.includes("AREA");
         }
 
         function canEditShift() {
             if (!dashboardData || !dashboardData.user) return false;
             const j = String(dashboardData.user.jabatan || dashboardData.user.JABATAN || '').toUpperCase();
-            return (j.includes("CHIEF") || j.includes("COS")) && !isUserAC();
+            return (j.includes("CHIEF") || j.includes("COS") || j.includes("ACOS") || j.includes("ASSISTANT")) && !isUserAC();
         }
 
         function isUserCOS() {
@@ -1022,6 +1027,7 @@
             updateNotifikasiBadgeCount();
         }
 
+        // REVISI 4: STRUKTUR BAGAN PER-TOKO (AREA COORDINATOR ADALAH JABATAN TERTINGGI, DILEPAS AM/DBM/BM/OGM)
         function renderProfilBaganStruktur(data) {
             const container = document.getElementById("timTokoContainer");
             if (!container) return;
@@ -1088,6 +1094,7 @@
             });
         }
 
+        // REVISI 3: MENU HAMBURGER (GARIS 3) MEMBUKA DRAWER KONFIGURASI PENGATURAN LENGKAP
         function openMenuSidebar() {
             triggerAndroidHaptic('medium');
             const htmlContent = `
@@ -1331,7 +1338,7 @@
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR' : '👁️ READ ONLY'}</b></p>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR (Chief / Assistant Chief)' : '👁️ READ ONLY (Area Coordinator)'}</b></p>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
@@ -1547,7 +1554,7 @@
                     </div>
 
                     <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer; width:100%;">
-                        ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Personil)
+                        ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Master User)
                     </button>
 
                     <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada rak.</p>'}</div>
@@ -1846,7 +1853,7 @@
             renderBelanjaKaryawanModal('resume');
         }
 
-        // PERBAIKAN 2: ALUR KERJA TERSTRUKTUR & KHUSUS UNTUK USER CHIEF OF STORE (COS) DAN AREA COORDINATOR (AC)
+        // REVISI 2: TAB VALIDASI STRUK DISEMBUNYIKAN UNTUK CREW & ACOS; DITAMPILKAN KHUSUS COS DAN AC
         function renderBelanjaKaryawanModal(activeTab = 'input') {
             const cycle = getBelanjaCutoffCycle();
             
@@ -2067,7 +2074,7 @@
                             </div>
                         </div>
 
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 DETAIL PERSONIL</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 STATUS APPROVAL PERSONIL TOKO</h5>
                         <div class="modal-grid-1">${listPersonilCards || '<p style="color:var(--text-sub);">Personil toko tidak ditemukan.</p>'}</div>
                     `;
                 }
@@ -2075,7 +2082,7 @@
                 tabContentHtml = `
                     <div class="modal-grid-1">
                         <div class="modal-card-box">
-                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL SALES</h5>
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL MONITORED SALES</h5>
                             <div class="modal-grid-2" style="margin-bottom:8px;">
                                 <div>
                                     <label style="font-size:0.65rem; font-weight:700;">Dari Tanggal:</label>
@@ -2109,7 +2116,7 @@
                                 📋 Validasi Struk ${pendingValidasiCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingValidasiCount}</span>` : ''}
                             </button>
                         ` : ''}
-                        <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderBelanjaKaryawanModal('resume')">📊 Monitoring</button>
+                        <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderBelanjaKaryawanModal('resume')">📊 Resume Toko</button>
                     </div>
 
                     ${tabContentHtml}
@@ -2184,7 +2191,6 @@
             });
         }
 
-        // PERBAIKAN 2: INPUT STRUK OLEH COS LANGSUNG BERSTATUS "MENUNGGU AC"
         function submitBelanjaTransactionAction() {
             const noBon = document.getElementById("belanjaNoBonVal").value.trim();
             const noMember = document.getElementById("belanjaNoMemberVal").value.trim();
@@ -2196,7 +2202,6 @@
             }
 
             const isCOS = isUserCOS();
-            // JIKA USER COS INPUT: LANGSUNG KE AC; JIKA CREW/ACOS: KE COS DULU
             const initialStatus = isCOS ? "Menunggu AC" : "Menunggu COS";
 
             const newTx = {
