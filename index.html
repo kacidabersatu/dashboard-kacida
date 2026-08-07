@@ -23,6 +23,17 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+    <!-- GARANSI EMERGENCY SAFETY TIMEOUT SPLASH SCREEN (PASTI HILANG 2 DETIK) -->
+    <script>
+        setTimeout(function() {
+            var splash = document.getElementById("splashScreen");
+            if (splash) {
+                splash.style.opacity = "0";
+                setTimeout(function() { splash.remove(); }, 500);
+            }
+        }, 2000);
+    </script>
+
     <style>
         :root, html[data-theme="default"], html[data-theme="light"] {
             --bg-main: #f3f8f5;
@@ -99,7 +110,6 @@
 
         .container { margin-top: 12px; width: 100%; }
 
-        /* DESAIN MEWAH 3D RUNNING TEXT BAR */
         .running-text-container {
             width: 100%; max-width: 600px;
             background: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%);
@@ -296,7 +306,6 @@
         
         <header class="app-header">
             <div class="header-left">
-                <!-- REVISI 3: HAMBURGER BUTTON -->
                 <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan & Konfigurasi Aplikasi"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
                     <div>
@@ -321,7 +330,7 @@
             </div>
         </header>
 
-        <!-- REVISI 5: RUNNING TEXT 3D MARQUEE TANPA LABEL TOKO -->
+        <!-- RUNNING TEXT MARQUEE TANPA PARENT TOKO -->
         <div id="runningTextHeaderBar" class="running-text-container hidden">
             <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap;">🔥 INFO SUPERVISI</span>
             <marquee id="marqueeTextContent" scrollamount="6" style="flex:1;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
@@ -349,7 +358,6 @@
                 </div>
             </div>
 
-            <!-- DISKET INFO BAR -->
             <section class="disket-info-bar">
                 <div class="disket-bar-item" onclick="openSalesMTDModal()">
                     <span class="disket-bar-label"><i class="fa-solid fa-chart-line" style="color: var(--accent-primary);"></i> Sales SPD</span>
@@ -381,7 +389,6 @@
                 <div class="swiper-pagination"></div>
             </div>
 
-            <!-- METRIK SUMMARY UTAMA -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d">
@@ -426,7 +433,6 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT NAVBAR -->
         <div id="tabChat" class="hidden container">
             <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-primary);"></i> Room Chat Tim Kacida</h2>
             
@@ -453,7 +459,6 @@
             </div>
         </div>
 
-        <!-- TAB MISI HARI INI -->
         <div id="tabAksiCepat" class="hidden container">
             <div class="menu-section-card">
                 <h2 class="section-title" style="color: var(--accent-primary);"><i class="fa-solid fa-rocket"></i> Target Misi Hari Ini</h2>
@@ -462,13 +467,11 @@
             </div>
         </div>
 
-        <!-- TAB LEADERBOARD -->
         <div id="tabLeaderboard" class="hidden container">
             <h2 class="section-title" style="color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-crown"></i> 🏆 Leaderboard Area</h2>
             <div id="leaderboardList" class="modal-grid-1"></div>
         </div>
 
-        <!-- TAB PROFIL -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover; margin: 0 auto 8px auto;">
@@ -479,14 +482,12 @@
                 <button onclick="handleLogout()" style="margin-top: 12px; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 18px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">LOGOUT / GANTI NIK</button>
             </div>
 
-            <!-- BAGAN STRUKTUR PERSONIL PER-TOKO -->
             <div class="menu-section-card">
                 <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Bagan Struktur Toko Saya</h3>
                 <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
             </div>
         </div>
 
-        <!-- REVISI 4: BOTTOM NAVBAR WITH UNREAD CHAT BADGE -->
         <nav class="bottom-nav">
             <a href="#" onclick="switchTab('beranda')" id="navBeranda" class="nav-item active"><i class="fa-solid fa-house"></i><span>Beranda</span></a>
             <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item">
@@ -551,7 +552,7 @@
         let belanjaFilterStart = "";
         let belanjaFilterEnd = "";
 
-        // REVISI 6: JOBDESK HARIAN MASTER DATA & STATE
+        // JOBDESK HARIAN MASTER DATA & STATE
         let activeJobdeskDateStr = new Date().toISOString().substring(0,10);
         let jobdeskUploadedPhoto = "";
         let activeJobdeskModalTarget = null;
@@ -560,31 +561,31 @@
         const BRIEFING_MASTER = {
           'Senin': {
             'Shift 1': ['MATERI BSP & REMAINDER TARGET FOKUS DAN SALES SHIFT 1', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
-            'Shift 2': ['EVALUASI PENCAPAIAN SHIFT 1 DAN BREAKDOWN TARGET SHIFT 2', 'EVALUASI PENCAPAIAN SALES PASCA JSM']
+            'Shift 2': ['ISI LINK SERAH TERIMA & EVALUASI PENCAPAIAN SHIFT 1 DAN BREAKDOWN TARGET SHIFT 2', 'EVALUASI PENCAPAIAN SALES PASCA JSM']
           },
           'Selasa': {
-            'Shift 1': ['EVALUASI PENCAPAIAN FOKUS DAN SALES DI MENU HIGHLIGH SALES', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
-            'Shift 2': ['EVALUASI PENCAPAIAN SHIFT 1 DAN BREAKDOWN SHIFT 2', 'EVALUASI PENCAPAIAN FOKUS YANG DIKIRIM MKT']
+            'Shift 1': ['EVALUASI PENCAPAIAN FOKUS DAN SALES DI LINK REPORT AREA', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['ISI LINK SERAH TERIMA & EVALUASI PENCAPAIAN SHIFT 1 DAN BREAKDOWN SHIFT 2', 'EVALUASI PENCAPAIAN FOKUS YANG DIKIRIM MKT']
           },
           'Rabu': {
             'Shift 1': ['CEK DAN EVALUASI PENCAPAIAN INDIKATOR DI IKT ONLINE', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
-            'Shift 2': ['BAHAS PERFORMA SALES DAN FOKUS']
+            'Shift 2': ['ISI LINK SERAH TERIMA & BAHAS PERFORMA SALES DAN FOKUS DI LINK LOOKER STUDIO AREA']
           },
           'Kamis': {
-            'Shift 1': ['EVALUASI PENCAPAIAN FOKUS YANG DIKIRIM MKT', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
-            'Shift 2': ['ATUR STRATEGI JSM DAN TARGET SALES YANG HARUS DICAPAI']
+            'Shift 1': ['EVALUASI PENCAPAIAN FOKUS DAN SALES DI LINK REPORT AREA', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['ISI LINK SERAH TERIMA & ATUR STRATEGI JSM DAN TARGET SALES YANG HARUS DICAPAI']
           },
           'Jumat': {
-            'Shift 1': ['CEK DAN EVALUASI PENCAPAIAN INDIKATOR IKT ONLINE', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
-            'Shift 2': ['BAHAS PERFORMA SALES DI MENU HIGHLIGHT SALES DAN FOKUS MKT']
+            'Shift 1': ['CEK DAN EVALUASI PENCAPAIAN INDIKATOR DI IKT ONLINE', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['ISI LINK SERAH TERIMA & BAHAS PERFORMA SALES DAN FOKUS DI LINK LOOKER STUDIO AREA']
           },
           'Sabtu': {
             'Shift 1': ['EVALUASI PENCAPAIAN FOKUS DAN SALES DI LINK REPORT AREA', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
-            'Shift 2': ['EVALUASI PENCAPAIAN FOKUS YANG DIKIRIM MKT']
+            'Shift 2': ['ISI LINK SERAH TERIMA & EVALUASI PENCAPAIAN FOKUS YANG DIKIRIM MKT']
           },
           'Minggu': {
             'Shift 1': ['CEK DAN EVALUASI PENCAPAIAN INDIKATOR DI IKT ONLINE', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
-            'Shift 2': ['CEK ULANG PERBAIKAN BASIC YANG TERLEWAT & BAHAS PERFORMA SALES']
+            'Shift 2': ['ISI LINK SERAH TERIMA, CEK ULANG PERBAIKAN BASIC YANG TERLEWAT & BAHAS PERFORMA SALES']
           }
         };
 
@@ -592,12 +593,12 @@
           { id: 'ACT-SEN-01', day: 'Senin', area: 'Toilet', title: 'KEBERSIHAN TOILET ISI CEKLIS' },
           { id: 'ACT-SEN-02', day: 'Senin', area: 'Bean Spot', title: 'CLEANING BEAN SPOT' },
           { id: 'ACT-SEN-03', day: 'Senin', area: 'Teras', title: 'KEBERSIHAN KESET MERAH DI CUCI' },
-          { id: 'ACT-SEN-04', day: 'Senin', area: 'Sales Area', title: 'UPDATE SEWA' },
+          { id: 'ACT-SEN-04', day: 'Senin', area: 'Kantor', title: 'UPDATE SEWA' },
           { id: 'ACT-SEN-05', day: 'Senin', area: 'Sales Area', title: 'KEBERSIHAN GALON' },
-          { id: 'ACT-SEN-06', day: 'Senin', area: 'Teras', title: 'KEBERSIHAN GENSET' },
+          { id: 'ACT-SEN-06', day: 'Senin', area: 'Backroom', title: 'KEBERSIHAN GENSET' },
 
           { id: 'ACT-SEL-01', day: 'Selasa', area: 'Sales Area', title: 'KEBERSIHAN KACA LUAR DAN DALAM' },
-          { id: 'ACT-SEL-02', day: 'Selasa', area: 'Display Area', title: 'KEBERSIHAN TERAS DAN SARANG LABA-LABA AREA SALES' },
+          { id: 'ACT-SEL-02', day: 'Selasa', area: 'Teras', title: 'KEBERSIHAN TERAS DAN SARANG LABA-LABA AREA SALES' },
           { id: 'ACT-SEL-03', day: 'Selasa', area: 'Display Area', title: 'KEBERSIHAN KOLONG RAK' },
           { id: 'ACT-SEL-04', day: 'Selasa', area: 'Freezer Area', title: 'KEBERSIHAN ALL FREEZER KISI-KISI NYA DAN KOLONG FREEZER' },
           { id: 'ACT-SEL-05', day: 'Selasa', area: 'Chiller Area', title: 'KEBERSIHAN CHILLER KACA DAN TIANG YANG BERKERAK' },
@@ -608,11 +609,11 @@
           { id: 'ACT-RAB-04', day: 'Rabu', area: 'Gudang & Kantor', title: 'KEBERSIHAN SARANG LABA-LABA AREA GUDANG DAN KANTOR' },
 
           { id: 'ACT-KAM-01', day: 'Kamis', area: 'Bean Spot', title: 'CLEANING BEAN SPOT' },
-          { id: 'ACT-KAM-02', day: 'Kamis', area: 'Sales Area', title: 'GENERAL CEK EXP ALL ITEM INPUT ALL ITEM DI APLIKASI CEKLIS EXP' },
+          { id: 'ACT-KAM-02', day: 'Kamis', area: 'Sales Area', title: 'GENERAL CEK EXP ALL ITEM INPUT ALL ITEM DI APLIKASI TAB' },
           { id: 'ACT-KAM-03', day: 'Kamis', area: 'Selasar', title: 'KEBERSIHAN SELASAR' },
 
           { id: 'ACT-JUM-01', day: 'Jumat', area: 'Toilet', title: 'KEBERSIHAN TOILET ISI CEKLIS' },
-          { id: 'ACT-JUM-02', day: 'Jumat', area: 'Gudang', title: 'GROUPING RAK ATK , RAK 979 DAN Z51' },
+          { id: 'ACT-JUM-02', day: 'Jumat', area: 'Display Area', title: 'GROUPING RAK ATK , RAK 979 DAN Z51' },
           { id: 'ACT-JUM-03', day: 'Jumat', area: 'Bean Spot', title: 'SO RPC MATERIAL BEANSPOT' },
           { id: 'ACT-JUM-04', day: 'Jumat', area: 'Gudang', title: 'KEBERSIHAN BOX RETURN STERIL NO BAD STOK AJUKAN OTP' },
 
@@ -658,7 +659,6 @@
             return dayNum < currentDay;
         }
 
-        // REVISI 5: LOG AKTIVITAS MASUK KE FIREBASE REALTIME DB
         function trackUserActivity(points = 5, actionName = "Aktivitas") {
             if (!currentNik) return;
             const ym = getCurrentMonthKey();
@@ -849,7 +849,6 @@
             }
         }
 
-        // REVISI 4: REALTIME CHAT WITH UNREAD BADGE COUNTER
         function initFirebaseRealtimeChat() {
             if (!rtdb) return;
             rtdb.ref('chats').limitToLast(50).on('value', (snapshot) => {
