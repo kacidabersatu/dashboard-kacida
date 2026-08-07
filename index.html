@@ -1,3 +1,7 @@
+Berikut adalah kode perbaikan lengkap dan tuntas untuk FILE 2: index.html.
+
+FILE 2: index.html (Frontend Full & Lengkap)
+
 <!DOCTYPE html>
 <html lang="id" data-theme="default">
 <head>
@@ -161,16 +165,14 @@
         .chat-tab-pill.active { background: var(--accent-green-grad); color: #ffffff; }
 
         .wa-chat-container { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 16px; flex: 1; min-height: 150px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-        .wa-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.78rem; position: relative; line-height: 1.4; word-wrap: break-word; }
+        .wa-bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: 0.78rem; position: relative; line-height: 1.4; word-wrap: break-word; cursor: pointer; }
         .wa-bubble.me { align-self: flex-end; background: var(--wa-bubble-me); color: white; border-bottom-right-radius: 2px; }
         .wa-bubble.other { align-self: flex-start; background: var(--wa-bubble-other); color: var(--text-main); border-bottom-left-radius: 2px; border: 1px solid var(--card-border); }
         .wa-bubble.ai { align-self: flex-start; background: #ecfdf5; border: 1px solid var(--accent-primary); color: #0f172a; width: 90%; }
         .wa-sender { font-size: 0.62rem; font-weight: 800; color: #a7f3d0; margin-bottom: 2px; }
-        
-        /* REALTIME TIMESTAMP DALAM BUBBLE CHAT */
         .wa-time { font-size: 0.58rem; opacity: 0.75; text-align: right; margin-top: 3px; display: block; font-weight: 600; }
 
-        .chat-input-bar { display: flex; gap: 8px; margin-top: 8px; align-items: center; flex-shrink: 0; }
+        .chat-input-bar { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; flex-shrink: 0; }
 
         .bottom-nav {
             position: fixed; bottom: calc(10px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 500px; height: 65px; 
@@ -252,6 +254,15 @@
 </head>
 <body>
 
+    <!-- REVISI 2: SPLASH SCREEN NATIVE ANDROID (DURASI 0-2 DETIK) -->
+    <div id="splashScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-main); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
+        <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width:100px; height:100px; border-radius:24px; margin-bottom:16px; border:2px solid var(--accent-primary); box-shadow:0 8px 25px rgba(16,185,129,0.3);">
+        <h1 class="brand-title-text" style="font-size:1.8rem; margin-bottom:6px;">KACIDA BERSATU ✦</h1>
+        <p style="font-size:0.75rem; color:var(--text-sub); margin-bottom:20px;">Portal Performa & Operasional Retail Pro</p>
+        <div style="width:36px; height:36px; border:3.5px solid rgba(16,185,129,0.2); border-top-color:#10b981; border-radius:50%; animation:spinSplash 0.8s linear infinite;"></div>
+        <style>@keyframes spinSplash { to { transform: rotate(360deg); } }</style>
+    </div>
+
     <!-- ANDROID FULL SCREEN MODAL OVERLAY -->
     <div id="customModalOverlay" class="custom-modal-overlay hidden">
         <div id="customModalCard" class="custom-modal-card">
@@ -287,7 +298,6 @@
                 <div class="brand-title">
                     <div>
                         <span class="brand-title-text">KACIDA BERSATU ✦</span>
-                        <!-- PERBAIKAN 4: BADGE HEADER TAMPILKAN NAMA TOKO + DOT ONLINE/OFFLINE -->
                         <div class="ocean-3d-badge-transparent" id="hdrOnlineBadgeStatus">
                             <span id="hdrOnlineDot" class="pulse-green-dot"></span>
                             <span id="hdrStoreOnlineName">TOKO ONLINE</span>
@@ -398,7 +408,6 @@
                 </div>
             </section>
 
-            <!-- PERBAIKAN 1: GRID MENU UTAMA DENGAN FALLBACK 8 TAB LENGKAP -->
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
                 <div id="gridMenuUtama" class="menu-grid-4"></div>
@@ -421,8 +430,19 @@
             <div id="chatBox" class="wa-chat-container"></div>
 
             <div class="chat-input-bar">
-                <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') handleSendChatAction()" style="flex: 1; background: var(--header-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.78rem; color: var(--text-main); outline: none;">
-                <button onclick="handleSendChatAction()" style="background: var(--accent-green-grad); color: #ffffff; padding: 0 16px; height: 40px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
+                <!-- REVISI 4: KOTAK REPLY / BALAS PESAN WA-STYLE -->
+                <div id="chatReplyBar" class="hidden" style="background:var(--card-bg); border-left:4px solid var(--accent-primary); padding:6px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <p style="font-size:0.6rem; font-weight:800; color:var(--accent-primary);" id="replySenderName">Membalas Pesan</p>
+                        <p style="font-size:0.7rem; color:var(--text-sub);" id="replyTextSnippet">Pesan...</p>
+                    </div>
+                    <button onclick="cancelChatReply()" style="background:none; border:none; color:#ef4444; font-size:0.9rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <input type="text" id="inputChatMsg" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') handleSendChatAction()" style="flex: 1; background: var(--header-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 14px; font-size: 0.78rem; color: var(--text-main); outline: none;">
+                    <button onclick="handleSendChatAction()" style="background: var(--accent-green-grad); color: #ffffff; padding: 0 16px; height: 40px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
             </div>
         </div>
 
@@ -441,7 +461,7 @@
             <div id="leaderboardList" class="modal-grid-1"></div>
         </div>
 
-        <!-- PERBAIKAN 2: TAB PROFIL DENGAN NAMA TOKO BISA DITAMPILKAN & BAGAN STRUKTUR PER-TOKO -->
+        <!-- TAB PROFIL BAGAN STRUKTUR -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover; margin: 0 auto 8px auto;">
@@ -454,7 +474,7 @@
 
             <!-- BAGAN STRUKTUR PERSONIL PER-TOKO -->
             <div class="menu-section-card">
-                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Bagan Struktur TokoSaya</h3>
+                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Bagan Struktur Toko Saya</h3>
                 <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
             </div>
         </div>
@@ -469,7 +489,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyu5nXeiO4kW7SpheQLS89Z6BD2iT2BW0xLKArMD9WEc09VmuunYW0405TiTA_DFwAb/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyj0EnSinX9iXyNiP7cyPTSkOQ-05kv-vBp_QCMLttXjCc8ZjByZ0Ic2Y2tIJVVtWg/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -499,6 +519,7 @@
         let currentMtdDetailData = null;
         let deferredPrompt = null;
         let selectedSurveyRating = 5;
+        let activeReplyData = null;
 
         // PLAN MASTER SHIFT STATE
         let currentShiftMonth = new Date().toISOString().substring(0,7); 
@@ -522,8 +543,12 @@
             return isNaN(parsed) ? 0 : parsed;
         }
 
+        // RESET OTOMATIS BULANAN
         function getCurrentMonthKey() {
-            return new Date().toISOString().substring(0, 7);
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            return `${y}-${m}`;
         }
 
         function trackUserActivity(points = 5, actionName = "Aktivitas") {
@@ -650,7 +675,6 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
-        // PERBAIKAN 4: OCEAN 3D BADGE DISPLAY NAMA TOKO + PULSE ONLINE/OFFLINE DOT
         function setupOnlineOfflineListener() {
             const updateStatus = () => {
                 const dot = document.getElementById("hdrOnlineDot");
@@ -732,13 +756,13 @@
             rtdb.ref('chats').limitToLast(50).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    cachedChatList = Object.values(data);
+                    const entries = Object.entries(data);
+                    cachedChatList = entries.map(([id, val]) => ({ id, ...val }));
                     if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
                 }
             });
         }
 
-        // PERBAIKAN 1: RENDER MENU INSTAN 0 DETIK PAKAI FALLBACK SEBELUM SERVER SELESAI
         function renderDefaultFallbackMenus() {
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
             const userCOS = isUserCOS();
@@ -772,10 +796,19 @@
             renderMenuGrid("gridMenuLainnya", sampleLayanan);
         }
 
+        // REVISI 2: STARTUP SPLASH SCREEN 0-2 DETIK
         window.addEventListener("DOMContentLoaded", () => {
             applyTheme(currentTheme);
             setupOnlineOfflineListener();
             renderDefaultFallbackMenus();
+
+            setTimeout(() => {
+                const splash = document.getElementById("splashScreen");
+                if (splash) {
+                    splash.style.opacity = "0";
+                    setTimeout(() => splash.remove(), 500);
+                }
+            }, 1500);
 
             const localCache = localStorage.getItem("kacida_cached_dashboard");
             if (localCache && currentNik) {
@@ -865,10 +898,8 @@
             document.getElementById("lblGreetingText").innerText = getTimeGreeting() + ",";
             document.getElementById("lblUserName").innerText = (escapeHTML(data.user.NAMA) || "USER") + "! 👋";
             
-            // BADGE MEMBAWA NAMA TOKO USER
             document.getElementById("hdrStoreOnlineName").innerText = data.user.namaToko || "ONLINE";
             
-            // METRIK PROFIL
             document.getElementById("profilNama").innerText = data.user.NAMA || "-";
             document.getElementById("profilJabatan").innerText = data.user.jabatan || data.user.JABATAN || "-";
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
@@ -877,17 +908,15 @@
                 document.getElementById("profilFoto").src = getRealisticHumanAvatar(data.user.NAMA, data.user["FOTO PROFIL"] || data.user.foto);
             }
 
-            // POPULASI BAR INFO HARIAN
-            document.getElementById("valSales").innerText = data.dataH1.spdLabel || `Sales: Rp ${Number(data.dataH1.sales).toLocaleString('id-ID')}`;
-            document.getElementById("valIKT").innerText = data.dataH1.iktNetSales || "-";
-            document.getElementById("valPenawaran").innerText = data.dataH1.point || "-";
-            document.getElementById("valTasks").innerText = data.badges.tugas;
+            document.getElementById("valSales").innerText = data.dataH1?.spdLabel || `Sales: Rp ${Number(data.dataH1?.sales||0).toLocaleString('id-ID')}`;
+            document.getElementById("valIKT").innerText = data.dataH1?.iktNetSales || "-";
+            document.getElementById("valPenawaran").innerText = data.dataH1?.point || "-";
+            document.getElementById("valTasks").innerText = data.badges?.tugas || 0;
 
-            // SINKRONISASI DUA ARAH POIN BERANDA SAMA PERSIS DENGAN LEADERBOARD
-            const officialPoint = cleanNum(data.badges?.point || data.user?.poin || data.user?.["POIN TOTAL"] || 0);
+            // SINKRONISASI DUA ARAH POIN BERANDA DENGAN LEADERBOARD
+            const officialPoint = cleanNum(data.user?.poin || data.badges?.point || data.user?.["POIN TOTAL"] || 0);
             document.getElementById("valPoints").innerText = Number(officialPoint).toLocaleString('id-ID');
 
-            // HITUNG RANK HARIAN DENGAN PRESISI
             let calculatedRank = "#1";
             if (data.allMasterUsers && Array.isArray(data.allMasterUsers) && data.allMasterUsers.length > 0) {
                 const sortedUsers = [...data.allMasterUsers].sort((a, b) => cleanNum(b.poin) - cleanNum(a.poin));
@@ -910,11 +939,9 @@
             renderCombinedMenuUtama(data.menu.utama || []);
             renderMenuGrid("gridMenuLainnya", data.menu.layanan);
 
-            // RENDER BAGAN TOKO PADA TAB PROFIL
             renderProfilBaganStruktur(data);
         }
 
-        // PERBAIKAN 2: STRUKTUR TAB PROFIL TAMPILKAN BAGAN STRUKTUR PER-TOKO LENGKAP
         function renderProfilBaganStruktur(data) {
             const container = document.getElementById("timTokoContainer");
             if (!container) return;
@@ -924,7 +951,6 @@
             const allMaster = data?.allMasterUsers || [];
 
             if (userAC && daftarToko.length > 0) {
-                // TAMPILAN BAGAN SEMUA TOKO BINAAN UNTUK AREA COORDINATOR
                 container.innerHTML = daftarToko.map(toko => {
                     const personilStore = allMaster.filter(u => u.kodeToko === toko.kodeToko);
                     return `
@@ -940,7 +966,6 @@
                     `;
                 }).join("");
             } else {
-                // BAGAN STRUKTUR PERSONIL TOKO SAYA
                 const personil = data?.struktur?.personilToko || [];
                 container.innerHTML = personil.map(p => `
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px;">
@@ -1128,16 +1153,22 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
+        // PERBAIKAN 3: PROTEKSI TOTAL MODAL MASTER SHIFT DENGAN TRY...FINALLY AGAR TIDAK PERNAH STUCK LOADING
         async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
-            const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko;
+            const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "TOKO";
             selectedShiftKodeToko = targetKode;
 
-            const res = await apiCall("getMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth });
-            hideLoading();
-            if (res && res.shiftData) localShiftMatrix = res.shiftData;
-            else localShiftMatrix = {};
-            renderPlanMasterShiftModal();
+            try {
+                const res = await apiCall("getMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth });
+                if (res && res.shiftData) localShiftMatrix = res.shiftData;
+                else localShiftMatrix = {};
+            } catch(e) {
+                localShiftMatrix = {};
+            } finally {
+                hideLoading();
+                renderPlanMasterShiftModal();
+            }
         }
 
         function changeShiftStore(kodeToko) {
@@ -1217,7 +1248,7 @@
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ (Chief / Assistant Chief)' : '👁️ READ ONLY'}</b></p>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR' : '👁️ READ ONLY'}</b></p>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
@@ -1486,7 +1517,7 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO (AREA COORDINATOR)</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO </h5>
                         <div class="modal-grid-1">${storeExpCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada data toko.</p>'}</div>
                     `;
                 } else {
@@ -1946,7 +1977,7 @@
                             </div>
                         </div>
 
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 STATUS APPROVAL PERSONIL TOKO</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;">📋 STATUS APPROVAL</h5>
                         <div class="modal-grid-1">${listPersonilCards || '<p style="color:var(--text-sub);">Personil toko tidak ditemukan.</p>'}</div>
                     `;
                 }
@@ -1954,7 +1985,7 @@
                 tabContentHtml = `
                     <div class="modal-grid-1">
                         <div class="modal-card-box">
-                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL SALES</h5>
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL MONITORED SALES</h5>
                             <div class="modal-grid-2" style="margin-bottom:8px;">
                                 <div>
                                     <label style="font-size:0.65rem; font-weight:700;">Dari Tanggal:</label>
@@ -1969,7 +2000,7 @@
                         </div>
 
                         <div class="mtd-summary-card">
-                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN AREA</span>
+                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN</span>
                             <div class="mtd-amount-hero">Rp ${totalNominalSales.toLocaleString('id-ID')}</div>
                             <p style="font-size:0.62rem; color:var(--text-sub); margin-top:4px;">Rentang Filter: ${belanjaFilterStart} s/d ${belanjaFilterEnd}</p>
                         </div>
@@ -2442,7 +2473,7 @@
             }
         }
 
-        // PERBAIKAN 3: RENDER BUBBLE CHAT TIM BERSAMA REALTIME TIMESTAMP (HH.mm WIB)
+        // PERBAIKAN 4: CHAT BUBBLE DENGAN INTERAKSI PRESS/CLICK BALAS (REPLY) & HAPUS (DELETE)
         function renderChatList(chats, isBackgroundRefresh = false) {
             const box = document.getElementById("chatBox");
             if (!box) return;
@@ -2451,6 +2482,7 @@
                 return;
             }
             box.innerHTML = chats.map(c => {
+                const msgId = c.id || "";
                 const nikPengirim = c.nik_pengirim || c.NIK || "";
                 const namaPengirim = c.nama_pengirim || c.NAMA || "User";
                 const isiPesan = c.isi_pesan || c.PESAN || "";
@@ -2458,7 +2490,7 @@
                 const chatTime = c.timestamp ? new Date(c.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
 
                 return `
-                    <div class="wa-bubble ${isMe ? 'me' : 'other'}">
+                    <div class="wa-bubble ${isMe ? 'me' : 'other'}" onclick="openChatBubbleActionMenu('${msgId}', '${nikPengirim}', '${escapeHTML(namaPengirim)}', '${escapeHTML(isiPesan)}')">
                         <div class="wa-sender"><span>${escapeHTML(namaPengirim)}</span></div>
                         <div>${escapeHTML(isiPesan)}</div>
                         <span class="wa-time">${chatTime} WIB</span>
@@ -2466,6 +2498,40 @@
                 `;
             }).join("");
             if (!isBackgroundRefresh) box.scrollTop = box.scrollHeight;
+        }
+
+        function openChatBubbleActionMenu(msgId, senderNik, senderNama, textMsg) {
+            triggerAndroidHaptic('light');
+            const isMe = String(senderNik).trim() === String(currentNik).trim();
+
+            Swal.fire({
+                title: `Pesan dari ${senderNama}`,
+                text: `"${textMsg.length > 35 ? textMsg.substring(0,35)+'...' : textMsg}"`,
+                showCancelButton: true,
+                confirmButtonText: '💬 Balas Pesan',
+                showDenyButton: isMe || isUserAC(),
+                denyButtonText: '🗑️ Hapus Pesan',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    activeReplyData = { msgId, senderNama, textMsg };
+                    document.getElementById("replySenderName").innerText = `Membalas ${senderNama}`;
+                    document.getElementById("replyTextSnippet").innerText = textMsg;
+                    document.getElementById("chatReplyBar").classList.remove("hidden");
+                    document.getElementById("inputChatMsg").focus();
+                } else if (res.isDenied) {
+                    if (rtdb && msgId) {
+                        rtdb.ref('chats/' + msgId).remove();
+                        showSwalSuccess('Dihapus', 'Pesan berhasil dihapus.');
+                    }
+                }
+            });
+        }
+
+        function cancelChatReply() {
+            activeReplyData = null;
+            document.getElementById("chatReplyBar").classList.add("hidden");
         }
 
         function renderAIChatRoom() {
@@ -2482,9 +2548,15 @@
         async function handleSendChatAction() {
             triggerAndroidHaptic('light');
             const input = document.getElementById("inputChatMsg");
-            const msg = input.value.trim();
-            if (!msg) return;
+            const rawMsg = input.value.trim();
+            if (!rawMsg) return;
             input.value = "";
+
+            let msg = rawMsg;
+            if (activeReplyData) {
+                msg = `[Membalas ${activeReplyData.senderNama}: "${activeReplyData.textMsg}"]\n${rawMsg}`;
+                cancelChatReply();
+            }
 
             const box = document.getElementById("chatBox");
             const nowTime = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
@@ -2505,14 +2577,14 @@
                 `;
                 box.scrollTop = box.scrollHeight;
 
-                const res = await apiCall("askAI", { pertanyaan: msg });
+                const res = await apiCall("askAI", { pertanyaan: rawMsg });
                 const aiBubble = document.getElementById(tempAiId);
 
                 let replyTxt = "";
                 if (res && res.status === "success" && res.jawaban) {
                     replyTxt = res.jawaban;
                 } else {
-                    replyTxt = generateSmartAIFallback(msg);
+                    replyTxt = generateSmartAIFallback(rawMsg);
                 }
 
                 if (aiBubble) {
@@ -2565,7 +2637,7 @@
             `);
         }
 
-        // PERBAIKAN 5: LEADERBOARD MENAMPILKAN REAL POIN LENGKAP DARI DATABASE MASTER_USER
+        // PERBAIKAN 5: LEADERBOARD MENGAMBIL POIN DARI FIREBASE RTDB (yyyy-MM) & OTOMATIS RESET TIAP TANGGAL 1 BULAN BARU
         async function loadLeaderboard() {
             const listEl = document.getElementById("leaderboardList");
             if (!listEl) return;
@@ -2579,7 +2651,7 @@
             }
 
             if (users && Array.isArray(users) && users.length > 0) {
-                users.sort((a,b) => cleanNum(b["POIN TOTAL"]||b.poin||0) - cleanNum(a["POIN TOTAL"]||a.poin||0));
+                users.sort((a,b) => cleanNum(b.poin) - cleanNum(a.poin));
                 listEl.innerHTML = users.map((u, idx) => `
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; border-left:4px solid ${idx===0 ? 'var(--gold)' : 'var(--card-border)'};">
                         <div style="display:flex; align-items:center; gap:10px;">
@@ -2590,7 +2662,7 @@
                                 <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(u["NAMA TOKO"] || u.namaToko || '-')}</p>
                             </div>
                         </div>
-                        <span style="font-weight:800; font-size:0.85rem; color:var(--accent-primary); font-family:monospace;">${cleanNum(u["POIN TOTAL"]||u.poin||0).toLocaleString('id-ID')} Pts</span>
+                        <span style="font-weight:800; font-size:0.85rem; color:var(--accent-primary); font-family:monospace;">${cleanNum(u.poin).toLocaleString('id-ID')} Pts</span>
                     </div>
                 `).join("");
             } else {
@@ -2643,6 +2715,7 @@
             if (tabName === "chat") initFirebaseRealtimeChat();
         }
 
+        // PERBAIKAN 1: LOGOUT CLEAR TOTAL SELURUH DATA LOKAL MEMORY & RESTART KE LOGIN FORM
         function handleLogout() {
             Swal.fire({
                 title: 'Konfirmasi Logout',
@@ -2654,10 +2727,15 @@
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    localStorage.removeItem("NIK_KACIDA");
-                    localStorage.removeItem("kacida_cached_dashboard");
+                    localStorage.clear();
                     currentNik = "";
                     dashboardData = null;
+                    localShiftMatrix = {};
+                    cachedChatList = [];
+                    belanjaTransactions = [];
+                    expProducts = [];
+                    expShelves = [];
+
                     document.getElementById("appSection").classList.add("hidden");
                     document.getElementById("loginSection").classList.remove("hidden");
                     document.getElementById("nikInput").value = "";
