@@ -250,7 +250,7 @@
 </head>
 <body>
 
-    <!-- REVISI 2: SPLASH SCREEN NATIVE ANDROID (DURASI 0-2 DETIK) -->
+    <!-- SPLASH SCREEN ANDROID NATIVE (0-2 DETIK) -->
     <div id="splashScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-main); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
         <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width:100px; height:100px; border-radius:24px; margin-bottom:16px; border:2px solid var(--accent-primary); box-shadow:0 8px 25px rgba(16,185,129,0.3);">
         <h1 class="brand-title-text" style="font-size:1.8rem; margin-bottom:6px;">KACIDA BERSATU ✦</h1>
@@ -314,11 +314,16 @@
             </div>
         </header>
 
+        <!-- REVISI 4: RUNNING TEXT 3D MARQUEE PENGUMUMAN SUPERVISI -->
+        <div id="runningTextHeaderBar" class="hidden" style="width:100%; max-width:600px; background:linear-gradient(135deg, #10b981 0%, #047857 100%); color:#ffffff; font-size:0.7rem; font-weight:800; padding:6px 12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-bottom:1px solid rgba(255,255,255,0.2);">
+            <marquee id="marqueeTextContent" scrollamount="5">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
+        </div>
+
         <main id="tabBeranda" class="container">
             <!-- RATA-RATA AREA COORDINATOR METRICS CARD -->
             <div id="acSummaryContainer" class="ac-metrics-card hidden">
                 <div style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <span><i class="fa-solid fa-chart-line"></i> RATA-RATA SE-AREA COORDINATOR</span>
+                    <span><i class="fa-solid fa-chart-line"></i> AVERAGE SALES AREA</span>
                     <span style="font-size:0.6rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px;" id="acStoreCountBadge">0 Toko</span>
                 </div>
                 <div class="modal-grid-3" style="text-align:center;">
@@ -426,7 +431,7 @@
             <div id="chatBox" class="wa-chat-container"></div>
 
             <div class="chat-input-bar">
-                <!-- REVISI 4: KOTAK REPLY / BALAS PESAN WA-STYLE -->
+                <!-- REVISI 4: BAR REPRY CHAT WA-STYLE -->
                 <div id="chatReplyBar" class="hidden" style="background:var(--card-bg); border-left:4px solid var(--accent-primary); padding:6px 12px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <p style="font-size:0.6rem; font-weight:800; color:var(--accent-primary);" id="replySenderName">Membalas Pesan</p>
@@ -485,7 +490,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyj0EnSinX9iXyNiP7cyPTSkOQ-05kv-vBp_QCMLttXjCc8ZjByZ0Ic2Y2tIJVVtWg/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmWrcrEOB73vOnlhPg_vdaGhWRpChzLS8L4QhKfVSnCaN7B26-ouN6HaYDjvvuHAMd/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -516,6 +521,7 @@
         let deferredPrompt = null;
         let selectedSurveyRating = 5;
         let activeReplyData = null;
+        let activeAnnouncementsList = [];
 
         // PLAN MASTER SHIFT STATE
         let currentShiftMonth = new Date().toISOString().substring(0,7); 
@@ -539,7 +545,6 @@
             return isNaN(parsed) ? 0 : parsed;
         }
 
-        // RESET OTOMATIS BULANAN
         function getCurrentMonthKey() {
             const d = new Date();
             const y = d.getFullYear();
@@ -759,6 +764,71 @@
             });
         }
 
+        // PERBAIKAN 4: FIREBASE REALTIME PENGUMUMAN LISTENER & 3D RUNNING TEXT
+        function initFirebaseAnnouncementsListener() {
+            if (!rtdb) return;
+            rtdb.ref('announcements').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const todayStr = new Date().toISOString().substring(0,10);
+                    const userKodeToko = dashboardData?.user?.kodeToko || '';
+                    
+                    const entries = Object.entries(data);
+                    activeAnnouncementsList = entries.map(([id, val]) => ({ id, ...val })).filter(item => {
+                        const notExpired = !item.deadline || item.deadline >= todayStr;
+                        const matchTarget = item.target === 'ALL' || item.target === userKodeToko;
+                        return notExpired && matchTarget;
+                    });
+
+                    updateRunningTextAndAnnounceBadges();
+                } else {
+                    activeAnnouncementsList = [];
+                    updateRunningTextAndAnnounceBadges();
+                }
+            });
+        }
+
+        function updateRunningTextAndAnnounceBadges() {
+            const bar = document.getElementById("runningTextHeaderBar");
+            const marquee = document.getElementById("marqueeTextContent");
+            const countBox = document.getElementById("valAnnounce");
+            const dotAnnounce = document.getElementById("dotAnnounce");
+
+            if (activeAnnouncementsList.length > 0) {
+                const fullText = activeAnnouncementsList.map(a => `📢 [${a.targetName || a.target || 'ALL'}]: ${a.judul} - ${a.pesan}`).join("  ✦  ");
+                if (marquee) marquee.innerText = fullText;
+                if (bar) bar.classList.remove("hidden");
+                if (countBox) countBox.innerText = activeAnnouncementsList.length;
+                if (dotAnnounce) dotAnnounce.classList.remove("hidden");
+            } else {
+                if (bar) bar.classList.add("hidden");
+                if (countBox) countBox.innerText = "0";
+                if (dotAnnounce) dotAnnounce.classList.add("hidden");
+            }
+            updateNotifikasiBadgeCount();
+        }
+
+        // PERBAIKAN 5: BADGE ANGKA DINAMIS KOTAK NOTIFIKASI
+        function updateNotifikasiBadgeCount() {
+            const userCOS = isUserCOS();
+            const userAC = isUserAC();
+
+            const pendingBelanjaCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
+            const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
+            const announceCount = activeAnnouncementsList.length;
+
+            const totalNotif = pendingBelanjaCount + pendingExpCount + announceCount;
+
+            const valNotifBox = document.getElementById("valNotifCount");
+            const dotNotif = document.getElementById("dotNotif");
+
+            if (valNotifBox) valNotifBox.innerText = totalNotif;
+            if (dotNotif) {
+                if (totalNotif > 0) dotNotif.classList.remove("hidden");
+                else dotNotif.classList.add("hidden");
+            }
+        }
+
         function renderDefaultFallbackMenus() {
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
             const userCOS = isUserCOS();
@@ -792,7 +862,6 @@
             renderMenuGrid("gridMenuLainnya", sampleLayanan);
         }
 
-        // REVISI 2: STARTUP SPLASH SCREEN 0-2 DETIK
         window.addEventListener("DOMContentLoaded", () => {
             applyTheme(currentTheme);
             setupOnlineOfflineListener();
@@ -865,6 +934,7 @@
                 document.getElementById("appSection").classList.remove("hidden");
                 renderDashboard(data);
                 trackUserActivity(5, "Akses Dashboard");
+                initFirebaseAnnouncementsListener();
             }
         }
 
@@ -909,7 +979,6 @@
             document.getElementById("valPenawaran").innerText = data.dataH1?.point || "-";
             document.getElementById("valTasks").innerText = data.badges?.tugas || 0;
 
-            // SINKRONISASI DUA ARAH POIN BERANDA DENGAN LEADERBOARD
             const officialPoint = cleanNum(data.user?.poin || data.badges?.point || data.user?.["POIN TOTAL"] || 0);
             document.getElementById("valPoints").innerText = Number(officialPoint).toLocaleString('id-ID');
 
@@ -936,6 +1005,7 @@
             renderMenuGrid("gridMenuLainnya", data.menu.layanan);
 
             renderProfilBaganStruktur(data);
+            updateNotifikasiBadgeCount();
         }
 
         function renderProfilBaganStruktur(data) {
@@ -1054,7 +1124,7 @@
                     </div>
                 </div>
             `;
-            showCustomModal("⚙️ Pengaturan & Informasi", htmlContent);
+            showCustomModal("⚙️ Pengaturan & Informasi", htmlBox);
         }
 
         function setSurveyRating(stars) {
@@ -1149,7 +1219,7 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        // PERBAIKAN 3: PROTEKSI TOTAL MODAL MASTER SHIFT DENGAN TRY...FINALLY AGAR TIDAK PERNAH STUCK LOADING
+        // PERBAIKAN 1: PROTEKSI FAIL-SAFE MASTER SHIFT MODAL DENGAN TRY...FINALLY AGAR TIDAK PERNAH STUCK SPINNER
         async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
             const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "TOKO";
@@ -1513,7 +1583,7 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO </h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO (AREA COORDINATOR)</h5>
                         <div class="modal-grid-1">${storeExpCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada data toko.</p>'}</div>
                     `;
                 } else {
@@ -1981,7 +2051,7 @@
                 tabContentHtml = `
                     <div class="modal-grid-1">
                         <div class="modal-card-box">
-                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL MONITORED SALES</h5>
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📅 FILTER RENTANG TANGGAL SALES</h5>
                             <div class="modal-grid-2" style="margin-bottom:8px;">
                                 <div>
                                     <label style="font-size:0.65rem; font-weight:700;">Dari Tanggal:</label>
@@ -2077,11 +2147,14 @@
             });
         }
 
+        // PERBAIKAN 2: FOTO STRUK BELANJA DENGAN TOMBOL TUTUP KHUSUS DAN DUKUNGAN PREVIEW MODAL
         function showFullImageModal(imgUrl) {
             Swal.fire({
                 imageUrl: imgUrl,
                 imageAlt: 'Foto Struk Belanja',
-                confirmButtonText: 'Tutup',
+                showCloseButton: true,
+                confirmButtonText: '✖ Tutup Preview Gambar',
+                allowOutsideClick: false,
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             });
         }
@@ -2256,6 +2329,7 @@
             openSalesMTDModal(currentMtdDetailData?.selectedMonthVal);
         }
 
+        // PERBAIKAN 3: RINCIAN HARIAN MODAL MTD TAMPIL DALAM GRID KOTAK 2-KOLOM DENGAN DESAIN RAPI
         function renderMtdModalView(filterType = 'semua') {
             const d = currentMtdDetailData;
             if (!d) return;
@@ -2292,24 +2366,22 @@
                 `;
             }
 
-            let rincianCardsHtml = filteredList.map(item => `
-                <div class="rincian-card-item">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div style="background:#f8fafc; border:1px solid var(--card-border); padding:6px 10px; border-radius:10px; text-align:center;">
-                            <span style="font-size:1.1rem; font-weight:800; color:#0f172a; display:block; line-height:1;">${item.day}</span>
+            let rincianCardsHtml = `
+                <div class="modal-grid-2">
+                    ${filteredList.map(item => `
+                        <div class="modal-card-box" style="padding:10px; border-left:4px solid ${item.isGrowth ? '#10b981' : '#ef4444'};">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                <span style="font-size:0.8rem; font-weight:800; color:#0f172a;">Tgl ${item.day}</span>
+                                <span class="growth-badge-pill ${item.isGrowth ? 'up' : 'down'}" style="font-size:0.6rem; padding:2px 6px;">
+                                    ${item.isGrowth ? '▲' : '▼'} ${item.growthPct?.toFixed(1)}%
+                                </span>
+                            </div>
+                            <div style="font-size:0.88rem; font-weight:800; color:var(--accent-primary);">${item.sales2026Formatted}</div>
+                            <div style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Prev: ${item.sales2025Formatted}</div>
                         </div>
-                        <div>
-                            <div style="font-size:0.92rem; font-weight:800; color:#0f172a;">${item.sales2026Formatted}</div>
-                            <div style="font-size:0.68rem; color:var(--text-sub);">vs ${item.sales2025Formatted}</div>
-                        </div>
-                    </div>
-                    <div>
-                        <span class="growth-badge-pill ${item.isGrowth ? 'up' : 'down'}">
-                            ${item.isGrowth ? '▲' : '▼'} ${item.growthPct?.toFixed(1)}%
-                        </span>
-                    </div>
+                    `).join("")}
                 </div>
-            `).join("");
+            `;
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
@@ -2352,7 +2424,7 @@
                     </div>
 
                     <div>
-                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN</h4>
+                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN (GRID)</h4>
                         ${rincianCardsHtml}
                     </div>
                 </div>
@@ -2469,7 +2541,6 @@
             }
         }
 
-        // PERBAIKAN 4: CHAT BUBBLE DENGAN INTERAKSI PRESS/CLICK BALAS (REPLY) & HAPUS (DELETE)
         function renderChatList(chats, isBackgroundRefresh = false) {
             const box = document.getElementById("chatBox");
             if (!box) return;
@@ -2633,7 +2704,166 @@
             `);
         }
 
-        // PERBAIKAN 5: LEADERBOARD MENGAMBIL POIN DARI FIREBASE RTDB (yyyy-MM) & OTOMATIS RESET TIAP TANGGAL 1 BULAN BARU
+        // PERBAIKAN 4: PUSAT SUPERVISI PENGUMUMAN DENGAN REALTIME FIREBASE + EDIT & HAPUS
+        function openPengumumanModal() {
+            const canManage = isUserCOS() || isUserAC();
+            const daftarToko = dashboardData?.daftarToko || [];
+
+            let managerFormHtml = '';
+            if (canManage) {
+                const storeOpts = `<option value="ALL">🌐 Semua Personil (ALL TOKO)</option>` + 
+                    daftarToko.map(t => `<option value="${t.kodeToko}">🏪 ${escapeHTML(t.namaToko)} (${t.kodeToko})</option>`).join("");
+
+                managerFormHtml = `
+                    <div class="modal-card-box" style="border-left:4px solid var(--gold); margin-bottom:12px;">
+                        <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:8px;"><i class="fa-solid fa-bullhorn"></i> BUAT PENGUMUMAN</h4>
+                        
+                        <div style="margin-bottom:8px;">
+                            <label style="font-weight:700; font-size:0.68rem;">Target Penerima Info:</label>
+                            <select id="announceTargetSelect" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                ${storeOpts}
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom:8px;">
+                            <label style="font-weight:700; font-size:0.68rem;">Judul Pengumuman:</label>
+                            <input type="text" id="announceJudulInput" placeholder="Cth: Target Sales Harian / SOP Kasir" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                        </div>
+
+                        <div style="margin-bottom:8px;">
+                            <label style="font-weight:700; font-size:0.68rem;">Isi Pesan Informasi:</label>
+                            <textarea id="announcePesanInput" placeholder="Tuliskan detail pengumuman..." style="width:100%; height:55px; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem; outline:none; resize:none;"></textarea>
+                        </div>
+
+                        <div style="margin-bottom:10px;">
+                            <label style="font-weight:700; font-size:0.68rem;">Batas Expiry / Deadline Info:</label>
+                            <input type="date" id="announceDeadlineInput" value="${new Date(Date.now() + 7*86400000).toISOString().substring(0,10)}" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                        </div>
+
+                        <button onclick="submitNewAnnouncementAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:10px; border-radius:10px; border:none; cursor:pointer;">
+                            🚀 TERBITKAN PENGUMUMAN
+                        </button>
+                    </div>
+                `;
+            }
+
+            let listCardsHtml = activeAnnouncementsList.map(item => `
+                <div class="modal-card-box">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+                        <span style="font-size:0.62rem; background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:6px; font-weight:800;">🎯 ${item.targetName || item.target || 'ALL'}</span>
+                        <span style="font-size:0.6rem; color:var(--text-sub);">Batas: ${item.deadline || 'Tanpa Batas'}</span>
+                    </div>
+                    <h5 style="font-weight:800; color:var(--accent-primary); font-size:0.85rem; margin-top:4px;">${escapeHTML(item.judul)}</h5>
+                    <p style="font-size:0.72rem; color:var(--text-main); margin-top:2px; line-height:1.4;">${escapeHTML(item.pesan)}</p>
+                    <p style="font-size:0.6rem; color:var(--text-sub); margin-top:4px;">Oleh: <b>${escapeHTML(item.author || 'Supervisi')}</b> (${item.createdAt || '-'})</p>
+
+                    ${canManage ? `
+                        <div style="display:flex; gap:6px; margin-top:8px;">
+                            <button onclick="deleteAnnouncementAction('${item.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:4px 8px; border-radius:6px; font-size:0.62rem; font-weight:800; cursor:pointer;">🗑️ Hapus</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join("");
+
+            showCustomModal("📢 PUSAT SUPERVISI PENGUMUMAN", `
+                <div class="modal-grid-1" style="font-size:0.78rem;">
+                    ${managerFormHtml}
+                    <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-list-check"></i> DAFTAR INFORMASI AKTIF</h5>
+                    ${listCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada pengumuman aktif.</p>'}
+                </div>
+            `);
+        }
+
+        function submitNewAnnouncementAction() {
+            const targetSelect = document.getElementById("announceTargetSelect");
+            const targetVal = targetSelect.value;
+            const targetText = targetSelect.options[targetSelect.selectedIndex].text;
+            const judul = document.getElementById("announceJudulInput").value.trim();
+            const pesan = document.getElementById("announcePesanInput").value.trim();
+            const deadline = document.getElementById("announceDeadlineInput").value;
+
+            if (!judul || !pesan) { showSwalWarning('Form Belum Lengkap', 'Mohon isi Judul dan Isi Pesan pengumuman.'); return; }
+
+            if (rtdb) {
+                rtdb.ref('announcements').push({
+                    target: targetVal,
+                    targetName: targetText,
+                    judul: judul,
+                    pesan: pesan,
+                    deadline: deadline,
+                    author: dashboardData?.user?.NAMA || 'Supervisi',
+                    createdAt: new Date().toLocaleString('id-ID')
+                });
+                closeCustomModal();
+                showSwalSuccess('Diterbitkan 🚀', 'Pengumuman baru berhasil dipublikasikan!');
+            }
+        }
+
+        function deleteAnnouncementAction(id) {
+            if (rtdb && id) {
+                rtdb.ref('announcements/' + id).remove();
+                closeCustomModal();
+                showSwalSuccess('Dihapus 🗑️', 'Pengumuman berhasil dihapus.');
+            }
+        }
+
+        // PERBAIKAN 5: MODAL NOTIFIKASI DENGAN BADGE ANGKA & PINTASAN HAK AKSES VALIDASI
+        function openNotifModal() {
+            const userCOS = isUserCOS();
+            const userAC = isUserAC();
+
+            const pendingBelanjaCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
+            const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
+            const announceCount = activeAnnouncementsList.length;
+
+            const htmlBox = `
+                <div class="modal-grid-1" style="font-size:0.78rem;">
+                    <div class="modal-card-box">
+                        <h4 style="font-size:0.88rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;"><i class="fa-solid fa-bell"></i> PUSAT TUGAS & VALIDASI AKTIF</h4>
+                        <p style="font-size:0.7rem; color:var(--text-sub); margin-bottom:12px;">Berikut tugas dan item yang memerlukan konfirmasi/validasi Anda saat ini:</p>
+
+                        <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingBelanjaCount > 0 ? '#ef4444' : '#10b981'};">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h5 style="font-weight:800; font-size:0.8rem;">Struk Belanja Karyawan</h5>
+                                    <p style="font-size:0.65rem; color:var(--text-sub);">${pendingBelanjaCount} Struk Menunggu Validasi</p>
+                                </div>
+                                <button onclick="closeCustomModal(); openBelanjaKaryawanModal();" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                    👉 Validasi Struk (${pendingBelanjaCount})
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingExpCount > 0 ? '#f59e0b' : '#10b981'};">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h5 style="font-weight:800; font-size:0.8rem;">Ceklis Expired Produk</h5>
+                                    <p style="font-size:0.65rem; color:var(--text-sub);">${pendingExpCount} Produk Perlu Eksekusi</p>
+                                </div>
+                                <button onclick="closeCustomModal(); openCeklisExpiredModal();" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                    👉 Cek Expired (${pendingExpCount})
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="modal-card-box" style="border-left:4px solid ${announceCount > 0 ? 'var(--gold)' : '#10b981'};">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h5 style="font-weight:800; font-size:0.8rem;">Info Pengumuman Supervisi</h5>
+                                    <p style="font-size:0.65rem; color:var(--text-sub);">${announceCount} Informasi Aktif</p>
+                                </div>
+                                <button onclick="closeCustomModal(); openPengumumanModal();" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                    👉 Buka Informasi (${announceCount})
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            showCustomModal("🔔 NOTIFIKASI & TUGAS VALIDASI", htmlBox);
+        }
+
         async function loadLeaderboard() {
             const listEl = document.getElementById("leaderboardList");
             if (!listEl) return;
@@ -2711,7 +2941,6 @@
             if (tabName === "chat") initFirebaseRealtimeChat();
         }
 
-        // PERBAIKAN 1: LOGOUT CLEAR TOTAL SELURUH DATA LOKAL MEMORY & RESTART KE LOGIN FORM
         function handleLogout() {
             Swal.fire({
                 title: 'Konfirmasi Logout',
@@ -2749,24 +2978,6 @@
                 link.href = canvas.toDataURL("image/png");
                 link.click();
             });
-        }
-
-        function openPengumumanModal() {
-            if (!dashboardData || !dashboardData.announcements || dashboardData.announcements.length === 0) {
-                showSwalSuccess('Pengumuman', 'Belum ada pengumuman baru.');
-                return;
-            }
-            const html = dashboardData.announcements.map(p => `<div class="modal-card-box" style="margin-bottom:8px;"><p style="font-weight:bold; color:var(--gold);">${escapeHTML(p.Pengumuman || p.PENGUMUMAN || 'Pengumuman')}</p></div>`).join("");
-            showCustomModal("📢 Pengumuman Resmi", `<div class="modal-grid-1">${html}</div>`);
-        }
-
-        function openNotifModal() {
-            if (!dashboardData || !dashboardData.notifications || dashboardData.notifications.length === 0) {
-                showSwalSuccess('Notifikasi', 'Tidak ada notifikasi baru.');
-                return;
-            }
-            const html = dashboardData.notifications.map(n => `<div class="modal-card-box" style="margin-bottom:8px;"><p style="font-weight:bold; color:var(--accent-primary);">${escapeHTML(n.PESAN || n.Pesan || 'Notifikasi')}</p></div>`).join("");
-            showCustomModal("🔔 Notifikasi Aplikasi", `<div class="modal-grid-1">${html}</div>`);
         }
     </script>
 </body>
