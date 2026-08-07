@@ -167,7 +167,7 @@
         .wa-bubble.ai { align-self: flex-start; background: #ecfdf5; border: 1px solid var(--accent-primary); color: #0f172a; width: 90%; }
         .wa-sender { font-size: 0.62rem; font-weight: 800; color: #a7f3d0; margin-bottom: 2px; }
         
-        /* PERBAIKAN 4: REALTIME JAM DI CHAT BUBBLE */
+        /* REALTIME TIMESTAMP DALAM BUBBLE CHAT */
         .wa-time { font-size: 0.58rem; opacity: 0.75; text-align: right; margin-top: 3px; display: block; font-weight: 600; }
 
         .chat-input-bar { display: flex; gap: 8px; margin-top: 8px; align-items: center; flex-shrink: 0; }
@@ -287,9 +287,10 @@
                 <div class="brand-title">
                     <div>
                         <span class="brand-title-text">KACIDA BERSATU ✦</span>
+                        <!-- PERBAIKAN 4: BADGE HEADER TAMPILKAN NAMA TOKO + DOT ONLINE/OFFLINE -->
                         <div class="ocean-3d-badge-transparent" id="hdrOnlineBadgeStatus">
-                            <span class="pulse-green-dot"></span>
-                            <span id="hdrStoreOnlineName">ONLINE 🟢</span>
+                            <span id="hdrOnlineDot" class="pulse-green-dot"></span>
+                            <span id="hdrStoreOnlineName">TOKO ONLINE</span>
                         </div>
                     </div>
                 </div>
@@ -397,6 +398,7 @@
                 </div>
             </section>
 
+            <!-- PERBAIKAN 1: GRID MENU UTAMA DENGAN FALLBACK 8 TAB LENGKAP -->
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
                 <div id="gridMenuUtama" class="menu-grid-4"></div>
@@ -439,7 +441,7 @@
             <div id="leaderboardList" class="modal-grid-1"></div>
         </div>
 
-        <!-- TAB PROFIL BAGAN STRUKTUR -->
+        <!-- PERBAIKAN 2: TAB PROFIL DENGAN NAMA TOKO BISA DITAMPILKAN & BAGAN STRUKTUR PER-TOKO -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover; margin: 0 auto 8px auto;">
@@ -450,27 +452,10 @@
                 <button onclick="handleLogout()" style="margin-top: 12px; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 18px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">LOGOUT / GANTI NIK</button>
             </div>
 
-            <!-- BAGAN PERSONIL TOKO BINAAN -->
+            <!-- BAGAN STRUKTUR PERSONIL PER-TOKO -->
             <div class="menu-section-card">
-                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Tim Personil Toko Saya</h3>
+                <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Bagan Struktur TokoSaya</h3>
                 <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
-            </div>
-
-            <div class="menu-section-card">
-                <h3 class="section-title" style="margin-bottom: 12px;"><i class="fa-solid fa-sitemap" style="color: var(--accent-primary);"></i> Bagan Struktur Organisasi</h3>
-                <div style="display: flex; flex-direction: column; gap: 6px; text-align: center; font-size: 0.75rem;">
-                    <div style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.62rem; color: var(--text-sub);">OGM (Operations General Manager)</p><p id="stOGM" style="font-weight:700;">HAIKAL (HKL)</p></div>
-                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
-                    <div style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.62rem; color: var(--text-sub);">BM (Branch Manager)</p><p id="stBM" style="font-weight:700;">PUTUT DESY SUSILO (PDS)</p></div>
-                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
-                    <div style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.62rem; color: var(--text-sub);">DBM (Deputy Branch Manager)</p><p id="stDBM" style="font-weight:700;">ROSI ERDIANSA (REA)</p></div>
-                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
-                    <div style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.62rem; color: var(--text-sub);">AM (Area Manager)</p><p id="stAM" style="font-weight:700;">MUHAMAD TAUFIK (MTK)</p></div>
-                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
-                    <div style="background: var(--input-bg); border: 1px solid var(--card-border); padding: 8px; border-radius: 10px;"><p style="font-size:0.62rem; color: var(--text-sub);">AC (Area Coordinator)</p><p id="stAC" style="font-weight:700;">AMED SUPRIADI</p></div>
-                    <div style="color: var(--text-sub); font-size: 0.6rem;">↓</div>
-                    <div style="background: #ecfdf5; border: 1px solid var(--accent-primary); padding: 8px; border-radius: 10px; color: var(--accent-primary);"><p style="font-size:0.62rem; font-weight:700;">SAYA (TOKO)</p><p id="stSaya" style="font-weight:800;">-</p></div>
-                </div>
             </div>
         </div>
 
@@ -484,7 +469,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvhUq197UP13IOTU2DYAqL4wWNDD9DgBtg26hRL2LPCjvBdsW3Wk5YlhSO3Ta-F333/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyu5nXeiO4kW7SpheQLS89Z6BD2iT2BW0xLKArMD9WEc09VmuunYW0405TiTA_DFwAb/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -665,14 +650,15 @@
             document.getElementById("customModalOverlay").classList.add("hidden");
         }
 
+        // PERBAIKAN 4: OCEAN 3D BADGE DISPLAY NAMA TOKO + PULSE ONLINE/OFFLINE DOT
         function setupOnlineOfflineListener() {
             const updateStatus = () => {
-                const el = document.getElementById("hdrOnlineBadgeStatus");
-                if (el) {
+                const dot = document.getElementById("hdrOnlineDot");
+                if (dot) {
                     if (navigator.onLine) {
-                        el.innerHTML = `<span class="pulse-green-dot"></span> <span style="color:var(--accent-primary); font-weight:800;">ONLINE 🟢</span>`;
+                        dot.className = "pulse-green-dot";
                     } else {
-                        el.innerHTML = `<span class="pulse-red-dot"></span> <span style="color:#ef4444; font-weight:800;">OFFLINE 🔴</span>`;
+                        dot.className = "pulse-red-dot";
                     }
                 }
             };
@@ -752,7 +738,7 @@
             });
         }
 
-        // PERBAIKAN 1: RENDER INSTAN DARI SCRIPT STARTUP DENGAN BUILD-IN MENU DI AWAL (0 DETIK PROSES)
+        // PERBAIKAN 1: RENDER MENU INSTAN 0 DETIK PAKAI FALLBACK SEBELUM SERVER SELESAI
         function renderDefaultFallbackMenus() {
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
             const userCOS = isUserCOS();
@@ -767,7 +753,7 @@
             ];
 
             const gridUtama = document.getElementById("gridMenuUtama");
-            if (gridUtama && gridUtama.children.length === 0) {
+            if (gridUtama) {
                 gridUtama.innerHTML = builtInMenus.map(m => `
                     <div class="menu-3d-item" onclick="${m.action}" style="position:relative;">
                         ${m.numBadge > 0 ? `<span class="num-badge-pill">${m.numBadge}</span>` : ''}
@@ -776,6 +762,14 @@
                     </div>
                 `).join("");
             }
+
+            const sampleLayanan = [
+                { "Nama Menu": "SAPA Delivery", "Icon URL": "https://cdn-icons-png.flaticon.com/512/2838/2838895.png" },
+                { "Nama Menu": "Katalog Promo", "Icon URL": "https://cdn-icons-png.flaticon.com/512/1077/1077035.png" },
+                { "Nama Menu": "Bantuan Kasir", "Icon URL": "https://cdn-icons-png.flaticon.com/512/1067/1067566.png" },
+                { "Nama Menu": "Target SPD", "Icon URL": "https://cdn-icons-png.flaticon.com/512/2921/2921222.png" }
+            ];
+            renderMenuGrid("gridMenuLainnya", sampleLayanan);
         }
 
         window.addEventListener("DOMContentLoaded", () => {
@@ -870,20 +864,30 @@
         function renderDashboard(data) {
             document.getElementById("lblGreetingText").innerText = getTimeGreeting() + ",";
             document.getElementById("lblUserName").innerText = (escapeHTML(data.user.NAMA) || "USER") + "! 👋";
-            document.getElementById("hdrStoreOnlineName").innerText = data.user.namaToko || "ONLINE 🟢";
+            
+            // BADGE MEMBAWA NAMA TOKO USER
+            document.getElementById("hdrStoreOnlineName").innerText = data.user.namaToko || "ONLINE";
+            
+            // METRIK PROFIL
             document.getElementById("profilNama").innerText = data.user.NAMA || "-";
             document.getElementById("profilJabatan").innerText = data.user.jabatan || data.user.JABATAN || "-";
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
-            document.getElementById("profilNik").innerText = "NIK: " + data.user.NIK;
+            document.getElementById("profilNik").innerText = "NIK: " + (data.user.NIK || "-");
+            if (data.user["FOTO PROFIL"] || data.user.foto) {
+                document.getElementById("profilFoto").src = getRealisticHumanAvatar(data.user.NAMA, data.user["FOTO PROFIL"] || data.user.foto);
+            }
+
+            // POPULASI BAR INFO HARIAN
             document.getElementById("valSales").innerText = data.dataH1.spdLabel || `Sales: Rp ${Number(data.dataH1.sales).toLocaleString('id-ID')}`;
             document.getElementById("valIKT").innerText = data.dataH1.iktNetSales || "-";
             document.getElementById("valPenawaran").innerText = data.dataH1.point || "-";
             document.getElementById("valTasks").innerText = data.badges.tugas;
 
-            // PERBAIKAN 2: SINKRONISASI 100% JUMLAH POIN & RANK ACTIVE BERANDA DENGAN DATABASE SPREADSHEET (SAMA PERSIS DENGAN LEADERBOARD)
-            const officialPoint = cleanNum(data.user?.poin || data.badges?.point || data.user?.["POIN TOTAL"] || 0);
+            // SINKRONISASI DUA ARAH POIN BERANDA SAMA PERSIS DENGAN LEADERBOARD
+            const officialPoint = cleanNum(data.badges?.point || data.user?.poin || data.user?.["POIN TOTAL"] || 0);
             document.getElementById("valPoints").innerText = Number(officialPoint).toLocaleString('id-ID');
 
+            // HITUNG RANK HARIAN DENGAN PRESISI
             let calculatedRank = "#1";
             if (data.allMasterUsers && Array.isArray(data.allMasterUsers) && data.allMasterUsers.length > 0) {
                 const sortedUsers = [...data.allMasterUsers].sort((a, b) => cleanNum(b.poin) - cleanNum(a.poin));
@@ -906,29 +910,77 @@
             renderCombinedMenuUtama(data.menu.utama || []);
             renderMenuGrid("gridMenuLainnya", data.menu.layanan);
 
-            if (data.struktur) {
-                document.getElementById("stOGM").innerText = data.struktur.ogm.nama;
-                document.getElementById("stBM").innerText = data.struktur.bm.nama;
-                document.getElementById("stDBM").innerText = data.struktur.dbm.nama;
-                document.getElementById("stAM").innerText = data.struktur.am.nama;
-                document.getElementById("stAC").innerText = data.struktur.ac.nama;
-                document.getElementById("stSaya").innerText = data.struktur.saya.toko;
+            // RENDER BAGAN TOKO PADA TAB PROFIL
+            renderProfilBaganStruktur(data);
+        }
 
-                if (data.struktur.personilToko && Array.isArray(data.struktur.personilToko)) {
-                    document.getElementById("timTokoContainer").innerHTML = data.struktur.personilToko.map(p => `
-                        <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <img src="${getRealisticHumanAvatar(p.nama, p.foto)}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">
+        // PERBAIKAN 2: STRUKTUR TAB PROFIL TAMPILKAN BAGAN STRUKTUR PER-TOKO LENGKAP
+        function renderProfilBaganStruktur(data) {
+            const container = document.getElementById("timTokoContainer");
+            if (!container) return;
+
+            const userAC = isUserAC();
+            const daftarToko = data?.daftarToko || [];
+            const allMaster = data?.allMasterUsers || [];
+
+            if (userAC && daftarToko.length > 0) {
+                // TAMPILAN BAGAN SEMUA TOKO BINAAN UNTUK AREA COORDINATOR
+                container.innerHTML = daftarToko.map(toko => {
+                    const personilStore = allMaster.filter(u => u.kodeToko === toko.kodeToko);
+                    return `
+                        <div class="modal-card-box" onclick="viewStorePersonilDetail('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid var(--accent-primary);" title="Klik untuk lihat personil toko">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
-                                    <p style="font-size:0.75rem; font-weight:800; color:var(--text-main);">${escapeHTML(p.nama)}</p>
-                                    <p style="font-size:0.6rem; color:var(--text-sub);">NIK: ${p.nik}</p>
+                                    <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
+                                    <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">Jumlah Personil: <b style="color:var(--accent-primary);">${personilStore.length} Orang</b></p>
                                 </div>
+                                <span style="font-size:0.68rem; color:var(--gold); font-weight:800;">Lihat Tim ➔</span>
                             </div>
-                            <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:2px 8px; border-radius:6px; font-weight:bold;">${escapeHTML(p.jabatan)}</span>
                         </div>
-                    `).join("");
-                }
+                    `;
+                }).join("");
+            } else {
+                // BAGAN STRUKTUR PERSONIL TOKO SAYA
+                const personil = data?.struktur?.personilToko || [];
+                container.innerHTML = personil.map(p => `
+                    <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <img src="${getRealisticHumanAvatar(p.nama, p.foto)}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                            <div>
+                                <p style="font-size:0.75rem; font-weight:800; color:var(--text-main);">${escapeHTML(p.nama)}</p>
+                                <p style="font-size:0.6rem; color:var(--text-sub);">NIK: ${p.nik}</p>
+                            </div>
+                        </div>
+                        <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:2px 8px; border-radius:6px; font-weight:bold;">${escapeHTML(p.jabatan)}</span>
+                    </div>
+                `).join("");
             }
+        }
+
+        function viewStorePersonilDetail(kodeToko, namaToko) {
+            triggerAndroidHaptic('light');
+            const allMaster = dashboardData?.allMasterUsers || [];
+            const storePersonil = allMaster.filter(u => u.kodeToko === kodeToko);
+
+            let html = storePersonil.map(sp => `
+                <div style="background:var(--input-bg); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="${getRealisticHumanAvatar(sp.nama, sp.foto)}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <p style="font-weight:800; font-size:0.78rem; color:var(--text-main);">${escapeHTML(sp.nama)}</p>
+                            <p style="font-size:0.62rem; color:var(--text-sub);">NIK: ${sp.nik}</p>
+                        </div>
+                    </div>
+                    <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:2px 8px; border-radius:6px; font-weight:bold;">${escapeHTML(sp.jabatan)}</span>
+                </div>
+            `).join("");
+
+            Swal.fire({
+                title: `Tim Personil Toko: ${namaToko}`,
+                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Personil toko tidak ditemukan.</p>`,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
         }
 
         function openMenuSidebar() {
@@ -981,7 +1033,7 @@
                     </div>
                 </div>
             `;
-            showCustomModal("⚙️ Pengaturan & Informasi", htmlBox);
+            showCustomModal("⚙️ Pengaturan & Informasi", htmlContent);
         }
 
         function setSurveyRating(stars) {
@@ -1150,7 +1202,7 @@
                 const options = daftarToko.map(t => `<option value="${t.kodeToko}" ${t.kodeToko === targetKode ? 'selected' : ''}>🏪 ${escapeHTML(t.namaToko)} (${t.kodeToko})</option>`).join("");
                 storeSelectHtml = `
                     <div class="modal-card-box" style="margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
-                        <span style="font-size:0.72rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-store"></i> PILIH TOKO :</span>
+                        <span style="font-size:0.72rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-store"></i> PILIH TOKO (AREA AC):</span>
                         <select onchange="changeShiftStore(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 10px; border-radius:10px;">
                             ${options}
                         </select>
@@ -1165,7 +1217,7 @@
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ (Chief / Assistant Chief)' : '👁️ (Area Coordinator)'}</b></p>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ (Chief / Assistant Chief)' : '👁️ READ ONLY'}</b></p>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
@@ -1917,7 +1969,7 @@
                         </div>
 
                         <div class="mtd-summary-card">
-                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN</span>
+                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN AREA</span>
                             <div class="mtd-amount-hero">Rp ${totalNominalSales.toLocaleString('id-ID')}</div>
                             <p style="font-size:0.62rem; color:var(--text-sub); margin-top:4px;">Rentang Filter: ${belanjaFilterStart} s/d ${belanjaFilterEnd}</p>
                         </div>
@@ -2390,7 +2442,7 @@
             }
         }
 
-        // PERBAIKAN 4: REALTIME TIMESTAMP DALAM BUBBLE CHAT
+        // PERBAIKAN 3: RENDER BUBBLE CHAT TIM BERSAMA REALTIME TIMESTAMP (HH.mm WIB)
         function renderChatList(chats, isBackgroundRefresh = false) {
             const box = document.getElementById("chatBox");
             if (!box) return;
@@ -2482,7 +2534,6 @@
             }
         }
 
-        // PERBAIKAN 3: KACIDA AI CERDAS BISA BERCANDA, BIKIN PANTUN, DAN MENJAWAB PERTANYAAN RETAIL
         function generateSmartAIFallback(msg) {
             const m = msg.toLowerCase();
             const uName = dashboardData?.user?.NAMA || "Kak";
@@ -2514,6 +2565,7 @@
             `);
         }
 
+        // PERBAIKAN 5: LEADERBOARD MENAMPILKAN REAL POIN LENGKAP DARI DATABASE MASTER_USER
         async function loadLeaderboard() {
             const listEl = document.getElementById("leaderboardList");
             if (!listEl) return;
@@ -2523,10 +2575,6 @@
             if (!users || !Array.isArray(users) || users.length === 0) {
                 if (dashboardData && dashboardData.allMasterUsers) {
                     users = dashboardData.allMasterUsers;
-                } else if (dashboardData && dashboardData.struktur && dashboardData.struktur.personilToko) {
-                    users = dashboardData.struktur.personilToko.map((p, i) => ({
-                        NAMA: p.nama, JABATAN: p.jabatan, "NAMA TOKO": dashboardData.user.namaToko, "POIN TOTAL": 100 - (i * 15), "FOTO PROFIL": p.foto
-                    }));
                 }
             }
 
@@ -2592,6 +2640,7 @@
 
             if (tabName === "leaderboard") loadLeaderboard();
             if (tabName === "aksiCepat") loadMisi();
+            if (tabName === "chat") initFirebaseRealtimeChat();
         }
 
         function handleLogout() {
