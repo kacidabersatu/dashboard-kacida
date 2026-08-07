@@ -100,6 +100,16 @@
 
         .container { margin-top: 12px; width: 100%; }
 
+        /* REVISI 3: DESAIN MEWAH 3D RUNNING TEXT BAR */
+        .running-text-container {
+            width: 100%; max-width: 600px;
+            background: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%);
+            color: #ffffff; font-size: 0.72rem; font-weight: 800;
+            padding: 8px 14px; box-shadow: 0 4px 15px rgba(4, 120, 87, 0.3);
+            border-bottom: 2px solid var(--accent-primary);
+            display: flex; align-items: center; gap: 8px;
+        }
+
         /* METRIK RATA-RATA AREA COORDINATOR */
         .ac-metrics-card { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid var(--accent-primary); border-radius: 20px; padding: 14px; margin-bottom: 12px; }
         .ac-metric-box { background: var(--header-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 8px 4px; }
@@ -250,7 +260,7 @@
 </head>
 <body>
 
-    <!-- SPLASH SCREEN ANDROID NATIVE (0-2 DETIK) -->
+    <!-- SPLASH SCREEN ANDROID NATIVE (DURASI 1.5 DETIK) -->
     <div id="splashScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-main); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
         <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width:100px; height:100px; border-radius:24px; margin-bottom:16px; border:2px solid var(--accent-primary); box-shadow:0 8px 25px rgba(16,185,129,0.3);">
         <h1 class="brand-title-text" style="font-size:1.8rem; margin-bottom:6px;">KACIDA BERSATU ✦</h1>
@@ -314,16 +324,17 @@
             </div>
         </header>
 
-        <!-- RUNNING TEXT 3D MARQUEE PENGUMUMAN SUPERVISI -->
-        <div id="runningTextHeaderBar" class="hidden" style="width:100%; max-width:600px; background:linear-gradient(135deg, #10b981 0%, #047857 100%); color:#ffffff; font-size:0.7rem; font-weight:800; padding:6px 12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); border-bottom:1px solid rgba(255,255,255,0.2);">
-            <marquee id="marqueeTextContent" scrollamount="5">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
+        <!-- REVISI 3: RUNNING TEXT 3D MEWAH DI BAWAH HEADER -->
+        <div id="runningTextHeaderBar" class="running-text-container hidden">
+            <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap;">🔥 INFO SUPERVISI</span>
+            <marquee id="marqueeTextContent" scrollamount="6" style="flex:1;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
         </div>
 
         <main id="tabBeranda" class="container">
             <!-- RATA-RATA AREA COORDINATOR METRICS CARD -->
             <div id="acSummaryContainer" class="ac-metrics-card hidden">
                 <div style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <span><i class="fa-solid fa-chart-line"></i> AVERAGE SALES AREA</span>
+                    <span><i class="fa-solid fa-chart-line"></i> RATA-RATA SALES AREA</span>
                     <span style="font-size:0.6rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px;" id="acStoreCountBadge">0 Toko</span>
                 </div>
                 <div class="modal-grid-3" style="text-align:center;">
@@ -806,7 +817,6 @@
             updateNotifikasiBadgeCount();
         }
 
-        // PERBAIKAN 3: KOTAK NOTIFIKASI HANYA MENAMPILKAN BADGE VALIDASI SESUAI HAK AKSES ROLE USER
         function updateNotifikasiBadgeCount() {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
@@ -908,7 +918,7 @@
             triggerAndroidHaptic('medium');
             const nik = document.getElementById("nikInput").value.trim();
             if (!nik) { showSwalWarning('Form Kosong ⚠️', 'Mohon masukkan NIK Anda!'); return; }
-            showLoading("Proses Login...");
+            showLoading("Proses Login Kilat...");
             currentNik = nik;
             const res = await apiCall("login", { nik: nik });
             hideLoading();
@@ -956,7 +966,7 @@
         function canEditShift() {
             if (!dashboardData || !dashboardData.user) return false;
             const j = String(dashboardData.user.jabatan || dashboardData.user.JABATAN || '').toUpperCase();
-            return (j.includes("CHIEF") || j.includes("COS") || j.includes("ACOS") || j.includes("ASSISTANT")) && !isUserAC();
+            return (j.includes("CHIEF") || j.includes("COS")) && !isUserAC();
         }
 
         function isUserCOS() {
@@ -1223,7 +1233,7 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        // PERBAIKAN 1: PROTEKSI MODAL PLAN MASTER SHIFT DENGAN FAIL-SAFE DUA ARAH (100% BEBAS STUCK/SPINNER)
+        // PERBAIKAN 1: BUKA PLAN MASTER SHIFT DENGAN PROTEKSI FAIL-SAFE AMAN 100% BEBAS STUCK/ERROR
         async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
             const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "TOKO";
@@ -1255,7 +1265,7 @@
             let personil = [];
             if (targetKode === dashboardData?.user?.kodeToko && dashboardData?.struktur?.personilToko) {
                 personil = dashboardData.struktur.personilToko;
-            } else if (dashboardData?.allMasterUsers) {
+            } else if (dashboardData?.allMasterUsers && Array.isArray(dashboardData.allMasterUsers)) {
                 personil = dashboardData.allMasterUsers.filter(u => u.kodeToko === targetKode);
             }
 
@@ -1321,7 +1331,7 @@
                     <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div>
                             <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR ' : '👁️ READ ONLY'}</b></p>
+                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR' : '👁️ READ ONLY'}</b></p>
                         </div>
                         <div style="display:flex; align-items:center; gap:6px;">
                             <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
@@ -1836,7 +1846,7 @@
             renderBelanjaKaryawanModal('resume');
         }
 
-        // PERBAIKAN 2: TAB VALIDASI STRUK BELANJA DITAMPILKAN KHUSUS CHIEF OF STORE (COS) DAN AREA COORDINATOR (AC)
+        // PERBAIKAN 2: ALUR KERJA TERSTRUKTUR & KHUSUS UNTUK USER CHIEF OF STORE (COS) DAN AREA COORDINATOR (AC)
         function renderBelanjaKaryawanModal(activeTab = 'input') {
             const cycle = getBelanjaCutoffCycle();
             
@@ -1847,7 +1857,6 @@
             const userAC = isUserAC();
             const canValidate = userCOS || userAC;
 
-            // JIKA CREW/ACOS COBA AKSES VALIDASI, DIALIHKAN KE INPUT
             if (!canValidate && activeTab === 'validasi') {
                 activeTab = 'input';
             }
@@ -1923,8 +1932,8 @@
                 `;
             } else if (activeTab === 'validasi') {
                 let validasiList = belanjaTransactions.filter(t => {
-                    if (userAC) return true; 
-                    if (userCOS) return t.status === "Menunggu COS" || t.status === "Menunggu AC" || t.penginputNik === currentNik;
+                    if (userAC) return t.status === "Menunggu AC"; 
+                    if (userCOS) return t.status === "Menunggu COS";
                     return t.penginputNik === currentNik;
                 });
 
@@ -1963,7 +1972,7 @@
                     `;
                 }).join("");
 
-                tabContentHtml = `<div class="modal-grid-1">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada data transaksi.</p>'}</div>`;
+                tabContentHtml = `<div class="modal-grid-1">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada data transaksi yang perlu divalidasi.</p>'}</div>`;
             } else if (activeTab === 'resume') {
                 let resumeTokoSectionHtml = '';
 
@@ -2175,6 +2184,7 @@
             });
         }
 
+        // PERBAIKAN 2: INPUT STRUK OLEH COS LANGSUNG BERSTATUS "MENUNGGU AC"
         function submitBelanjaTransactionAction() {
             const noBon = document.getElementById("belanjaNoBonVal").value.trim();
             const noMember = document.getElementById("belanjaNoMemberVal").value.trim();
@@ -2186,6 +2196,7 @@
             }
 
             const isCOS = isUserCOS();
+            // JIKA USER COS INPUT: LANGSUNG KE AC; JIKA CREW/ACOS: KE COS DULU
             const initialStatus = isCOS ? "Menunggu AC" : "Menunggu COS";
 
             const newTx = {
@@ -2206,7 +2217,7 @@
             saveBelanjaTx([newTx, ...belanjaTransactions]);
             belanjaPhotoPreview = null;
             trackUserActivity(10, "Submit Struk Belanja");
-            renderBelanjaKaryawanModal('validasi');
+            renderBelanjaKaryawanModal(isCOS ? 'resume' : 'input');
             showSwalSuccess('Data Terkirim 🚀', 'Struk belanja karyawan berhasil dikirimkan!');
         }
 
@@ -2845,7 +2856,7 @@
                                 <h5 style="font-weight:800; font-size:0.8rem;">Struk Belanja Karyawan</h5>
                                 <p style="font-size:0.65rem; color:var(--text-sub);">${pendingBelanjaCount} Struk Menunggu Validasi Anda</p>
                             </div>
-                            <button onclick="closeCustomModal(); openBelanjaKaryawanModal();" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                            <button onclick="closeCustomModal(); openBelanjaKaryawanModal('validasi');" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
                                 👉 Validasi Struk (${pendingBelanjaCount})
                             </button>
                         </div>
@@ -3009,4 +3020,3 @@
     </script>
 </body>
 </html>
-            
