@@ -56,7 +56,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* DISABLE NATIVE FULL PULL-TO-REFRESH */
         html, body { 
             overscroll-behavior-y: none;
             background: var(--bg-main); color: var(--text-main); min-height: 100vh; width: 100%;
@@ -110,7 +109,6 @@
             display: flex; align-items: center; gap: 8px;
         }
 
-        /* METRIK RATA-RATA AREA COORDINATOR */
         .ac-metrics-card { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid var(--accent-primary); border-radius: 20px; padding: 14px; margin-bottom: 12px; }
         .ac-metric-box { background: var(--header-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 8px 4px; }
 
@@ -164,7 +162,6 @@
         .menu-label { font-size: clamp(0.74rem, 2.7vw, 0.8rem); font-weight: 800; color: var(--text-main); line-height: 1.25; word-break: break-word; margin-top: 2px; }
         .rocket-deco { position: absolute; right: -10px; bottom: -10px; width: 85px; z-index: 1; pointer-events: none; opacity: 0.9; }
 
-        /* DINAMIS CHAT TAB LAYOUT FOR MOBILE KEYBOARD */
         #tabChat { display: flex; flex-direction: column; height: calc(100dvh - 160px); }
         .chat-tab-wrapper { display: flex; gap: 8px; background: var(--card-bg); padding: 6px; border-radius: 14px; border: 1px solid var(--card-border); margin-bottom: 10px; flex-shrink: 0; }
         .chat-tab-pill { flex: 1; padding: 8px 12px; font-size: 0.75rem; font-weight: 800; border-radius: 10px; border: none; background: transparent; color: var(--text-sub); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -192,7 +189,6 @@
         .fab-rocket { width: 50px; height: 50px; background: var(--accent-green-grad); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; margin-top: -28px; border: 4px solid var(--bg-main); cursor: pointer; }
         .hidden { display: none !important; }
 
-        /* MODAL FULL SCREEN RESPONSIVE & GRID CARDS */
         .custom-modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(15, 23, 42, 0.7); z-index: 10000; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
@@ -260,7 +256,7 @@
 </head>
 <body>
 
-    <!-- SPLASH SCREEN ANDROID NATIVE (0-2 DETIK) -->
+    <!-- SPLASH SCREEN ANDROID NATIVE -->
     <div id="splashScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-main); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
         <img src="https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ" style="width:100px; height:100px; border-radius:24px; margin-bottom:16px; border:2px solid var(--accent-primary); box-shadow:0 8px 25px rgba(16,185,129,0.3);">
         <h1 class="brand-title-text" style="font-size:1.8rem; margin-bottom:6px;">KACIDA BERSATU ✦</h1>
@@ -300,7 +296,7 @@
         
         <header class="app-header">
             <div class="header-left">
-                <!-- REVISI 3: HAMBURGER BUTTON MENUKA DRAWER KONFIGURASI PENGATURAN LENGKAP -->
+                <!-- REVISI 3: HAMBURGER BUTTON -->
                 <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan & Konfigurasi Aplikasi"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
                     <div>
@@ -325,14 +321,13 @@
             </div>
         </header>
 
-        <!-- RUNNING TEXT 3D MARQUEE PENGUMUMAN SUPERVISI -->
+        <!-- REVISI 5: RUNNING TEXT 3D MARQUEE TANPA LABEL TOKO -->
         <div id="runningTextHeaderBar" class="running-text-container hidden">
             <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap;">🔥 INFO SUPERVISI</span>
             <marquee id="marqueeTextContent" scrollamount="6" style="flex:1;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
         </div>
 
         <main id="tabBeranda" class="container">
-            <!-- RATA-RATA AREA COORDINATOR METRICS CARD -->
             <div id="acSummaryContainer" class="ac-metrics-card hidden">
                 <div style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                     <span><i class="fa-solid fa-chart-line"></i> RATA RATA SALES AREA</span>
@@ -386,7 +381,7 @@
                 <div class="swiper-pagination"></div>
             </div>
 
-            <!-- KOTAK METRIK SUMMARY UTAMA -->
+            <!-- METRIK SUMMARY UTAMA -->
             <section class="metrics-scroll">
                 <div class="metric-card" onclick="switchTab('aksiCepat')">
                     <img src="https://cdn-icons-png.flaticon.com/512/2620/2620522.png" class="metric-icon-3d">
@@ -431,7 +426,7 @@
             <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
         </main>
 
-        <!-- TAB CHAT NAVBAR UTUH -->
+        <!-- TAB CHAT NAVBAR -->
         <div id="tabChat" class="hidden container">
             <h2 class="section-title" id="chatTitleHeader"><i class="fa-solid fa-comments" style="color: var(--accent-primary);"></i> Room Chat Tim Kacida</h2>
             
@@ -467,13 +462,13 @@
             </div>
         </div>
 
-        <!-- TAB LEADERBOARD AREA -->
+        <!-- TAB LEADERBOARD -->
         <div id="tabLeaderboard" class="hidden container">
             <h2 class="section-title" style="color: var(--gold); margin-bottom: 12px;"><i class="fa-solid fa-crown"></i> 🏆 Leaderboard Area</h2>
             <div id="leaderboardList" class="modal-grid-1"></div>
         </div>
 
-        <!-- TAB PROFIL BAGAN STRUKTUR PER-TOKO -->
+        <!-- TAB PROFIL -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
                 <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover; margin: 0 auto 8px auto;">
@@ -501,7 +496,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ0OJu3RqVhcwQJb86F8tkH30Zdw7H8pqopd1RqkjnXgY1I9rgxN7kDAG6cL8nVe1N/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5A-Oj558MWiDM36-xDWgol9SXPFaIRk-BuESkF-xTa6PVnW56G0WNlbxoGUrhLYRL/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -534,16 +529,18 @@
         let activeReplyData = null;
         let activeAnnouncementsList = [];
 
-        // PLAN MASTER SHIFT STATE
+        // SHIFT & HANDOVER STATES
         let currentShiftMonth = new Date().toISOString().substring(0,7); 
         let localShiftMatrix = {}; 
+        let activeHandoversList = [];
+        let handoverCheckDoneThisSession = false;
 
         // CEKLIS EXPIRED STATE
         let expShelves = JSON.parse(localStorage.getItem('kacida_exp_shelves')) || [];
         let expProducts = JSON.parse(localStorage.getItem('kacida_exp_products')) || [];
 
-        // BELANJA KARYAWAN STATE
-        let belanjaTransactions = JSON.parse(localStorage.getItem('kacida_belanja_tx')) || [];
+        // BELANJA KARYAWAN REALTIME STATE VIA FIREBASE
+        let belanjaTransactions = [];
         let belanjaPhotoPreview = null;
         let belanjaFilterStart = "";
         let belanjaFilterEnd = "";
@@ -561,6 +558,21 @@
             const y = d.getFullYear();
             const m = String(d.getMonth() + 1).padStart(2, '0');
             return `${y}-${m}`;
+        }
+
+        function isDatePassed(yearMonthStr, dayNum) {
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth() + 1;
+            const currentDay = today.getDate();
+
+            const [yr, mo] = yearMonthStr.split("-").map(v => parseInt(v, 10));
+
+            if (yr < currentYear) return true;
+            if (yr > currentYear) return false;
+            if (mo < currentMonth) return true;
+            if (mo > currentMonth) return false;
+            return dayNum < currentDay;
         }
 
         function trackUserActivity(points = 5, actionName = "Aktivitas") {
@@ -587,23 +599,13 @@
                         updatePointsAndRankUI(newPts);
                     }
                 });
-            } else {
-                let localPts = Number(localStorage.getItem(`pts_${ym}_${currentNik}`) || 0) + points;
-                localStorage.setItem(`pts_${ym}_${currentNik}`, localPts);
-                updatePointsAndRankUI(localPts);
             }
-
             apiCall("logActivity", { nama: uNama, namaToko: uToko, aksi: actionName }).catch(()=>{});
         }
 
         function updatePointsAndRankUI(pointsVal) {
             const ptEl = document.getElementById("valPoints");
             if (ptEl) ptEl.innerText = Number(pointsVal).toLocaleString("id-ID");
-        }
-
-        function saveBelanjaTx(data) {
-            belanjaTransactions = data;
-            localStorage.setItem('kacida_belanja_tx', JSON.stringify(data));
         }
 
         function applyTheme(theme) {
@@ -775,6 +777,23 @@
             });
         }
 
+        // REVISI 2: BELANJA KARYAWAN REALTIME LISTENER FIREBASE
+        function initFirebaseBelanjaListener() {
+            if (!rtdb) return;
+            rtdb.ref('belanja_karyawan').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const entries = Object.entries(data);
+                    belanjaTransactions = entries.map(([id, val]) => ({ id, ...val })).sort((a,b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+                    updateNotifikasiBadgeCount();
+                } else {
+                    belanjaTransactions = [];
+                    updateNotifikasiBadgeCount();
+                }
+            });
+        }
+
+        // REVISI 5: RUNNING TEXT PENGUMUMAN (TANPA LABEL TOKO)
         function initFirebaseAnnouncementsListener() {
             if (!rtdb) return;
             rtdb.ref('announcements').on('value', (snapshot) => {
@@ -805,7 +824,8 @@
             const dotAnnounce = document.getElementById("dotAnnounce");
 
             if (activeAnnouncementsList.length > 0) {
-                const fullText = activeAnnouncementsList.map(a => `📢 [${a.targetName || a.target || 'ALL'}]: ${a.judul} - ${a.pesan}`).join("  ✦  ");
+                // REVISI 5: LANGSUNG KE PESAN / JUDUL TANPA NAMA TOKO
+                const fullText = activeAnnouncementsList.map(a => `${a.judul} : ${a.pesan}`).join("  ✦  ");
                 if (marquee) marquee.innerText = fullText;
                 if (bar) bar.classList.remove("hidden");
                 if (countBox) countBox.innerText = activeAnnouncementsList.length;
@@ -816,6 +836,90 @@
                 if (dotAnnounce) dotAnnounce.classList.add("hidden");
             }
             updateNotifikasiBadgeCount();
+        }
+
+        // REVISI 4: LISTENER & SHIFT HANDOVER REALTIME POP-UP DETECTOR (JAM HP 07-15, 14-23, 22-07)
+        function getCurrentShiftByTime() {
+            const hour = new Date().getHours();
+            if (hour >= 7 && hour < 15) return "Shift 1";
+            if (hour >= 14 && hour < 23) return "Shift 2";
+            return "Shift 3";
+        }
+
+        function initFirebaseShiftHandoverListener() {
+            if (!rtdb || !currentNik || !dashboardData?.user?.kodeToko) return;
+            const ym = getCurrentMonthKey();
+            const kodeToko = dashboardData.user.kodeToko;
+
+            rtdb.ref(`shift_handovers/${kodeToko}/${ym}`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const entries = Object.entries(data);
+                    activeHandoversList = entries.map(([id, val]) => ({ id, ...val }));
+                } else {
+                    activeHandoversList = [];
+                }
+                checkAndTriggerHandoverPopUp();
+            });
+        }
+
+        function checkAndTriggerHandoverPopUp() {
+            if (!dashboardData || !dashboardData.user || isUserAC()) return;
+
+            const currentShift = getCurrentShiftByTime();
+            const myNik = String(currentNik).trim();
+            const todayDateStr = new Date().toDateString();
+
+            // Cari Handover dari shift terdekat/sebelumnya yang dibuat oleh rekan toko lain
+            const pendingHandover = activeHandoversList.find(ho => {
+                const isSameDay = new Date(ho.timestamp).toDateString() === todayDateStr;
+                const isInputtedByOther = String(ho.nik).trim() !== myNik;
+                const isAlreadyConfirmedByMe = ho.confirmedBy && ho.confirmedBy[myNik];
+                return isSameDay && isInputtedByOther && !isAlreadyConfirmedByMe;
+            });
+
+            if (pendingHandover && !handoverCheckDoneThisSession) {
+                handoverCheckDoneThisSession = true;
+                showHandoverConfirmationPopUp(pendingHandover);
+            }
+        }
+
+        function showHandoverConfirmationPopUp(ho) {
+            triggerAndroidHaptic('medium');
+            Swal.fire({
+                title: `🤝 KONFIRMASI SERAH TERIMA SHIFT (${ho.shift})`,
+                html: `
+                    <div style="text-align:left; font-size:0.75rem; color:var(--text-main); line-height:1.5;">
+                        <p style="margin-bottom:6px;">Diserahkan oleh: <b style="color:var(--accent-primary);">${escapeHTML(ho.namaPenginput)}</b> (${ho.timestamp})</p>
+                        <div style="background:var(--input-bg); border:1px solid var(--card-border); padding:10px; border-radius:10px; margin-bottom:10px;">
+                            <p><b>Sales Shift:</b> Rp ${Number(ho.salesShift||0).toLocaleString('id-ID')}</p>
+                            <p><b>PSM:</b> ${ho.actPsm||0} | <b>PWP:</b> ${ho.actPwp||0} | <b>Serba Gratis:</b> ${ho.actSerbaGratis||0}</p>
+                            <p><b>Catatan:</b> ${escapeHTML(ho.catatan||'-')}</p>
+                        </div>
+                        <p style="font-size:0.68rem; color:#ef4444; font-weight:800;">*Anda wajib mengonfirmasi catatan serah terima shift ini untuk melanjutkan operasional toko.</p>
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: '✅ SAYA KONFIRMASI & TERIMA SHIFT',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    confirmShiftHandoverAction(ho.id);
+                }
+            });
+        }
+
+        function confirmShiftHandoverAction(hoId) {
+            if (!rtdb || !dashboardData?.user?.kodeToko) return;
+            const ym = getCurrentMonthKey();
+            const kodeToko = dashboardData.user.kodeToko;
+            const myNik = String(currentNik).trim();
+            const timestamp = new Date().toLocaleString('id-ID');
+
+            rtdb.ref(`shift_handovers/${kodeToko}/${ym}/${hoId}/confirmedBy/${myNik}`).set(timestamp);
+            showSwalSuccess('Shift Dikonfirmasi! 🤝', 'Terima kasih, konfirmasi serah terima shift berhasil dicatat.');
         }
 
         function updateNotifikasiBadgeCount() {
@@ -949,7 +1053,11 @@
                 document.getElementById("appSection").classList.remove("hidden");
                 renderDashboard(data);
                 trackUserActivity(5, "Akses Dashboard");
+                
+                // INISIALISASI REALTIME LISTENERS FIREBASE
                 initFirebaseAnnouncementsListener();
+                initFirebaseBelanjaListener();
+                initFirebaseShiftHandoverListener();
             }
         }
 
@@ -1023,7 +1131,6 @@
             updateNotifikasiBadgeCount();
         }
 
-        // REVISI 4: STRUKTUR BAGAN PER-TOKO (AREA COORDINATOR ADALAH JABATAN TERTINGGI, DILEPAS AM/DBM/BM/OGM)
         function renderProfilBaganStruktur(data) {
             const container = document.getElementById("timTokoContainer");
             if (!container) return;
@@ -1090,11 +1197,25 @@
             });
         }
 
-        // REVISI 3: MENU HAMBURGER (GARIS 3) MEMBUKA DRAWER KONFIGURASI PENGATURAN LENGKAP
+        // REVISI 3: MENU HAMBURGER (DRAWER CONFIG DETAILED + TRACKING USER UTK 14125034)
         function openMenuSidebar() {
             triggerAndroidHaptic('medium');
+            const isSpecialUser = String(currentNik).trim() === "14125034";
+
+            const trackingButtonHtml = isSpecialUser ? `
+                <div class="modal-card-box" style="border:1px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
+                    <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-user-gear"></i> FITUR SUPER ADMINISTRATOR</h4>
+                    <p style="font-size:0.68rem; color:#b45309; margin-bottom:10px;">Akses khusus Monitoring Log & Tracking Aktivitas Semua User Firebase Realtime.</p>
+                    <button onclick="openUserActivityTrackingModal()" style="width:100%; background:var(--gold); color:#ffffff; font-weight:800; padding:10px; border-radius:10px; border:none; cursor:pointer;">
+                        📊 BUKA DETAIL TRACKING AKTIVITAS USER
+                    </button>
+                </div>
+            ` : '';
+
             const htmlContent = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
+                    ${trackingButtonHtml}
+
                     <div class="modal-card-box">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;"><i class="fa-solid fa-sliders"></i> PENGATURAN TEMA & TAMPILAN</h4>
                         <button class="sub-tab-btn active" onclick="toggleThemeSwitcher()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">
@@ -1114,7 +1235,7 @@
 
                     <div class="modal-card-box">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-star"></i> SURVEY & RATING APLIKASI</h4>
-                        <p style="font-size:0.7rem; color:var(--text-sub);">Berikan penilaian dan masukan Anda untuk pengembangan Kacida App:</p>
+                        <p style="font-size:0.7rem; color:var(--text-sub);">Berikan penilaian dan masukan Anda untuk pengembangan Kacida App :</p>
                         
                         <div class="star-rating-box" id="starRatingContainer">
                             <i class="fa-solid fa-star active" onclick="setSurveyRating(1)"></i>
@@ -1141,7 +1262,68 @@
                     </div>
                 </div>
             `;
-            showCustomModal("⚙️ Pengaturan & Informasi", htmlBox);
+            showCustomModal("⚙️ Pengaturan & Informasi", htmlContent);
+        }
+
+        // REVISI 3: FITUR KHUSUS USER 14125034 (TRACKING AKTIVITAS ALL USER FIREBASE)
+        function openUserActivityTrackingModal() {
+            if (String(currentNik).trim() !== "14125034") {
+                showSwalWarning("Akses Ditolak 🔒", "Menu khusus Administrator!");
+                return;
+            }
+
+            if (!rtdb) {
+                showSwalWarning("Offline", "Koneksi Firebase Realtime DB belum siap.");
+                return;
+            }
+
+            showLoading("Memuat Log Aktivitas User...");
+            rtdb.ref('activity_logs').limitToLast(100).once('value').then((snapshot) => {
+                hideLoading();
+                const data = snapshot.val();
+                let logsList = [];
+                if (data) {
+                    logsList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                }
+
+                const totalLogs = logsList.length;
+                const uniqueUsers = new Set(logsList.map(l => l.nik)).size;
+
+                let cardsHtml = logsList.map(log => `
+                    <div class="modal-card-box" style="padding:10px; border-left:4px solid var(--accent-primary);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <div>
+                                <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(log.nama || 'User')}</b>
+                                <span style="font-size:0.62rem; color:var(--text-sub);"> (NIK: ${log.nik})</span>
+                            </div>
+                            <span style="font-size:0.6rem; color:var(--gold); font-weight:700;">${log.timestamp || ''}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem;">
+                            <span style="background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(log.toko || 'TOKO')}</span>
+                            <span style="color:var(--accent-primary); font-weight:800;">⚡ ${escapeHTML(log.action || log.aksi || 'Aktivitas')}</span>
+                        </div>
+                    </div>
+                `).join("");
+
+                const htmlBox = `
+                    <div class="modal-grid-1" style="font-size:0.78rem;">
+                        <div class="modal-grid-2">
+                            <div class="modal-card-box" style="text-align:center;">
+                                <span style="font-size:0.62rem; color:var(--text-sub);">TOTAL AKTIVITAS</span>
+                                <p style="font-size:1.2rem; font-weight:800; color:var(--accent-primary);">${totalLogs}</p>
+                            </div>
+                            <div class="modal-card-box" style="text-align:center;">
+                                <span style="font-size:0.62rem; color:var(--text-sub);">USER AKTIF</span>
+                                <p style="font-size:1.2rem; font-weight:800; color:var(--gold);">${uniqueUsers} Orang</p>
+                            </div>
+                        </div>
+
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;"><i class="fa-solid fa-list-check"></i> 100 AKTIVITAS TERAKHIR USER</h5>
+                        <div class="modal-grid-1" style="max-height:60vh; overflow-y:auto;">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada log aktivitas.</p>'}</div>
+                    </div>
+                `;
+                showCustomModal("📊 TRACKING LOG AKTIVITAS (NIK: 14125034)", htmlBox);
+            });
         }
 
         function setSurveyRating(stars) {
@@ -1156,17 +1338,26 @@
             }
         }
 
+        // REVISI 3: SURVEY TERCATAT LANGSUNG KE FIREBASE DB
         async function submitSurveyAction() {
             const saran = document.getElementById("surveySaranInput").value.trim();
             showLoading("Mengirimkan Survey...");
+            
+            if (rtdb) {
+                rtdb.ref('surveys').push({
+                    nik: currentNik,
+                    nama: dashboardData?.user?.NAMA || 'User',
+                    toko: dashboardData?.user?.namaToko || '-',
+                    rating: selectedSurveyRating,
+                    saran: saran || "-",
+                    timestamp: new Date().toISOString()
+                });
+            }
+
             const res = await apiCall("submitSurvey", { rating: selectedSurveyRating, saran: saran || "-" });
             hideLoading();
-            if (res && res.status === "success") {
-                closeCustomModal();
-                showSwalSuccess("Terima Kasih! 🙏", "Rating dan saran Anda berhasil disimpan.");
-            } else {
-                showSwalWarning("Gagal Mengirim", res?.message || "Terjadi kesalahan.");
-            }
+            closeCustomModal();
+            showSwalSuccess("Terima Kasih! 🙏", "Rating dan saran Anda berhasil disimpan!");
         }
 
         function renderCarousel(banners, namaToko) {
@@ -1236,10 +1427,10 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        // PERBAIKAN 1: BUKA PLAN MASTER SHIFT DENGAN PROTEKSI FAIL-SAFE AMAN 100% BEBAS STUCK/ERROR
+        // REVISI 1: OPEN PLAN MASTER SHIFT DENGAN AMBIL DATA MASTER_USER KELUAR SEMPURNA
         async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
-            const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "TOKO";
+            const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "2J7K";
             selectedShiftKodeToko = targetKode;
 
             try {
@@ -1263,7 +1454,7 @@
             const userAC = isUserAC();
             const daftarToko = dashboardData?.daftarToko || [];
             
-            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
+            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko || "2J7K";
 
             let personil = [];
             if (targetKode === dashboardData?.user?.kodeToko && dashboardData?.struktur?.personilToko) {
@@ -1849,7 +2040,7 @@
             renderBelanjaKaryawanModal('resume');
         }
 
-        // REVISI 2: TAB VALIDASI STRUK DISEMBUNYIKAN UNTUK CREW & ACOS; DITAMPILKAN KHUSUS COS DAN AC
+        // REVISI 2: TAB VALIDASI STRUK DAN APPROVAL LANGSUNG KE FIREBASE RTDB
         function renderBelanjaKaryawanModal(activeTab = 'input') {
             const cycle = getBelanjaCutoffCycle();
             
@@ -2187,6 +2378,7 @@
             });
         }
 
+        // REVISI 2: SUBMIT BELANJA DENGAN PENYIMPANAN DI FIREBASE DB REALTIME
         function submitBelanjaTransactionAction() {
             const noBon = document.getElementById("belanjaNoBonVal").value.trim();
             const noMember = document.getElementById("belanjaNoMemberVal").value.trim();
@@ -2199,9 +2391,10 @@
 
             const isCOS = isUserCOS();
             const initialStatus = isCOS ? "Menunggu AC" : "Menunggu COS";
+            const txId = 'tx_' + Date.now();
 
             const newTx = {
-                id: 'tx_' + Date.now(),
+                id: txId,
                 penginputNik: currentNik,
                 penginputNama: dashboardData?.user?.NAMA || 'User',
                 noBon: noBon,
@@ -2215,7 +2408,11 @@
                 namaToko: dashboardData?.user?.namaToko || 'Toko'
             };
 
-            saveBelanjaTx([newTx, ...belanjaTransactions]);
+            // SIMPAN LANGSUNG KE FIREBASE RTDB
+            if (rtdb) {
+                rtdb.ref('belanja_karyawan/' + txId).set(newTx);
+            }
+
             belanjaPhotoPreview = null;
             trackUserActivity(10, "Submit Struk Belanja");
             renderBelanjaKaryawanModal(isCOS ? 'resume' : 'input');
@@ -2226,14 +2423,15 @@
             const nowStr = new Date().toLocaleString('id-ID');
             const approverName = `${dashboardData?.user?.NAMA || 'User'} (${dashboardData?.user?.JABATAN || 'Atasan'})`;
 
-            const updated = belanjaTransactions.map(t => {
-                if (t.id === id) {
-                    return { ...t, status: newStatus, approvedBy: approverName, approvalTime: nowStr };
-                }
-                return t;
-            });
+            // UPDATE STATUS DI FIREBASE RTDB
+            if (rtdb) {
+                rtdb.ref('belanja_karyawan/' + id).update({
+                    status: newStatus,
+                    approvedBy: approverName,
+                    approvalTime: nowStr
+                });
+            }
 
-            saveBelanjaTx(updated);
             renderBelanjaKaryawanModal('validasi');
             showSwalSuccess('Status Diperbarui', `Transaksi diubah menjadi: ${newStatus}`);
         }
@@ -2253,7 +2451,7 @@
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
-                    <div class="perf-card-neon" style="display:grid; grid-template-columns: 1fr 1.2fr; gap:12px; align-items:center;">
+                    <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:12px; align-items:center; background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:12px;">
                         <div class="gauge-container">
                             <svg class="gauge-svg" viewBox="0 0 100 50">
                                 <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="12"/>
@@ -2276,7 +2474,7 @@
                                 🏆 RANK PENAWARAN: <b style="color:var(--gold);">#${d.rankPenawaran || 1}</b> / ${d.totalTokoArea || 18} TOKO
                             </div>
                             <div style="font-size:0.75rem; font-weight:800; color:var(--gold); margin-bottom:4px;">💪 SALES HARIAN</div>
-                            <div style="font-size:0.7rem;">Real : <strong style="color:#0f172a;">Rp ${Number(d.sales2026||0).toLocaleString('id-ID')}</strong></div>
+                            <div style="font-size:0.7rem;">Real : <strong style="color:var(--text-main);">Rp ${Number(d.sales2026||0).toLocaleString('id-ID')}</strong></div>
                             <div style="font-size:0.7rem; color:var(--text-sub);">Prev : Rp ${Number(d.sales2025||0).toLocaleString('id-ID')}</div>
                             <div style="margin-top:6px;">
                                 <span class="growth-badge-pill ${isHarianGrowth ? 'up' : 'down'}">
@@ -2291,19 +2489,19 @@
                             <i class="fa-solid fa-fire" style="color:#ef4444;"></i> PENAWARAN LANGSUNG (POINT: ${d.pointDash || '100%'})
                         </span>
                         <div class="modal-grid-4" style="text-align:center;">
-                            <div style="background:#f8fafc; padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
+                            <div style="background:var(--input-bg); padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.6rem; color:var(--text-sub); display:block; font-weight:700;">PSM</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.psm || '100%'}</span>
                             </div>
-                            <div style="background:#f8fafc; padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
+                            <div style="background:var(--input-bg); padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.6rem; color:var(--text-sub); display:block; font-weight:700;">PWP</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.pwp || '95%'}</span>
                             </div>
-                            <div style="background:#f8fafc; padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
+                            <div style="background:var(--input-bg); padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">S.GRATIS</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.serbaGratis || '98%'}</span>
                             </div>
-                            <div style="background:#f8fafc; padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
+                            <div style="background:var(--input-bg); padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.6rem; color:var(--text-sub); display:block; font-weight:700;">APC</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.apc || '102%'}</span>
                             </div>
@@ -2320,22 +2518,22 @@
                     <div class="modal-card-box">
                         <span style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); display:block; margin-bottom:8px;"><i class="fa-solid fa-shield-halved"></i> IKT TOKO</span>
                         <div class="modal-grid-3" style="text-align:center;">
-                            <div style="background:#f8fafc; padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                            <div style="background:var(--input-bg); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.6rem; color:var(--text-sub); display:block;">ACV SALES</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.acvNetSales || '-'}</span>
                             </div>
-                            <div style="background:#f8fafc; padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                            <div style="background:var(--input-bg); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.6rem; color:var(--text-sub); display:block;">ACV PROFIT</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.acvProfit || '-'}</span>
                             </div>
-                            <div style="background:#f8fafc; padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                            <div style="background:var(--input-bg); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
                                 <span style="font-size:0.6rem; color:var(--text-sub); display:block;">ACV GM%</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--gold);">${d.acvGM || '-'}</span>
                             </div>
                         </div>
                     </div>
 
-                    <button onclick="downloadPerformaCardHD()" class="btn-copy-action"><i class="fa-solid fa-image"></i> DOWNLOAD KARTU PERFORMA HD 🖼️</button>
+                    <button onclick="downloadPerformaCardHD()" style="background:var(--accent-green-grad); color:#ffffff; padding:12px; border-radius:12px; font-weight:800; border:none; cursor:pointer; width:100%;"><i class="fa-solid fa-image"></i> DOWNLOAD KARTU PERFORMA HD 🖼️</button>
                 </div>
             `;
             showCustomModal("📊 DATA PERFORMANCE", htmlBox);
@@ -2384,9 +2582,9 @@
                 const currentKode = d.kodeToko || selectedKodeTokoAC || dashboardData?.user?.kodeToko;
                 const opts = daftarToko.map(t => `<option value="${t.kodeToko}" ${t.kodeToko === currentKode ? 'selected' : ''}>🏪 ${escapeHTML(t.namaToko)} (${t.kodeToko})</option>`).join("");
                 storeSelectHtml = `
-                    <div style="background:#ffffff; border:1px solid var(--card-border); padding:8px 12px; border-radius:14px; display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                    <div style="background:var(--header-bg); border:1px solid var(--card-border); padding:8px 12px; border-radius:14px; display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
                         <span style="font-size:0.72rem; font-weight:700; color:var(--accent-primary);"><i class="fa-solid fa-store"></i> PILIH TOKO (AC):</span>
-                        <select onchange="changeMtdStore(this.value)" style="background:#f8fafc; color:#0f172a; border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none;">
+                        <select onchange="changeMtdStore(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none;">
                             ${opts}
                         </select>
                     </div>
@@ -2398,7 +2596,7 @@
                     ${filteredList.map(item => `
                         <div class="modal-card-box" style="padding:10px; border-left:4px solid ${item.isGrowth ? '#10b981' : '#ef4444'};">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                                <span style="font-size:0.8rem; font-weight:800; color:#0f172a;">Tgl ${item.day}</span>
+                                <span style="font-size:0.8rem; font-weight:800; color:var(--text-main);">Tgl ${item.day}</span>
                                 <span class="growth-badge-pill ${item.isGrowth ? 'up' : 'down'}" style="font-size:0.6rem; padding:2px 6px;">
                                     ${item.isGrowth ? '▲' : '▼'} ${item.growthPct?.toFixed(1)}%
                                 </span>
@@ -2414,9 +2612,9 @@
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     ${storeSelectHtml}
 
-                    <div style="background:#ffffff; border:1px solid var(--card-border); padding:8px 12px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="background:var(--header-bg); border:1px solid var(--card-border); padding:8px 12px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;">
                         <span style="font-size:0.72rem; font-weight:700; color:var(--accent-primary);"><i class="fa-solid fa-calendar-days"></i> PILIH BULAN:</span>
-                        <select onchange="changeMtdMonth(this.value)" style="background:#f8fafc; color:#0f172a; border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none;">
+                        <select onchange="changeMtdMonth(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 12px; border-radius:10px; outline:none;">
                             ${monthOptionsHtml}
                         </select>
                     </div>
@@ -2438,16 +2636,16 @@
                     </div>
 
                     <div class="modal-card-box">
-                        <span style="font-weight:800; color:#0f172a; font-size:0.75rem;"><i class="fa-solid fa-chart-line" style="color:var(--accent-primary);"></i> GRAFIK HARIAN SALES</span>
+                        <span style="font-weight:800; color:var(--text-main); font-size:0.75rem;"><i class="fa-solid fa-chart-line" style="color:var(--accent-primary);"></i> GRAFIK HARIAN SALES</span>
                         <div style="height:150px; position:relative; margin-top:8px;">
                             <canvas id="chartSalesTrend" style="width:100%; height:150px;"></canvas>
                         </div>
                     </div>
 
-                    <div class="filter-pills-row">
-                        <button class="filter-pill-btn ${filterType==='semua'?'active':''}" onclick="renderMtdModalView('semua')"><i class="fa-solid fa-filter"></i> Filter: Semua</button>
-                        <button class="filter-pill-btn ${filterType==='growth'?'active':''}" onclick="renderMtdModalView('growth')">▲ Achieved (Growth)</button>
-                        <button class="filter-pill-btn ${filterType==='decline'?'active':''}" onclick="renderMtdModalView('decline')">▼ Decline (Turun)</button>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="sub-tab-btn ${filterType==='semua'?'active':''}" onclick="renderMtdModalView('semua')"><i class="fa-solid fa-filter"></i> Semua</button>
+                        <button class="sub-tab-btn ${filterType==='growth'?'active':''}" onclick="renderMtdModalView('growth')">▲ Achieved</button>
+                        <button class="sub-tab-btn ${filterType==='decline'?'active':''}" onclick="renderMtdModalView('decline')">▼ Decline</button>
                     </div>
 
                     <div>
@@ -2488,18 +2686,27 @@
             }, 100);
         }
 
+        // REVISI 4: MODAL SERAH TERIMA SHIFT DENGAN RIWAYAT LENGKAP & FIREBASE RTDB
         function openSerahTerimaModal() {
             showCustomModal("🔄 SERAH TERIMA SHIFT KERJA", `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     <div class="modal-card-box">
-                        <label style="font-weight:700; color:#0f172a; display:block; margin-bottom:4px;">Shift Kerja Saat Ini</label>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <h4 style="font-size:0.88rem; font-weight:800; color:var(--accent-primary);">📝 FORM LAPORAN SHIFT</h4>
+                            <button onclick="openShiftHandoverHistoryModal()" style="background:var(--input-bg); border:1px solid var(--card-border); color:var(--gold); font-size:0.68rem; font-weight:800; padding:4px 10px; border-radius:8px; cursor:pointer;">
+                                📜 Lihat Riwayat Shift
+                            </button>
+                        </div>
+
+                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Shift Kerja Saat Ini</label>
                         <select id="stShiftVal" style="width:100%; background:var(--input-bg); color:var(--accent-primary); font-weight:bold; border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
                             <option value="Shift 1">Shift 1 (07:00 - 15:00 WIB)</option>
-                            <option value="Shift 2">Shift 2 (15:00 - 23:00 WIB)</option>
+                            <option value="Shift 2">Shift 2 (14:00 - 23:00 WIB)</option>
+                            <option value="Shift 3">Shift 3 (22:00 - 07:00 WIB)</option>
                         </select>
 
-                        <label style="font-weight:700; color:#0f172a; display:block; margin-bottom:4px;">Pendapatan Sales Shift (Rp)</label>
-                        <input type="number" id="stSalesShift" placeholder="Contoh: 4500000" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); color:#0f172a; border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
+                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Pendapatan Sales Shift (Rp)</label>
+                        <input type="number" id="stSalesShift" placeholder="Contoh: 4500000" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); color:var(--text-main); border-radius:10px; padding:10px; margin-bottom:12px; outline:none;">
 
                         <div class="modal-grid-2" style="margin-bottom:12px;">
                             <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
@@ -2520,7 +2727,7 @@
                             </div>
                         </div>
 
-                        <label style="font-weight:700; color:#0f172a; display:block; margin-bottom:4px;">Catatan / Kendala Shift</label>
+                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Catatan / Kendala Shift</label>
                         <textarea id="stCatatan" placeholder="Kasir bersih, EDC aman..." style="width:100%; height:60px; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:8px; font-size:0.75rem; outline:none; resize:none; margin-bottom:12px;"></textarea>
 
                         <button onclick="saveShiftAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">💾 SIMPAN & SERAH TERIMA ✦</button>
@@ -2529,13 +2736,65 @@
             `);
         }
 
+        // REVISI 4: RIWAYAT SHIFT HANDOVER (OTOMATIS TERCATAT DAN DAPAT DICEK KEMBALI)
+        function openShiftHandoverHistoryModal() {
+            triggerAndroidHaptic('light');
+            const ym = getCurrentMonthKey();
+            const kodeToko = dashboardData?.user?.kodeToko || "2J7K";
+
+            showLoading("Memuat Riwayat Shift...");
+            if (rtdb) {
+                rtdb.ref(`shift_handovers/${kodeToko}/${ym}`).once('value').then((snapshot) => {
+                    hideLoading();
+                    const data = snapshot.val();
+                    let list = [];
+                    if (data) {
+                        list = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    }
+
+                    let cardsHtml = list.map(ho => {
+                        const confirmCount = ho.confirmedBy ? Object.keys(ho.confirmedBy).length : 0;
+                        return `
+                            <div class="modal-card-box">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                                    <div>
+                                        <b style="font-size:0.85rem; color:var(--accent-primary);">${escapeHTML(ho.shift)}</b>
+                                        <p style="font-size:0.62rem; color:var(--text-sub);">${ho.timestamp}</p>
+                                    </div>
+                                    <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:2px 8px; border-radius:6px; font-weight:800;">
+                                        ✅ ${confirmCount} Konfirmasi
+                                    </span>
+                                </div>
+                                <p style="font-size:0.72rem; color:var(--text-main);">Penginput: <b>${escapeHTML(ho.namaPenginput)}</b></p>
+                                <div style="background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; margin:6px 0; font-size:0.68rem;">
+                                    <b>Sales:</b> Rp ${Number(ho.salesShift||0).toLocaleString('id-ID')} | <b>PSM:</b> ${ho.actPsm||0} Pcs | <b>PWP:</b> ${ho.actPwp||0} Pcs
+                                    <p style="margin-top:2px;"><b>Catatan:</b> ${escapeHTML(ho.catatan||'-')}</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+
+                    const htmlBox = `
+                        <div class="modal-grid-1" style="font-size:0.78rem;">
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-clock-rotate-left"></i> RIWAYAT SHIFT HANDOVER BULAN INI</h5>
+                            <div class="modal-grid-1" style="max-height:65vh; overflow-y:auto;">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada riwayat shift bulan ini.</p>'}</div>
+                        </div>
+                    `;
+                    showCustomModal("📜 RIWAYAT SERAH TERIMA SHIFT", htmlBox);
+                });
+            } else {
+                hideLoading();
+                showSwalWarning("Offline", "Koneksi ke Database tidak tersedia.");
+            }
+        }
+
         async function saveShiftAction() {
             const shift = document.getElementById("stShiftVal").value;
             const salesShift = document.getElementById("stSalesShift").value;
             if (!salesShift) { showSwalWarning('Form Belum Lengkap', 'Mohon isi nominal Pendapatan Sales Shift.'); return; }
 
             showLoading("Menyimpan Laporan Shift...");
-            const res = await apiCall("submitShiftHandover", {
+            const params = {
                 shift: shift,
                 salesShift: salesShift,
                 actPsm: document.getElementById("stActPsm").value || 0,
@@ -2543,7 +2802,9 @@
                 actPwp: document.getElementById("stActPwp").value || 0,
                 actNewMember: document.getElementById("stActMember").value || 0,
                 catatan: document.getElementById("stCatatan").value || '-'
-            });
+            };
+
+            const res = await apiCall("submitShiftHandover", params);
             hideLoading();
 
             closeCustomModal();
