@@ -486,9 +486,13 @@
             </div>
         </div>
 
+        <!-- REVISI 4: BOTTOM NAVBAR WITH UNREAD CHAT BADGE -->
         <nav class="bottom-nav">
             <a href="#" onclick="switchTab('beranda')" id="navBeranda" class="nav-item active"><i class="fa-solid fa-house"></i><span>Beranda</span></a>
-            <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item"><i class="fa-solid fa-comment-dots"></i><span>Chat</span></a>
+            <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item">
+                <span id="navChatBadge" class="num-badge-pill hidden" style="top:-4px; right:4px;">0</span>
+                <i class="fa-solid fa-comment-dots"></i><span>Chat</span>
+            </a>
             <div class="fab-rocket" onclick="switchTab('aksiCepat')"><i class="fa-solid fa-rocket"></i></div>
             <a href="#" onclick="switchTab('leaderboard')" id="navLeaderboard" class="nav-item"><i class="fa-solid fa-crown"></i><span>Leaderboard</span></a>
             <a href="#" onclick="switchTab('profil')" id="navProfil" class="nav-item"><i class="fa-solid fa-user"></i><span>Profil</span></a>
@@ -496,7 +500,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5A-Oj558MWiDM36-xDWgol9SXPFaIRk-BuESkF-xTa6PVnW56G0WNlbxoGUrhLYRL/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4PsnF4lzwKU_WXVRAfB7fhaXerYHMSo2UkCBTvGHf4ZCNxUeBSdPFY1-vSV5R1J52/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -521,6 +525,8 @@
         let selectedExpAlertStore = "ALL";
         let chatRoomMode = "team";
         let cachedChatList = [];
+        let totalChatCount = 0;
+        let lastSeenChatCount = parseInt(localStorage.getItem("last_seen_chat_count") || "0", 10);
         let salesChartInstance = null;
         let swiperInstance = null;
         let currentMtdDetailData = null;
@@ -535,15 +541,92 @@
         let activeHandoversList = [];
         let handoverCheckDoneThisSession = false;
 
-        // CEKLIS EXPIRED STATE
-        let expShelves = JSON.parse(localStorage.getItem('kacida_exp_shelves')) || [];
-        let expProducts = JSON.parse(localStorage.getItem('kacida_exp_products')) || [];
+        // CEKLIS EXPIRED STATE VIA FIREBASE REALTIME DB
+        let expShelves = [];
+        let expProducts = [];
 
         // BELANJA KARYAWAN REALTIME STATE VIA FIREBASE
         let belanjaTransactions = [];
         let belanjaPhotoPreview = null;
         let belanjaFilterStart = "";
         let belanjaFilterEnd = "";
+
+        // REVISI 6: JOBDESK HARIAN MASTER DATA & STATE
+        let activeJobdeskDateStr = new Date().toISOString().substring(0,10);
+        let jobdeskUploadedPhoto = "";
+        let activeJobdeskModalTarget = null;
+        let jobdeskStoreData = {};
+
+        const BRIEFING_MASTER = {
+          'Senin': {
+            'Shift 1': ['MATERI BSP & REMAINDER TARGET FOKUS DAN SALES SHIFT 1', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['EVALUASI PENCAPAIAN SHIFT 1 DAN BREAKDOWN TARGET SHIFT 2', 'EVALUASI PENCAPAIAN SALES PASCA JSM']
+          },
+          'Selasa': {
+            'Shift 1': ['EVALUASI PENCAPAIAN FOKUS DAN SALES DI MENU HIGHLIGH SALES', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['EVALUASI PENCAPAIAN SHIFT 1 DAN BREAKDOWN SHIFT 2', 'EVALUASI PENCAPAIAN FOKUS YANG DIKIRIM MKT']
+          },
+          'Rabu': {
+            'Shift 1': ['CEK DAN EVALUASI PENCAPAIAN INDIKATOR DI IKT ONLINE', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['BAHAS PERFORMA SALES DAN FOKUS']
+          },
+          'Kamis': {
+            'Shift 1': ['EVALUASI PENCAPAIAN FOKUS YANG DIKIRIM MKT', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['ATUR STRATEGI JSM DAN TARGET SALES YANG HARUS DICAPAI']
+          },
+          'Jumat': {
+            'Shift 1': ['CEK DAN EVALUASI PENCAPAIAN INDIKATOR IKT ONLINE', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['BAHAS PERFORMA SALES DI MENU HIGHLIGHT SALES DAN FOKUS MKT']
+          },
+          'Sabtu': {
+            'Shift 1': ['EVALUASI PENCAPAIAN FOKUS DAN SALES DI LINK REPORT AREA', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['EVALUASI PENCAPAIAN FOKUS YANG DIKIRIM MKT']
+          },
+          'Minggu': {
+            'Shift 1': ['CEK DAN EVALUASI PENCAPAIAN INDIKATOR DI IKT ONLINE', 'PLAN JOBDESK SHIFT 1 DAN PERBAIKAN BASIC'],
+            'Shift 2': ['CEK ULANG PERBAIKAN BASIC YANG TERLEWAT & BAHAS PERFORMA SALES']
+          }
+        };
+
+        const DAILY_ACTIVITY_MASTER = [
+          { id: 'ACT-SEN-01', day: 'Senin', area: 'Toilet', title: 'KEBERSIHAN TOILET ISI CEKLIS' },
+          { id: 'ACT-SEN-02', day: 'Senin', area: 'Bean Spot', title: 'CLEANING BEAN SPOT' },
+          { id: 'ACT-SEN-03', day: 'Senin', area: 'Teras', title: 'KEBERSIHAN KESET MERAH DI CUCI' },
+          { id: 'ACT-SEN-04', day: 'Senin', area: 'Sales Area', title: 'UPDATE SEWA' },
+          { id: 'ACT-SEN-05', day: 'Senin', area: 'Sales Area', title: 'KEBERSIHAN GALON' },
+          { id: 'ACT-SEN-06', day: 'Senin', area: 'Teras', title: 'KEBERSIHAN GENSET' },
+
+          { id: 'ACT-SEL-01', day: 'Selasa', area: 'Sales Area', title: 'KEBERSIHAN KACA LUAR DAN DALAM' },
+          { id: 'ACT-SEL-02', day: 'Selasa', area: 'Display Area', title: 'KEBERSIHAN TERAS DAN SARANG LABA-LABA AREA SALES' },
+          { id: 'ACT-SEL-03', day: 'Selasa', area: 'Display Area', title: 'KEBERSIHAN KOLONG RAK' },
+          { id: 'ACT-SEL-04', day: 'Selasa', area: 'Freezer Area', title: 'KEBERSIHAN ALL FREEZER KISI-KISI NYA DAN KOLONG FREEZER' },
+          { id: 'ACT-SEL-05', day: 'Selasa', area: 'Chiller Area', title: 'KEBERSIHAN CHILLER KACA DAN TIANG YANG BERKERAK' },
+
+          { id: 'ACT-RAB-01', day: 'Rabu', area: 'Entrance', title: 'KEBERSIHAN KERANJANG BELANJA (STANDAR 24 PCS)' },
+          { id: 'ACT-RAB-02', day: 'Rabu', area: 'Gudang', title: 'KEBERSIHAN KOLONG RAK GUDANG' },
+          { id: 'ACT-RAB-03', day: 'Rabu', area: 'Gudang', title: 'KERAPIHAN RAK GUDANG, LABLE EXP KARTONAN DAN GRUPING KARTONAN' },
+          { id: 'ACT-RAB-04', day: 'Rabu', area: 'Gudang & Kantor', title: 'KEBERSIHAN SARANG LABA-LABA AREA GUDANG DAN KANTOR' },
+
+          { id: 'ACT-KAM-01', day: 'Kamis', area: 'Bean Spot', title: 'CLEANING BEAN SPOT' },
+          { id: 'ACT-KAM-02', day: 'Kamis', area: 'Sales Area', title: 'GENERAL CEK EXP ALL ITEM INPUT ALL ITEM DI APLIKASI CEKLIS EXP' },
+          { id: 'ACT-KAM-03', day: 'Kamis', area: 'Selasar', title: 'KEBERSIHAN SELASAR' },
+
+          { id: 'ACT-JUM-01', day: 'Jumat', area: 'Toilet', title: 'KEBERSIHAN TOILET ISI CEKLIS' },
+          { id: 'ACT-JUM-02', day: 'Jumat', area: 'Gudang', title: 'GROUPING RAK ATK , RAK 979 DAN Z51' },
+          { id: 'ACT-JUM-03', day: 'Jumat', area: 'Bean Spot', title: 'SO RPC MATERIAL BEANSPOT' },
+          { id: 'ACT-JUM-04', day: 'Jumat', area: 'Gudang', title: 'KEBERSIHAN BOX RETURN STERIL NO BAD STOK AJUKAN OTP' },
+
+          { id: 'ACT-SAB-01', day: 'Sabtu', area: 'Kasir & Server', title: 'KEBERSIHAN AREA KASIR DAN SERVER' },
+          { id: 'ACT-SAB-02', day: 'Sabtu', area: 'Backwall', title: 'KEBERSIHAN BACKWALL' },
+          { id: 'ACT-SAB-03', day: 'Sabtu', area: 'Gudang', title: 'PEMASANGAN LABEL EXP KARTONAN' },
+
+          { id: 'ACT-MNG-01', day: 'Minggu', area: 'Parkiran', title: 'PENGECEKAN LINGKUNGAN HALAMAN PARKIR' },
+          { id: 'ACT-MNG-02', day: 'Minggu', area: 'Outdoor', title: 'KEBERSIHAN TEMPAT SAMPAH DICUCI & KEBERSIHAN RUMPUT LIAR' },
+          { id: 'ACT-MNG-03', day: 'Minggu', area: 'Sales & Teras', title: 'KEBERSIHAN SARANG LABA-LABA AREA TERAS, SALES, SELASAR, KANTOR' },
+          { id: 'ACT-MNG-04', day: 'Minggu', area: 'Kantor & Mess', title: 'KEBERSIHAN AREA KANTOR DAN MES' }
+        ];
+
+        const DAYS_INDONESIA = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
         function cleanNum(val) {
             if (val === null || val === undefined || val === "" || val === "NaN") return 0;
@@ -575,6 +658,7 @@
             return dayNum < currentDay;
         }
 
+        // REVISI 5: LOG AKTIVITAS MASUK KE FIREBASE REALTIME DB
         function trackUserActivity(points = 5, actionName = "Aktivitas") {
             if (!currentNik) return;
             const ym = getCurrentMonthKey();
@@ -765,6 +849,7 @@
             }
         }
 
+        // REVISI 4: REALTIME CHAT WITH UNREAD BADGE COUNTER
         function initFirebaseRealtimeChat() {
             if (!rtdb) return;
             rtdb.ref('chats').limitToLast(50).on('value', (snapshot) => {
@@ -772,11 +857,36 @@
                 if (data) {
                     const entries = Object.entries(data);
                     cachedChatList = entries.map(([id, val]) => ({ id, ...val }));
+                    totalChatCount = cachedChatList.length;
+
+                    const activeTabChat = document.getElementById("tabChat");
+                    const isChatTabOpen = activeTabChat && !activeTabChat.classList.contains("hidden");
+
+                    if (isChatTabOpen) {
+                        lastSeenChatCount = totalChatCount;
+                        localStorage.setItem("last_seen_chat_count", lastSeenChatCount);
+                        updateChatBadgeUI(0);
+                    } else {
+                        const unread = Math.max(0, totalChatCount - lastSeenChatCount);
+                        updateChatBadgeUI(unread);
+                    }
+
                     if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
                 }
             });
         }
 
+        function updateChatBadgeUI(unreadCount) {
+            const badge = document.getElementById("navChatBadge");
+            if (!badge) return;
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount > 99 ? '99+' : unreadCount;
+                badge.classList.remove("hidden");
+            } else {
+                badge.classList.add("hidden");
+            }
+        }
+        
         // REVISI 2: BELANJA KARYAWAN REALTIME LISTENER FIREBASE
         function initFirebaseBelanjaListener() {
             if (!rtdb) return;
@@ -866,11 +976,9 @@
         function checkAndTriggerHandoverPopUp() {
             if (!dashboardData || !dashboardData.user || isUserAC()) return;
 
-            const currentShift = getCurrentShiftByTime();
             const myNik = String(currentNik).trim();
             const todayDateStr = new Date().toDateString();
 
-            // Cari Handover dari shift terdekat/sebelumnya yang dibuat oleh rekan toko lain
             const pendingHandover = activeHandoversList.find(ho => {
                 const isSameDay = new Date(ho.timestamp).toDateString() === todayDateStr;
                 const isInputtedByOther = String(ho.nik).trim() !== myNik;
@@ -922,6 +1030,24 @@
             showSwalSuccess('Shift Dikonfirmasi! 🤝', 'Terima kasih, konfirmasi serah terima shift berhasil dicatat.');
         }
 
+        // REVISI 2 & 3: CEKLIS EXPIRED REALTIME DB FIREBASE (PER-TOKO)
+        function initFirebaseCeklisExpiredListener() {
+            if (!rtdb || !dashboardData?.user?.kodeToko) return;
+            const kodeToko = dashboardData.user.kodeToko;
+
+            rtdb.ref(`ceklis_expired/${kodeToko}`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    expShelves = data.shelves ? Object.values(data.shelves) : [];
+                    expProducts = data.products ? Object.values(data.products) : [];
+                } else {
+                    expShelves = [];
+                    expProducts = [];
+                }
+                updateNotifikasiBadgeCount();
+            });
+        }
+
         function updateNotifikasiBadgeCount() {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
@@ -955,6 +1081,7 @@
             const pendingBelanjaCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
 
             const builtInMenus = [
+                { name: "Jobdesk Harian", icon: "https://cdn-icons-png.flaticon.com/512/3079/3079164.png", action: "openJobdeskHarianModal()" },
                 { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
                 { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: pendingExpCount },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
@@ -1054,10 +1181,13 @@
                 renderDashboard(data);
                 trackUserActivity(5, "Akses Dashboard");
                 
-                // INISIALISASI REALTIME LISTENERS FIREBASE
+                // INISIALISASI LISTENERS FIREBASE REALTIME DB
                 initFirebaseAnnouncementsListener();
                 initFirebaseBelanjaListener();
                 initFirebaseShiftHandoverListener();
+                initFirebaseCeklisExpiredListener();
+                initFirebaseJobdeskHarianListener();
+                initFirebaseRealtimeChat();
             }
         }
 
@@ -1197,15 +1327,15 @@
             });
         }
 
-        // REVISI 3: MENU HAMBURGER (DRAWER CONFIG DETAILED + TRACKING USER UTK 14125034)
+        // REVISI 3 & 5: DRAWER HAMBURGER DENGAN FITUR SUPER ADMIN (NIK 14125034)
         function openMenuSidebar() {
             triggerAndroidHaptic('medium');
-            const isSpecialUser = String(currentNik).trim() === "14125034";
+            const isSuperAdmin = String(currentNik).trim() === "14125034";
 
-            const trackingButtonHtml = isSpecialUser ? `
-                <div class="modal-card-box" style="border:1px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
+            const superAdminSectionHtml = isSuperAdmin ? `
+                <div class="modal-card-box" style="border:1px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); margin-bottom:12px;">
                     <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-user-gear"></i> FITUR SUPER ADMINISTRATOR</h4>
-                    <p style="font-size:0.68rem; color:#b45309; margin-bottom:10px;">Akses khusus Monitoring Log & Tracking Aktivitas Semua User Firebase Realtime.</p>
+                    <p style="font-size:0.68rem; color:#b45309; margin-bottom:10px;">Akses khusus Monitoring Log & Tracking Aktivitas Semua User Realtime.</p>
                     <button onclick="openUserActivityTrackingModal()" style="width:100%; background:var(--gold); color:#ffffff; font-weight:800; padding:10px; border-radius:10px; border:none; cursor:pointer;">
                         📊 BUKA DETAIL TRACKING AKTIVITAS USER
                     </button>
@@ -1214,7 +1344,7 @@
 
             const htmlContent = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
-                    ${trackingButtonHtml}
+                    ${superAdminSectionHtml}
 
                     <div class="modal-card-box">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;"><i class="fa-solid fa-sliders"></i> PENGATURAN TEMA & TAMPILAN</h4>
@@ -1226,16 +1356,16 @@
                     <div class="modal-card-box">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-book-open"></i> README & TATA CARA APLIKASI</h4>
                         <div style="font-size:0.72rem; color:var(--text-main); line-height:1.5;">
-                            <p><b>1. Fitur Sales SPD & MTD:</b> Klik baris Sales di beranda untuk melihat rincian performa harian beserta filter bulan aktif & toko.</p>
-                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS dapat mengedit pola shift bulanan. User AC dapat memantau seluruh toko.</p>
-                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Pantau rak toko dan catat barang yang mendekati expired dalam format Resume Toko.</p>
-                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Unggah struk belanja untuk dikonfirmasi COS & disetujui AC secara real-time seluruh toko.</p>
+                            <p><b>1. Jobdesk Harian:</b> Briefing per shift & daily activity checklist lengkap dengan bukti foto & approval COS.</p>
+                            <p style="margin-top:4px;"><b>2. Sales MTD:</b> Monitoring pencapaian omset toko dan proyeksi akhir bulan.</p>
+                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Pengelolaan rak toko & alert produk expired terpusat via Firebase.</p>
+                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Approval berjenjang COS & AC untuk klaim belanja karyawan.</p>
                         </div>
                     </div>
 
                     <div class="modal-card-box">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-star"></i> SURVEY & RATING APLIKASI</h4>
-                        <p style="font-size:0.7rem; color:var(--text-sub);">Berikan penilaian dan masukan Anda untuk pengembangan Kacida App :</p>
+                        <p style="font-size:0.7rem; color:var(--text-sub);">Berikan penilaian dan masukan Anda (Tercatat ke Firebase):</p>
                         
                         <div class="star-rating-box" id="starRatingContainer">
                             <i class="fa-solid fa-star active" onclick="setSurveyRating(1)"></i>
@@ -1265,415 +1395,348 @@
             showCustomModal("⚙️ Pengaturan & Informasi", htmlContent);
         }
 
-        // REVISI 3: FITUR KHUSUS USER 14125034 (TRACKING AKTIVITAS ALL USER FIREBASE)
+        // REVISI 5: MODAL DETAIL TRACKING USER & STATUS ONLINE KHUSUS NIK 14125034
         function openUserActivityTrackingModal() {
             if (String(currentNik).trim() !== "14125034") {
-                showSwalWarning("Akses Ditolak 🔒", "Menu khusus Administrator!");
-                return;
-            }
-
-            if (!rtdb) {
-                showSwalWarning("Offline", "Koneksi Firebase Realtime DB belum siap.");
+                showSwalWarning("Akses Ditolak 🔒", "Fitur khusus Super Administrator!");
                 return;
             }
 
             showLoading("Memuat Log Aktivitas User...");
-            rtdb.ref('activity_logs').limitToLast(100).once('value').then((snapshot) => {
+            if (rtdb) {
+                rtdb.ref('activity_logs').limitToLast(100).once('value').then((snapshot) => {
+                    hideLoading();
+                    const data = snapshot.val();
+                    let logsList = [];
+                    if (data) {
+                        logsList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    }
+
+                    const nowTimeMs = Date.now();
+                    const activeOnlineNiks = new Set();
+
+                    logsList.forEach(log => {
+                        const logTimeMs = new Date(log.timestamp).getTime();
+                        if (nowTimeMs - logTimeMs <= 15 * 60 * 1000) { // Aktif dalam 15 menit terakhir
+                            activeOnlineNiks.add(log.nik);
+                        }
+                    });
+
+                    let cardsHtml = logsList.map(log => `
+                        <div class="modal-card-box" style="padding:10px; border-left:4px solid var(--accent-primary);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                <div>
+                                    <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(log.nama || 'User')}</b>
+                                    <span style="font-size:0.62rem; color:var(--text-sub);"> (NIK: ${log.nik})</span>
+                                </div>
+                                <span style="font-size:0.6rem; color:var(--gold); font-weight:700;">${log.timestamp || ''}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem;">
+                                <span style="background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(log.toko || 'TOKO')}</span>
+                                <span style="color:var(--accent-primary); font-weight:800;">⚡ ${escapeHTML(log.action || log.aksi || 'Aktivitas')}</span>
+                            </div>
+                        </div>
+                    `).join("");
+
+                    const htmlBox = `
+                        <div class="modal-grid-1" style="font-size:0.78rem;">
+                            <div class="modal-grid-2">
+                                <div class="modal-card-box" style="text-align:center;">
+                                    <span style="font-size:0.62rem; color:var(--text-sub);">TOTAL LOG RECORD</span>
+                                    <p style="font-size:1.2rem; font-weight:800; color:var(--accent-primary);">${logsList.length}</p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center;">
+                                    <span style="font-size:0.62rem; color:var(--text-sub);">USER ONLINE (15m)</span>
+                                    <p style="font-size:1.2rem; font-weight:800; color:var(--gold);">${activeOnlineNiks.size} Orang</p>
+                                </div>
+                            </div>
+
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;"><i class="fa-solid fa-list-check"></i> 100 LOG AKTIVITAS TERAKHIR</h5>
+                            <div class="modal-grid-1" style="max-height:60vh; overflow-y:auto;">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada log aktivitas.</p>'}</div>
+                        </div>
+                    `;
+                    showCustomModal("📊 TRACKING AKTIVITAS ALL USER (NIK: 14125034)", htmlBox);
+                });
+            } else {
                 hideLoading();
+                showSwalWarning("Offline", "Koneksi Realtime Database tidak tersedia.");
+            }
+        }
+
+        // REVISI 6: MODAL & LOGIK JOBDESK HARIAN LENGKAP
+        function initFirebaseJobdeskHarianListener() {
+            if (!rtdb || !dashboardData?.user?.kodeToko) return;
+            const kodeToko = dashboardData.user.kodeToko;
+            const ym = getCurrentMonthKey();
+
+            rtdb.ref(`jobdesk_harian/${kodeToko}/${ym}`).on('value', (snapshot) => {
                 const data = snapshot.val();
-                let logsList = [];
                 if (data) {
-                    logsList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    jobdeskStoreData = data;
+                } else {
+                    jobdeskStoreData = {};
                 }
-
-                const totalLogs = logsList.length;
-                const uniqueUsers = new Set(logsList.map(l => l.nik)).size;
-
-                let cardsHtml = logsList.map(log => `
-                    <div class="modal-card-box" style="padding:10px; border-left:4px solid var(--accent-primary);">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <div>
-                                <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(log.nama || 'User')}</b>
-                                <span style="font-size:0.62rem; color:var(--text-sub);"> (NIK: ${log.nik})</span>
-                            </div>
-                            <span style="font-size:0.6rem; color:var(--gold); font-weight:700;">${log.timestamp || ''}</span>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem;">
-                            <span style="background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(log.toko || 'TOKO')}</span>
-                            <span style="color:var(--accent-primary); font-weight:800;">⚡ ${escapeHTML(log.action || log.aksi || 'Aktivitas')}</span>
-                        </div>
-                    </div>
-                `).join("");
-
-                const htmlBox = `
-                    <div class="modal-grid-1" style="font-size:0.78rem;">
-                        <div class="modal-grid-2">
-                            <div class="modal-card-box" style="text-align:center;">
-                                <span style="font-size:0.62rem; color:var(--text-sub);">TOTAL AKTIVITAS</span>
-                                <p style="font-size:1.2rem; font-weight:800; color:var(--accent-primary);">${totalLogs}</p>
-                            </div>
-                            <div class="modal-card-box" style="text-align:center;">
-                                <span style="font-size:0.62rem; color:var(--text-sub);">USER AKTIF</span>
-                                <p style="font-size:1.2rem; font-weight:800; color:var(--gold);">${uniqueUsers} Orang</p>
-                            </div>
-                        </div>
-
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;"><i class="fa-solid fa-list-check"></i> 100 AKTIVITAS TERAKHIR USER</h5>
-                        <div class="modal-grid-1" style="max-height:60vh; overflow-y:auto;">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada log aktivitas.</p>'}</div>
-                    </div>
-                `;
-                showCustomModal("📊 TRACKING LOG AKTIVITAS (NIK: 14125034)", htmlBox);
             });
         }
 
-        function setSurveyRating(stars) {
-            selectedSurveyRating = stars;
-            const container = document.getElementById("starRatingContainer");
-            if (container) {
-                const iconStars = container.querySelectorAll("i");
-                iconStars.forEach((star, idx) => {
-                    if (idx < stars) star.classList.add("active");
-                    else star.classList.remove("active");
-                });
-            }
+        function openJobdeskHarianModal() {
+            renderJobdeskHarianModal();
         }
 
-        // REVISI 3: SURVEY TERCATAT LANGSUNG KE FIREBASE DB
-        async function submitSurveyAction() {
-            const saran = document.getElementById("surveySaranInput").value.trim();
-            showLoading("Mengirimkan Survey...");
-            
-            if (rtdb) {
-                rtdb.ref('surveys').push({
-                    nik: currentNik,
-                    nama: dashboardData?.user?.NAMA || 'User',
-                    toko: dashboardData?.user?.namaToko || '-',
-                    rating: selectedSurveyRating,
-                    saran: saran || "-",
-                    timestamp: new Date().toISOString()
-                });
-            }
-
-            const res = await apiCall("submitSurvey", { rating: selectedSurveyRating, saran: saran || "-" });
-            hideLoading();
-            closeCustomModal();
-            showSwalSuccess("Terima Kasih! 🙏", "Rating dan saran Anda berhasil disimpan!");
+        function getDayNameFromDateStr(dateStr) {
+            const [y, m, d] = dateStr.split('-').map(Number);
+            const dt = new Date(y, m - 1, d);
+            return DAYS_INDONESIA[dt.getDay()];
         }
 
-        function renderCarousel(banners, namaToko) {
-            const wrapper = document.getElementById("carouselWrapper");
-            if (!wrapper) return;
-            if (swiperInstance) swiperInstance.destroy(true, true);
-            if (!banners || banners.length === 0) {
-                wrapper.innerHTML = `<div class="swiper-slide banner-card"><span class="banner-tag">${escapeHTML(namaToko || "PROMO")}</span><h2 class="banner-heading">PIC SAPA</h2><p class="banner-subtext">(SIAP ANTAR PESANAN ANDA)</p></div>`;
-            } else {
-                wrapper.innerHTML = banners.map(b => `<div class="swiper-slide banner-card"><span class="banner-tag">${escapeHTML(b["NAMA TOKO"] || "PROMO")}</span><h2 class="banner-heading">${escapeHTML(b.PIC || "PIC SAPA")}</h2><p class="banner-subtext">${escapeHTML(b.SUBTITLE || "(SIAP ANTAR PESANAN ANDA)")}</p></div>`).join("");
-            }
-            swiperInstance = new Swiper(".mainCarousel", { autoplay: { delay: 4000 }, loop: true, pagination: { el: ".swiper-pagination", clickable: true } });
-        }
-
-        function renderCombinedMenuUtama(sheetUtamaMenus) {
-            const container = document.getElementById("gridMenuUtama");
-            const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
-            
+        function renderJobdeskHarianModal() {
+            const dayName = getDayNameFromDateStr(activeJobdeskDateStr);
             const userCOS = isUserCOS();
             const userAC = isUserAC();
-            const pendingBelanjaCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
 
-            const builtInMenus = [
-                { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
-                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: pendingExpCount },
-                { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
-                { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()", numBadge: pendingBelanjaCount }
-            ];
+            const ym = activeJobdeskDateStr.substring(0,7);
+            const dateRecords = jobdeskStoreData[activeJobdeskDateStr] || { activities: {}, briefings: {} };
 
-            let allUtamaCards = [
-                ...builtInMenus.map(m => `
-                    <div class="menu-3d-item" onclick="${m.action}" style="position:relative;">
-                        ${m.numBadge > 0 ? `<span class="num-badge-pill">${m.numBadge}</span>` : ''}
-                        <div class="icon-box-3d"><img src="${m.icon}"></div>
-                        <span class="menu-label">${m.name}</span>
-                    </div>
-                `),
-                ...(sheetUtamaMenus || []).map(m => `
-                    <div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')">
-                        <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
-                        <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
-                    </div>
-                `)
-            ];
+            // 1. BRIEFINGS RENDER
+            const dayBriefings = BRIEFING_MASTER[dayName] || { 'Shift 1': [], 'Shift 2': [] };
+            let briefingsHtml = ['Shift 1', 'Shift 2'].map(shiftKey => {
+                const points = dayBriefings[shiftKey] || [];
+                const record = dateRecords.briefings?.[shiftKey] || { status: 'PENDING' };
 
-            container.innerHTML = allUtamaCards.slice(0, 8).join("");
-        }
+                let pointsHtml = points.map((p, idx) => `
+                    <li style="display:flex; gap:6px; font-size:0.72rem; color:var(--text-main); margin-bottom:3px;">
+                        <span style="color:var(--accent-primary); font-weight:bold;">${idx + 1}.</span>
+                        <span>${p}</span>
+                    </li>
+                `).join('');
 
-        function getSmart3DIcon(menuName, defaultIcon) {
-            if (defaultIcon && defaultIcon.trim().length > 10) return defaultIcon;
-            return 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png';
-        }
+                let statusBadge = `<span style="font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; background:#f1f5f9; color:#64748b;">Belum</span>`;
+                if (record.status === 'APPROVED') statusBadge = `<span style="font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; background:#d1fae5; color:#047857;">Disetujui</span>`;
+                if (record.status === 'SUBMITTED') statusBadge = `<span style="font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; background:#fef3c7; color:#b45309;">Menunggu Validasi</span>`;
+                if (record.status === 'REJECTED') statusBadge = `<span style="font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; background:#fee2e2; color:#dc2626;">Ditolak</span>`;
 
-        function renderMenuGrid(elementId, items) {
-            let cards = (items || []).map(m => `
-                <div class="menu-3d-item" onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')">
-                    <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
-                    <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
-                </div>
-            `);
-            document.getElementById(elementId).innerHTML = cards.slice(0, 8).join("");
-        }
-
-        async function onMenuClick(namaMenu, link) {
-            triggerAndroidHaptic('light');
-            trackUserActivity(2, "Klik " + namaMenu);
-            if (link && link !== "#") window.open(link, "_blank");
-        }
-
-        // REVISI 1: OPEN PLAN MASTER SHIFT DENGAN AMBIL DATA MASTER_USER KELUAR SEMPURNA
-        async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
-            showLoading("Memuat Jadwal Master Shift...");
-            const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "2J7K";
-            selectedShiftKodeToko = targetKode;
-
-            try {
-                const res = await apiCall("getMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth });
-                if (res && res.shiftData) localShiftMatrix = res.shiftData;
-                else localShiftMatrix = {};
-            } catch(e) {
-                localShiftMatrix = {};
-            } finally {
-                hideLoading();
-                renderPlanMasterShiftModal();
-            }
-        }
-
-        function changeShiftStore(kodeToko) {
-            openPlanMasterShiftModal(kodeToko);
-        }
-
-        function renderPlanMasterShiftModal() {
-            const canEdit = canEditShift();
-            const userAC = isUserAC();
-            const daftarToko = dashboardData?.daftarToko || [];
-            
-            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko || "2J7K";
-
-            let personil = [];
-            if (targetKode === dashboardData?.user?.kodeToko && dashboardData?.struktur?.personilToko) {
-                personil = dashboardData.struktur.personilToko;
-            } else if (dashboardData?.allMasterUsers && Array.isArray(dashboardData.allMasterUsers)) {
-                personil = dashboardData.allMasterUsers.filter(u => u.kodeToko === targetKode);
-            }
-
-            if (!personil || personil.length === 0) {
-                personil = dashboardData?.struktur?.personilToko || [];
-            }
-
-            const [yr, mo] = currentShiftMonth.split("-");
-            const daysInMonth = new Date(parseInt(yr, 10), parseInt(mo, 10), 0).getDate();
-            const dayNamesShort = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
-
-            let shiftHeaderColsHtml = '';
-            for (let d = 1; d <= daysInMonth; d++) {
-                const passed = isDatePassed(currentShiftMonth, d);
-                const dt = new Date(parseInt(yr, 10), parseInt(mo, 10) - 1, d);
-                const dayName = dayNamesShort[dt.getDay()];
-
-                shiftHeaderColsHtml += `
-                    <th style="padding:4px; min-width:38px; text-align:center; font-size:0.6rem; border:1px solid var(--card-border); ${passed ? 'background:#e2e8f0; color:#64748b;' : ''}">
-                        <div>${d}</div>
-                        <div style="font-size:0.52rem; opacity:0.8;">${dayName}</div>
-                    </th>
-                `;
-            }
-
-            let personilRowsHtml = personil.map(p => {
-                let dayCellsHtml = '';
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const shiftCode = localShiftMatrix[p.nik]?.[d] || 'off';
-                    const pillClass = `shift-${shiftCode}`;
-                    const labelTxt = shiftCode.toUpperCase();
-                    const passed = isDatePassed(currentShiftMonth, d);
-
-                    dayCellsHtml += `
-                        <td style="padding:3px; text-align:center; border:1px solid var(--card-border);">
-                            <div class="shift-pill ${pillClass} ${passed ? 'shift-locked' : ''}" 
-                                 onclick="${(canEdit && !passed) ? `openShiftPickerModal('${p.nik}', ${d}, '${shiftCode}')` : (passed ? `showSwalWarning('Tanggal Terkunci 🔒', 'Tanggal ini telah berlalu.')` : `showSwalWarning('Read Only 👁️', 'Mode Lihat Hanya Khusus Area Coordinator.')`)}">
-                                ${labelTxt}
-                            </div>
-                        </td>
-                    `;
+                let actionBtn = '';
+                if (!userAC && (record.status === 'PENDING' || record.status === 'REJECTED')) {
+                    actionBtn = `<button onclick="openJobdeskSubmitModal('BRIEFING', '${shiftKey}')" style="width:100%; margin-top:8px; background:var(--accent-green-grad); color:#fff; font-weight:800; padding:8px; border-radius:8px; border:none; cursor:pointer; font-size:0.72rem;">📷 Upload 1 Foto Briefing ${shiftKey}</button>`;
+                } else if (userCOS && record.status === 'SUBMITTED') {
+                    actionBtn = `<button onclick="openJobdeskValidateModal('BRIEFING', '${shiftKey}')" style="width:100%; margin-top:8px; background:var(--gold); color:#fff; font-weight:800; padding:8px; border-radius:8px; border:none; cursor:pointer; font-size:0.72rem;">🔍 Validasi Briefing ${shiftKey}</button>`;
                 }
-                return `<tr><td style="padding:8px; font-weight:800; border:1px solid var(--card-border); position:sticky; left:0; background:var(--header-bg); z-index:2; min-width:130px;"><div>${escapeHTML(p.nama)}</div><div style="font-size:0.6rem; color:var(--text-sub);">${escapeHTML(p.jabatan)}</div></td>${dayCellsHtml}</tr>`;
+
+                return `
+                    <div class="modal-card-box" style="margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:4px; margin-bottom:6px;">
+                            <span style="font-size:0.75rem; font-weight:800; color:var(--accent-primary);">${shiftKey}</span>
+                            ${statusBadge}
+                        </div>
+                        <ul style="list-style:none; padding:0;">${pointsHtml}</ul>
+                        ${record.rejectionReason ? `<p style="font-size:0.65rem; color:#dc2626; background:#fee2e2; padding:4px; border-radius:6px; margin-top:4px;"><b>Alasan Ditolak:</b> ${escapeHTML(record.rejectionReason)}</p>` : ''}
+                        ${record.photoUrl ? `<div style="margin-top:6px;"><img src="${record.photoUrl}" onclick="showFullImageModal('${record.photoUrl}')" style="width:100%; height:110px; object-fit:cover; border-radius:8px; cursor:pointer;"></div>` : ''}
+                        ${actionBtn}
+                    </div>
+                `;
             }).join("");
 
-            let storeSelectHtml = '';
-            if (userAC && daftarToko.length > 0) {
-                const options = daftarToko.map(t => `<option value="${t.kodeToko}" ${t.kodeToko === targetKode ? 'selected' : ''}>🏪 ${escapeHTML(t.namaToko)} (${t.kodeToko})</option>`).join("");
-                storeSelectHtml = `
-                    <div class="modal-card-box" style="margin-bottom:8px; display:flex; align-items:center; justify-content:space-between;">
-                        <span style="font-size:0.72rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-store"></i> PILIH TOKO (AREA AC):</span>
-                        <select onchange="changeShiftStore(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); font-weight:800; font-size:0.75rem; padding:6px 10px; border-radius:10px;">
-                            ${options}
-                        </select>
+            // 2. DAILY ACTIVITIES RENDER
+            const tasks = DAILY_ACTIVITY_MASTER.filter(t => t.day === dayName);
+            let activitiesHtml = tasks.map(task => {
+                const record = dateRecords.activities?.[task.id] || { status: 'PENDING' };
+
+                let statusBadge = `<span style="font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; background:#f1f5f9; color:#64748b;">Belum</span>`;
+                if (record.status === 'APPROVED') statusBadge = `<span style="font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; background:#d1fae5; color:#047857;">Disetujui</span>`;
+                if (record.status === 'SUBMITTED') statusBadge = `<span style="font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; background:#fef3c7; color:#b45309;">Menunggu Validasi</span>`;
+                if (record.status === 'REJECTED') statusBadge = `<span style="font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; background:#fee2e2; color:#dc2626;">Ditolak</span>`;
+
+                let actionBtn = '';
+                if (!userAC && (record.status === 'PENDING' || record.status === 'REJECTED')) {
+                    actionBtn = `<button onclick="openJobdeskSubmitModal('ACTIVITY', '${task.id}')" style="background:var(--accent-green-grad); color:#fff; font-weight:800; padding:6px 12px; border-radius:6px; border:none; cursor:pointer; font-size:0.68rem;">📷 Upload Bukti</button>`;
+                } else if (userCOS && record.status === 'SUBMITTED') {
+                    actionBtn = `<button onclick="openJobdeskValidateModal('ACTIVITY', '${task.id}')" style="background:var(--gold); color:#fff; font-weight:800; padding:6px 12px; border-radius:6px; border:none; cursor:pointer; font-size:0.68rem;">🔍 Validasi</button>`;
+                }
+
+                return `
+                    <div class="modal-card-box" style="margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <span style="font-size:0.6rem; font-weight:800; color:var(--text-sub);">${task.area}</span>
+                                <h5 style="font-size:0.8rem; font-weight:800; color:var(--text-main); margin-top:2px;">${task.title}</h5>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        ${record.rejectionReason ? `<p style="font-size:0.65rem; color:#dc2626; background:#fee2e2; padding:4px; border-radius:6px; margin-top:4px;"><b>Ditolak:</b> ${escapeHTML(record.rejectionReason)}</p>` : ''}
+                        ${record.photoUrl ? `<div style="margin-top:6px;"><img src="${record.photoUrl}" onclick="showFullImageModal('${record.photoUrl}')" style="width:100%; height:110px; object-fit:cover; border-radius:8px; cursor:pointer;"></div>` : ''}
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; border-top:1px solid var(--card-border); pt-4;">
+                            <span style="font-size:0.6rem; color:var(--text-sub);">${record.submittedBy ? `Oleh: ${record.submittedBy}` : 'Belum dikerjakan'}</span>
+                            <div>${actionBtn}</div>
+                        </div>
                     </div>
                 `;
-            }
+            }).join("");
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
-                    ${storeSelectHtml}
-
-                    <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                        <div>
-                            <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);">📅 PLAN MASTER SHIFT BULANAN</h4>
-                            <p style="font-size:0.68rem; color:var(--text-sub);">Status Mode: <b>${canEdit ? '✏️ EDITOR (Chief / Assistant Chief)' : '👁️ READ ONLY (Area Coordinator)'}</b></p>
+                    <div class="modal-card-box">
+                        <label style="font-size:0.65rem; font-weight:800; color:var(--text-sub); display:block; margin-bottom:4px;">📅 PILIH TANGGAL OPERASIONAL:</label>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                            <input type="date" value="${activeJobdeskDateStr}" onchange="changeJobdeskDate(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.75rem;">
+                            <button onclick="jumpJobdeskDate(-1)" style="background:var(--input-bg); border:1px solid var(--card-border); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.7rem;">◀ Kemarin</button>
+                            <button onclick="setJobdeskToday()" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.7rem;">Hari Ini</button>
+                            <button onclick="jumpJobdeskDate(1)" style="background:var(--input-bg); border:1px solid var(--card-border); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.7rem;">Besok ▶</button>
                         </div>
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <label style="font-weight:700; font-size:0.7rem;">Bulan:</label>
-                            <input type="month" value="${currentShiftMonth}" onchange="changeShiftMonth(this.value)" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:6px; border-radius:8px; outline:none; font-weight:700; font-size:0.75rem;">
-                        </div>
+                        <p style="font-size:0.68rem; font-weight:800; color:var(--accent-primary); margin-top:6px;">Tanggal Aktif: Hari ${dayName}, ${activeJobdeskDateStr}</p>
                     </div>
 
-                    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-                        <span class="shift-pill shift-p">P (Pagi)</span>
-                        <span class="shift-pill shift-s">S (Siang)</span>
-                        <span class="shift-pill shift-m">M (Malam)</span>
-                        <span class="shift-pill shift-ao">AO (Add Off)</span>
-                        <span class="shift-pill shift-off">OFF (Libur)</span>
-                    </div>
+                    <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-bullhorn"></i> MATERI BRIEFING (${dayName})</h5>
+                    ${briefingsHtml}
 
-                    <div style="overflow-x:auto; border:1px solid var(--card-border); border-radius:14px; background:var(--header-bg);">
-                        <table style="width:100%; border-collapse:collapse; text-align:left;">
-                            <thead><tr style="background:var(--input-bg);"><th style="padding:8px; border:1px solid var(--card-border); font-size:0.7rem; position:sticky; left:0; background:var(--input-bg); z-index:3;">Personil Toko</th>${shiftHeaderColsHtml}</tr></thead>
-                            <tbody>${personilRowsHtml || '<tr><td colspan="32" style="text-align:center; padding:12px; color:var(--text-sub);">Personil toko tidak ditemukan.</td></tr>'}</tbody>
-                        </table>
-                    </div>
-
-                    ${canEdit ? `
-                        <div class="modal-grid-3">
-                            <button onclick="openInstantSwapModal()" style="background:#e0e7ff; color:#3730a3; border:1px solid #c7d2fe; font-weight:800; padding:12px; border-radius:12px; cursor:pointer;">🔄 Tukar Instan</button>
-                            <button onclick="autoGenerateMonthlyShift()" style="background:#fef3c7; color:#b45309; border:1px solid #fcd34d; font-weight:800; padding:12px; border-radius:12px; cursor:pointer;">✨ Auto-Generate</button>
-                            <button onclick="saveMonthlyShiftDataAction()" style="background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">💾 SIMPAN SHIFT</button>
-                        </div>
-                    ` : ''}
+                    <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:8px;"><i class="fa-solid fa-broom"></i> DAILY ACTIVITY CHECKLIST (${dayName})</h5>
+                    ${activitiesHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada tugas daily activity hari ini.</p>'}
                 </div>
             `;
-            showCustomModal("Plan Master Shift Toko", htmlBox);
+
+            showCustomModal("🧹 JOBDESK HARIAN TOKO", htmlBox);
         }
 
-        function openShiftPickerModal(nik, dayNum, currentCode) {
-            triggerAndroidHaptic('light');
+        function changeJobdeskDate(val) {
+            if (val) {
+                activeJobdeskDateStr = val;
+                renderJobdeskHarianModal();
+            }
+        }
+
+        function jumpJobdeskDate(offset) {
+            const [y, m, d] = activeJobdeskDateStr.split('-').map(Number);
+            const dt = new Date(y, m - 1, d + offset);
+            activeJobdeskDateStr = dt.toISOString().split('T')[0];
+            renderJobdeskHarianModal();
+        }
+
+        function setJobdeskToday() {
+            activeJobdeskDateStr = new Date().toISOString().split('T')[0];
+            renderJobdeskHarianModal();
+        }
+
+        function openJobdeskSubmitModal(type, key) {
+            activeJobdeskModalTarget = { type, key };
+            jobdeskUploadedPhoto = "";
+
             Swal.fire({
-                title: `Pilih Shift (Tgl ${dayNum})`,
-                input: 'select',
-                inputOptions: { 'p': 'P - Shift Pagi', 's': 'S - Shift Siang', 'm': 'M - Shift Malam', 'ao': 'AO - Add Off', 'off': 'OFF - Libur' },
-                inputValue: currentCode,
+                title: `Upload Bukti Foto (${key})`,
+                html: `
+                    <div style="text-align:left; font-size:0.78rem;">
+                        <label style="font-weight:700; display:block; margin-bottom:4px;">Pilih Foto Kamera Bukti Physical *</label>
+                        <input type="file" accept="image/*" id="jobdeskPhotoFileInput" onchange="handleJobdeskPhotoChange(event)" style="width:100%; background:var(--input-bg); padding:6px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:10px;">
+                        <textarea id="jobdeskNoteInput" placeholder="Catatan opsional..." style="width:100%; height:50px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; padding:6px; font-size:0.75rem;"></textarea>
+                    </div>
+                `,
                 showCancelButton: true,
-                confirmButtonText: 'Terapkan',
+                confirmButtonText: '🚀 Kirim Laporan',
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            }).then((result) => {
-                if (result.isConfirmed && result.value) {
-                    if (!localShiftMatrix[nik]) localShiftMatrix[nik] = {};
-                    localShiftMatrix[nik][dayNum] = result.value;
-                    renderPlanMasterShiftModal();
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    confirmJobdeskSubmit();
                 }
             });
         }
 
-        function openInstantSwapModal() {
-            triggerAndroidHaptic('medium');
-            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
-            let personil = [];
-            if (dashboardData?.allMasterUsers) personil = dashboardData.allMasterUsers.filter(u => u.kodeToko === targetKode);
-            if (personil.length === 0) personil = dashboardData?.struktur?.personilToko || [];
-
-            if (personil.length < 2) { showSwalWarning('Data Kurang', 'Minimal harus ada 2 personil toko.'); return; }
-
-            const personilOptions = personil.map(p => `<option value="${p.nik}">${escapeHTML(p.nama)} (${p.jabatan})</option>`).join("");
-
-            const htmlContent = `
-                <div class="modal-grid-1" style="font-size:0.78rem;">
-                    <div class="modal-card-box">
-                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Pilih Karyawan Pertama (A):</label>
-                        <select id="swapNikA" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:10px;">
-                            ${personilOptions}
-                        </select>
-
-                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Pilih Karyawan Kedua (B):</label>
-                        <select id="swapNikB" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:10px;">
-                            ${personilOptions}
-                        </select>
-
-                        <label style="font-weight:700; color:var(--text-main); display:block; margin-bottom:4px;">Tanggal Penukaran (Hari Ke-):</label>
-                        <input type="number" id="swapDayNum" min="1" max="31" value="${new Date().getDate()}" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); border-radius:10px; padding:10px; margin-bottom:14px;">
-
-                        <button onclick="executeInstantSwapAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">
-                            🔄 PROSES TUKAR INSTAN NOW
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            showCustomModal("🔄 Tukar Shift Instan", htmlContent);
+        function handleJobdeskPhotoChange(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => { jobdeskUploadedPhoto = reader.result; };
+                reader.readAsDataURL(file);
+            }
         }
 
-        function executeInstantSwapAction() {
-            const nikA = document.getElementById("swapNikA").value;
-            const nikB = document.getElementById("swapNikB").value;
-            const dayNum = parseInt(document.getElementById("swapDayNum").value, 10);
-
-            if (nikA === nikB) {
-                showSwalWarning('Error Swap', 'Pilih dua karyawan yang berbeda untuk ditukar!');
+        function confirmJobdeskSubmit() {
+            if (!jobdeskUploadedPhoto) {
+                showSwalWarning('Foto Wajib ⚠️', 'Mohon lampirkan foto bukti pengerjaan!');
                 return;
             }
 
-            if (!localShiftMatrix[nikA]) localShiftMatrix[nikA] = {};
-            if (!localShiftMatrix[nikB]) localShiftMatrix[nikB] = {};
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+            const ym = activeJobdeskDateStr.substring(0,7);
+            const notes = document.getElementById("jobdeskNoteInput")?.value || "";
 
-            const shiftA = localShiftMatrix[nikA][dayNum] || 'off';
-            const shiftB = localShiftMatrix[nikB][dayNum] || 'off';
+            const record = {
+                status: 'SUBMITTED',
+                photoUrl: jobdeskUploadedPhoto,
+                notes: notes,
+                submittedBy: `${dashboardData?.user?.NAMA || 'Staff'} (${dashboardData?.user?.JABATAN || 'Crew'})`,
+                submittedAt: new Date().toLocaleTimeString('id-ID'),
+                rejectionReason: null
+            };
 
-            localShiftMatrix[nikA][dayNum] = shiftB;
-            localShiftMatrix[nikB][dayNum] = shiftA;
+            const path = activeJobdeskModalTarget.type === 'BRIEFING' 
+                ? `jobdesk_harian/${kodeToko}/${ym}/${activeJobdeskDateStr}/briefings/${activeJobdeskModalTarget.key}`
+                : `jobdesk_harian/${kodeToko}/${ym}/${activeJobdeskDateStr}/activities/${activeJobdeskModalTarget.key}`;
 
-            closeCustomModal();
-            renderPlanMasterShiftModal();
-            showSwalSuccess('Swap Berhasil 🔄', `Berhasil menukar shift Tgl ${dayNum} antara kedua karyawan!`);
+            if (rtdb) {
+                rtdb.ref(path).set(record);
+            }
+
+            trackUserActivity(5, "Submit Jobdesk " + activeJobdeskModalTarget.key);
+            renderJobdeskHarianModal();
+            showSwalSuccess('Laporan Terkirim 🚀', 'Tugas dikirim untuk divalidasi atasan!');
         }
 
-        function changeShiftMonth(val) { currentShiftMonth = val; openPlanMasterShiftModal(); }
+        function openJobdeskValidateModal(type, key) {
+            activeJobdeskModalTarget = { type, key };
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+            const ym = activeJobdeskDateStr.substring(0,7);
+            const dateRecords = jobdeskStoreData[activeJobdeskDateStr] || {};
+            const record = type === 'BRIEFING' ? dateRecords.briefings?.[key] : dateRecords.activities?.[key];
 
-        function autoGenerateMonthlyShift() {
-            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
-            let personil = [];
-            if (dashboardData?.allMasterUsers) personil = dashboardData.allMasterUsers.filter(u => u.kodeToko === targetKode);
-            if (personil.length === 0) personil = dashboardData?.struktur?.personilToko || [];
+            if (!record) return;
 
-            const [yr, mo] = currentShiftMonth.split("-");
-            const daysInMonth = new Date(parseInt(yr, 10), parseInt(mo, 10), 0).getDate();
-            const shifts = ['p', 's', 'm', 'ao'];
-
-            personil.forEach((p, pIdx) => {
-                localShiftMatrix[p.nik] = {};
-                for (let d = 1; d <= daysInMonth; d++) {
-                    localShiftMatrix[p.nik][d] = (d % 6 === 0) ? 'off' : shifts[(pIdx + d) % shifts.length];
+            Swal.fire({
+                title: `Validasi Laporan (${key})`,
+                html: `
+                    <div style="text-align:left; font-size:0.78rem;">
+                        <img src="${record.photoUrl}" style="width:100%; height:130px; object-fit:cover; border-radius:8px; margin-bottom:8px;">
+                        <p style="font-size:0.7rem; color:var(--text-sub); margin-bottom:6px;">Catatan Staff: "${escapeHTML(record.notes || '-')}"</p>
+                        <input type="text" id="jobdeskRejectionReasonInput" placeholder="Alasan penolakan (wajib jika menolak)..." style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                    </div>
+                `,
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: '✅ Setujui (Approve)',
+                denyButtonText: '❌ Tolak (Reject)',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    confirmJobdeskValidation('APPROVED');
+                } else if (res.isDenied) {
+                    confirmJobdeskValidation('REJECTED');
                 }
             });
-            renderPlanMasterShiftModal();
-            showSwalSuccess('Jadwal Digenerate ✨', 'Jadwal shift bulanan berhasil disusun!');
         }
 
-        async function saveMonthlyShiftDataAction() {
-            showLoading("Menyimpan Master Shift...");
-            const targetKode = selectedShiftKodeToko || dashboardData?.user?.kodeToko;
-            const jsonStr = JSON.stringify(localShiftMatrix);
-            const res = await apiCall("saveMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth, shiftDataJson: jsonStr });
-            hideLoading();
-            if (res && res.status === "success") {
-                trackUserActivity(10, "Simpan Master Shift");
-                showSwalSuccess('Berhasil Disimpan 💾', 'Data Shift Toko Berhasil Disimpan!');
+        function confirmJobdeskValidation(newStatus) {
+            const reason = document.getElementById("jobdeskRejectionReasonInput")?.value || "";
+            if (newStatus === 'REJECTED' && !reason.trim()) {
+                showSwalWarning('Alasan Wajib ⚠️', 'Mohon isi alasan penolakan!');
+                return;
             }
+
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+            const ym = activeJobdeskDateStr.substring(0,7);
+            const path = activeJobdeskModalTarget.type === 'BRIEFING' 
+                ? `jobdesk_harian/${kodeToko}/${ym}/${activeJobdeskDateStr}/briefings/${activeJobdeskModalTarget.key}`
+                : `jobdesk_harian/${kodeToko}/${ym}/${activeJobdeskDateStr}/activities/${activeJobdeskModalTarget.key}`;
+
+            if (rtdb) {
+                rtdb.ref(path).update({
+                    status: newStatus,
+                    rejectionReason: newStatus === 'REJECTED' ? reason : null,
+                    verifiedBy: `${dashboardData?.user?.NAMA || 'COS'} (${dashboardData?.user?.JABATAN || 'Chief'})`
+                });
+            }
+
+            renderJobdeskHarianModal();
+            showSwalSuccess('Validasi Disimpan', `Status tugas diubah menjadi: ${newStatus}`);
         }
 
+        // REVISI 3: MANAJEMEN RAK RESTRIKSI KHUSUS CHIEF OF STORE & FOTO BU KTI
         function openCeklisExpiredModal() { renderCeklisExpiredModal('rak'); }
 
         function renderCeklisExpiredModal(activeTab = 'rak') {
@@ -1682,6 +1745,7 @@
             const selesaiRak = expShelves.filter(s => s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr).length;
             const belumRak = totalRak - selesaiRak;
 
+            const userCOS = isUserCOS();
             const userAC = isUserAC();
             const daftarToko = dashboardData?.daftarToko || [];
 
@@ -1693,7 +1757,7 @@
                 let rakListCards = expShelves.map(s => {
                     const isDone = s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr;
                     return `
-                        <div class="modal-card-box" style="border-left: 4px solid ${isDone ? '#10b981' : '#f59e0b'};">
+                        <div class="modal-card-box" style="border-left: 4px solid ${isDone ? '#10b981' : '#f59e0b'}; margin-bottom:8px;">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                                 <div>
                                     <h4 style="font-weight:800; font-size:0.9rem; color:var(--text-main);">${escapeHTML(s.name)}</h4>
@@ -1706,15 +1770,45 @@
                                     <span style="font-size:0.65rem; padding:3px 8px; border-radius:6px; font-weight:800; ${isDone ? 'background:#d1fae5; color:#047857;' : 'background:#fef3c7; color:#b45309;'}">
                                         ${isDone ? '✅ Selesai' : '⏳ Pending'}
                                     </span>
-                                    <button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:2px 6px; border-radius:6px; font-size:0.6rem; cursor:pointer;">Hapus</button>
+                                    ${userCOS ? `<button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:2px 6px; border-radius:6px; font-size:0.6rem; cursor:pointer;">Hapus</button>` : ''}
                                 </div>
                             </div>
-                            <button onclick="markShelfCheckAction('${s.id}')" style="margin-top:10px; width:100%; background:${isDone ? '#ffffff' : 'var(--accent-green-grad)'}; color:${isDone ? '#047857' : '#ffffff'}; border:${isDone ? '1px solid #10b981' : 'none'}; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
-                                ${isDone ? 'Update Ceklis Ulang' : 'Tandai Selesai Dikerjakan'}
+
+                            ${s.photoUrl ? `<img src="${s.photoUrl}" onclick="showFullImageModal('${s.photoUrl}')" style="width:100%; height:90px; object-fit:cover; border-radius:8px; margin-top:6px; cursor:pointer;">` : ''}
+
+                            <button onclick="openCheckShelfModal('${s.id}')" style="margin-top:8px; width:100%; background:${isDone ? 'var(--input-bg)' : 'var(--accent-green-grad)'}; color:${isDone ? 'var(--accent-primary)' : '#ffffff'}; border:${isDone ? '1px solid var(--card-border)' : 'none'}; padding:8px; border-radius:10px; font-weight:800; cursor:pointer; font-size:0.72rem;">
+                                ${isDone ? '📷 Update Foto / Ceklis Ulang' : '📷 Unggah Foto Kondisi Rak & Tandai Selesai'}
                             </button>
                         </div>
                     `;
                 }).join("");
+
+                // HANYA CHIEF OF STORE (COS) YANG BISA TAMBAH RAK & AUTO GENERATE DELEGASI
+                let cosManagementFormHtml = '';
+                if (userCOS) {
+                    cosManagementFormHtml = `
+                        <div class="modal-card-box" style="margin-bottom:8px;">
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK (KHUSUS CHIEF OF STORE)</h5>
+                            <div class="modal-grid-2" style="margin-bottom:8px;">
+                                <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                            </div>
+                            <div class="modal-grid-2" style="margin-bottom:10px;">
+                                <select id="addCatRakInput" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                    <option value="Makanan">Makanan</option>
+                                    <option value="Minuman">Minuman</option>
+                                    <option value="Kosmetik">Kosmetik</option>
+                                    <option value="Kebutuhan">Non-Food</option>
+                                </select>
+                                <button onclick="addShelfManualAction()" style="background:var(--accent-green-grad); color:#fff; font-weight:800; padding:8px; border-radius:8px; border:none; cursor:pointer;">+ Tambah Rak</button>
+                            </div>
+                        </div>
+
+                        <button onclick="autoGenerateShelvesByPersonnel()" style="background:var(--gold); color:#ffffff; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer; width:100%; margin-bottom:10px; font-size:0.72rem;">
+                            ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Personil)
+                        </button>
+                    `;
+                }
 
                 tabContentHtml = `
                     <div class="modal-grid-3">
@@ -1723,28 +1817,9 @@
                         <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">PENDING</span><p style="font-size:1.1rem; font-weight:800; color:#f59e0b;">${belumRak}</p></div>
                     </div>
 
-                    <div class="modal-card-box">
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK</h5>
-                        <div class="modal-grid-2" style="margin-bottom:8px;">
-                            <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
-                            <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
-                        </div>
-                        <div class="modal-grid-2" style="margin-bottom:10px;">
-                            <select id="addCatRakInput" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
-                                <option value="Makanan">Makanan</option>
-                                <option value="Minuman">Minuman</option>
-                                <option value="Kosmetik">Kosmetik</option>
-                                <option value="Kebutuhan">Non-Food</option>
-                            </select>
-                            <button onclick="addShelfManualAction()" style="background:var(--accent-green-grad); color:#fff; font-weight:800; padding:8px; border-radius:8px; border:none; cursor:pointer;">+ Tambah Rak</button>
-                        </div>
-                    </div>
+                    ${cosManagementFormHtml}
 
-                    <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer; width:100%;">
-                        ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Personil)
-                    </button>
-
-                    <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada rak.</p>'}</div>
+                    <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada rak terdaftar.</p>'}</div>
                 `;
             } else if (activeTab === 'input') {
                 const shelfOptionsHtml = expShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
@@ -1769,71 +1844,39 @@
                     </div>
                 `;
             } else if (activeTab === 'alert') {
-                if (userAC && daftarToko.length > 0) {
-                    const storeExpCards = daftarToko.map(toko => {
-                        const storeItems = expProducts.filter(p => p.kodeToko === toko.kodeToko);
-                        const pendingCount = storeItems.filter(p => p.status !== 'selesai').length;
-                        const doneCount = storeItems.filter(p => p.status === 'selesai').length;
-
-                        return `
-                            <div class="modal-card-box" onclick="viewStoreExpDetail('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid ${pendingCount > 0 ? '#ef4444' : '#10b981'};" title="Klik untuk lihat rincian produk">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <div>
-                                        <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
-                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">
-                                            Status: <b style="color:#10b981;">${doneCount} Dieksekusi</b> | <b style="color:#ef4444;">${pendingCount} Belum</b>
-                                        </p>
-                                    </div>
-                                    <div style="display:flex; align-items:center; gap:6px;">
-                                        ${pendingCount > 0 ? `<span style="background:#ef4444; color:#fff; font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:10px;">${pendingCount} Harus Dieksekusi</span>` : `<span style="background:#d1fae5; color:#047857; font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:10px;">Aman ✅</span>`}
-                                        <span style="font-size:0.6rem; color:var(--gold);">Detail ➔</span>
-                                    </div>
+                let alertListHtml = expProducts.map(p => {
+                    const shelf = expShelves.find(s => s.id === p.shelfId);
+                    const isDone = p.status === 'selesai';
+                    return `
+                        <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
+                                    <span style="font-size:0.58rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(p.namaToko || p.kodeToko || 'TOKO')}</span>
                                 </div>
+                                <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
                             </div>
-                        `;
-                    }).join("");
-
-                    tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO (AREA COORDINATOR)</h5>
-                        <div class="modal-grid-1">${storeExpCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada data toko.</p>'}</div>
+                            <div style="display:flex; gap:6px;">
+                                ${!isDone ? `
+                                    <button onclick="markExpProductHandled('${p.id}')" style="background:#d1fae5; color:#047857; border:1px solid var(--accent-primary); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                        ✅ Konfirmasi
+                                    </button>
+                                ` : `
+                                    <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
+                                    ${userCOS ? `<button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">🗑️ Hapus</button>` : ''}
+                                `}
+                            </div>
+                        </div>
                     `;
-                } else {
-                    let alertListHtml = expProducts.map(p => {
-                        const shelf = expShelves.find(s => s.id === p.shelfId);
-                        const isDone = p.status === 'selesai';
-                        return `
-                            <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <div style="display:flex; align-items:center; gap:6px;">
-                                        <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
-                                        <span style="font-size:0.58rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(p.namaToko || p.kodeToko || 'TOKO')}</span>
-                                    </div>
-                                    <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
-                                </div>
-                                <div style="display:flex; gap:6px;">
-                                    ${!isDone ? `
-                                        <button onclick="markExpProductHandled('${p.id}')" style="background:#d1fae5; color:#047857; border:1px solid var(--accent-primary); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                            ✅ Konfirmasi
-                                        </button>
-                                    ` : `
-                                        <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
-                                        <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                            🗑️ Hapus
-                                        </button>
-                                    `}
-                                </div>
-                            </div>
-                        `;
-                    }).join("");
+                }).join("");
 
-                    tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
-                }
+                tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
             }
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     <div style="display:flex; gap:6px;">
-                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Manajemen & Setting Rak</button>
+                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Setting & Ceklis Rak</button>
                         <button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderCeklisExpiredModal('input')">➕ Input Produk</button>
                         <button class="sub-tab-btn ${activeTab==='alert'?'active':''}" onclick="renderCeklisExpiredModal('alert')">
                             🔔 Alert Expired ${pendingExpCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingExpCount}</span>` : ''}
@@ -1845,31 +1888,53 @@
             showCustomModal("⚠️ CEKLIS EXP & MANAJEMEN RAK", htmlBox);
         }
 
-        function viewStoreExpDetail(kodeToko, namaToko) {
-            triggerAndroidHaptic('light');
-            const storeItems = expProducts.filter(p => p.kodeToko === kodeToko);
-
-            let html = storeItems.map(p => {
-                const isDone = p.status === 'selesai';
-                return `
-                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(p.name)}</p>
-                            <p style="font-size:0.62rem; color:var(--text-sub);">Exp: <b style="color:#ef4444;">${p.expDate}</b> | Penginput: ${escapeHTML(p.addedBy || 'Staff')}</p>
-                        </div>
-                        <span style="font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; ${isDone ? 'background:#d1fae5; color:#047857;' : 'background:#fee2e2; color:#dc2626;'}">
-                            ${isDone ? '✅ Sudah Dieksekusi' : '⚠️ Belum Dieksekusi'}
-                        </span>
-                    </div>
-                `;
-            }).join("");
-
+        // UNGGAH FOTO CEKLIS KONDISI RAK
+        function openCheckShelfModal(shelfId) {
+            let photoData = "";
             Swal.fire({
-                title: `Detail Expired: ${namaToko}`,
-                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Tidak ada catatan produk expired di toko ini.</p>`,
-                confirmButtonText: 'Tutup',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+                title: 'Unggah Foto Kondisi Rak',
+                html: `
+                    <div style="text-align:left; font-size:0.78rem;">
+                        <label style="font-weight:700; display:block; margin-bottom:4px;">Pilih Foto Bukti Kebersihan/Kondisi Rak *</label>
+                        <input type="file" accept="image/*" id="shelfPhotoInput" style="width:100%; background:var(--input-bg); padding:6px; border-radius:8px; border:1px solid var(--card-border);">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '✅ Tandai Selesai',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' },
+                preConfirm: () => {
+                    const fileInput = document.getElementById("shelfPhotoInput");
+                    const file = fileInput.files[0];
+                    if (!file) {
+                        Swal.showValidationMessage("Wajib mengunggah foto kondisi rak!");
+                        return false;
+                    }
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(file);
+                    });
+                }
+            }).then((res) => {
+                if (res.isConfirmed && res.value) {
+                    markShelfCheckAction(shelfId, res.value);
+                }
             });
+        }
+
+        function markShelfCheckAction(shelfId, photoUrl = '') {
+            const shelf = expShelves.find(s => s.id === shelfId);
+            if (shelf && rtdb) {
+                const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+                shelf.lastChecked = new Date().toISOString();
+                shelf.checkedBy = dashboardData?.user?.NAMA || 'User';
+                if (photoUrl) shelf.photoUrl = photoUrl;
+
+                rtdb.ref(`ceklis_expired/${kodeToko}/shelves/${shelfId}`).set(shelf);
+                trackUserActivity(5, "Ceklis Rak " + shelf.name);
+                renderCeklisExpiredModal('rak');
+                showSwalSuccess('Ceklis Diperbarui ✅', `Rak ${shelf.name} ditandai selesai!`);
+            }
         }
 
         function addShelfManualAction() {
@@ -1879,8 +1944,10 @@
 
             if (!name) { showSwalWarning('Form Kosong', 'Mohon masukkan nama rak!'); return; }
 
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+            const id = 'shelf_' + Date.now();
             const newShelf = {
-                id: 'shelf_' + Date.now(),
+                id: id,
                 noRak: noRak || 'R-0' + (expShelves.length + 1),
                 name: name,
                 category: cat,
@@ -1890,21 +1957,27 @@
                 checkedBy: null
             };
 
-            expShelves.push(newShelf);
-            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+            if (rtdb) {
+                rtdb.ref(`ceklis_expired/${kodeToko}/shelves/${id}`).set(newShelf);
+            }
+
             renderCeklisExpiredModal('rak');
             showSwalSuccess('Rak Ditambahkan 📦', 'Rak baru berhasil dibuat!');
         }
 
         function deleteShelfAction(id) {
-            expShelves = expShelves.filter(s => s.id !== id);
-            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+            if (rtdb) {
+                rtdb.ref(`ceklis_expired/${kodeToko}/shelves/${id}`).remove();
+            }
             renderCeklisExpiredModal('rak');
         }
 
         function deleteExpProductAction(id) {
-            expProducts = expProducts.filter(p => p.id !== id);
-            localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+            if (rtdb) {
+                rtdb.ref(`ceklis_expired/${kodeToko}/products/${id}`).remove();
+            }
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Item Dihapus 🗑️', 'Item alert expired berhasil dihapus!');
         }
@@ -1913,6 +1986,7 @@
             const personil = dashboardData?.struktur?.personilToko || [];
             if (personil.length === 0) { showSwalWarning('Data Kosong', 'Tidak ada personil toko ditemukan.'); return; }
 
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
             if (expShelves.length === 0) {
                 expShelves = [
                     { id: 'shelf_1', noRak: 'R-01', name: 'Rak Snack A1', category: 'Makanan' },
@@ -1926,23 +2000,13 @@
                 const assignedUser = personil[idx % personil.length];
                 shelf.assignedNik = assignedUser.nik;
                 shelf.assignedName = assignedUser.nama;
+                if (rtdb) {
+                    rtdb.ref(`ceklis_expired/${kodeToko}/shelves/${shelf.id}`).set(shelf);
+                }
             });
 
-            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
             renderCeklisExpiredModal('rak');
             showSwalSuccess('Delegasi Rak Berhasil ✨', `Berhasil membagi ${expShelves.length} Rak kepada ${personil.length} Personil Toko!`);
-        }
-
-        function markShelfCheckAction(shelfId) {
-            const shelf = expShelves.find(s => s.id === shelfId);
-            if (shelf) {
-                shelf.lastChecked = new Date().toISOString();
-                shelf.checkedBy = dashboardData?.user?.NAMA || 'User';
-                localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
-                trackUserActivity(5, "Ceklis Rak " + shelf.name);
-                renderCeklisExpiredModal('rak');
-                showSwalSuccess('Ceklis Diperbarui ✅', `Rak ${shelf.name} ditandai selesai!`);
-            }
         }
 
         function saveExpProductAction() {
@@ -1952,31 +2016,35 @@
 
             if (!shelfId || !name || !expDate) { showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi semua data.'); return; }
 
-            expProducts.push({
-                id: 'prod_' + Date.now(),
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+            const id = 'prod_' + Date.now();
+            const prodObj = {
+                id: id,
                 name,
                 shelfId,
                 expDate,
                 addedBy: dashboardData?.user?.NAMA || 'User',
                 status: 'pending',
-                kodeToko: dashboardData?.user?.kodeToko || 'TOKO',
+                kodeToko: kodeToko,
                 namaToko: dashboardData?.user?.namaToko || 'Toko'
-            });
+            };
 
-            localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
+            if (rtdb) {
+                rtdb.ref(`ceklis_expired/${kodeToko}/products/${id}`).set(prodObj);
+            }
+
             trackUserActivity(5, "Catat Produk Expired");
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Tersimpan 📦', 'Produk Expired berhasil dicatat!');
         }
 
         function markExpProductHandled(prodId) {
-            const p = expProducts.find(item => item.id === prodId);
-            if (p) {
-                p.status = 'selesai';
-                localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
-                renderCeklisExpiredModal('alert');
-                showSwalSuccess('Selesai ✅', 'Penanganan produk expired dicatat!');
+            const kodeToko = dashboardData?.user?.kodeToko || '2J7K';
+            if (rtdb) {
+                rtdb.ref(`ceklis_expired/${kodeToko}/products/${prodId}/status`).set('selesai');
             }
+            renderCeklisExpiredModal('alert');
+            showSwalSuccess('Selesai ✅', 'Penanganan produk expired dicatat!');
         }
 
         function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
@@ -2040,7 +2108,6 @@
             renderBelanjaKaryawanModal('resume');
         }
 
-        // REVISI 2: TAB VALIDASI STRUK DAN APPROVAL LANGSUNG KE FIREBASE RTDB
         function renderBelanjaKaryawanModal(activeTab = 'input') {
             const cycle = getBelanjaCutoffCycle();
             
@@ -2219,7 +2286,7 @@
 
                     resumeTokoSectionHtml = `
                         ${acSummaryBoxesHtml}
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;">🏪 REKAP SALES PER-TOKO (AREA COORDINATOR)</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;">🏪 REKAP SALES PER-TOKO</h5>
                         <div class="modal-grid-1">${storeCards}</div>
                     `;
                 } else {
@@ -2284,7 +2351,7 @@
                         </div>
 
                         <div class="mtd-summary-card">
-                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN AREA</span>
+                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">💰 TOTAL SALES BELANJA KARYAWAN</span>
                             <div class="mtd-amount-hero">Rp ${totalNominalSales.toLocaleString('id-ID')}</div>
                             <p style="font-size:0.62rem; color:var(--text-sub); margin-top:4px;">Rentang Filter: ${belanjaFilterStart} s/d ${belanjaFilterEnd}</p>
                         </div>
@@ -2370,7 +2437,7 @@
         function showFullImageModal(imgUrl) {
             Swal.fire({
                 imageUrl: imgUrl,
-                imageAlt: 'Foto Struk Belanja',
+                imageAlt: 'Foto Bukti',
                 showCloseButton: true,
                 confirmButtonText: '✖ Tutup Preview Gambar',
                 allowOutsideClick: false,
@@ -2378,7 +2445,6 @@
             });
         }
 
-        // REVISI 2: SUBMIT BELANJA DENGAN PENYIMPANAN DI FIREBASE DB REALTIME
         function submitBelanjaTransactionAction() {
             const noBon = document.getElementById("belanjaNoBonVal").value.trim();
             const noMember = document.getElementById("belanjaNoMemberVal").value.trim();
@@ -2408,7 +2474,6 @@
                 namaToko: dashboardData?.user?.namaToko || 'Toko'
             };
 
-            // SIMPAN LANGSUNG KE FIREBASE RTDB
             if (rtdb) {
                 rtdb.ref('belanja_karyawan/' + txId).set(newTx);
             }
@@ -2423,7 +2488,6 @@
             const nowStr = new Date().toLocaleString('id-ID');
             const approverName = `${dashboardData?.user?.NAMA || 'User'} (${dashboardData?.user?.JABATAN || 'Atasan'})`;
 
-            // UPDATE STATUS DI FIREBASE RTDB
             if (rtdb) {
                 rtdb.ref('belanja_karyawan/' + id).update({
                     status: newStatus,
@@ -2686,7 +2750,6 @@
             }, 100);
         }
 
-        // REVISI 4: MODAL SERAH TERIMA SHIFT DENGAN RIWAYAT LENGKAP & FIREBASE RTDB
         function openSerahTerimaModal() {
             showCustomModal("🔄 SERAH TERIMA SHIFT KERJA", `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
@@ -2736,7 +2799,6 @@
             `);
         }
 
-        // REVISI 4: RIWAYAT SHIFT HANDOVER (OTOMATIS TERCATAT DAN DAPAT DICEK KEMBALI)
         function openShiftHandoverHistoryModal() {
             triggerAndroidHaptic('light');
             const ym = getCurrentMonthKey();
@@ -3238,9 +3300,15 @@
 
             if (tabName === "leaderboard") loadLeaderboard();
             if (tabName === "aksiCepat") loadMisi();
-            if (tabName === "chat") initFirebaseRealtimeChat();
+            if (tabName === "chat") {
+                initFirebaseRealtimeChat();
+                lastSeenChatCount = totalChatCount;
+                localStorage.setItem("last_seen_chat_count", lastSeenChatCount);
+                updateChatBadgeUI(0);
+            }
         }
 
+        // REVISI 1: RESET TOTAL SHIFT CACHE & STATES SAAT LOGOUT
         function handleLogout() {
             Swal.fire({
                 title: 'Konfirmasi Logout',
@@ -3255,11 +3323,16 @@
                     localStorage.clear();
                     currentNik = "";
                     dashboardData = null;
+
+                    // CLEAR SHIFT CACHE & USER STATES
                     localShiftMatrix = {};
+                    selectedShiftKodeToko = null;
                     cachedChatList = [];
                     belanjaTransactions = [];
                     expProducts = [];
                     expShelves = [];
+                    jobdeskStoreData = {};
+                    handoverCheckDoneThisSession = false;
 
                     document.getElementById("appSection").classList.add("hidden");
                     document.getElementById("loginSection").classList.remove("hidden");
