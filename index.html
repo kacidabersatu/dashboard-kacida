@@ -99,7 +99,7 @@
 
         .container { margin-top: 12px; width: 100%; }
 
-        /* DESAIN MEWAH 3D RUNNING TEXT BAR */
+        /* RUNNING TEXT BAR 3D */
         .running-text-container {
             width: 100%; max-width: 600px;
             background: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%);
@@ -145,7 +145,7 @@
         .metric-value { font-size: clamp(0.78rem, 3vw, 0.9rem); font-weight: 800; color: var(--text-main); }
         .red-dot-badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; }
 
-        .num-badge-pill { position: absolute; top: -2px; right: -2px; background: #ef4444; color: #ffffff; font-size: 0.58rem; font-weight: 800; padding: 1px 6px; border-radius: 10px; border: 1px solid #ffffff; }
+        .num-badge-pill { position: absolute; top: -2px; right: -2px; background: #ef4444; color: #ffffff; font-size: 0.58rem; font-weight: 800; padding: 1px 6px; border-radius: 10px; border: 1px solid #ffffff; z-index: 5; }
 
         .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .section-title { font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 6px; color: var(--text-main); }
@@ -296,7 +296,6 @@
         
         <header class="app-header">
             <div class="header-left">
-                <!-- REVISI 3: HAMBURGER BUTTON -->
                 <button class="btn-hamburger" onclick="openMenuSidebar()" title="Pengaturan & Konfigurasi Aplikasi"><i class="fa-solid fa-bars"></i></button>
                 <div class="brand-title">
                     <div>
@@ -321,7 +320,7 @@
             </div>
         </header>
 
-        <!-- REVISI 5: RUNNING TEXT 3D MARQUEE TANPA LABEL TOKO -->
+        <!-- RUNNING TEXT MARQUEE -->
         <div id="runningTextHeaderBar" class="running-text-container hidden">
             <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap;">🔥 INFO SUPERVISI</span>
             <marquee id="marqueeTextContent" scrollamount="6" style="flex:1;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
@@ -488,7 +487,10 @@
 
         <nav class="bottom-nav">
             <a href="#" onclick="switchTab('beranda')" id="navBeranda" class="nav-item active"><i class="fa-solid fa-house"></i><span>Beranda</span></a>
-            <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item"><i class="fa-solid fa-comment-dots"></i><span>Chat</span></a>
+            <a href="#" onclick="switchTab('chat')" id="navChat" class="nav-item">
+                <span id="chatNavBadge" class="num-badge-pill hidden">0</span>
+                <i class="fa-solid fa-comment-dots"></i><span>Chat</span>
+            </a>
             <div class="fab-rocket" onclick="switchTab('aksiCepat')"><i class="fa-solid fa-rocket"></i></div>
             <a href="#" onclick="switchTab('leaderboard')" id="navLeaderboard" class="nav-item"><i class="fa-solid fa-crown"></i><span>Leaderboard</span></a>
             <a href="#" onclick="switchTab('profil')" id="navProfil" class="nav-item"><i class="fa-solid fa-user"></i><span>Profil</span></a>
@@ -496,7 +498,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDjmieO6ffn3YoFzHaLAVSi5wGSoy2oGH-nLGQ2eRW37-hbYfcOsR7k5xLzgKideE/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbyxukm_kh0oL1ATU-67U2XiA7uoLpk61Hl4vN-3Uit6rMMFywe3tl7QDh3y8lxxjH/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -515,6 +517,7 @@
 
         let currentNik = localStorage.getItem("NIK_KACIDA") || "";
         let currentTheme = localStorage.getItem("KACIDA_THEME") || "default";
+        let lastChatReadTimestamp = parseInt(localStorage.getItem("LAST_CHAT_READ_TS") || "0", 10);
         let dashboardData = null;
         let selectedKodeTokoAC = null;
         let selectedShiftKodeToko = null;
@@ -535,9 +538,10 @@
         let activeHandoversList = [];
         let handoverCheckDoneThisSession = false;
 
-        // CEKLIS EXPIRED STATE
-        let expShelves = JSON.parse(localStorage.getItem('kacida_exp_shelves')) || [];
-        let expProducts = JSON.parse(localStorage.getItem('kacida_exp_products')) || [];
+        // CEKLIS EXPIRED STATE VIA FIREBASE RTDB
+        let expShelves = [];
+        let expProducts = [];
+        let expPhotoPreview = null;
 
         // BELANJA KARYAWAN REALTIME STATE VIA FIREBASE
         let belanjaTransactions = [];
@@ -581,13 +585,27 @@
             const uNama = dashboardData?.user?.NAMA || 'User';
             const uToko = dashboardData?.user?.namaToko || '-';
 
+            const isPWAInstalled = window.matchMedia('(display-mode: standalone)').matches || Boolean(navigator.standalone);
+            const notifPermission = ('Notification' in window) ? Notification.permission : 'not_supported';
+
             if (rtdb) {
                 rtdb.ref('activity_logs').push({
                     nik: currentNik,
                     nama: uNama,
                     toko: uToko,
                     action: actionName,
+                    isPWAInstalled: isPWAInstalled,
+                    notifPermission: notifPermission,
                     timestamp: new Date().toISOString()
+                });
+
+                rtdb.ref('user_presence/' + currentNik).set({
+                    nik: currentNik,
+                    nama: uNama,
+                    toko: uToko,
+                    lastActive: new Date().toISOString(),
+                    isPWAInstalled: isPWAInstalled,
+                    notifPermission: notifPermission
                 });
 
                 const userRef = rtdb.ref(`user_activity_points/${ym}/${currentNik}`);
@@ -600,7 +618,7 @@
                     }
                 });
             }
-            apiCall("logActivity", { nama: uNama, namaToko: uToko, aksi: actionName }).catch(()=>{});
+            apiCall("logActivity", { nama: uNama, namaToko: uToko, aksi: actionName, isPWAInstalled, notifPermission }).catch(()=>{});
         }
 
         function updatePointsAndRankUI(pointsVal) {
@@ -727,6 +745,7 @@
             Notification.requestPermission().then(perm => {
                 if (perm === 'granted') {
                     showSwalSuccess('Notifikasi Aktif 🔔', 'Izin notifikasi aplikasi berhasil diaktifkan!');
+                    trackUserActivity(2, "Mengaktifkan Notifikasi");
                 }
             });
         }
@@ -747,7 +766,10 @@
                         else if (action === "submitSurvey") r.submitSurveyData(currentNik, params.rating, params.saran);
                         else if (action === "getLeaderboard") r.getLeaderboard();
                         else if (action === "getDaftarToko") r.getDaftarToko(currentNik);
-                        else if (action === "logActivity") r.logUserActivityToFirebase(currentNik, params.nama, params.namaToko, params.aksi);
+                        else if (action === "logActivity") r.logUserActivityToFirebase(currentNik, params.nama, params.namaToko, params.aksi, {
+                            isPWAInstalled: params.isPWAInstalled,
+                            notifPermission: params.notifPermission
+                        });
                     });
                 } else {
                     const url = new URL(SCRIPT_URL);
@@ -765,6 +787,7 @@
             }
         }
 
+        // POIN 3 & 4: FIREBASE CHAT REALTIME WITH UNREAD BADGE & INSTANT DELETE
         function initFirebaseRealtimeChat() {
             if (!rtdb) return;
             rtdb.ref('chats').limitToLast(50).on('value', (snapshot) => {
@@ -772,12 +795,73 @@
                 if (data) {
                     const entries = Object.entries(data);
                     cachedChatList = entries.map(([id, val]) => ({ id, ...val }));
+                    
+                    // Hitung unread badge
+                    let unreadCount = 0;
+                    cachedChatList.forEach(c => {
+                        const ts = new Date(c.timestamp || 0).getTime();
+                        if (ts > lastChatReadTimestamp && String(c.nik_pengirim).trim() !== String(currentNik).trim()) {
+                            unreadCount++;
+                        }
+                    });
+
+                    updateChatBadgeUI(unreadCount);
+
                     if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
+                } else {
+                    cachedChatList = [];
+                    updateChatBadgeUI(0);
+                    if (chatRoomMode === 'team') renderChatList([], true);
                 }
+            });
+
+            // Listener instant delete
+            rtdb.ref('chats').on('child_removed', (snapshot) => {
+                const deletedId = snapshot.key;
+                cachedChatList = cachedChatList.filter(c => c.id !== deletedId);
+                if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
             });
         }
 
-        // REVISI 2: BELANJA KARYAWAN REALTIME LISTENER FIREBASE
+        function updateChatBadgeUI(count) {
+            const badge = document.getElementById("chatNavBadge");
+            if (badge) {
+                if (count > 0) {
+                    badge.innerText = count;
+                    badge.classList.remove("hidden");
+                } else {
+                    badge.classList.add("hidden");
+                }
+            }
+        }
+
+        // POIN 2: INITIALIZE CEKLIS EXPIRED FIREBASE REALTIME DB
+        function initFirebaseCeklisExpiredListener() {
+            if (!rtdb) return;
+            
+            // Listen Shelves
+            rtdb.ref('ceklis_expired/shelves').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    expShelves = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+                } else {
+                    expShelves = [];
+                }
+                updateNotifikasiBadgeCount();
+            });
+
+            // Listen Products
+            rtdb.ref('ceklis_expired/products').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    expProducts = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+                } else {
+                    expProducts = [];
+                }
+                updateNotifikasiBadgeCount();
+            });
+        }
+
         function initFirebaseBelanjaListener() {
             if (!rtdb) return;
             rtdb.ref('belanja_karyawan').on('value', (snapshot) => {
@@ -793,7 +877,6 @@
             });
         }
 
-        // REVISI 5: RUNNING TEXT PENGUMUMAN (TANPA LABEL TOKO)
         function initFirebaseAnnouncementsListener() {
             if (!rtdb) return;
             rtdb.ref('announcements').on('value', (snapshot) => {
@@ -824,7 +907,6 @@
             const dotAnnounce = document.getElementById("dotAnnounce");
 
             if (activeAnnouncementsList.length > 0) {
-                // REVISI 5: LANGSUNG KE PESAN / JUDUL TANPA NAMA TOKO
                 const fullText = activeAnnouncementsList.map(a => `${a.judul} : ${a.pesan}`).join("  ✦  ");
                 if (marquee) marquee.innerText = fullText;
                 if (bar) bar.classList.remove("hidden");
@@ -838,7 +920,6 @@
             updateNotifikasiBadgeCount();
         }
 
-        // REVISI 4: LISTENER & SHIFT HANDOVER REALTIME POP-UP DETECTOR (JAM HP 07-15, 14-23, 22-07)
         function getCurrentShiftByTime() {
             const hour = new Date().getHours();
             if (hour >= 7 && hour < 15) return "Shift 1";
@@ -866,11 +947,9 @@
         function checkAndTriggerHandoverPopUp() {
             if (!dashboardData || !dashboardData.user || isUserAC()) return;
 
-            const currentShift = getCurrentShiftByTime();
             const myNik = String(currentNik).trim();
             const todayDateStr = new Date().toDateString();
 
-            // Cari Handover dari shift terdekat/sebelumnya yang dibuat oleh rekan toko lain
             const pendingHandover = activeHandoversList.find(ho => {
                 const isSameDay = new Date(ho.timestamp).toDateString() === todayDateStr;
                 const isInputtedByOther = String(ho.nik).trim() !== myNik;
@@ -934,9 +1013,11 @@
             }
 
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
+            const pendingExpValidasiCount = expShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
+
             const announceCount = activeAnnouncementsList.length;
 
-            const totalNotif = pendingBelanjaCount + pendingExpCount + announceCount;
+            const totalNotif = pendingBelanjaCount + pendingExpCount + pendingExpValidasiCount + announceCount;
 
             const valNotifBox = document.getElementById("valNotifCount");
             const dotNotif = document.getElementById("dotNotif");
@@ -1023,7 +1104,12 @@
             triggerAndroidHaptic('medium');
             const nik = document.getElementById("nikInput").value.trim();
             if (!nik) { showSwalWarning('Form Kosong ⚠️', 'Mohon masukkan NIK Anda!'); return; }
-            showLoading("Proses Login Kilat...");
+            showLoading("Proses Login...");
+            
+            // Clear shift cache & user state untuk login baru
+            localShiftMatrix = {};
+            selectedShiftKodeToko = null;
+            
             currentNik = nik;
             const res = await apiCall("login", { nik: nik });
             hideLoading();
@@ -1054,10 +1140,12 @@
                 renderDashboard(data);
                 trackUserActivity(5, "Akses Dashboard");
                 
-                // INISIALISASI REALTIME LISTENERS FIREBASE
+                // INITIALIZE REALTIME LISTENERS FIREBASE
                 initFirebaseAnnouncementsListener();
                 initFirebaseBelanjaListener();
+                initFirebaseCeklisExpiredListener();
                 initFirebaseShiftHandoverListener();
+                initFirebaseRealtimeChat();
             }
         }
 
@@ -1078,9 +1166,10 @@
             return (j.includes("CHIEF") || j.includes("COS") || j.includes("ACOS") || j.includes("ASSISTANT")) && !isUserAC();
         }
 
+        // PERBAIKAN POIN 2: DETEKSI USER CHIEF OF STORE
         function isUserCOS() {
             const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
-            return j.includes("CHIEF") || j.includes("COS");
+            return j.includes("CHIEF") || j.includes("COS") || j.includes("STORE MANAGER") || j.includes("KEPALA TOKO");
         }
 
         function renderDashboard(data) {
@@ -1197,17 +1286,16 @@
             });
         }
 
-        // REVISI 3: MENU HAMBURGER (DRAWER CONFIG DETAILED + TRACKING USER UTK 14125034)
         function openMenuSidebar() {
             triggerAndroidHaptic('medium');
-            const isSpecialUser = String(currentNik).trim() === "14125034";
+            const isSpecialUser = String(currentNik).trim() === "14125034" || isUserAC() || isUserCOS();
 
             const trackingButtonHtml = isSpecialUser ? `
                 <div class="modal-card-box" style="border:1px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
-                    <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-user-gear"></i> FITUR SUPER ADMINISTRATOR</h4>
-                    <p style="font-size:0.68rem; color:#b45309; margin-bottom:10px;">Akses khusus Monitoring Log & Tracking Aktivitas Semua User Firebase Realtime.</p>
+                    <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-user-gear"></i> MENU SUPER ADMINISTRATOR</h4>
+                    <p style="font-size:0.68rem; color:#b45309; margin-bottom:10px;">Monitor User Online, Status Install PWA, Notifikasi, dan Tracking Aktivitas Realtime.</p>
                     <button onclick="openUserActivityTrackingModal()" style="width:100%; background:var(--gold); color:#ffffff; font-weight:800; padding:10px; border-radius:10px; border:none; cursor:pointer;">
-                        📊 BUKA DETAIL TRACKING AKTIVITAS USER
+                        📊 BUKA MONITORING SUPER ADMINISTRATOR
                     </button>
                 </div>
             ` : '';
@@ -1226,16 +1314,16 @@
                     <div class="modal-card-box">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-book-open"></i> README & TATA CARA APLIKASI</h4>
                         <div style="font-size:0.72rem; color:var(--text-main); line-height:1.5;">
-                            <p><b>1. Fitur Sales SPD & MTD:</b> Klik baris Sales di beranda untuk melihat rincian performa harian beserta filter bulan aktif & toko.</p>
-                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS dapat mengedit pola shift bulanan. User AC dapat memantau seluruh toko.</p>
-                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Pantau rak toko dan catat barang yang mendekati expired dalam format Resume Toko.</p>
-                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Unggah struk belanja untuk dikonfirmasi COS & disetujui AC secara real-time seluruh toko.</p>
+                            <p><b>1. Sales SPD & MTD:</b> Klik baris Sales di beranda untuk melihat rincian performa harian STD & APC 2026.</p>
+                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS dapat mengedit pola shift bulanan. Logout akan mengosongkan cache jadwal.</p>
+                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Manajemen rak khusus Chief of Store. Pengerjaan rak oleh Staff wajib upload foto & divalidasi COS.</p>
+                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Unggah struk belanja untuk dikonfirmasi COS & disetujui AC secara real-time.</p>
                         </div>
                     </div>
 
                     <div class="modal-card-box">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-star"></i> SURVEY & RATING APLIKASI</h4>
-                        <p style="font-size:0.7rem; color:var(--text-sub);">Berikan penilaian dan masukan Anda untuk pengembangan Kacida App (Tercatat ke Firebase):</p>
+                        <p style="font-size:0.7rem; color:var(--text-sub);">Berikan penilaian dan masukan Anda untuk pengembangan Kacida App:</p>
                         
                         <div class="star-rating-box" id="starRatingContainer">
                             <i class="fa-solid fa-star active" onclick="setSurveyRating(1)"></i>
@@ -1265,64 +1353,130 @@
             showCustomModal("⚙️ Pengaturan & Informasi", htmlContent);
         }
 
-        // REVISI 3: FITUR KHUSUS USER 14125034 (TRACKING AKTIVITAS ALL USER FIREBASE)
+        // PERBAIKAN POIN 5: MONITORING SUPER ADMINISTRATOR (STATUS ONLINE, INSTALL PWA, NOTIFIKASI, & DETAIL LOGS)
         function openUserActivityTrackingModal() {
-            if (String(currentNik).trim() !== "14125034") {
-                showSwalWarning("Akses Ditolak 🔒", "Menu khusus Super Administrator!");
-                return;
-            }
-
             if (!rtdb) {
                 showSwalWarning("Offline", "Koneksi Firebase Realtime DB belum siap.");
                 return;
             }
 
-            showLoading("Memuat Log Aktivitas User...");
-            rtdb.ref('activity_logs').limitToLast(100).once('value').then((snapshot) => {
+            showLoading("Memuat Dashboard Super Administrator...");
+            
+            // Ambil data User Presence & Activity Logs
+            Promise.all([
+                rtdb.ref('user_presence').once('value'),
+                rtdb.ref('activity_logs').limitToLast(100).once('value')
+            ]).then(([presSnap, logSnap]) => {
                 hideLoading();
-                const data = snapshot.val();
-                let logsList = [];
-                if (data) {
-                    logsList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-                }
+                
+                const presData = presSnap.val() || {};
+                const logData = logSnap.val() || {};
 
-                const totalLogs = logsList.length;
-                const uniqueUsers = new Set(logsList.map(l => l.nik)).size;
+                const nowMs = Date.now();
+                const presenceList = Object.values(presData);
 
-                let cardsHtml = logsList.map(log => `
-                    <div class="modal-card-box" style="padding:10px; border-left:4px solid var(--accent-primary);">
+                // User dianggap online jika aktif dalam 10 menit terakhir
+                const onlineUsers = presenceList.filter(u => {
+                    const lastMs = new Date(u.lastActive || 0).getTime();
+                    return (nowMs - lastMs) <= (10 * 60 * 1000);
+                });
+
+                const totalInstalledPWA = presenceList.filter(u => u.isPWAInstalled).length;
+                const totalNotifActive = presenceList.filter(u => u.notifPermission === 'granted').length;
+
+                let onlineCardsHtml = onlineUsers.map(u => `
+                    <div style="background:var(--input-bg); border:1px solid var(--accent-primary); border-radius:10px; padding:8px 10px; display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="pulse-green-dot"></span>
+                            <div>
+                                <b style="font-size:0.78rem; color:var(--text-main);">${escapeHTML(u.nama || u.nik)}</b>
+                                <p style="font-size:0.6rem; color:var(--text-sub);">${escapeHTML(u.toko || 'Toko')}</p>
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <span style="font-size:0.58rem; background:${u.isPWAInstalled ? '#d1fae5' : '#fee2e2'}; color:${u.isPWAInstalled ? '#047857' : '#dc2626'}; padding:2px 6px; border-radius:4px; font-weight:800;">
+                                ${u.isPWAInstalled ? '📱 Installed PWA' : '🌐 Browser Web'}
+                            </span>
+                        </div>
+                    </div>
+                `).join("");
+
+                let logsList = Object.entries(logData).map(([id, val]) => ({ id, ...val })).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                let logsCardsHtml = logsList.map(log => `
+                    <div class="modal-card-box" onclick="viewLogDetailPopup('${log.id}')" style="padding:10px; border-left:4px solid var(--accent-primary); cursor:pointer;" title="Klik untuk lihat detail lengkap">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                             <div>
                                 <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(log.nama || 'User')}</b>
-                                <span style="font-size:0.62rem; color:var(--text-sub);"> (NIK: ${log.nik})</span>
+                                <span style="font-size:0.62rem; color:var(--text-sub);"> (${log.nik})</span>
                             </div>
                             <span style="font-size:0.6rem; color:var(--gold); font-weight:700;">${log.timestamp || ''}</span>
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem;">
                             <span style="background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(log.toko || 'TOKO')}</span>
-                            <span style="color:var(--accent-primary); font-weight:800;">⚡ ${escapeHTML(log.action || log.aksi || 'Aktivitas')}</span>
+                            <span style="color:var(--accent-primary); font-weight:800;">⚡ ${escapeHTML(log.action || log.aksi || 'Aktivitas')} ➔</span>
                         </div>
                     </div>
                 `).join("");
 
                 const htmlBox = `
                     <div class="modal-grid-1" style="font-size:0.78rem;">
-                        <div class="modal-grid-2">
-                            <div class="modal-card-box" style="text-align:center;">
-                                <span style="font-size:0.62rem; color:var(--text-sub);">TOTAL AKTIVITAS</span>
-                                <p style="font-size:1.2rem; font-weight:800; color:var(--accent-primary);">${totalLogs}</p>
+                        <div class="modal-grid-3" style="text-align:center;">
+                            <div class="modal-card-box">
+                                <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">SEDANG ONLINE</span>
+                                <p style="font-size:1.1rem; font-weight:800; color:var(--accent-primary);">${onlineUsers.length} User</p>
                             </div>
-                            <div class="modal-card-box" style="text-align:center;">
-                                <span style="font-size:0.62rem; color:var(--text-sub);">USER AKTIF</span>
-                                <p style="font-size:1.2rem; font-weight:800; color:var(--gold);">${uniqueUsers} Orang</p>
+                            <div class="modal-card-box">
+                                <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">TER-INSTALL PWA</span>
+                                <p style="font-size:1.1rem; font-weight:800; color:var(--gold);">${totalInstalledPWA} User</p>
+                            </div>
+                            <div class="modal-card-box">
+                                <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">NOTIFIKASI AKTIF</span>
+                                <p style="font-size:1.1rem; font-weight:800; color:#0284c7;">${totalNotifActive} User</p>
                             </div>
                         </div>
 
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;"><i class="fa-solid fa-list-check"></i> 100 AKTIVITAS TERAKHIR USER</h5>
-                        <div class="modal-grid-1" style="max-height:60vh; overflow-y:auto;">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada log aktivitas.</p>'}</div>
+                        <div class="modal-card-box">
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-users"></i> USER SEDANG ONLINE SAAT INI (${onlineUsers.length})</h5>
+                            <div style="display:flex; flex-direction:column; gap:6px; max-height:140px; overflow-y:auto;">
+                                ${onlineCardsHtml || '<p style="text-align:center; color:var(--text-sub); font-size:0.7rem;">Tidak ada user online dalam 10 menit terakhir.</p>'}
+                            </div>
+                        </div>
+
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;"><i class="fa-solid fa-list-check"></i> RIWAYAT AKTIVITAS USER (KLIK UNTUK DETAIL)</h5>
+                        <div class="modal-grid-1" style="max-height:45vh; overflow-y:auto;">
+                            ${logsCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada data log aktivitas.</p>'}
+                        </div>
                     </div>
                 `;
-                showCustomModal("📊 TRACKING LOG AKTIVITAS (NIK: 14125034)", htmlBox);
+                showCustomModal("📊 TRACKING SUPER ADMINISTRATOR", htmlBox);
+            });
+        }
+
+        function viewLogDetailPopup(logId) {
+            triggerAndroidHaptic('light');
+            if (!rtdb) return;
+
+            rtdb.ref('activity_logs/' + logId).once('value').then((snap) => {
+                const log = snap.val();
+                if (!log) return;
+
+                Swal.fire({
+                    title: `Detail Log Aktivitas`,
+                    html: `
+                        <div style="text-align:left; font-size:0.75rem; line-height:1.6; color:var(--text-main);">
+                            <p><b>Nama User:</b> ${escapeHTML(log.nama || '-')}</p>
+                            <p><b>NIK:</b> ${escapeHTML(log.nik || '-')}</p>
+                            <p><b>Lokasi Toko:</b> ${escapeHTML(log.toko || log.namaToko || '-')}</p>
+                            <p><b>Aksi / Kegiatan:</b> <span style="color:var(--accent-primary); font-weight:bold;">${escapeHTML(log.action || log.aksi || '-')}</span></p>
+                            <p><b>Waktu Timestamp:</b> ${escapeHTML(log.timestamp || '-')}</p>
+                            <p><b>Status PWA Installed:</b> ${log.isPWAInstalled ? '✅ YA (Home Screen)' : '❌ BUKAN (Browser Web)'}</p>
+                            <p><b>Izin Push Notifikasi:</b> ${log.notifPermission === 'granted' ? '🔔 Aktif (Granted)' : '🔕 Tidak Aktif / Default'}</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'Tutup Detail',
+                    customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+                });
             });
         }
 
@@ -1338,7 +1492,6 @@
             }
         }
 
-        // REVISI 3: SURVEY TERCATAT LANGSUNG KE FIREBASE DB
         async function submitSurveyAction() {
             const saran = document.getElementById("surveySaranInput").value.trim();
             showLoading("Mengirimkan Survey...");
@@ -1427,7 +1580,7 @@
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        // REVISI 1: OPEN PLAN MASTER SHIFT DENGAN AMBIL DATA MASTER_USER KELUAR SEMPURNA
+        // POIN 1: OPEN PLAN MASTER SHIFT DENGAN CLEAR CACHE LOGOUT & DETEKSI TOKO DINAMIS
         async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
             const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "2J7K";
@@ -1496,7 +1649,7 @@
                     dayCellsHtml += `
                         <td style="padding:3px; text-align:center; border:1px solid var(--card-border);">
                             <div class="shift-pill ${pillClass} ${passed ? 'shift-locked' : ''}" 
-                                 onclick="${(canEdit && !passed) ? `openShiftPickerModal('${p.nik}', ${d}, '${shiftCode}')` : (passed ? `showSwalWarning('Tanggal Terkunci 🔒', 'Tanggal ini telah berlalu.')` : `showSwalWarning('Read Only 👁️', 'Mode Lihat Hanya Khusus Area Coordinator.')`)}">
+                                 onclick="${(canEdit && !passed) ? `openShiftPickerModal('${p.nik}', ${d}, '${shiftCode}')` : (passed ? `showSwalWarning('Tanggal Terkunci 🔒', 'Tanggal ini telah berlalu.')` : `showSwalWarning('Read Only 👁️', 'I'am Sorry Silahkan Hub COS/ACOS')`)}">
                                 ${labelTxt}
                             </div>
                         </td>
@@ -1674,16 +1827,31 @@
             }
         }
 
+        // PERBAIKAN POIN 2: CEKLIS EXPIRED (MANAJEMEN RAK KHUSUS COS, UPLOAD FOTO, & VALIDASI COS)
         function openCeklisExpiredModal() { renderCeklisExpiredModal('rak'); }
+
+        function handleExpPhotoChangePreview(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    expPhotoPreview = reader.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const totalRak = expShelves.length;
             const todayStr = new Date().toDateString();
-            const selesaiRak = expShelves.filter(s => s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr).length;
-            const belumRak = totalRak - selesaiRak;
 
+            const userCOS = isUserCOS();
             const userAC = isUserAC();
-            const daftarToko = dashboardData?.daftarToko || [];
+            const canManageRak = userCOS; // Khusus Chief of Store untuk edit/tambah/generate
+
+            const selesaiRak = expShelves.filter(s => s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr && s.status === 'Selesai').length;
+            const pendingValidasiRak = expShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
+            const belumRak = totalRak - selesaiRak;
 
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
 
@@ -1691,9 +1859,11 @@
 
             if (activeTab === 'rak') {
                 let rakListCards = expShelves.map(s => {
-                    const isDone = s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr;
+                    const isDone = s.status === 'Selesai';
+                    const isPendingVal = s.status === 'Menunggu Validasi COS';
+
                     return `
-                        <div class="modal-card-box" style="border-left: 4px solid ${isDone ? '#10b981' : '#f59e0b'};">
+                        <div class="modal-card-box" style="border-left: 4px solid ${isDone ? '#10b981' : (isPendingVal ? '#f59e0b' : '#ef4444')};">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                                 <div>
                                     <h4 style="font-weight:800; font-size:0.9rem; color:var(--text-main);">${escapeHTML(s.name)}</h4>
@@ -1701,50 +1871,76 @@
                                         No. Rak: <b>${escapeHTML(s.noRak || '-')}</b> | Kategori: <b>${escapeHTML(s.category)}</b><br/>
                                         Penanggung Jawab: <b style="color:var(--accent-primary);">${escapeHTML(s.assignedName || 'Belum Didelegasikan')}</b>
                                     </p>
+                                    ${s.lastChecked ? `<p style="font-size:0.6rem; color:var(--text-sub); margin-top:2px;">Terakhir Cek: ${new Date(s.lastChecked).toLocaleString('id-ID')} oleh <b>${escapeHTML(s.checkedBy||'-')}</b></p>` : ''}
                                 </div>
                                 <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
-                                    <span style="font-size:0.65rem; padding:3px 8px; border-radius:6px; font-weight:800; ${isDone ? 'background:#d1fae5; color:#047857;' : 'background:#fef3c7; color:#b45309;'}">
-                                        ${isDone ? '✅ Selesai' : '⏳ Pending'}
+                                    <span style="font-size:0.65rem; padding:3px 8px; border-radius:6px; font-weight:800; ${isDone ? 'background:#d1fae5; color:#047857;' : (isPendingVal ? 'background:#fef3c7; color:#b45309;' : 'background:#fee2e2; color:#dc2626;')}">
+                                        ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Menunggu Validasi COS' : '❌ Belum Ceklis')}
                                     </span>
-                                    <button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:2px 6px; border-radius:6px; font-size:0.6rem; cursor:pointer;">Hapus</button>
+                                    
+                                    ${canManageRak ? `
+                                        <button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:3px 8px; border-radius:6px; font-size:0.6rem; cursor:pointer; font-weight:800;">🗑️ Hapus Rak</button>
+                                    ` : ''}
                                 </div>
                             </div>
-                            <button onclick="markShelfCheckAction('${s.id}')" style="margin-top:10px; width:100%; background:${isDone ? '#ffffff' : 'var(--accent-green-grad)'}; color:${isDone ? '#047857' : '#ffffff'}; border:${isDone ? '1px solid #10b981' : 'none'}; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
-                                ${isDone ? 'Update Ceklis Ulang' : 'Tandai Selesai Dikerjakan'}
-                            </button>
+
+                            ${s.photoUrl ? `
+                                <div style="margin-top:8px;">
+                                    <img src="${s.photoUrl}" onclick="showFullImageModal('${s.photoUrl}')" style="width:100%; height:110px; object-fit:cover; border-radius:8px; cursor:pointer;" title="Klik Pratinjau Foto Fullscreen">
+                                </div>
+                            ` : ''}
+
+                            <div style="margin-top:10px; display:flex; gap:6px;">
+                                ${isPendingVal && userCOS ? `
+                                    <button onclick="validateShelfByCOS('${s.id}')" style="flex:1; background:var(--accent-green-grad); color:#fff; border:none; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
+                                        ✅ VALIDASI RAK (CHIEF OF STORE)
+                                    </button>
+                                ` : ''}
+
+                                <button onclick="promptShelfCompletion('${s.id}')" style="flex:1; background:${isDone ? '#ffffff' : 'var(--accent-green-grad)'}; color:${isDone ? '#047857' : '#ffffff'}; border:${isDone ? '1px solid #10b981' : 'none'}; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
+                                    ${isDone ? '🔄 Update / Ceklis Ulang' : '📸 Tandai Selesai + Foto Bukti'}
+                                </button>
+                            </div>
                         </div>
                     `;
                 }).join("");
+
+                let configSectionHtml = '';
+                if (canManageRak) {
+                    configSectionHtml = `
+                        <div class="modal-card-box">
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH & MANAJEMEN RAK (KHUSUS COS)</h5>
+                            <div class="modal-grid-2" style="margin-bottom:8px;">
+                                <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                            </div>
+                            <div class="modal-grid-2" style="margin-bottom:10px;">
+                                <select id="addCatRakInput" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                    <option value="Makanan">Makanan</option>
+                                    <option value="Minuman">Minuman</option>
+                                    <option value="Kosmetik">Kosmetik</option>
+                                    <option value="Kebutuhan">Non-Food</option>
+                                </select>
+                                <button onclick="addShelfManualAction()" style="background:var(--accent-green-grad); color:#fff; font-weight:800; padding:8px; border-radius:8px; border:none; cursor:pointer;">+ Tambah Rak</button>
+                            </div>
+
+                            <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer; width:100%;">
+                                ✨ Auto-Generate Delegasi Rak Ke Personil
+                            </button>
+                        </div>
+                    `;
+                }
 
                 tabContentHtml = `
                     <div class="modal-grid-3">
                         <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">TOTAL RAK</span><p style="font-size:1.1rem; font-weight:800;">${totalRak}</p></div>
                         <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">SELESAI</span><p style="font-size:1.1rem; font-weight:800; color:#10b981;">${selesaiRak}</p></div>
-                        <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">PENDING</span><p style="font-size:1.1rem; font-weight:800; color:#f59e0b;">${belumRak}</p></div>
+                        <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">PENDING VAL</span><p style="font-size:1.1rem; font-weight:800; color:#f59e0b;">${pendingValidasiRak}</p></div>
                     </div>
 
-                    <div class="modal-card-box">
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK</h5>
-                        <div class="modal-grid-2" style="margin-bottom:8px;">
-                            <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
-                            <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
-                        </div>
-                        <div class="modal-grid-2" style="margin-bottom:10px;">
-                            <select id="addCatRakInput" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
-                                <option value="Makanan">Makanan</option>
-                                <option value="Minuman">Minuman</option>
-                                <option value="Kosmetik">Kosmetik</option>
-                                <option value="Kebutuhan">Non-Food</option>
-                            </select>
-                            <button onclick="addShelfManualAction()" style="background:var(--accent-green-grad); color:#fff; font-weight:800; padding:8px; border-radius:8px; border:none; cursor:pointer;">+ Tambah Rak</button>
-                        </div>
-                    </div>
+                    ${configSectionHtml}
 
-                    <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:12px; border-radius:12px; font-weight:800; cursor:pointer; width:100%;">
-                        ✨ Auto-Generate Delegasi Rak (Bagi Rata ke Personil)
-                    </button>
-
-                    <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada rak.</p>'}</div>
+                    <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data rak di toko ini.</p>'}</div>
                 `;
             } else if (activeTab === 'input') {
                 const shelfOptionsHtml = expShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
@@ -1769,71 +1965,41 @@
                     </div>
                 `;
             } else if (activeTab === 'alert') {
-                if (userAC && daftarToko.length > 0) {
-                    const storeExpCards = daftarToko.map(toko => {
-                        const storeItems = expProducts.filter(p => p.kodeToko === toko.kodeToko);
-                        const pendingCount = storeItems.filter(p => p.status !== 'selesai').length;
-                        const doneCount = storeItems.filter(p => p.status === 'selesai').length;
-
-                        return `
-                            <div class="modal-card-box" onclick="viewStoreExpDetail('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid ${pendingCount > 0 ? '#ef4444' : '#10b981'};" title="Klik untuk lihat rincian produk">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <div>
-                                        <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
-                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">
-                                            Status: <b style="color:#10b981;">${doneCount} Dieksekusi</b> | <b style="color:#ef4444;">${pendingCount} Belum</b>
-                                        </p>
-                                    </div>
-                                    <div style="display:flex; align-items:center; gap:6px;">
-                                        ${pendingCount > 0 ? `<span style="background:#ef4444; color:#fff; font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:10px;">${pendingCount} Harus Dieksekusi</span>` : `<span style="background:#d1fae5; color:#047857; font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:10px;">Aman ✅</span>`}
-                                        <span style="font-size:0.6rem; color:var(--gold);">Detail ➔</span>
-                                    </div>
+                let alertListHtml = expProducts.map(p => {
+                    const shelf = expShelves.find(s => s.id === p.shelfId);
+                    const isDone = p.status === 'selesai';
+                    return `
+                        <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
+                                    <span style="font-size:0.58rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(p.namaToko || p.kodeToko || 'TOKO')}</span>
                                 </div>
+                                <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
                             </div>
-                        `;
-                    }).join("");
-
-                    tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO (AREA COORDINATOR)</h5>
-                        <div class="modal-grid-1">${storeExpCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada data toko.</p>'}</div>
+                            <div style="display:flex; gap:6px;">
+                                ${!isDone ? `
+                                    <button onclick="markExpProductHandled('${p.id}')" style="background:#d1fae5; color:#047857; border:1px solid var(--accent-primary); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                        ✅ Konfirmasi
+                                    </button>
+                                ` : `
+                                    <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
+                                    <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                        🗑️ Hapus
+                                    </button>
+                                `}
+                            </div>
+                        </div>
                     `;
-                } else {
-                    let alertListHtml = expProducts.map(p => {
-                        const shelf = expShelves.find(s => s.id === p.shelfId);
-                        const isDone = p.status === 'selesai';
-                        return `
-                            <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <div style="display:flex; align-items:center; gap:6px;">
-                                        <p style="font-weight:800; color:var(--text-main);">${escapeHTML(p.name)}</p>
-                                        <span style="font-size:0.58rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(p.namaToko || p.kodeToko || 'TOKO')}</span>
-                                    </div>
-                                    <p style="font-size:0.68rem; color:var(--text-sub); margin-top:2px;">Rak: ${escapeHTML(shelf?.name || 'Umum')} | Exp: <b style="color:#ef4444;">${p.expDate}</b></p>
-                                </div>
-                                <div style="display:flex; gap:6px;">
-                                    ${!isDone ? `
-                                        <button onclick="markExpProductHandled('${p.id}')" style="background:#d1fae5; color:#047857; border:1px solid var(--accent-primary); padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                            ✅ Konfirmasi
-                                        </button>
-                                    ` : `
-                                        <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
-                                        <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                            🗑️ Hapus
-                                        </button>
-                                    `}
-                                </div>
-                            </div>
-                        `;
-                    }).join("");
+                }).join("");
 
-                    tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
-                }
+                tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
             }
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     <div style="display:flex; gap:6px;">
-                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Manajemen & Setting Rak</button>
+                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Ceklis & Rak Toko</button>
                         <button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderCeklisExpiredModal('input')">➕ Input Produk</button>
                         <button class="sub-tab-btn ${activeTab==='alert'?'active':''}" onclick="renderCeklisExpiredModal('alert')">
                             🔔 Alert Expired ${pendingExpCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingExpCount}</span>` : ''}
@@ -1845,76 +2011,121 @@
             showCustomModal("⚠️ CEKLIS EXP & MANAJEMEN RAK", htmlBox);
         }
 
-        function viewStoreExpDetail(kodeToko, namaToko) {
-            triggerAndroidHaptic('light');
-            const storeItems = expProducts.filter(p => p.kodeToko === kodeToko);
-
-            let html = storeItems.map(p => {
-                const isDone = p.status === 'selesai';
-                return `
-                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(p.name)}</p>
-                            <p style="font-size:0.62rem; color:var(--text-sub);">Exp: <b style="color:#ef4444;">${p.expDate}</b> | Penginput: ${escapeHTML(p.addedBy || 'Staff')}</p>
-                        </div>
-                        <span style="font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; ${isDone ? 'background:#d1fae5; color:#047857;' : 'background:#fee2e2; color:#dc2626;'}">
-                            ${isDone ? '✅ Sudah Dieksekusi' : '⚠️ Belum Dieksekusi'}
-                        </span>
-                    </div>
-                `;
-            }).join("");
+        function promptShelfCompletion(shelfId) {
+            triggerAndroidHaptic('medium');
+            expPhotoPreview = null;
 
             Swal.fire({
-                title: `Detail Expired: ${namaToko}`,
-                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Tidak ada catatan produk expired di toko ini.</p>`,
-                confirmButtonText: 'Tutup',
+                title: 'Tandai Rak Selesai',
+                html: `
+                    <div style="text-align:left; font-size:0.75rem;">
+                        <p style="margin-bottom:8px;">Unggah foto bukti pengerjaan/kebersihan rak:</p>
+                        <input type="file" id="expShelfPhotoFile" accept="image/*" onchange="handleExpPhotoChangePreview(event)" style="width:100%; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border);">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '📸 Submit Bukti Pengerjaan',
+                cancelButtonText: 'Batal',
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    markShelfCheckAction(shelfId);
+                }
             });
         }
 
+        function markShelfCheckAction(shelfId) {
+            const userCOS = isUserCOS();
+            const statusTarget = userCOS ? 'Selesai' : 'Menunggu Validasi COS';
+            const timestamp = new Date().toISOString();
+            const userName = dashboardData?.user?.NAMA || 'User';
+
+            if (rtdb) {
+                rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
+                    status: statusTarget,
+                    lastChecked: timestamp,
+                    checkedBy: userName,
+                    photoUrl: expPhotoPreview || ''
+                });
+            }
+
+            expPhotoPreview = null;
+            trackUserActivity(5, "Ceklis Rak Expired");
+            renderCeklisExpiredModal('rak');
+            showSwalSuccess('Ceklis Terkirim!', userCOS ? 'Rak ditandai Selesai!' : 'Foto dikirimkan. Menunggu Validasi Chief of Store.');
+        }
+
+        function validateShelfByCOS(shelfId) {
+            if (!isUserCOS()) return;
+
+            if (rtdb) {
+                rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
+                    status: 'Selesai',
+                    validatedByCOS: dashboardData?.user?.NAMA || 'COS'
+                });
+            }
+
+            renderCeklisExpiredModal('rak');
+            showSwalSuccess('Rak Divalidasi ✅', 'Hasil pengerjaan rak oleh staff berhasil divalidasi!');
+        }
+
         function addShelfManualAction() {
+            if (!isUserCOS()) { showSwalWarning('Akses Ditolak', 'Hanya Chief of Store yang dapat menambah rak.'); return; }
+
             const noRak = document.getElementById("addNoRakInput").value.trim();
             const name = document.getElementById("addNamaRakInput").value.trim();
             const cat = document.getElementById("addCatRakInput").value;
 
             if (!name) { showSwalWarning('Form Kosong', 'Mohon masukkan nama rak!'); return; }
 
+            const shelfId = 'shelf_' + Date.now();
             const newShelf = {
-                id: 'shelf_' + Date.now(),
+                id: shelfId,
                 noRak: noRak || 'R-0' + (expShelves.length + 1),
                 name: name,
                 category: cat,
                 assignedNik: '',
                 assignedName: 'Belum Didelegasikan',
+                status: 'Belum Ceklis',
                 lastChecked: null,
                 checkedBy: null
             };
 
-            expShelves.push(newShelf);
-            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+            if (rtdb) {
+                rtdb.ref('ceklis_expired/shelves/' + shelfId).set(newShelf);
+            }
+
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Rak Ditambahkan 📦', 'Rak baru berhasil dibuat!');
+            showSwalSuccess('Rak Ditambahkan 📦', 'Rak baru berhasil dibuat di Realtime DB!');
         }
 
         function deleteShelfAction(id) {
-            expShelves = expShelves.filter(s => s.id !== id);
-            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
+            if (!isUserCOS()) { showSwalWarning('Akses Ditolak', 'Hanya Chief of Store yang dapat menghapus rak.'); return; }
+
+            if (rtdb) {
+                rtdb.ref('ceklis_expired/shelves/' + id).remove();
+            }
             renderCeklisExpiredModal('rak');
+            showSwalSuccess('Dihapus 🗑️', 'Data rak berhasil dihapus!');
         }
 
         function deleteExpProductAction(id) {
-            expProducts = expProducts.filter(p => p.id !== id);
-            localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
+            if (rtdb) {
+                rtdb.ref('ceklis_expired/products/' + id).remove();
+            }
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Item Dihapus 🗑️', 'Item alert expired berhasil dihapus!');
         }
 
         function autoGenerateShelvesByPersonnel() {
+            if (!isUserCOS()) { showSwalWarning('Akses Ditolak', 'Hanya Chief of Store yang dapat membagi rak.'); return; }
+
             const personil = dashboardData?.struktur?.personilToko || [];
             if (personil.length === 0) { showSwalWarning('Data Kosong', 'Tidak ada personil toko ditemukan.'); return; }
 
-            if (expShelves.length === 0) {
-                expShelves = [
+            let defaultShelves = expShelves;
+            if (defaultShelves.length === 0) {
+                defaultShelves = [
                     { id: 'shelf_1', noRak: 'R-01', name: 'Rak Snack A1', category: 'Makanan' },
                     { id: 'shelf_2', noRak: 'R-02', name: 'Chiller Minuman B1', category: 'Minuman' },
                     { id: 'shelf_3', noRak: 'R-03', name: 'Rak Staples C1', category: 'Makanan' },
@@ -1922,27 +2133,20 @@
                 ];
             }
 
-            expShelves.forEach((shelf, idx) => {
+            defaultShelves.forEach((shelf, idx) => {
                 const assignedUser = personil[idx % personil.length];
-                shelf.assignedNik = assignedUser.nik;
-                shelf.assignedName = assignedUser.nama;
+                const updatedObj = {
+                    ...shelf,
+                    assignedNik: assignedUser.nik,
+                    assignedName: assignedUser.nama
+                };
+                if (rtdb) {
+                    rtdb.ref('ceklis_expired/shelves/' + shelf.id).set(updatedObj);
+                }
             });
 
-            localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Delegasi Rak Berhasil ✨', `Berhasil membagi ${expShelves.length} Rak kepada ${personil.length} Personil Toko!`);
-        }
-
-        function markShelfCheckAction(shelfId) {
-            const shelf = expShelves.find(s => s.id === shelfId);
-            if (shelf) {
-                shelf.lastChecked = new Date().toISOString();
-                shelf.checkedBy = dashboardData?.user?.NAMA || 'User';
-                localStorage.setItem('kacida_exp_shelves', JSON.stringify(expShelves));
-                trackUserActivity(5, "Ceklis Rak " + shelf.name);
-                renderCeklisExpiredModal('rak');
-                showSwalSuccess('Ceklis Diperbarui ✅', `Rak ${shelf.name} ditandai selesai!`);
-            }
+            showSwalSuccess('Delegasi Rak Berhasil ✨', `Berhasil membagi ${defaultShelves.length} Rak kepada ${personil.length} Personil Toko!`);
         }
 
         function saveExpProductAction() {
@@ -1952,8 +2156,9 @@
 
             if (!shelfId || !name || !expDate) { showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi semua data.'); return; }
 
-            expProducts.push({
-                id: 'prod_' + Date.now(),
+            const prodId = 'prod_' + Date.now();
+            const prodObj = {
+                id: prodId,
                 name,
                 shelfId,
                 expDate,
@@ -1961,22 +2166,23 @@
                 status: 'pending',
                 kodeToko: dashboardData?.user?.kodeToko || 'TOKO',
                 namaToko: dashboardData?.user?.namaToko || 'Toko'
-            });
+            };
 
-            localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
+            if (rtdb) {
+                rtdb.ref('ceklis_expired/products/' + prodId).set(prodObj);
+            }
+
             trackUserActivity(5, "Catat Produk Expired");
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Tersimpan 📦', 'Produk Expired berhasil dicatat!');
         }
 
         function markExpProductHandled(prodId) {
-            const p = expProducts.find(item => item.id === prodId);
-            if (p) {
-                p.status = 'selesai';
-                localStorage.setItem('kacida_exp_products', JSON.stringify(expProducts));
-                renderCeklisExpiredModal('alert');
-                showSwalSuccess('Selesai ✅', 'Penanganan produk expired dicatat!');
+            if (rtdb) {
+                rtdb.ref('ceklis_expired/products/' + prodId).update({ status: 'selesai' });
             }
+            renderCeklisExpiredModal('alert');
+            showSwalSuccess('Selesai ✅', 'Penanganan produk expired dicatat!');
         }
 
         function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
@@ -2040,7 +2246,6 @@
             renderBelanjaKaryawanModal('resume');
         }
 
-        // REVISI 2: TAB VALIDASI STRUK DAN APPROVAL LANGSUNG KE FIREBASE RTDB
         function renderBelanjaKaryawanModal(activeTab = 'input') {
             const cycle = getBelanjaCutoffCycle();
             
@@ -2370,15 +2575,14 @@
         function showFullImageModal(imgUrl) {
             Swal.fire({
                 imageUrl: imgUrl,
-                imageAlt: 'Foto Struk Belanja',
+                imageAlt: 'Preview Foto Bukti',
                 showCloseButton: true,
-                confirmButtonText: '✖ Tutup Preview Gambar',
+                confirmButtonText: '✖ TUTUP PRATINJAU',
                 allowOutsideClick: false,
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             });
         }
 
-// REVISI 2: SUBMIT BELANJA DENGAN PENYIMPANAN DI FIREBASE DB REALTIME
         function submitBelanjaTransactionAction() {
             const noBon = document.getElementById("belanjaNoBonVal").value.trim();
             const noMember = document.getElementById("belanjaNoMemberVal").value.trim();
@@ -2408,7 +2612,6 @@
                 namaToko: dashboardData?.user?.namaToko || 'Toko'
             };
 
-            // SIMPAN LANGSUNG KE FIREBASE RTDB
             if (rtdb) {
                 rtdb.ref('belanja_karyawan/' + txId).set(newTx);
             }
@@ -2423,7 +2626,6 @@
             const nowStr = new Date().toLocaleString('id-ID');
             const approverName = `${dashboardData?.user?.NAMA || 'User'} (${dashboardData?.user?.JABATAN || 'Atasan'})`;
 
-            // UPDATE STATUS DI FIREBASE RTDB
             if (rtdb) {
                 rtdb.ref('belanja_karyawan/' + id).update({
                     status: newStatus,
@@ -2444,10 +2646,13 @@
             renderPerformaModalView(res);
         }
 
+        // PERBAIKAN POIN 7: MODAL PERFORMA (RANK PINDAH KE KOTAK PENAWARAN LANGSUNG & DIBUAT DINAMIS)
         function renderPerformaModalView(d) {
             const ptNum = parseFloat(String(d.pointDash || '100%').replace('%','').replace(',','.')) || 0;
             const gaugeRotation = Math.min(Math.max((ptNum / 150) * 180, 0), 180);
             const isHarianGrowth = d.growthHarian >= 0;
+
+            const totalTokoDin = d.totalTokoArea || dashboardData?.totalTokoAktifArea || 19;
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
@@ -2470,9 +2675,6 @@
                         </div>
 
                         <div style="border-left:1px dashed var(--card-border); padding-left:10px;">
-                            <div style="font-size:0.72rem; color:var(--text-sub); font-weight:800; margin-bottom:2px;">
-                                🏆 RANK PENAWARAN: <b style="color:var(--gold);">#${d.rankPenawaran || 1}</b> / ${d.totalTokoArea || 18} TOKO
-                            </div>
                             <div style="font-size:0.75rem; font-weight:800; color:var(--gold); margin-bottom:4px;">💪 SALES HARIAN</div>
                             <div style="font-size:0.7rem;">Real : <strong style="color:var(--text-main);">Rp ${Number(d.sales2026||0).toLocaleString('id-ID')}</strong></div>
                             <div style="font-size:0.7rem; color:var(--text-sub);">Prev : Rp ${Number(d.sales2025||0).toLocaleString('id-ID')}</div>
@@ -2484,25 +2686,36 @@
                         </div>
                     </div>
 
-                    <div class="modal-card-box">
-                        <span style="font-size:0.75rem; font-weight:800; color:var(--accent-primary); display:block; margin-bottom:8px;">
-                            <i class="fa-solid fa-fire" style="color:#ef4444;"></i> PENAWARAN LANGSUNG (POINT: ${d.pointDash || '100%'})
-                        </span>
+                    <!-- KOTAK PENAWARAN LANGSUNG DILENGKAPI POSISI RANK DINAMIS -->
+                    <div class="modal-card-box" style="border:1.5px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span style="font-size:0.78rem; font-weight:800; color:#b45309;">
+                                <i class="fa-solid fa-fire" style="color:#ef4444;"></i> PENAWARAN LANGSUNG
+                            </span>
+                            <span style="font-size:0.72rem; font-weight:900; background:var(--gold); color:#ffffff; padding:3px 10px; border-radius:20px; box-shadow:0 2px 6px rgba(217,119,6,0.3);">
+                                🏆 RANK #${d.rankPenawaran || 1} / ${totalTokoDin} TOKO
+                            </span>
+                        </div>
+
+                        <div style="font-size:0.72rem; color:#92400e; font-weight:700; margin-bottom:8px;">
+                            POINT DASHBOARD: <b style="color:#b45309; font-size:0.85rem;">${d.pointDash || '100%'}</b>
+                        </div>
+
                         <div class="modal-grid-4" style="text-align:center;">
-                            <div style="background:var(--input-bg); padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
-                                <span style="font-size:0.6rem; color:var(--text-sub); display:block; font-weight:700;">PSM</span>
+                            <div style="background:#ffffff; padding:8px 4px; border-radius:10px; border:1px solid #fcd34d;">
+                                <span style="font-size:0.6rem; color:#92400e; display:block; font-weight:700;">PSM</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.psm || '100%'}</span>
                             </div>
-                            <div style="background:var(--input-bg); padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
-                                <span style="font-size:0.6rem; color:var(--text-sub); display:block; font-weight:700;">PWP</span>
+                            <div style="background:#ffffff; padding:8px 4px; border-radius:10px; border:1px solid #fcd34d;">
+                                <span style="font-size:0.6rem; color:#92400e; display:block; font-weight:700;">PWP</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.pwp || '95%'}</span>
                             </div>
-                            <div style="background:var(--input-bg); padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
-                                <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">S.GRATIS</span>
+                            <div style="background:#ffffff; padding:8px 4px; border-radius:10px; border:1px solid #fcd34d;">
+                                <span style="font-size:0.58rem; color:#92400e; display:block; font-weight:700;">S.GRATIS</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.serbaGratis || '98%'}</span>
                             </div>
-                            <div style="background:var(--input-bg); padding:8px 4px; border-radius:10px; border:1px solid var(--card-border);">
-                                <span style="font-size:0.6rem; color:var(--text-sub); display:block; font-weight:700;">APC</span>
+                            <div style="background:#ffffff; padding:8px 4px; border-radius:10px; border:1px solid #fcd34d;">
+                                <span style="font-size:0.6rem; color:#92400e; display:block; font-weight:700;">APC</span>
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);">${d.apc || '102%'}</span>
                             </div>
                         </div>
@@ -2555,6 +2768,7 @@
             openSalesMTDModal(currentMtdDetailData?.selectedMonthVal);
         }
 
+        // PERBAIKAN POIN 6: MODAL MTD RINCIAN HARIAN DENGAN PENAMBAHAN DATA STD 2026 DAN APC 2026 SERTA ICON GROWTH/DISGROWTH
         function renderMtdModalView(filterType = 'semua') {
             const d = currentMtdDetailData;
             if (!d) return;
@@ -2592,17 +2806,34 @@
             }
 
             let rincianCardsHtml = `
-                <div class="modal-grid-2">
+                <div class="modal-grid-1">
                     ${filteredList.map(item => `
                         <div class="modal-card-box" style="padding:10px; border-left:4px solid ${item.isGrowth ? '#10b981' : '#ef4444'};">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                                <span style="font-size:0.8rem; font-weight:800; color:var(--text-main);">Tgl ${item.day}</span>
-                                <span class="growth-badge-pill ${item.isGrowth ? 'up' : 'down'}" style="font-size:0.6rem; padding:2px 6px;">
-                                    ${item.isGrowth ? '▲' : '▼'} ${item.growthPct?.toFixed(1)}%
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                <span style="font-size:0.85rem; font-weight:800; color:var(--text-main);">Tgl ${item.day}</span>
+                                <span class="growth-badge-pill ${item.isGrowth ? 'up' : 'down'}" style="font-size:0.62rem; padding:2px 8px;">
+                                    ${item.isGrowth ? '▲ Growth' : '▼ Decline'} ${item.growthPct?.toFixed(1)}%
                                 </span>
                             </div>
-                            <div style="font-size:0.88rem; font-weight:800; color:var(--accent-primary);">${item.sales2026Formatted}</div>
-                            <div style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Prev: ${item.sales2025Formatted}</div>
+
+                            <div class="modal-grid-3" style="text-align:left; background:var(--input-bg); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
+                                <div>
+                                    <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">SALES 2026</span>
+                                    <span style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);">${item.sales2026Formatted}</span>
+                                </div>
+                                <div>
+                                    <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">STD 2026</span>
+                                    <span style="font-size:0.8rem; font-weight:800; color:var(--gold);">
+                                        ${item.std2026 || 0} <small style="font-size:0.55rem; color:${item.isStdGrowth ? '#10b981' : '#ef4444'};">${item.isStdGrowth ? '▲' : '▼'}</small>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">APC 2026</span>
+                                    <span style="font-size:0.8rem; font-weight:800; color:#0284c7;">
+                                        Rp ${Number(item.apc2026||0).toLocaleString('id-ID')} <small style="font-size:0.55rem; color:${item.isApcGrowth ? '#10b981' : '#ef4444'};">${item.isApcGrowth ? '▲' : '▼'}</small>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     `).join("")}
                 </div>
@@ -2649,7 +2880,7 @@
                     </div>
 
                     <div>
-                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN (GRID)</h4>
+                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN (SALES, STD, & APC 2026)</h4>
                         ${rincianCardsHtml}
                     </div>
                 </div>
@@ -2686,7 +2917,6 @@
             }, 100);
         }
 
-        // REVISI 4: MODAL SERAH TERIMA SHIFT DENGAN RIWAYAT LENGKAP & FIREBASE RTDB
         function openSerahTerimaModal() {
             showCustomModal("🔄 SERAH TERIMA SHIFT KERJA", `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
@@ -2736,7 +2966,6 @@
             `);
         }
 
-        // REVISI 4: RIWAYAT SHIFT HANDOVER (OTOMATIS TERCATAT DAN DAPAT DICEK KEMBALI)
         function openShiftHandoverHistoryModal() {
             triggerAndroidHaptic('light');
             const ym = getCurrentMonthKey();
@@ -2855,6 +3084,7 @@
             if (!isBackgroundRefresh) box.scrollTop = box.scrollHeight;
         }
 
+        // PERBAIKAN POIN 4: HAPUS PESAN LANGSUNG HILANG DARI CHAT
         function openChatBubbleActionMenu(msgId, senderNik, senderNama, textMsg) {
             triggerAndroidHaptic('light');
             const isMe = String(senderNik).trim() === String(currentNik).trim();
@@ -2877,8 +3107,11 @@
                     document.getElementById("inputChatMsg").focus();
                 } else if (res.isDenied) {
                     if (rtdb && msgId) {
-                        rtdb.ref('chats/' + msgId).remove();
-                        showSwalSuccess('Dihapus', 'Pesan berhasil dihapus.');
+                        rtdb.ref('chats/' + msgId).remove().then(() => {
+                            cachedChatList = cachedChatList.filter(c => c.id !== msgId);
+                            renderChatList(cachedChatList, true);
+                            showSwalSuccess('Dihapus', 'Pesan berhasil dihapus!');
+                        });
                     }
                 }
             });
@@ -3107,6 +3340,7 @@
             }
 
             const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
+            const pendingExpValidasiCount = expShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
             const announceCount = activeAnnouncementsList.length;
 
             let belanjaNotifCardHtml = '';
@@ -3134,13 +3368,25 @@
 
                         ${belanjaNotifCardHtml}
 
+                        <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingExpValidasiCount > 0 ? '#f59e0b' : '#10b981'};">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h5 style="font-weight:800; font-size:0.8rem;">Validasi Ceklis Rak (Chief of Store)</h5>
+                                    <p style="font-size:0.65rem; color:var(--text-sub);">${pendingExpValidasiCount} Rak Menunggu Validasi</p>
+                                </div>
+                                <button onclick="closeCustomModal(); openCeklisExpiredModal('rak');" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                    👉 Validasi Rak (${pendingExpValidasiCount})
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingExpCount > 0 ? '#f59e0b' : '#10b981'};">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <div>
                                     <h5 style="font-weight:800; font-size:0.8rem;">Ceklis Expired Produk</h5>
                                     <p style="font-size:0.65rem; color:var(--text-sub);">${pendingExpCount} Produk Perlu Eksekusi</p>
                                 </div>
-                                <button onclick="closeCustomModal(); openCeklisExpiredModal();" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                <button onclick="closeCustomModal(); openCeklisExpiredModal('alert');" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
                                     👉 Cek Expired (${pendingExpCount})
                                 </button>
                             </div>
@@ -3222,6 +3468,7 @@
             `).join("");
         }
 
+        // PERBAIKAN POIN 3: SWITCH TAB DENGAN RESET BADGE UNREAD CHAT
         function switchTab(tabName) {
             triggerAndroidHaptic('light');
             ["beranda", "chat", "aksiCepat", "leaderboard", "profil"].forEach(t => {
@@ -3238,9 +3485,15 @@
 
             if (tabName === "leaderboard") loadLeaderboard();
             if (tabName === "aksiCepat") loadMisi();
-            if (tabName === "chat") initFirebaseRealtimeChat();
+            if (tabName === "chat") {
+                lastChatReadTimestamp = Date.now();
+                localStorage.setItem("LAST_CHAT_READ_TS", lastChatReadTimestamp.toString());
+                updateChatBadgeUI(0);
+                initFirebaseRealtimeChat();
+            }
         }
 
+        // PERBAIKAN POIN 1: CLEAR CACHE SHIFT & DATA SAAT LOGOUT
         function handleLogout() {
             Swal.fire({
                 title: 'Konfirmasi Logout',
@@ -3256,6 +3509,7 @@
                     currentNik = "";
                     dashboardData = null;
                     localShiftMatrix = {};
+                    selectedShiftKodeToko = null;
                     cachedChatList = [];
                     belanjaTransactions = [];
                     expProducts = [];
@@ -3264,7 +3518,7 @@
                     document.getElementById("appSection").classList.add("hidden");
                     document.getElementById("loginSection").classList.remove("hidden");
                     document.getElementById("nikInput").value = "";
-                    showSwalSuccess('Logout Berhasil', 'Anda telah keluar. Silakan masukkan NIK baru.');
+                    showSwalSuccess('Logout Berhasil', 'Cache akun dibersihkan. Silakan masukkan NIK baru.');
                 }
             });
         }
