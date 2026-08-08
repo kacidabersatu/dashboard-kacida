@@ -1881,7 +1881,7 @@
             const userKodeToko = dashboardData?.user?.kodeToko || '';
             const daftarToko = dashboardData?.daftarToko || [];
 
-            // FILTER KETAT DATA SESUAI TOKO (KECUALI AC)
+            // Filter data sesuai toko (Kecuali User AC)
             let storeShelves = expShelves;
             let storeProducts = expProducts;
 
@@ -1928,7 +1928,7 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO (AREA COORDINATOR - HANYA LIHAT)</h5>
                         <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
@@ -2048,10 +2048,32 @@
                     </div>
                 `;
             } 
-            // TAB 3: ALERT EXPIRED
+            // TAB 3: ALERT EXPIRED (DILENGKAPI KOTAK RESUME TOTAL)
             else if (activeTab === 'alert') {
+                const targetAlertProducts = userAC ? expProducts : expProducts.filter(p => p.kodeToko === userKodeToko);
+
+                const totalInputItem = targetAlertProducts.length;
+                const totalSudahDieksekusi = targetAlertProducts.filter(p => p.status === 'selesai').length;
+                const totalBelumDieksekusi = totalInputItem - totalSudahDieksekusi;
+
+                const summaryBoxesHtml = `
+                    <div class="modal-grid-3" style="margin-bottom:12px;">
+                        <div class="modal-card-box" style="text-align:center; border-left:4px solid var(--accent-primary); padding:10px;">
+                            <span style="font-size:0.6rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL EXP</span>
+                            <p style="font-size:1.1rem; font-weight:800; color:var(--accent-primary); margin-top:2px;">${totalInputItem} <small style="font-size:0.65rem;">Item</small></p>
+                        </div>
+                        <div class="modal-card-box" style="text-align:center; border-left:4px solid #10b981; padding:10px;">
+                            <span style="font-size:0.6rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH DIEKSEKUSI</span>
+                            <p style="font-size:1.1rem; font-weight:800; color:#047857; margin-top:2px;">${totalSudahDieksekusi} <small style="font-size:0.65rem;">Item</small></p>
+                        </div>
+                        <div class="modal-card-box" style="text-align:center; border-left:4px solid #ef4444; padding:10px;">
+                            <span style="font-size:0.6rem; color:var(--text-sub); font-weight:700; display:block;">BELUM DIEKSEKUSI</span>
+                            <p style="font-size:1.1rem; font-weight:800; color:#dc2626; margin-top:2px;">${totalBelumDieksekusi} <small style="font-size:0.65rem;">Item</small></p>
+                        </div>
+                    </div>
+                `;
+
                 if (userAC && daftarToko.length > 0) {
-                    // MODE AREA COORDINATOR: GRID TOKO ALERT EXP (READ-ONLY)
                     const storeExpCards = daftarToko.map(toko => {
                         const storeItems = expProducts.filter(p => p.kodeToko === toko.kodeToko);
                         const pendingCount = storeItems.filter(p => p.status !== 'selesai').length;
@@ -2076,6 +2098,7 @@
                     }).join("");
 
                     tabContentHtml = `
+                        ${summaryBoxesHtml}
                         <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO</h5>
                         <div class="modal-grid-1">${storeExpCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada data toko.</p>'}</div>
                     `;
@@ -2108,7 +2131,10 @@
                         `;
                     }).join("");
 
-                    tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
+                    tabContentHtml = `
+                        ${summaryBoxesHtml}
+                        <div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired di toko ini.</p>'}</div>
+                    `;
                 }
             }
 
