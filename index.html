@@ -99,13 +99,14 @@
 
         .container { margin-top: 12px; width: 100%; }
 
+        /* RUNNING TEXT BAR 3D ANIMATED */
         .running-text-container {
             width: 100%; max-width: 600px;
             background: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%);
             color: #ffffff; font-size: 0.72rem; font-weight: 800;
             padding: 8px 14px; box-shadow: 0 4px 15px rgba(4, 120, 87, 0.3);
             border-bottom: 2px solid var(--accent-primary);
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 8px; overflow: hidden;
         }
 
         .ac-metrics-card { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid var(--accent-primary); border-radius: 20px; padding: 14px; margin-bottom: 12px; }
@@ -319,7 +320,7 @@
             </div>
         </header>
 
-        <!-- RUNNING TEXT MARQUEE -->
+        <!-- RUNNING TEXT MARQUEE BERJALAN SMOOTH -->
         <div id="runningTextHeaderBar" class="running-text-container hidden">
             <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap;">🔥 INFO SUPERVISI</span>
             <marquee id="marqueeTextContent" scrollamount="6" style="flex:1;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
@@ -477,7 +478,6 @@
                 <button onclick="handleLogout()" style="margin-top: 12px; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 18px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">LOGOUT / GANTI NIK</button>
             </div>
 
-            <!-- BAGAN STRUKTUR PERSONIL PER-TOKO -->
             <div class="menu-section-card">
                 <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Bagan Struktur Toko Saya</h3>
                 <div id="timTokoContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
@@ -497,7 +497,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzMBsJ_Xa9cMBtaPai-Xdufwu4PazpXbWZHg3xteH4xngAnCiEtVXW4rfcpsZe4JLqB/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLFxelHnnL2ij0Qo366N2jbaXvihZ9DgyfpHEaaBDPG57EYp0WJQ72QlVzsW3uNMk2/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -520,6 +520,7 @@
         let dashboardData = null;
         let selectedKodeTokoAC = null;
         let selectedShiftKodeToko = null;
+        let selectedExpAlertStore = "ALL";
         let chatRoomMode = "team";
         let cachedChatList = [];
         let salesChartInstance = null;
@@ -536,12 +537,12 @@
         let activeHandoversList = [];
         let handoverCheckDoneThisSession = false;
 
-        // CEKLIS EXPIRED STATE REALTIME
+        // CEKLIS EXPIRED REALTIME STATE VIA FIREBASE RTDB
         let expShelves = [];
         let expProducts = [];
         let expPhotoPreview = null;
 
-        // BELANJA KARYAWAN REALTIME STATE
+        // BELANJA KARYAWAN REALTIME STATE VIA FIREBASE
         let belanjaTransactions = [];
         let belanjaPhotoPreview = null;
         let belanjaFilterStart = "";
@@ -743,7 +744,7 @@
             Notification.requestPermission().then(perm => {
                 if (perm === 'granted') {
                     showSwalSuccess('Notifikasi Aktif 🔔', 'Izin notifikasi aplikasi berhasil diaktifkan!');
-                    trackUserActivity(2, "Mengaktifkan Notifikasi");
+                    trackUserActivity(5, "Mengaktifkan Notifikasi");
                 }
             });
         }
@@ -785,7 +786,6 @@
             }
         }
 
-        // FIREBASE CHAT REALTIME LISTENER WITH UNREAD BADGE
         function initFirebaseRealtimeChat() {
             if (!rtdb) return;
             rtdb.ref('chats').limitToLast(50).on('value', (snapshot) => {
@@ -831,7 +831,6 @@
             }
         }
 
-        // POIN 3 & 4: FIREBASE CEKLIS EXPIRED DENGAN PENGUNCIAN TOKO DINGIN
         function initFirebaseCeklisExpiredListener() {
             if (!rtdb) return;
             
@@ -856,7 +855,6 @@
             });
         }
 
-        // POIN 6: FIREBASE BELANJA KARYAWAN REALTIME LISTENER & BADGE
         function initFirebaseBelanjaListener() {
             if (!rtdb) return;
             rtdb.ref('belanja_karyawan').on('value', (snapshot) => {
@@ -996,33 +994,28 @@
             showSwalSuccess('Shift Dikonfirmasi! 🤝', 'Terima kasih, konfirmasi serah terima shift berhasil dicatat.');
         }
 
-        // POIN 4 & 6: PERHITUNGAN BADGE NUMERIK REALTIME UNTUK BELANJA & EXPIRED
+        // PERBAIKAN POIN 4 & 6: BADGE REALTIME HANYA MUNCUL DI USER YANG MEMILIKI HAK VALIDASI
         function updateNotifikasiBadgeCount() {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
-            const myKodeToko = dashboardData?.user?.kodeToko || '';
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
 
             let pendingBelanjaCount = 0;
             if (userAC) {
                 pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu AC").length;
             } else if (userCOS) {
-                pendingBelanjaCount = belanjaTransactions.filter(t => t.kodeToko === myKodeToko && t.status === "Menunggu COS").length;
+                pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu COS" && t.kodeToko === userKodeToko).length;
             }
 
-            let pendingExpCount = 0;
             let pendingExpValidasiCount = 0;
-
-            if (userAC) {
-                pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
-                pendingExpValidasiCount = expShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
-            } else {
-                pendingExpCount = expProducts.filter(p => p.kodeToko === myKodeToko && p.status !== 'selesai').length;
-                pendingExpValidasiCount = expShelves.filter(s => s.kodeToko === myKodeToko && s.status === 'Menunggu Validasi COS').length;
+            if (userCOS) {
+                pendingExpValidasiCount = expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length;
             }
 
+            const userExpPendingProducts = expProducts.filter(p => p.status !== 'selesai' && (userAC || p.kodeToko === userKodeToko)).length;
             const announceCount = activeAnnouncementsList.length;
 
-            const totalNotif = pendingBelanjaCount + pendingExpCount + pendingExpValidasiCount + announceCount;
+            const totalNotif = pendingBelanjaCount + pendingExpValidasiCount + userExpPendingProducts + announceCount;
 
             const valNotifBox = document.getElementById("valNotifCount");
             const dotNotif = document.getElementById("dotNotif");
@@ -1032,32 +1025,17 @@
                 if (totalNotif > 0) dotNotif.classList.remove("hidden");
                 else dotNotif.classList.add("hidden");
             }
-
-            renderDefaultFallbackMenus();
         }
 
         function renderDefaultFallbackMenus() {
+            const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
             const userCOS = isUserCOS();
             const userAC = isUserAC();
-            const myKodeToko = dashboardData?.user?.kodeToko || '';
-
-            let pendingExpValidasiCount = 0;
-            if (userAC) {
-                pendingExpValidasiCount = expShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
-            } else {
-                pendingExpValidasiCount = expShelves.filter(s => s.kodeToko === myKodeToko && s.status === 'Menunggu Validasi COS').length;
-            }
-
-            let pendingBelanjaCount = 0;
-            if (userAC) {
-                pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu AC").length;
-            } else if (userCOS) {
-                pendingBelanjaCount = belanjaTransactions.filter(t => t.kodeToko === myKodeToko && t.status === "Menunggu COS").length;
-            }
+            const pendingBelanjaCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
 
             const builtInMenus = [
                 { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
-                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: pendingExpValidasiCount },
+                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: pendingExpCount },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
                 { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()", numBadge: pendingBelanjaCount }
             ];
@@ -1124,17 +1102,21 @@
             triggerAndroidHaptic('medium');
             const nik = document.getElementById("nikInput").value.trim();
             if (!nik) { showSwalWarning('Form Kosong ⚠️', 'Mohon masukkan NIK Anda!'); return; }
-            showLoading("Proses Login Kilat...");
+            showLoading("Proses Login...");
             
+            // Clear cache state untuk login baru
             localShiftMatrix = {};
             selectedShiftKodeToko = null;
+            expShelves = [];
+            expProducts = [];
+            belanjaTransactions = [];
             
             currentNik = nik;
             const res = await apiCall("login", { nik: nik });
             hideLoading();
             if (res && res.status === "success") {
                 localStorage.setItem("NIK_KACIDA", nik);
-                trackUserActivity(10, "Login Aplikasi");
+                trackUserActivity(1, "Login Aplikasi");
                 document.getElementById("loginSection").classList.add("hidden");
                 document.getElementById("appSection").classList.remove("hidden");
                 initDashboard(null, false);
@@ -1157,7 +1139,7 @@
                 document.getElementById("loginSection").classList.add("hidden");
                 document.getElementById("appSection").classList.remove("hidden");
                 renderDashboard(data);
-                trackUserActivity(5, "Akses Dashboard");
+                trackUserActivity(2, "Akses Dashboard");
                 
                 initFirebaseAnnouncementsListener();
                 initFirebaseBelanjaListener();
@@ -1186,7 +1168,7 @@
 
         function isUserCOS() {
             const j = String(dashboardData?.user?.jabatan || dashboardData?.user?.JABATAN || '').toUpperCase();
-            return j.includes("CHIEF") || j.includes("COS") || j.includes("STORE MANAGER") || j.includes("KEPALA TOKO");
+            return (j.includes("CHIEF") || j.includes("COS") || j.includes("STORE MANAGER") || j.includes("KEPALA TOKO")) && !isUserAC();
         }
 
         function renderDashboard(data) {
@@ -1303,17 +1285,17 @@
             });
         }
 
-        // PERBAIKAN POIN 1: SEMBUNYIKAN MENU SUPER ADMIN UNTUK USER LAIN (HANYA MUNCUL DI NIK 14125034)
+        // PERBAIKAN POIN 1: MENU SUPER ADMIN KHUSUS NIK 14125034
         function openMenuSidebar() {
             triggerAndroidHaptic('medium');
-            const isSuperAdmin = String(currentNik).trim() === "14125034";
+            const isSuperAdminUser = String(currentNik).trim() === "14125034";
 
-            const trackingButtonHtml = isSuperAdmin ? `
-                <div class="modal-card-box" style="border:1px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); margin-bottom:12px;">
+            const trackingButtonHtml = isSuperAdminUser ? `
+                <div class="modal-card-box" style="border:1px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
                     <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-user-gear"></i> MENU SUPER ADMINISTRATOR</h4>
-                    <p style="font-size:0.68rem; color:#b45309; margin-bottom:10px;">Monitor User Online, Status Install PWA, Notifikasi, Survey & Tracking Aktivitas Realtime.</p>
+                    <p style="font-size:0.68rem; color:#b45309; margin-bottom:10px;">Monitor User Online, Status Install PWA, Notifikasi, Hasil Survey & Activity Log Realtime.</p>
                     <button onclick="openUserActivityTrackingModal()" style="width:100%; background:var(--gold); color:#ffffff; font-weight:800; padding:10px; border-radius:10px; border:none; cursor:pointer;">
-                        📊 BUKA MONITORING SUPER ADMINISTRATOR
+                        📊 BUKA DASHBOARD SUPER ADMINISTRATOR
                     </button>
                 </div>
             ` : '';
@@ -1333,9 +1315,9 @@
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-book-open"></i> README & TATA CARA APLIKASI</h4>
                         <div style="font-size:0.72rem; color:var(--text-main); line-height:1.5;">
                             <p><b>1. Sales SPD & MTD:</b> Klik baris Sales di beranda untuk melihat rincian performa harian STD & APC 2026.</p>
-                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS dapat mengedit pola shift bulanan. Logout mengosongkan cache jadwal.</p>
-                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Penguncian per-toko. Pengerjaan rak oleh Staff wajib upload foto & divalidasi/ditolak COS.</p>
-                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Validasi realtime tanpa harus klik sync manual.</p>
+                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS dapat mengedit pola shift bulanan. Logout akan mengosongkan cache jadwal.</p>
+                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Manajemen rak khusus Chief of Store. Pengerjaan rak wajib lampirkan foto & divalidasi COS (Setujui/Tolak).</p>
+                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Unggah struk belanja untuk dikonfirmasi COS & disetujui AC secara real-time.</p>
                         </div>
                     </div>
 
@@ -1371,10 +1353,10 @@
             showCustomModal("⚙️ Pengaturan & Informasi", htmlContent);
         }
 
-        // PERBAIKAN POIN 1: MONITORING SUPER ADMIN HANYA BISA DIBUKA NIK 14125034 DAN MENAMPILKAN DOKUMEN SURVEY
+        // PERBAIKAN POIN 1: MONITORING SUPER ADMINISTRATOR (DENGAN TAMPILAN SURVEY)
         function openUserActivityTrackingModal() {
             if (String(currentNik).trim() !== "14125034") {
-                showSwalWarning("Akses Ditolak 🔒", "Fitur khusus Super Administrator (NIK 14125034)!");
+                showSwalWarning("Akses Ditolak 🔒", "Menu Khusus Super Administrator!");
                 return;
             }
 
@@ -1424,19 +1406,22 @@
                     </div>
                 `).join("");
 
-                let surveyList = Object.values(survData).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-                let surveyCardsHtml = surveyList.map(s => `
+                let surveyCardsHtml = Object.values(survData).reverse().map(sv => `
                     <div class="modal-card-box" style="padding:10px; border-left:4px solid var(--gold); margin-bottom:6px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <b>${escapeHTML(s.nama || s.nik)} (${escapeHTML(s.toko || 'Toko')})</b>
-                            <span style="color:var(--gold); font-weight:800;">⭐ ${s.rating || 5}/5</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <div>
+                                <b style="font-size:0.78rem; color:var(--text-main);">${escapeHTML(sv.nama || sv.nik)}</b>
+                                <span style="font-size:0.62rem; color:var(--text-sub);"> (${escapeHTML(sv.toko || 'Toko')})</span>
+                            </div>
+                            <span style="font-size:0.7rem; color:var(--gold); font-weight:800;">⭐ ${sv.rating} / 5</span>
                         </div>
-                        <p style="font-size:0.7rem; color:var(--text-main); margin-top:4px;">"${escapeHTML(s.saran || '-')}"</p>
-                        <p style="font-size:0.58rem; color:var(--text-sub); margin-top:2px;">Waktu: ${s.timestamp}</p>
+                        <p style="font-size:0.72rem; color:var(--text-main); font-style:italic;">"${escapeHTML(sv.saran || '-')}"</p>
+                        <span style="font-size:0.58rem; color:var(--text-sub); margin-top:4px; display:block;">${sv.timestamp || ''}</span>
                     </div>
                 `).join("");
 
                 let logsList = Object.entries(logData).map(([id, val]) => ({ id, ...val })).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
                 let logsCardsHtml = logsList.map(log => `
                     <div class="modal-card-box" onclick="viewLogDetailPopup('${log.id}')" style="padding:10px; border-left:4px solid var(--accent-primary); cursor:pointer;" title="Klik untuk lihat detail lengkap">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -1478,14 +1463,14 @@
                         </div>
 
                         <div class="modal-card-box">
-                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--gold); margin-bottom:8px;"><i class="fa-solid fa-comments"></i> MASUKAN & SURVEY USER (${surveyList.length})</h5>
-                            <div style="display:flex; flex-direction:column; gap:6px; max-height:150px; overflow-y:auto;">
-                                ${surveyCardsHtml || '<p style="text-align:center; color:var(--text-sub); font-size:0.7rem;">Belum ada survey dikirimkan.</p>'}
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--gold); margin-bottom:8px;"><i class="fa-solid fa-star"></i> HASIL SURVEY & SARAN PENGGUNA</h5>
+                            <div style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto;">
+                                ${surveyCardsHtml || '<p style="text-align:center; color:var(--text-sub); font-size:0.7rem;">Belum ada masukan survey masuk.</p>'}
                             </div>
                         </div>
 
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;"><i class="fa-solid fa-list-check"></i> RIWAYAT LOG AKTIVITAS (KLIK UNTUK DETAIL)</h5>
-                        <div class="modal-grid-1" style="max-height:35vh; overflow-y:auto;">
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;"><i class="fa-solid fa-list-check"></i> LOG AKTIVITAS USER (KLIK DETAIL)</h5>
+                        <div class="modal-grid-1" style="max-height:40vh; overflow-y:auto;">
                             ${logsCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada data log aktivitas.</p>'}
                         </div>
                     </div>
@@ -1568,27 +1553,22 @@
 
         function renderCombinedMenuUtama(sheetUtamaMenus) {
             const container = document.getElementById("gridMenuUtama");
-            const myKodeToko = dashboardData?.user?.kodeToko || '';
-            const userAC = isUserAC();
+            const pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
+            
             const userCOS = isUserCOS();
-
-            let pendingExpValidasiCount = 0;
-            if (userAC) {
-                pendingExpValidasiCount = expShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
-            } else {
-                pendingExpValidasiCount = expShelves.filter(s => s.kodeToko === myKodeToko && s.status === 'Menunggu Validasi COS').length;
-            }
+            const userAC = isUserAC();
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
 
             let pendingBelanjaCount = 0;
             if (userAC) {
                 pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu AC").length;
             } else if (userCOS) {
-                pendingBelanjaCount = belanjaTransactions.filter(t => t.kodeToko === myKodeToko && t.status === "Menunggu COS").length;
+                pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu COS" && t.kodeToko === userKodeToko).length;
             }
 
             const builtInMenus = [
                 { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
-                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: pendingExpValidasiCount },
+                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: userCOS ? expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length : 0 },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
                 { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()", numBadge: pendingBelanjaCount }
             ];
@@ -1629,23 +1609,25 @@
 
         async function onMenuClick(namaMenu, link) {
             triggerAndroidHaptic('light');
-            trackUserActivity(2, "Klik " + namaMenu);
+            trackUserActivity(1, "Klik " + namaMenu);
             if (link && link !== "#") window.open(link, "_blank");
         }
 
-        async function openPlanMasterShiftModal(kodeTokoPilihan = null) {
+        function openPlanMasterShiftModal(kodeTokoPilihan = null) {
             showLoading("Memuat Jadwal Master Shift...");
             const targetKode = kodeTokoPilihan || selectedShiftKodeToko || dashboardData?.user?.kodeToko || "2J7K";
             selectedShiftKodeToko = targetKode;
 
             try {
-                const res = await apiCall("getMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth });
-                if (res && res.shiftData) localShiftMatrix = res.shiftData;
-                else localShiftMatrix = {};
+                apiCall("getMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth }).then(res => {
+                    hideLoading();
+                    if (res && res.shiftData) localShiftMatrix = res.shiftData;
+                    else localShiftMatrix = {};
+                    renderPlanMasterShiftModal();
+                });
             } catch(e) {
-                localShiftMatrix = {};
-            } finally {
                 hideLoading();
+                localShiftMatrix = {};
                 renderPlanMasterShiftModal();
             }
         }
@@ -1701,7 +1683,7 @@
                     dayCellsHtml += `
                         <td style="padding:3px; text-align:center; border:1px solid var(--card-border);">
                             <div class="shift-pill ${pillClass} ${passed ? 'shift-locked' : ''}" 
-                                 onclick="${(canEdit && !passed) ? `openShiftPickerModal('${p.nik}', ${d}, '${shiftCode}')` : (passed ? `showSwalWarning('Tanggal Terkunci 🔒', 'Tanggal ini telah berlalu.')` : `showSwalWarning('Read Only 👁️', 'I am sorry, Silahkan hub COS/ACOS')`)}">
+                                 onclick="${(canEdit && !passed) ? `openShiftPickerModal('${p.nik}', ${d}, '${shiftCode}')` : (passed ? `showSwalWarning('Tanggal Terkunci 🔒', 'Tanggal ini telah berlalu.')` : `showSwalWarning('Read Only 👁️', 'Iam Sorry, Silahkan hub COS/ACOS.')`)}">
                                 ${labelTxt}
                             </div>
                         </td>
@@ -1874,12 +1856,12 @@
             const res = await apiCall("saveMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth, shiftDataJson: jsonStr });
             hideLoading();
             if (res && res.status === "success") {
-                trackUserActivity(10, "Simpan Master Shift");
+                trackUserActivity(3, "Simpan Master Shift");
                 showSwalSuccess('Berhasil Disimpan 💾', 'Data Shift Toko Berhasil Disimpan!');
             }
         }
 
-        // PERBAIKAN POIN 2, 3, 5: CEKLIS EXPIRED (FOTO WAJIB, APPROVE/REJECT COS BERALASAN, ISOLASI TOKO, & GRID AREA AC)
+        // PERBAIKAN POIN 2, 3, 4, 5: CEKLIS EXPIRED (FOTO WAJIB, VALIDASI COS SETUJUI/TOLAK, FILTER TOKO, & AC READ-ONLY)
         function openCeklisExpiredModal() { renderCeklisExpiredModal('rak'); }
 
         function handleExpPhotoChangePreview(e) {
@@ -1894,56 +1876,50 @@
         }
 
         function renderCeklisExpiredModal(activeTab = 'rak') {
-            const myKodeToko = dashboardData?.user?.kodeToko || '';
             const userCOS = isUserCOS();
             const userAC = isUserAC();
-            const canManageRak = userCOS;
-
-            if (userAC && activeTab === 'input') {
-                activeTab = 'rak';
-            }
-
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
             const daftarToko = dashboardData?.daftarToko || [];
 
-            let filteredShelves = [];
-            let filteredProducts = [];
+            // FILTER KETAT DATA SESUAI TOKO (KECUALI AC)
+            let storeShelves = expShelves;
+            let storeProducts = expProducts;
 
-            if (userAC) {
-                filteredShelves = expShelves;
-                filteredProducts = expProducts;
-            } else {
-                filteredShelves = expShelves.filter(s => s.kodeToko === myKodeToko);
-                filteredProducts = expProducts.filter(p => p.kodeToko === myKodeToko);
+            if (!userAC) {
+                storeShelves = expShelves.filter(s => s.kodeToko === userKodeToko);
+                storeProducts = expProducts.filter(p => p.kodeToko === userKodeToko);
             }
 
-            const totalRak = filteredShelves.length;
+            const totalRak = storeShelves.length;
             const todayStr = new Date().toDateString();
 
-            const selesaiRak = filteredShelves.filter(s => s.status === 'Selesai').length;
-            const pendingValidasiRak = filteredShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
+            const selesaiRak = storeShelves.filter(s => s.lastChecked && new Date(s.lastChecked).toDateString() === todayStr && s.status === 'Selesai').length;
+            const pendingValidasiRak = storeShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
 
-            const pendingExpCount = filteredProducts.filter(p => p.status !== 'selesai').length;
+            const pendingExpCount = storeProducts.filter(p => p.status !== 'selesai').length;
 
             let tabContentHtml = '';
 
+            // TAB 1: CEKLIS & RAK TOKO
             if (activeTab === 'rak') {
                 if (userAC && daftarToko.length > 0) {
-                    let storeGridCardsHtml = daftarToko.map(toko => {
-                        const storeShelves = expShelves.filter(s => s.kodeToko === toko.kodeToko);
-                        const storePendingVal = storeShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
-                        const storeSelesai = storeShelves.filter(s => s.status === 'Selesai').length;
+                    // MODE AREA COORDINATOR: GRID TOKO (READ-ONLY)
+                    const storeCards = daftarToko.map(toko => {
+                        const tShelves = expShelves.filter(s => s.kodeToko === toko.kodeToko);
+                        const tSelesai = tShelves.filter(s => s.status === 'Selesai').length;
+                        const tPending = tShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
 
                         return `
-                            <div class="modal-card-box" onclick="viewStoreShelvesDetailAC('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid ${storePendingVal > 0 ? '#f59e0b' : '#10b981'};" title="Klik Rincian Rak Toko">
+                            <div class="modal-card-box" onclick="viewStoreShelvesDetailAC('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid var(--accent-primary);" title="Klik untuk lihat rincian rak toko (Hanya Lihat)">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div>
                                         <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
                                         <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">
-                                            Total Rak: <b>${storeShelves.length}</b> | Selesai: <b style="color:#047857;">${storeSelesai}</b>
+                                            Selesai: <b style="color:#047857;">${tSelesai} / ${tShelves.length} Rak</b> | Pending: <b style="color:#b45309;">${tPending}</b>
                                         </p>
                                     </div>
                                     <div style="text-align:right;">
-                                        ${storePendingVal > 0 ? `<span style="background:#fef3c7; color:#b45309; font-size:0.62rem; padding:3px 8px; border-radius:6px; font-weight:800;">⏳ ${storePendingVal} Perlu Validasi</span>` : `<span style="background:#d1fae5; color:#047857; font-size:0.62rem; padding:3px 8px; border-radius:6px; font-weight:800;">✅ Selesai</span>`}
+                                        <span style="font-size:0.6rem; background:#e0e7ff; color:#3730a3; padding:2px 6px; border-radius:4px; font-weight:800;">👁️ Read-Only</span>
                                         <p style="font-size:0.58rem; color:var(--gold); margin-top:2px;">Lihat Rak ➔</p>
                                     </div>
                                 </div>
@@ -1952,14 +1928,15 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 DETAIL PERTOKO</h5>
-                        <div class="modal-grid-1">${storeGridCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada toko terdaftar.</p>'}</div>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO</h5>
+                        <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
-                    let rakListCards = filteredShelves.map(s => {
+                    // MODE STORE USER (STAFF & COS)
+                    let rakListCards = storeShelves.map(s => {
                         const isDone = s.status === 'Selesai';
                         const isPendingVal = s.status === 'Menunggu Validasi COS';
-                        const isRejected = String(s.status).includes('Ditolak');
+                        const isRejected = s.status === 'Ditolak';
 
                         return `
                             <div class="modal-card-box" style="border-left: 4px solid ${isDone ? '#10b981' : (isPendingVal ? '#f59e0b' : '#ef4444')};">
@@ -1971,14 +1948,15 @@
                                             Penanggung Jawab: <b style="color:var(--accent-primary);">${escapeHTML(s.assignedName || 'Belum Didelegasikan')}</b>
                                         </p>
                                         ${s.lastChecked ? `<p style="font-size:0.6rem; color:var(--text-sub); margin-top:2px;">Terakhir Cek: ${new Date(s.lastChecked).toLocaleString('id-ID')} oleh <b>${escapeHTML(s.checkedBy||'-')}</b></p>` : ''}
+                                        ${isRejected && s.alasanTolak ? `<p style="font-size:0.62rem; color:#dc2626; font-weight:bold; margin-top:2px;">🚫 Ditolak COS: ${escapeHTML(s.alasanTolak)}</p>` : ''}
                                     </div>
                                     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
                                         <span style="font-size:0.65rem; padding:3px 8px; border-radius:6px; font-weight:800; ${isDone ? 'background:#d1fae5; color:#047857;' : (isPendingVal ? 'background:#fef3c7; color:#b45309;' : 'background:#fee2e2; color:#dc2626;')}">
-                                            ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Menunggu Validasi COS' : escapeHTML(s.status || 'Belum Ceklis'))}
+                                            ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Menunggu Validasi COS' : (isRejected ? '🚫 Ditolak' : '❌ Belum Ceklis'))}
                                         </span>
                                         
-                                        ${canManageRak ? `
-                                            <button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:3px 8px; border-radius:6px; font-size:0.6rem; cursor:pointer; font-weight:800;">🗑️ Hapus Rak</button>
+                                        ${userCOS ? `
+                                            <button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:3px 8px; border-radius:6px; font-size:0.6rem; cursor:pointer; font-weight:800;">🗑️ Hapus</button>
                                         ` : ''}
                                     </div>
                                 </div>
@@ -1991,26 +1969,24 @@
 
                                 <div style="margin-top:10px; display:flex; gap:6px;">
                                     ${isPendingVal && userCOS ? `
-                                        <button onclick="validateShelfByCOS('${s.id}')" style="flex:1; background:var(--accent-green-grad); color:#fff; border:none; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
-                                            ✅ Setujui
-                                        </button>
                                         <button onclick="rejectShelfByCOS('${s.id}')" style="flex:1; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
-                                            ❌ Tolak
+                                            ❌ TOLAK
                                         </button>
-                                    ` : ''}
-
-                                    ${!isPendingVal || !userCOS ? `
+                                        <button onclick="validateShelfByCOS('${s.id}')" style="flex:1; background:var(--accent-green-grad); color:#fff; border:none; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
+                                            ✅ SETUJUI
+                                        </button>
+                                    ` : `
                                         <button onclick="promptShelfCompletion('${s.id}')" style="flex:1; background:${isDone ? '#ffffff' : 'var(--accent-green-grad)'}; color:${isDone ? '#047857' : '#ffffff'}; border:${isDone ? '1px solid #10b981' : 'none'}; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
-                                            ${isDone ? '🔄 Update / Ceklis Ulang' : '📸 Tandai Selesai + Foto Bukti (Wajib)'}
+                                            ${isDone ? '🔄 Update / Ceklis Ulang' : '📸 Tandai Selesai + Foto Wajib'}
                                         </button>
-                                    ` : ''}
+                                    `}
                                 </div>
                             </div>
                         `;
                     }).join("");
 
                     let configSectionHtml = '';
-                    if (canManageRak) {
+                    if (userCOS) {
                         configSectionHtml = `
                             <div class="modal-card-box">
                                 <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH & MANAJEMEN RAK (KHUSUS COS)</h5>
@@ -2047,11 +2023,13 @@
                         <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data rak di toko ini.</p>'}</div>
                     `;
                 }
-            } else if (activeTab === 'input' && !userAC) {
-                const shelfOptionsHtml = filteredShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
+            } 
+            // TAB 2: INPUT PRODUK (DISEMBUNYIKAN UNTUK AC)
+            else if (activeTab === 'input' && !userAC) {
+                const shelfOptionsHtml = storeShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
                 tabContentHtml = `
                     <div class="modal-card-box">
-                        <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;">➕ INPUT PRODUK EXPIRED TOKO SAYA</h4>
+                        <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;">➕ INPUT PRODUK EXPIRED</h4>
                         <div style="margin-bottom:10px;">
                             <label style="font-weight:700; display:block; margin-bottom:4px;">Pilih Rak Penempatan:</label>
                             <select id="expShelfIdInput" style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:10px; border-radius:10px;">
@@ -2069,23 +2047,27 @@
                         <button onclick="saveExpProductAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">💾 SIMPAN PRODUK EXP</button>
                     </div>
                 `;
-            } else if (activeTab === 'alert') {
+            } 
+            // TAB 3: ALERT EXPIRED
+            else if (activeTab === 'alert') {
                 if (userAC && daftarToko.length > 0) {
-                    let alertStoreCards = daftarToko.map(toko => {
-                        const storeProds = expProducts.filter(p => p.kodeToko === toko.kodeToko);
-                        const storePending = storeProds.filter(p => p.status !== 'selesai').length;
+                    // MODE AREA COORDINATOR: GRID TOKO ALERT EXP (READ-ONLY)
+                    const storeExpCards = daftarToko.map(toko => {
+                        const storeItems = expProducts.filter(p => p.kodeToko === toko.kodeToko);
+                        const pendingCount = storeItems.filter(p => p.status !== 'selesai').length;
+                        const doneCount = storeItems.filter(p => p.status === 'selesai').length;
 
                         return `
-                            <div class="modal-card-box" onclick="viewStoreAlertExpDetailAC('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid ${storePending > 0 ? '#ef4444' : '#10b981'};" title="Klik Detail Alert Toko">
+                            <div class="modal-card-box" onclick="viewStoreExpDetailAC('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid ${pendingCount > 0 ? '#ef4444' : '#10b981'};" title="Klik untuk lihat rincian produk exp toko (Hanya Lihat)">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div>
                                         <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
-                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">Total Produk Alert: <b>${storeProds.length}</b></p>
+                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">
+                                            Status: <b style="color:#10b981;">${doneCount} Dieksekusi</b> | <b style="color:#ef4444;">${pendingCount} Belum</b>
+                                        </p>
                                     </div>
                                     <div style="text-align:right;">
-                                        <span style="font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:6px; ${storePending > 0 ? 'background:#fee2e2; color:#dc2626;' : 'background:#d1fae5; color:#047857;'}">
-                                            ${storePending > 0 ? `⚠️ ${storePending} Belum Eksekusi` : '✅ Aman'}
-                                        </span>
+                                        <span style="font-size:0.6rem; background:#e0e7ff; color:#3730a3; padding:2px 6px; border-radius:4px; font-weight:800;">👁️ Read-Only</span>
                                         <p style="font-size:0.58rem; color:var(--gold); margin-top:2px;">Detail ➔</p>
                                     </div>
                                 </div>
@@ -2094,12 +2076,12 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 ALERT EXPIRED PER-TOKO</h5>
-                        <div class="modal-grid-1">${alertStoreCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada data toko.</p>'}</div>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RESUME EXPIRED PER-TOKO</h5>
+                        <div class="modal-grid-1">${storeExpCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada data toko.</p>'}</div>
                     `;
                 } else {
-                    let alertListHtml = filteredProducts.map(p => {
-                        const shelf = expShelves.find(s => s.id === p.shelfId);
+                    let alertListHtml = storeProducts.map(p => {
+                        const shelf = storeShelves.find(s => s.id === p.shelfId);
                         const isDone = p.status === 'selesai';
                         return `
                             <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
@@ -2126,7 +2108,7 @@
                         `;
                     }).join("");
 
-                    tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired di toko ini.</p>'}</div>`;
+                    tabContentHtml = `<div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada peringatan expired.</p>'}</div>`;
                 }
             }
 
@@ -2145,56 +2127,74 @@
             showCustomModal("⚠️ CEKLIS EXP & MANAJEMEN RAK", htmlBox);
         }
 
+        // FUNGSI DETAIL RAK KHUSUS AC (READ-ONLY KETAT)
         function viewStoreShelvesDetailAC(kodeToko, namaToko) {
             triggerAndroidHaptic('light');
             const storeShelves = expShelves.filter(s => s.kodeToko === kodeToko);
 
-            let html = storeShelves.map(s => `
-                <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <b>${escapeHTML(s.name)} (No: ${s.noRak||'-'})</b>
-                        <span style="font-size:0.62rem; padding:2px 6px; border-radius:4px; font-weight:800; ${s.status==='Selesai'?'background:#d1fae5; color:#047857;':'background:#fef3c7; color:#b45309;'}">
-                            ${escapeHTML(s.status||'Belum Ceklis')}
+            let html = storeShelves.map(s => {
+                const isDone = s.status === 'Selesai';
+                const isPendingVal = s.status === 'Menunggu Validasi COS';
+                const isRejected = s.status === 'Ditolak';
+
+                return `
+                    <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <h5 style="font-weight:800; font-size:0.85rem; color:var(--text-main);">${escapeHTML(s.name)}</h5>
+                                <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">No. Rak: ${escapeHTML(s.noRak||'-')} | PJ: <b>${escapeHTML(s.assignedName||'-')}</b></p>
+                                ${s.lastChecked ? `<p style="font-size:0.6rem; color:var(--text-sub);">Dikerjakan: ${new Date(s.lastChecked).toLocaleString('id-ID')} oleh ${escapeHTML(s.checkedBy||'-')}</p>` : ''}
+                            </div>
+                            <span style="font-size:0.65rem; padding:3px 8px; border-radius:6px; font-weight:800; ${isDone ? 'background:#d1fae5; color:#047857;' : (isPendingVal ? 'background:#fef3c7; color:#b45309;' : 'background:#fee2e2; color:#dc2626;')}">
+                                ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Pending COS' : (isRejected ? '🚫 Ditolak' : '❌ Belum Ceklis'))}
+                            </span>
+                        </div>
+                        ${s.photoUrl ? `
+                            <div style="margin-top:6px;">
+                                <img src="${s.photoUrl}" onclick="showFullImageModal('${s.photoUrl}')" style="width:100%; height:100px; object-fit:cover; border-radius:8px; cursor:pointer;" title="Klik Pratinjau Foto Fullscreen">
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join("");
+
+            Swal.fire({
+                title: `Rincian Rak Toko: ${namaToko} (Read-Only)`,
+                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Belum ada data rak di toko ini.</p>`,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
+        }
+
+        // FUNGSI DETAIL ALERT EXP KHUSUS AC (READ-ONLY KETAT)
+        function viewStoreExpDetailAC(kodeToko, namaToko) {
+            triggerAndroidHaptic('light');
+            const storeItems = expProducts.filter(p => p.kodeToko === kodeToko);
+
+            let html = storeItems.map(p => {
+                const isDone = p.status === 'selesai';
+                return `
+                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(p.name)}</p>
+                            <p style="font-size:0.62rem; color:var(--text-sub);">Exp: <b style="color:#ef4444;">${p.expDate}</b> | Penginput: ${escapeHTML(p.addedBy || 'Staff')}</p>
+                        </div>
+                        <span style="font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; ${isDone ? 'background:#d1fae5; color:#047857;' : 'background:#fee2e2; color:#dc2626;'}">
+                            ${isDone ? '✅ Sudah Dieksekusi' : '⚠️ Belum Dieksekusi'}
                         </span>
                     </div>
-                    <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">PJ: ${escapeHTML(s.assignedName||'-')}</p>
-                    ${s.photoUrl ? `<img src="${s.photoUrl}" onclick="showFullImageModal('${s.photoUrl}')" style="width:100%; height:110px; object-fit:cover; border-radius:8px; margin-top:6px; cursor:pointer;" title="Klik Pratinjau Foto">` : ''}
-                </div>
-            `).join("");
+                `;
+            }).join("");
 
             Swal.fire({
-                title: `Rak Toko: ${namaToko}`,
-                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Belum ada rak dibuat di toko ini.</p>`,
+                title: `Detail Expired: ${namaToko} (Read-Only)`,
+                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Tidak ada catatan produk expired di toko ini.</p>`,
                 confirmButtonText: 'Tutup',
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             });
         }
 
-        function viewStoreAlertExpDetailAC(kodeToko, namaToko) {
-            triggerAndroidHaptic('light');
-            const storeProds = expProducts.filter(p => p.kodeToko === kodeToko);
-
-            let html = storeProds.map(p => `
-                <div style="background:var(--input-bg); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(p.name)}</p>
-                        <p style="font-size:0.62rem; color:var(--text-sub);">Exp: <b style="color:#ef4444;">${p.expDate}</b> | Penginput: ${escapeHTML(p.addedBy || 'Staff')}</p>
-                    </div>
-                    <span style="font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; ${p.status==='selesai' ? 'background:#d1fae5; color:#047857;' : 'background:#fee2e2; color:#dc2626;'}">
-                        ${p.status==='selesai' ? '✅ Selesai' : '⚠️ Belum'}
-                    </span>
-                </div>
-            `).join("");
-
-            Swal.fire({
-                title: `Alert Expired: ${namaToko}`,
-                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Tidak ada catatan alert expired di toko ini.</p>`,
-                confirmButtonText: 'Tutup',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            });
-        }
-
-        // PERBAIKAN POIN 2: PROMPT PEMILIHAN FOTO BUKTI CEKLIS RAK (FOTO WAJIB)
+        // PERBAIKAN POIN 2: PROMPT BUKTI FOTO CEKLIS EXP WAJIB
         function promptShelfCompletion(shelfId) {
             triggerAndroidHaptic('medium');
             expPhotoPreview = null;
@@ -2203,18 +2203,18 @@
                 title: 'Tandai Rak Selesai',
                 html: `
                     <div style="text-align:left; font-size:0.75rem;">
-                        <p style="margin-bottom:8px; color:#dc2626; font-weight:800;">* Wajib unggah foto bukti pengerjaan/kebersihan rak untuk melanjutkan:</p>
+                        <p style="margin-bottom:8px; font-weight:bold; color:#dc2626;">* PILIH / UNGGAH FOTO BUKTI BUKTI PENGERJAAN (WAJIB):</p>
                         <input type="file" id="expShelfPhotoFile" accept="image/*" onchange="handleExpPhotoChangePreview(event)" style="width:100%; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border);">
                     </div>
                 `,
                 showCancelButton: true,
-                confirmButtonText: '📸 Submit Bukti Pengerjaan',
+                confirmButtonText: '📸 Submit Bukti Foto',
                 cancelButtonText: 'Batal',
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             }).then((res) => {
                 if (res.isConfirmed) {
                     if (!expPhotoPreview) {
-                        showSwalWarning('Foto Wajib ⚠️', 'Foto Bukti Pengerjaan Rak Wajib Diunggah! Silakan ulangi kembali.');
+                        showSwalWarning('Foto Bukti Wajib ⚠️', 'Anda WAJIB memilih/mengunggah foto bukti kebersihan rak!');
                         return;
                     }
                     markShelfCheckAction(shelfId);
@@ -2227,25 +2227,24 @@
             const statusTarget = userCOS ? 'Selesai' : 'Menunggu Validasi COS';
             const timestamp = new Date().toISOString();
             const userName = dashboardData?.user?.NAMA || 'User';
-            const myKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+            const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
 
             if (rtdb) {
                 rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
                     status: statusTarget,
                     lastChecked: timestamp,
                     checkedBy: userName,
-                    photoUrl: expPhotoPreview || '',
-                    kodeToko: myKodeToko
+                    kodeToko: userKodeToko,
+                    photoUrl: expPhotoPreview || ''
                 });
             }
 
             expPhotoPreview = null;
-            trackUserActivity(5, "Ceklis Rak Expired");
+            trackUserActivity(2, "Ceklis Rak Expired");
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Ceklis Terkirim!', userCOS ? 'Rak ditandai Selesai!' : 'Foto berhasil dikirimkan. Menunggu Validasi Chief of Store.');
+            showSwalSuccess('Ceklis Terkirim!', userCOS ? 'Rak ditandai Selesai!' : 'Foto berhasil dikirim. Menunggu Validasi Chief of Store.');
         }
 
-        // PERBAIKAN POIN 2: COS APPROVE / REJECT BERALASAN
         function validateShelfByCOS(shelfId) {
             if (!isUserCOS()) return;
 
@@ -2257,32 +2256,32 @@
             }
 
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Rak Divalidasi ✅', 'Hasil pengerjaan rak oleh staff berhasil disetujui!');
+            showSwalSuccess('Rak Divalidasi ✅', 'Hasil pengerjaan rak berhasil disetujui!');
         }
 
+        // PERBAIKAN POIN 2: COS DAPAT MENOLAK BERALASAN
         function rejectShelfByCOS(shelfId) {
             if (!isUserCOS()) return;
 
             Swal.fire({
                 title: 'Tolak Pengerjaan Rak',
                 input: 'textarea',
-                inputPlaceholder: 'Tuliskan alasan penolakan (cth: Rak masih kotor, susunan salah)...',
+                inputPlaceholder: 'Tuliskan alasan penolakan (misal: Foto kurang jelas, rak masih kotor)...',
                 showCancelButton: true,
-                confirmButtonText: 'Kirim Penolakan',
+                confirmButtonText: '🚫 Kirim Penolakan',
                 cancelButtonText: 'Batal',
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             }).then((res) => {
                 if (res.isConfirmed && res.value) {
-                    const alasan = res.value.trim();
                     if (rtdb) {
                         rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
-                            status: `Ditolak (Alasan: ${alasan})`,
-                            rejectedByCOS: dashboardData?.user?.NAMA || 'COS',
-                            photoUrl: ''
+                            status: 'Ditolak',
+                            alasanTolak: res.value,
+                            rejectedByCOS: dashboardData?.user?.NAMA || 'COS'
                         });
                     }
                     renderCeklisExpiredModal('rak');
-                    showSwalSuccess('Pengerjaan Ditolak', 'Alasan penolakan telah dikirimkan ke staff!');
+                    showSwalSuccess('Penolakan Dikirim', 'Status pengerjaan rak diubah menjadi Ditolak.');
                 }
             });
         }
@@ -2293,7 +2292,7 @@
             const noRak = document.getElementById("addNoRakInput").value.trim();
             const name = document.getElementById("addNamaRakInput").value.trim();
             const cat = document.getElementById("addCatRakInput").value;
-            const myKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+            const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
 
             if (!name) { showSwalWarning('Form Kosong', 'Mohon masukkan nama rak!'); return; }
 
@@ -2306,7 +2305,7 @@
                 assignedNik: '',
                 assignedName: 'Belum Didelegasikan',
                 status: 'Belum Ceklis',
-                kodeToko: myKodeToko,
+                kodeToko: userKodeToko,
                 lastChecked: null,
                 checkedBy: null
             };
@@ -2316,7 +2315,7 @@
             }
 
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Rak Ditambahkan 📦', 'Rak baru berhasil dibuat di Realtime DB!');
+            showSwalSuccess('Rak Ditambahkan 📦', 'Rak baru berhasil dibuat!');
         }
 
         function deleteShelfAction(id) {
@@ -2343,15 +2342,15 @@
             const personil = dashboardData?.struktur?.personilToko || [];
             if (personil.length === 0) { showSwalWarning('Data Kosong', 'Tidak ada personil toko ditemukan.'); return; }
 
-            const myKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+            const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+            let defaultShelves = expShelves.filter(s => s.kodeToko === userKodeToko);
 
-            let defaultShelves = expShelves.filter(s => s.kodeToko === myKodeToko);
             if (defaultShelves.length === 0) {
                 defaultShelves = [
-                    { id: 'shelf_1_' + Date.now(), noRak: 'R-01', name: 'Rak Snack A1', category: 'Makanan', kodeToko: myKodeToko },
-                    { id: 'shelf_2_' + Date.now(), noRak: 'R-02', name: 'Chiller Minuman B1', category: 'Minuman', kodeToko: myKodeToko },
-                    { id: 'shelf_3_' + Date.now(), noRak: 'R-03', name: 'Rak Staples C1', category: 'Makanan', kodeToko: myKodeToko },
-                    { id: 'shelf_4_' + Date.now(), noRak: 'R-04', name: 'Rak Kosmetik D1', category: 'Kosmetik', kodeToko: myKodeToko }
+                    { id: 'shelf_' + Date.now() + '_1', noRak: 'R-01', name: 'Rak Snack A1', category: 'Makanan', kodeToko: userKodeToko },
+                    { id: 'shelf_' + Date.now() + '_2', noRak: 'R-02', name: 'Chiller Minuman B1', category: 'Minuman', kodeToko: userKodeToko },
+                    { id: 'shelf_' + Date.now() + '_3', noRak: 'R-03', name: 'Rak Staples C1', category: 'Makanan', kodeToko: userKodeToko },
+                    { id: 'shelf_' + Date.now() + '_4', noRak: 'R-04', name: 'Rak Kosmetik D1', category: 'Kosmetik', kodeToko: userKodeToko }
                 ];
             }
 
@@ -2359,9 +2358,9 @@
                 const assignedUser = personil[idx % personil.length];
                 const updatedObj = {
                     ...shelf,
-                    kodeToko: myKodeToko,
                     assignedNik: assignedUser.nik,
-                    assignedName: assignedUser.nama
+                    assignedName: assignedUser.nama,
+                    kodeToko: userKodeToko
                 };
                 if (rtdb) {
                     rtdb.ref('ceklis_expired/shelves/' + shelf.id).set(updatedObj);
@@ -2376,7 +2375,6 @@
             const shelfId = document.getElementById("expShelfIdInput").value;
             const name = document.getElementById("expProductNameInput").value.trim();
             const expDate = document.getElementById("expDateInput").value;
-            const myKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
 
             if (!shelfId || !name || !expDate) { showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi semua data.'); return; }
 
@@ -2388,7 +2386,7 @@
                 expDate,
                 addedBy: dashboardData?.user?.NAMA || 'User',
                 status: 'pending',
-                kodeToko: myKodeToko,
+                kodeToko: dashboardData?.user?.kodeToko || 'TOKO',
                 namaToko: dashboardData?.user?.namaToko || 'Toko'
             };
 
@@ -2396,7 +2394,7 @@
                 rtdb.ref('ceklis_expired/products/' + prodId).set(prodObj);
             }
 
-            trackUserActivity(5, "Catat Produk Expired");
+            trackUserActivity(2, "Catat Produk Expired");
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Tersimpan 📦', 'Produk Expired berhasil dicatat!');
         }
@@ -2487,7 +2485,8 @@
             const daftarToko = dashboardData?.daftarToko || [];
             const allMaster = dashboardData?.allMasterUsers || [];
 
-            const pendingValidasiCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
+            const pendingValidasiCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS" && t.kodeToko === userKodeToko)).length;
 
             const filteredTx = belanjaTransactions.filter(t => {
                 const tDate = new Date(t.timestamp || t.date);
@@ -2556,7 +2555,7 @@
             } else if (activeTab === 'validasi') {
                 let validasiList = belanjaTransactions.filter(t => {
                     if (userAC) return t.status === "Menunggu AC"; 
-                    if (userCOS) return t.status === "Menunggu COS";
+                    if (userCOS) return t.status === "Menunggu COS" && t.kodeToko === userKodeToko;
                     return t.penginputNik === currentNik;
                 });
 
@@ -2841,7 +2840,7 @@
             }
 
             belanjaPhotoPreview = null;
-            trackUserActivity(10, "Submit Struk Belanja");
+            trackUserActivity(2, "Submit Struk Belanja");
             renderBelanjaKaryawanModal(isCOS ? 'resume' : 'input');
             showSwalSuccess('Data Terkirim 🚀', 'Struk belanja karyawan berhasil dikirimkan!');
         }
@@ -3258,7 +3257,7 @@
             hideLoading();
 
             closeCustomModal();
-            trackUserActivity(10, "Serah Terima Shift");
+            trackUserActivity(2, "Serah Terima Shift");
             showSwalSuccess('Serah Terima Berhasil 🤝', 'Laporan Shift Kasir Berhasil Dicatat!');
         }
 
@@ -3551,26 +3550,17 @@
             const userCOS = isUserCOS();
             const userAC = isUserAC();
             const canValidate = userCOS || userAC;
-            const myKodeToko = dashboardData?.user?.kodeToko || '';
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
 
             let pendingBelanjaCount = 0;
             if (userAC) {
                 pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu AC").length;
             } else if (userCOS) {
-                pendingBelanjaCount = belanjaTransactions.filter(t => t.kodeToko === myKodeToko && t.status === "Menunggu COS").length;
+                pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu COS" && t.kodeToko === userKodeToko).length;
             }
 
-            let pendingExpCount = 0;
-            let pendingExpValidasiCount = 0;
-
-            if (userAC) {
-                pendingExpCount = expProducts.filter(p => p.status !== 'selesai').length;
-                pendingExpValidasiCount = expShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
-            } else {
-                pendingExpCount = expProducts.filter(p => p.kodeToko === myKodeToko && p.status !== 'selesai').length;
-                pendingExpValidasiCount = expShelves.filter(s => s.kodeToko === myKodeToko && s.status === 'Menunggu Validasi COS').length;
-            }
-
+            const pendingExpCount = expProducts.filter(p => p.status !== 'selesai' && (userAC || p.kodeToko === userKodeToko)).length;
+            const pendingExpValidasiCount = userCOS ? expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length : 0;
             const announceCount = activeAnnouncementsList.length;
 
             let belanjaNotifCardHtml = '';
@@ -3590,6 +3580,23 @@
                 `;
             }
 
+            let expValidasiCardHtml = '';
+            if (userCOS) {
+                expValidasiCardHtml = `
+                    <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingExpValidasiCount > 0 ? '#f59e0b' : '#10b981'};">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h5 style="font-weight:800; font-size:0.8rem;">Validasi Ceklis Rak (Chief of Store)</h5>
+                                <p style="font-size:0.65rem; color:var(--text-sub);">${pendingExpValidasiCount} Rak Menunggu Validasi Anda</p>
+                            </div>
+                            <button onclick="closeCustomModal(); openCeklisExpiredModal('rak');" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                👉 Validasi Rak (${pendingExpValidasiCount})
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     <div class="modal-card-box">
@@ -3597,18 +3604,7 @@
                         <p style="font-size:0.7rem; color:var(--text-sub); margin-bottom:12px;">Berikut tugas dan item yang memerlukan konfirmasi/validasi Anda saat ini:</p>
 
                         ${belanjaNotifCardHtml}
-
-                        <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingExpValidasiCount > 0 ? '#f59e0b' : '#10b981'};">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <h5 style="font-weight:800; font-size:0.8rem;">Validasi Ceklis Rak (Chief of Store)</h5>
-                                    <p style="font-size:0.65rem; color:var(--text-sub);">${pendingExpValidasiCount} Rak Menunggu Validasi</p>
-                                </div>
-                                <button onclick="closeCustomModal(); openCeklisExpiredModal('rak');" style="background:var(--accent-green-grad); color:#fff; border:none; padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
-                                    👉 Validasi Rak (${pendingExpValidasiCount})
-                                </button>
-                            </div>
-                        </div>
+                        ${expValidasiCardHtml}
 
                         <div class="modal-card-box" style="margin-bottom:8px; border-left:4px solid ${pendingExpCount > 0 ? '#f59e0b' : '#10b981'};">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -3722,6 +3718,7 @@
             }
         }
 
+        // PEMBERSIHAN TOTAL ALL CACHE/STATE PADA LOGOUT
         function handleLogout() {
             Swal.fire({
                 title: 'Konfirmasi Logout',
@@ -3746,7 +3743,7 @@
                     document.getElementById("appSection").classList.add("hidden");
                     document.getElementById("loginSection").classList.remove("hidden");
                     document.getElementById("nikInput").value = "";
-                    showSwalSuccess('Logout Berhasil', 'Cache akun dibersihkan. Silakan masukkan NIK baru.');
+                    showSwalSuccess('Logout Berhasil', 'Seluruh cache dan data lokal dibersihkan. Silakan masukkan NIK baru.');
                 }
             });
         }
