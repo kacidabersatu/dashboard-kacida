@@ -422,7 +422,7 @@
             </section>
 
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-star" style="color: var(--gold);"></i> Layanan Lainnya</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Lainnya')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
-            <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-4"></div></section>
+            <section class="menu-section-card"><div id="gridMenuLainnya" class="menu-grid-5"></div></section>
         </main>
 
         <!-- TAB CHAT NAVBAR -->
@@ -497,7 +497,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzT_L-0tpTA2vS4WOs6ccIOS-2HFJWTeGqW27pLEV72UP_umq3QqoG43TG0cpnpg5HD/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-PL5UpZoHqPDPBv41gRusH7603ohwD3VtPgVO8G3Z5d-d5sw4gJQcY_pmLSZi13qd/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -1808,7 +1808,7 @@
                     <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
                 </div>
             `);
-            document.getElementById(elementId).innerHTML = cards.slice(0, 8).join("");
+            document.getElementById(elementId).innerHTML = cards.slice(0, 10).join("");
         }
 
         async function onMenuClick(namaMenu, link) {
