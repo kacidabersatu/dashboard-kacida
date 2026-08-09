@@ -547,6 +547,125 @@
         let belanjaPhotoPreview = null;
         let belanjaFilterStart = "";
         let belanjaFilterEnd = "";
+        // =================================================================
+        // MASTER DATA & STATE JOBDESK HARIAN
+        // =================================================================
+        let jobdeskReports = [];
+        let selectedJobdeskDay = getTodayNameIndo();
+        let selectedJobdeskCategory = 'Daily Activity';
+        let jobdeskPhotoPreview = null;
+
+        function getTodayNameIndo() {
+            const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            return days[new Date().getDay()];
+        }
+
+        function getStartOfWeekKey() {
+            const now = new Date();
+            const day = now.getDay();
+            const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(now.setDate(diff));
+            monday.setHours(0, 0, 0, 0);
+            return monday.toDateString();
+        }
+
+        const JOBDESK_MASTER_TASKS = {
+            "Daily Activity": {
+                "Senin": [
+                    { title: "KEBERSIHAN TOILET ISI CEKLIS", cara: "Sikat lantai & kloset pakai karbol, bersihkan cermin/wastafel, isi ulang sabun & tisu. Paraf ceklis dinding.", poin: "Bebas bau, kloset tidak berkerak, lantai kering, ceklis terisi." },
+                    { title: "CLEANING BEAN SPOT", cara: "Lap body mesin kopi, cuci portafilter, bersihkan drip tray, serta lap meja bar & grinder dengan kain mikrofiber.", poin: "Area saji steril, bebas noda susu/kopi, peralatan kering higienis." },
+                    { title: "KEBERSIHAN KESET MERAH DI CUCI", cara: "Cuci keset merah dengan sikat & detergen, bilas bersih, jemur hingga kering sebelum dipasang di pintu masuk.", poin: "Bebas lumpur, tidak berbau apak, terpasang simetris." },
+                    { title: "UPDATE SEWA", cara: "Cek area sewa tenant (ATM/booth), bersihkan area sekitar, cocokkan status pembayaran di sistem.", poin: "Area sewa bersih, data status sewa terekam akurat di sistem." },
+                    { title: "KEBERSIHAN GALON", cara: "Lap bagian luar seluruh galon display dan stok gudang menggunakan kain lembab.", poin: "Galon bebas debu distributor & tidak ada air menetes di lantai." },
+                    { title: "KEBERSIHAN GENSET", cara: "Lap bodi luar genset, periksa oli & BBM, panaskan mesin genset 5–10 menit.", poin: "Genset siap pakai, bebas genangan oli, area genset bersih." }
+                ],
+                "Selasa": [
+                    { title: "KEBERSIHAN KACA LUAR DAN DALAM", cara: "Semprot cairan pembersih kaca, gosok dengan kain halus, tarik air dengan wiper dari atas ke bawah.", poin: "Bebas noda sidik jari, tidak bergaris bekas air, bening." },
+                    { title: "KEBERSIHAN TERAS DAN SARANG LABA-LABA AREA SALES", cara: "Sapu teras luar. Gunakan sapu bertangkai panjang untuk sarang laba-laba di sudut plafon sales.", poin: "Plafon bebas jaring debu, teras bebas puntung rokok/sampah." },
+                    { title: "KEBERSIHAN KOLONG RAK", cara: "Lepas shelving bawah / gunakan sapu tipis untuk menarik debu & sampah dari kolong rak sales.", poin: "Tidak ada produk jatuh tertinggal, kolong rak bebas debu tebal." },
+                    { title: "MAINTENANCE AC & EXHAUST", cara: "Lap bagian filter luar AC dan pastikan pembuangan air lancar. Bersihkan kipas exhaust fan.", poin: "Suhu toko sejuk optimal, tidak ada bocoran air AC." },
+                    { title: "KEBERSIHAN CHILLER & FREEZER", cara: "Lap bagian pintu kaca dan tray dalam chiller, buang bunga es jika menumpuk di freezer.", poin: "Kaca chiller bening, produk dingin merata & higienis." }
+                ],
+                "Rabu": [
+                    { title: "KEBERSIHAN KERANJANG BELANJA (STANDAR 24 PCS)", cara: "Lap luar-dalam keranjang dengan desinfektan. Susun rapi di pintu masuk.", poin: "Jumlah pas 24 pcs, pegangan tidak lengket, dasar bersih." },
+                    { title: "KEBERSIHAN KOLONG RAK GUDANG", cara: "Pindahkan karton bawah jika memungkinkan, sapu dan pel lantai di bawah rak gudang.", poin: "Gudang bebas serangga/hama, karton tidak basah." },
+                    { title: "KEBERSIHAN MEJA KASIR & PERANGKAT POS", cara: "Lap permukaan meja kasir, layar komputer, keyboard, mesin EDC, dan pemindai barcode.", poin: "Meja kasir rapi, area bebas debu/minyak, perangkat siap pakai." },
+                    { title: "CEK EXPIRED PRODUK SNACK & BISKUIT", cara: "Pemeriksaan tanggal kedaluwarsa pada seluruh item kategori snack dan biskuit rak sales.", poin: "FEFO berjalan baik, produk expired terpisah dari rak sales." }
+                ],
+                "Kamis": [
+                    { title: "CLEANING BEAN SPOT DEEP CLEANING", cara: "Bersihkan hopper biji kopi, pipa pembuangan, tempat sirup, serta sanitasi cup dispenser.", poin: "Bebas endapan sisa produk cair, higienitas terjaga." },
+                    { title: "GENERAL CEK EXP ALL ITEM INPUT TAB", cara: "Sisir seluruh rak sales, cek tanggal exp tiap item, scan dan input item mendekati exp ke TAB.", poin: "Data exp ter-input 100% akurat, tidak ada barang exp lolos." },
+                    { title: "KEBERSIHAN AREA FAST FOOD & GORENGAN", cara: "Cuci kuali/pemanas makanan, ganti minyak jika keruh, lap rak etalase kaca saji.", poin: "Makanan higienis, etalase bebas noda minyak/jelantah." },
+                    { title: "PENATAAN & SANITASI TEMPAT SAMPAH", cara: "Cuci tempat sampah luar & dalam, ganti kantong plastik hitam baru.", poin: "Tidak berbau busuk, tidak berlalat, plastik terpasang rapi." }
+                ],
+                "Jumat": [
+                    { title: "KEBERSIHAN TOILET DEEP CLEANING", cara: "Deep cleaning pembuangan air, sikat keramik dinding toilet, lengkapi paraf ceklis.", poin: "Bebas bau tidak sedap, tidak ada genangan air." },
+                    { title: "SO RPC MATERIAL BEANSPOT", cara: "Hitung fisik bahan baku Bean Spot (kopi, susu, sirup, cup), cocokkan dengan data RPC.", poin: "Selisih stok fisik dan sistem adalah 0 (pasti & akurat)." },
+                    { title: "KEBERSIHAN GUDANG & RAPRAPAN PALET", cara: "Rapikan susunan karton stok di atas palet sesuai kategori, beri jarak dari dinding.", poin: "Gudang tertata rapi, jalur evakuasi/akses barang lancar." },
+                    { title: "PENGECEKAN ALAT PEMADAM (APAR)", cara: "Periksa tekanan jarum indikator APAR, lap tabung, pastikan segel utuh dan akses tidak terhalang.", poin: "APAR siap pakai, kondisi fisik bersih dan aman." }
+                ],
+                "Sabtu": [
+                    { title: "KEBERSIHAN AREA KASIR DAN SERVER", cara: "Lap meja kasir, monitor POS, EDC, serta bersihkan debu halus CPU server & UPS dengan kain kering.", poin: "Bebas debu, kabel tertata rapi, perangkat tidak overheat." },
+                    { title: "KEBERSIHAN FACADE & NEON BOX", cara: "Lap tiang & kaca neon box depan toko, bersihkan debu spanduk promo luar.", poin: "Tampilan toko terang jernih, promosi terlihat jelas." },
+                    { title: "PERSIAPAN STOCK REFILL FAST MOVING", cara: "Pindahkan produk fast-moving (air mineral, minyak, gula) dari gudang ke area kasir/sales.", poin: "Rak sales selalu terisi penuh menjelang jam ramai weekend." }
+                ],
+                "Minggu": [
+                    { title: "PENGECEKAN LINGKUNGAN HALAMAN PARKIR", cara: "Sapu area parkir dari sampah plastik & daun. Rapikan posisi marka parkir.", poin: "Halaman bersih, rapi, menyambut kedatangan pelanggan." },
+                    { title: "DEEP CLEANING AREA SALES & MEJA MAKAN", cara: "Sapu dan pel lantai sales hingga mengkilap, bersihkan meja & kursi makan indoor/outdoor.", poin: "Lantai bersih bebas lengket, meja makan siap pakai." },
+                    { title: "CEK BANNER & POP PROMOSI", cara: "Pastikan seluruh POP harga & banner promo terpasang simetris dan tidak ada yang sobek.", poin: "Informasi promo akurat dan menarik perhatian konsumen." }
+                ]
+            },
+            "Materi Briefing Shift 1 & 2": {
+                "Senin": [
+                    { title: "[SHIFT 1] MATERI BSP & TARGET MINGGUAN", cara: "Sampaikan materi Basic Store Performance & target sales pekan baru kepada seluruh tim.", poin: "Tim paham target nominal sales & fokus produk pekan ini." },
+                    { title: "[SHIFT 1] REMINDER TARGET FOKUS DAN SALES SHIFT 1", cara: "Ingatkan kembali breakdown target penjualan shift 1 di awal kerja.", poin: "Fokus penawaran di kasir berjalan sejak jam awal." },
+                    { title: "[SHIFT 2] ISI LINK SERAH TERIMA & KAS", cara: "Input data fisik uang kasir, sisa modal, dan kondisi toko di link serah terima.", poin: "Data serah terima valid dan 100% akurat." }
+                ],
+                "Selasa": [
+                    { title: "[SHIFT 1] EVALUASI PROMO & TARGET SHIFT 1", cara: "Briefing pencapaian promo mingguan dan breakdown target sales Shift 1 hari Selasa.", poin: "Tim memahami item promo utama dan fokus penawaran kasir." },
+                    { title: "[SHIFT 2] SERAH TERIMA KASIR & DRAFT SO", cara: "Cek selisih kasir Shift 1 ke Shift 2 dan update data kelengkapan di link serah terima.", poin: "Uang kasir klop dan laporan serah terima terisi." }
+                ],
+                "Rabu": [
+                    { title: "[SHIFT 1] REVIEW ITEM FOCUS & CEK EXPIRED", cara: "Briefing penawaran item fokus minggu ini dan sosialisasi pencegahan produk mendekati expired.", poin: "Peningkatan transaksi item fokus dan nol barang expired terlewat." },
+                    { title: "[SHIFT 2] SERAH TERIMA & KEBERSIHAN AREA SALES", cara: "Briefing pergantian shift, serah terima fisik uang modal, serta kerapihan area kasir.", poin: "Serah terima lancar & area sales teratur rapi." }
+                ],
+                "Kamis": [
+                    { title: "[SHIFT 1] STANDAR PELAYANAN & GREETING", cara: "Ingatkan kembali penerapan 5S (Senyum, Salam, Sapa, Sopan, Santun) dan kecepatan transaksi kasir.", poin: "Pelayanan ramah, standar greeting konsisten, antrean terkendali." },
+                    { title: "[SHIFT 2] SERAH TERIMA & PERSIAPAN PROMO JUMAT", cara: "Update tag harga bila ada promo esok hari dan pastikan link serah terima diisi lengkap.", poin: "Label harga akurat dan pencatatan serah terima selesai." }
+                ],
+                "Jumat": [
+                    { title: "[SHIFT 1] BRIEFING JUMAT BERKAH & TARGET WEEKEND", cara: "Briefing kesiapan stok produk fast-moving dan strategi peningkatan sales menyambut weekend.", poin: "Stok produk siap & target penjualan Jumat tercapai." },
+                    { title: "[SHIFT 2] SERAH TERIMA SHIFT & CEK STOK BEAN SPOT", cara: "Sampaikan evaluasi sales shift 1 dan pastikan bahan baku Bean Spot aman untuk operational malam.", poin: "Bahan baku Bean Spot memadai & serah terima terinput." }
+                ],
+                "Sabtu": [
+                    { title: "[SHIFT 1] BRIEFING PEAK TIME WEEKEND SHIFT 1", cara: "Pengaturan kecepatan transaksi saat peak time, pencegahan penumpukan antrean, & penawaran promo.", poin: "Antrean kasir terurai cepat dan sales maksimal." },
+                    { title: "[SHIFT 2] BRIEFING PEAK TIME WEEKEND SHIFT 2", cara: "Briefing kelengkapan display produk saat ramai dan pencatatan kasir di link serah terima.", poin: "Display rak tetap terisi rapi & data serah terima valid." }
+                ],
+                "Minggu": [
+                    { title: "[SHIFT 1] REVIEW TARGET MINGGUAN & CLOSING MINGGU", cara: "Evaluasi ketercapaian sales mingguan dan dorong penyelesaian target akhir pekan.", poin: "Tim termotivasi mencapai target mingguan toko." },
+                    { title: "[SHIFT 2] SERAH TERIMA SHIFT & PREPARASI OPERASIONAL SENIN", cara: "Input link serah terima, cek kebersihan area toko, dan persiapan pergantian modal kerja pekan baru.", poin: "Toko siap 100% untuk operasional awal pekan." }
+                ]
+            }
+        };
+
+        function initFirebaseJobdeskListener() {
+            if (!rtdb) return;
+            const currentWeekKey = getStartOfWeekKey();
+
+            rtdb.ref('jobdesk_reports').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const entries = Object.entries(data);
+                    jobdeskReports = entries.map(([id, val]) => ({ id, ...val }))
+                        .filter(item => !item.weekKey || item.weekKey === currentWeekKey)
+                        .sort((a,b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+                } else {
+                    jobdeskReports = [];
+                }
+                updateNotifikasiBadgeCount();
+                renderCombinedMenuUtama(dashboardData?.menu?.utama || []);
+            });
+        }
 
         function cleanNum(val) {
             if (val === null || val === undefined || val === "" || val === "NaN") return 0;
@@ -1015,7 +1134,15 @@
             const userExpPendingProducts = expProducts.filter(p => p.status !== 'selesai' && (userAC || p.kodeToko === userKodeToko)).length;
             const announceCount = activeAnnouncementsList.length;
 
-            const totalNotif = pendingBelanjaCount + pendingExpValidasiCount + userExpPendingProducts + announceCount;
+            // ✅ PERHITUNGAN BADGE PENDING JOBDESK HARIAN
+            let pendingJobdeskCount = 0;
+            if (userAC) {
+                pendingJobdeskCount = jobdeskReports.filter(j => j.status === 'PENDING_AC').length;
+            } else if (userCOS) {
+                pendingJobdeskCount = jobdeskReports.filter(j => j.status === 'PENDING_COS' && j.kodeToko === userKodeToko).length;
+            }
+
+            const totalNotif = pendingBelanjaCount + pendingExpValidasiCount + userExpPendingProducts + announceCount + pendingJobdeskCount;
 
             const valNotifBox = document.getElementById("valNotifCount");
             const dotNotif = document.getElementById("dotNotif");
@@ -1033,9 +1160,11 @@
             const userAC = isUserAC();
             const pendingBelanjaCount = belanjaTransactions.filter(t => (userAC && t.status === "Menunggu AC") || (userCOS && t.status === "Menunggu COS")).length;
 
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
             const builtInMenus = [
+                { name: "Jobdesk Harian", icon: "https://cdn-icons-png.flaticon.com/512/3209/3209265.png", action: "openJobdeskHarianModal()", numBadge: isUserAC() ? jobdeskReports.filter(j => j.status === 'PENDING_AC').length : (isUserCOS() ? jobdeskReports.filter(j => j.status === 'PENDING_COS' && j.kodeToko === userKodeToko).length : 0) },
                 { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
-                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: pendingExpCount },
+                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: isUserCOS() ? expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length : 0 },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
                 { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()", numBadge: pendingBelanjaCount }
             ];
@@ -1146,6 +1275,7 @@
                 initFirebaseCeklisExpiredListener();
                 initFirebaseShiftHandoverListener();
                 initFirebaseRealtimeChat();
+                initFirebaseJobdeskListener();
             }
         }
 
@@ -3769,6 +3899,10 @@
                     belanjaTransactions = [];
                     expProducts = [];
                     expShelves = [];
+                    jobdeskReports = [];
+                    selectedJobdeskDay = getTodayNameIndo();
+                    selectedJobdeskCategory = 'Daily Activity';
+                    jobdeskPhotoPreview = null;
 
                     document.getElementById("appSection").classList.add("hidden");
                     document.getElementById("loginSection").classList.remove("hidden");
@@ -3777,7 +3911,358 @@
                 }
             });
         }
+        // =================================================================
+        // LOGIKA & MODAL UI JOBDESK HARIAN
+        // =================================================================
+        function openJobdeskHarianModal(activeTab = 'input') {
+            if (isUserAC() && activeTab === 'input') activeTab = 'resume';
+            renderJobdeskModalView(activeTab);
+        }
 
+        function handleJobdeskPhotoChangePreview(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => { jobdeskPhotoPreview = reader.result; };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderJobdeskModalView(activeTab = 'input') {
+            const userCOS = isUserCOS();
+            const userAC = isUserAC();
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
+            const userNamaToko = dashboardData?.user?.namaToko || 'Toko';
+            const daftarToko = dashboardData?.daftarToko || [];
+
+            const pendingCosCount = jobdeskReports.filter(j => j.status === 'PENDING_COS' && j.kodeToko === userKodeToko).length;
+            const pendingAcCount = jobdeskReports.filter(j => j.status === 'PENDING_AC').length;
+
+            let tabContentHtml = '';
+
+            if (activeTab === 'input' && !userAC) {
+                const tasks = JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || [];
+
+                let taskCardsHtml = tasks.map((task) => {
+                    const existingSub = jobdeskReports.find(r => 
+                        r.taskTitle === task.title && 
+                        r.day === selectedJobdeskDay && 
+                        r.category === selectedJobdeskCategory && 
+                        r.kodeToko === userKodeToko
+                    );
+
+                    let statusText = 'Belum Dikerjakan';
+                    let badgeBg = 'background:var(--input-bg); color:var(--text-sub); border:1px solid var(--card-border);';
+                    let isLocked = false;
+                    let isRejected = false;
+
+                    if (existingSub) {
+                        if (existingSub.status === 'APPROVED') {
+                            statusText = '✅ Approved Final';
+                            badgeBg = 'background:#d1fae5; color:#047857;';
+                            isLocked = true;
+                        } else if (existingSub.status === 'PENDING_COS') {
+                            statusText = '⏳ Review COS';
+                            badgeBg = 'background:#fef3c7; color:#b45309;';
+                            isLocked = true;
+                        } else if (existingSub.status === 'PENDING_AC') {
+                            statusText = '⌛ Review AC';
+                            badgeBg = 'background:#cff4fc; color:#0891b2;';
+                            isLocked = true;
+                        } else if (existingSub.status.startsWith('REJECTED')) {
+                            statusText = '❌ Ditolak';
+                            badgeBg = 'background:#fee2e2; color:#dc2626;';
+                            isRejected = true;
+                        }
+                    }
+
+                    return `
+                        <div class="modal-card-box" style="border-left:4px solid ${isLocked ? '#10b981' : (isRejected ? '#ef4444' : 'var(--accent-primary)')};">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                                <h4 style="font-size:0.82rem; font-weight:800; color:var(--text-main); flex:1; padding-right:8px;">${escapeHTML(task.title)}</h4>
+                                <span style="font-size:0.62rem; font-weight:800; padding:2px 8px; border-radius:10px; ${badgeBg}">${statusText}</span>
+                            </div>
+
+                            ${isLocked ? `
+                                <button disabled style="width:100%; background:var(--input-bg); color:var(--text-sub); font-weight:800; padding:8px; border-radius:10px; border:1px solid var(--card-border); opacity:0.7; cursor:not-allowed;">
+                                    🔒 Tugas Sudah Dikirim
+                                </button>
+                            ` : `
+                                <button onclick="openJobdeskTaskFormModal('${escapeHTML(task.title)}')" style="width:100%; background:${isRejected ? '#fee2e2' : 'var(--accent-green-grad)'}; color:${isRejected ? '#dc2626' : '#ffffff'}; border:${isRejected ? '1px solid #fca5a5' : 'none'}; font-weight:800; padding:10px; border-radius:10px; cursor:pointer;">
+                                    📖 ${isRejected ? 'Perbaiki & Lihat SOP' : 'Lihat SOP & Kerjakan'}
+                                </button>
+                            `}
+                        </div>
+                    `;
+                }).join("");
+
+                tabContentHtml = `
+                    <div class="modal-grid-1">
+                        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;">
+                            ${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'].map(d => `
+                                <button onclick="selectedJobdeskDay='${d}'; renderJobdeskModalView('input');" class="sub-tab-btn ${selectedJobdeskDay === d ? 'active' : ''}" style="white-space:nowrap; padding:6px 12px; font-size:0.7rem;">
+                                    ${d} ${d === getTodayNameIndo() ? '📍' : ''}
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div class="modal-grid-2">
+                            <button onclick="selectedJobdeskCategory='Daily Activity'; renderJobdeskModalView('input');" class="sub-tab-btn ${selectedJobdeskCategory==='Daily Activity'?'active':''}" style="font-size:0.68rem;">Daily Activity</button>
+                            <button onclick="selectedJobdeskCategory='Materi Briefing Shift 1 & 2'; renderJobdeskModalView('input');" class="sub-tab-btn ${selectedJobdeskCategory==='Materi Briefing Shift 1 & 2'?'active':''}" style="font-size:0.68rem;">Briefing Shift 1 & 2</button>
+                        </div>
+
+                        <div class="modal-grid-1">${taskCardsHtml}</div>
+                    </div>
+                `;
+            } else if (activeTab === 'resume') {
+                const tasks = JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || [];
+
+                if (userAC && daftarToko.length > 0) {
+                    const storeCards = daftarToko.map(toko => {
+                        let doneCount = 0;
+                        tasks.forEach(t => {
+                            const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === selectedJobdeskCategory && r.kodeToko === toko.kodeToko);
+                            if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneCount++;
+                        });
+                        const percent = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
+
+                        return `
+                            <div class="modal-card-box" onclick="viewStoreJobdeskDetailAC('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid var(--accent-primary);">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
+                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">Progres: <b style="color:var(--accent-primary);">${percent}% (${doneCount}/${tasks.length} Jobdesk)</b></p>
+                                    </div>
+                                    <span style="font-size:0.6rem; color:var(--gold); font-weight:800;">Lihat Detail ➔</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
+
+                    tabContentHtml = `
+                        <div class="modal-grid-1">
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);">🏪 MONITORING RESUME TOKO AREA (${selectedJobdeskDay})</h5>
+                            ${storeCards}
+                        </div>
+                    `;
+                } else {
+                    let doneCount = 0;
+                    tasks.forEach(t => {
+                        const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === selectedJobdeskCategory && r.kodeToko === userKodeToko);
+                        if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneCount++;
+                    });
+                    const percent = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
+
+                    tabContentHtml = `
+                        <div class="modal-grid-1">
+                            <div class="mtd-summary-card">
+                                <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">📊 KETERCAPAIAN JOBDESK TOKO (${userNamaToko})</span>
+                                <div class="mtd-amount-hero">${percent}% <small style="font-size:0.8rem;">(${doneCount}/${tasks.length} Selesai)</small></div>
+                                <div style="width:100%; background:rgba(0,0,0,0.1); height:8px; border-radius:10px; margin-top:8px; overflow:hidden;">
+                                    <div style="width:${percent}%; background:var(--accent-primary); height:100%; border-radius:10px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else if (activeTab === 'approval') {
+                let pendingList = [];
+                if (userAC) {
+                    pendingList = jobdeskReports.filter(r => r.status === 'PENDING_AC');
+                } else if (userCOS) {
+                    pendingList = jobdeskReports.filter(r => r.status === 'PENDING_COS' && r.kodeToko === userKodeToko);
+                }
+
+                let cardsHtml = pendingList.map(item => `
+                    <div class="modal-card-box">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                            <div>
+                                <span style="font-size:0.62rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(item.namaToko || item.kodeToko)} • ${item.day}</span>
+                                <h4 style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-top:4px;">${escapeHTML(item.taskTitle)}</h4>
+                            </div>
+                            <span style="font-size:0.6rem; color:var(--text-sub);">${item.submittedAt || ''}</span>
+                        </div>
+                        <p style="font-size:0.7rem; color:var(--text-sub);">Penginput: <b>${escapeHTML(item.submittedBy)}</b> (${item.role})</p>
+                        ${item.notes ? `<p style="font-size:0.68rem; color:var(--text-main); margin-top:2px;">Catatan: <i>"${escapeHTML(item.notes)}"</i></p>` : ''}
+
+                        ${item.photoUrl ? `
+                            <img src="${item.photoUrl}" onclick="showFullImageModal('${item.photoUrl}')" style="width:100%; height:120px; object-fit:cover; border-radius:10px; margin:8px 0; cursor:pointer;" title="Klik Fullscreen">
+                        ` : ''}
+
+                        <div style="display:flex; gap:8px; margin-top:8px;">
+                            <button onclick="rejectJobdeskReport('${item.id}')" style="flex:1; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:8px; border-radius:8px; font-weight:800; cursor:pointer;">Tolak</button>
+                            <button onclick="approveJobdeskReport('${item.id}')" style="flex:1; background:var(--accent-green-grad); color:#ffffff; border:none; padding:8px; border-radius:8px; font-weight:800; cursor:pointer;">
+                                ${userAC ? 'Approve Final' : 'Setujui (Lanjut ke AC)'}
+                            </button>
+                        </div>
+                    </div>
+                `).join("");
+
+                tabContentHtml = `<div class="modal-grid-1">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada antrean approval jobdesk saat ini.</p>'}</div>`;
+            }
+
+            const htmlBox = `
+                <div class="modal-grid-1" style="font-size:0.78rem;">
+                    <div style="display:flex; gap:6px;">
+                        ${!userAC ? `<button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderJobdeskModalView('input')">📝 Jobdesk</button>` : ''}
+                        <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderJobdeskModalView('resume')">📊 Resume</button>
+                        ${(userCOS || userAC) ? `
+                            <button class="sub-tab-btn ${activeTab==='approval'?'active':''}" onclick="renderJobdeskModalView('approval')">
+                                ⏳ Approval ${userAC ? (pendingAcCount > 0 ? `(${pendingAcCount})` : '') : (pendingCosCount > 0 ? `(${pendingCosCount})` : '')}
+                            </button>
+                        ` : ''}
+                    </div>
+                    ${tabContentHtml}
+                </div>
+            `;
+            showCustomModal("📋 JOBDESK HARIAN & BRIEFING", htmlBox);
+        }
+
+        function viewStoreJobdeskDetailAC(kodeToko, storeName) {
+            triggerAndroidHaptic('light');
+            const tasks = JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || [];
+
+            let html = tasks.map(t => {
+                const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === selectedJobdeskCategory && r.kodeToko === kodeToko);
+                const statusTxt = sub ? (sub.status === 'APPROVED' ? '✅ Approved' : (sub.status === 'PENDING_AC' ? '⏳ Review AC' : '⏳ Review COS')) : '❌ Belum Dikerjakan';
+
+                return `
+                    <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <b style="font-size:0.78rem; color:var(--text-main);">${escapeHTML(t.title)}</b>
+                            <span style="font-size:0.62rem; font-weight:bold; color:var(--accent-primary);">${statusTxt}</span>
+                        </div>
+                        ${sub ? `<p style="font-size:0.62rem; color:var(--text-sub); margin-top:2px;">Petugas: ${escapeHTML(sub.submittedBy)} (${sub.submittedAt})</p>` : ''}
+                        ${sub && sub.photoUrl ? `<img src="${sub.photoUrl}" onclick="showFullImageModal('${sub.photoUrl}')" style="width:100%; height:90px; object-fit:cover; border-radius:6px; margin-top:4px; cursor:pointer;">` : ''}
+                    </div>
+                `;
+            }).join("");
+
+            Swal.fire({
+                title: `Detail Jobdesk: ${storeName}`,
+                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Belum ada pengerjaan jobdesk.</p>`,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
+        }
+
+        function openJobdeskTaskFormModal(taskTitle) {
+            const task = (JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || []).find(t => t.title === taskTitle);
+            if (!task) return;
+
+            jobdeskPhotoPreview = null;
+
+            Swal.fire({
+                title: `Detail SOP & Upload Foto`,
+                html: `
+                    <div style="text-align:left; font-size:0.75rem; color:var(--text-main);">
+                        <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:10px;">
+                            <b style="color:var(--accent-primary);">📋 Cara Kerja (SOP):</b>
+                            <p style="margin-top:2px; margin-bottom:6px;">${escapeHTML(task.cara)}</p>
+                            <b style="color:var(--gold);">🎯 Poin Evaluasi / Hasil:</b>
+                            <p style="margin-top:2px;">${escapeHTML(task.poin)}</p>
+                        </div>
+
+                        <label style="font-weight:bold; display:block; margin-bottom:4px;">Catatan Tambahan (Opsional):</label>
+                        <input type="text" id="jobdeskNotesInput" placeholder="Kondisi / keterangan..." style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; padding:8px; margin-bottom:10px;">
+
+                        <label style="font-weight:bold; display:block; margin-bottom:4px; color:#dc2626;">* Foto Bukti Pekerjaan (Wajib):</label>
+                        <input type="file" accept="image/*" onchange="handleJobdeskPhotoChangePreview(event)" style="width:100%; background:var(--input-bg); padding:6px; border-radius:8px; border:1px solid var(--card-border);">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '🚀 Kirim Laporan',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    if (!jobdeskPhotoPreview) {
+                        showSwalWarning('Foto Wajib ⚠️', 'Mohon lampirkan foto bukti pekerjaan!');
+                        return;
+                    }
+                    const notes = document.getElementById("jobdeskNotesInput")?.value || '';
+                    submitJobdeskReportAction(taskTitle, notes);
+                }
+            });
+        }
+
+        function submitJobdeskReportAction(taskTitle, notes) {
+            const isCOS = isUserCOS();
+            const initialStatus = isCOS ? 'PENDING_AC' : 'PENDING_COS';
+            const reportId = 'jobdesk_' + Date.now();
+            const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+            const userNamaToko = dashboardData?.user?.namaToko || 'Toko';
+
+            const newReport = {
+                id: reportId,
+                taskTitle: taskTitle,
+                category: selectedJobdeskCategory,
+                day: selectedJobdeskDay,
+                weekKey: getStartOfWeekKey(),
+                kodeToko: userKodeToko,
+                namaToko: userNamaToko,
+                submittedBy: dashboardData?.user?.NAMA || 'User',
+                role: dashboardData?.user?.JABATAN || 'Crew',
+                notes: notes,
+                photoUrl: jobdeskPhotoPreview || '',
+                submittedAt: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: new Date().toISOString(),
+                status: initialStatus
+            };
+
+            if (rtdb) {
+                rtdb.ref('jobdesk_reports/' + reportId).set(newReport);
+            }
+
+            jobdeskPhotoPreview = null;
+            trackUserActivity(10, "Submit Jobdesk " + taskTitle);
+            renderJobdeskModalView('input');
+            showSwalSuccess('Laporan Terkirim 🚀', 'Pekerjaan berhasil dilaporkan!');
+        }
+
+        function approveJobdeskReport(reportId) {
+            const userAC = isUserAC();
+            const nextStatus = userAC ? 'APPROVED' : 'PENDING_AC';
+            const approverName = `${dashboardData?.user?.NAMA || 'User'} (${dashboardData?.user?.JABATAN || 'Atasan'})`;
+
+            if (rtdb) {
+                rtdb.ref('jobdesk_reports/' + reportId).update({
+                    status: nextStatus,
+                    approvedBy: approverName,
+                    approvedAt: new Date().toLocaleString('id-ID')
+                });
+            }
+
+            trackUserActivity(5, "Approve Jobdesk");
+            renderJobdeskModalView('approval');
+            showSwalSuccess('Approved ✅', userAC ? 'Persetujuan Final berhasil!' : 'Diteruskan ke Area Coordinator (AC).');
+        }
+
+        function rejectJobdeskReport(reportId) {
+            const userAC = isUserAC();
+            const rejectStatus = userAC ? 'REJECTED_AC' : 'REJECTED_COS';
+
+            Swal.fire({
+                title: 'Alasan Penolakan Jobdesk',
+                input: 'textarea',
+                inputPlaceholder: 'Tuliskan instruksi perbaikan...',
+                showCancelButton: true,
+                confirmButtonText: '🚫 Tolak Pekerjaan',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed && res.value) {
+                    if (rtdb) {
+                        rtdb.ref('jobdesk_reports/' + reportId).update({
+                            status: rejectStatus,
+                            rejectReason: res.value,
+                            rejectedBy: dashboardData?.user?.NAMA || 'User'
+                        });
+                    }
+                    renderJobdeskModalView('approval');
+                    showSwalSuccess('Ditolak', 'Status pekerjaan diubah menjadi Ditolak.');
+                }
+            });
+        }
         function downloadPerformaCardHD() {
             const cardElement = document.getElementById("customModalCard");
             if (!cardElement || typeof html2canvas === "undefined") return;
