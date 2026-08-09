@@ -3947,6 +3947,7 @@
 
             let tabContentHtml = '';
 
+            // TAB 1: FORM INPUT JOBDESK
             if (activeTab === 'input' && !userAC) {
                 const tasks = JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || [];
 
@@ -4021,11 +4022,12 @@
                         <div class="modal-grid-1">${taskCardsHtml}</div>
                     </div>
                 `;
-            } else if (activeTab === 'resume') {
+            } 
+            // TAB 2: RESUME PROGRESS (3 KOTAK KECIL RESUME)
+            else if (activeTab === 'resume') {
                 const tasks = JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || [];
 
                 if (userAC && daftarToko.length > 0) {
-                    // MODE AREA COORDINATOR: REKAP AKUMULASI SELURUH TOKO AREA
                     let totalTasksArea = tasks.length * daftarToko.length;
                     let doneTasksArea = 0;
 
@@ -4055,7 +4057,6 @@
 
                     tabContentHtml = `
                         <div class="modal-grid-1">
-                            <!-- 📊 3 KOTAK KECIL RESUME UNTUK USER AC (TOTAL AREA) -->
                             <div class="modal-grid-3" style="margin-bottom:8px;">
                                 <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid var(--accent-primary);">
                                     <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL TUGAS AREA</span>
@@ -4076,7 +4077,6 @@
                         </div>
                     `;
                 } else {
-                    // MODE USER TOKO (STAFF & COS): KHUSUS TOKONYA SENDIRI
                     let totalTasksStore = tasks.length;
                     let doneCountStore = 0;
                     
@@ -4090,7 +4090,6 @@
 
                     tabContentHtml = `
                         <div class="modal-grid-1">
-                            <!-- 📊 3 KOTAK KECIL RESUME UNTUK USER TOKO -->
                             <div class="modal-grid-3" style="margin-bottom:8px;">
                                 <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid var(--accent-primary);">
                                     <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL TUGAS</span>
@@ -4116,8 +4115,9 @@
                         </div>
                     `;
                 }
-            }
-            } else if (activeTab === 'approval') {
+            } 
+            // TAB 3: APPROVAL BERJENJANG
+            else if (activeTab === 'approval') {
                 let pendingList = [];
                 if (userAC) {
                     pendingList = jobdeskReports.filter(r => r.status === 'PENDING_AC');
