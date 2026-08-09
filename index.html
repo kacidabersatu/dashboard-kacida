@@ -152,7 +152,7 @@
         .btn-see-all { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--accent-primary); padding: 4px 10px; border-radius: 12px; font-size: 0.68rem; text-decoration: none; font-weight: 700; }
 
         .menu-section-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 22px; padding: 16px; margin-bottom: 16px; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .menu-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; position: relative; z-index: 2; }
+        .menu-grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; position: relative; z-index: 2; }
 
         .menu-3d-item { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; cursor: pointer; transition: transform 0.15s; }
         .menu-3d-item:active { transform: scale(0.92); }
@@ -417,7 +417,7 @@
 
             <div class="section-header"><h3 class="section-title"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Menu Utama</h3><a href="#" class="btn-see-all" onclick="openAllMenuModal('Utama')">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a></div>
             <section class="menu-section-card">
-                <div id="gridMenuUtama" class="menu-grid-4"></div>
+                <div id="gridMenuUtama" class="menu-grid-5"></div>
                 <img src="https://cdn-icons-png.flaticon.com/512/1356/1356479.png" class="rocket-deco" alt="Rocket">
             </section>
 
@@ -497,7 +497,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwLFxelHnnL2ij0Qo366N2jbaXvihZ9DgyfpHEaaBDPG57EYp0WJQ72QlVzsW3uNMk2/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzT_L-0tpTA2vS4WOs6ccIOS-2HFJWTeGqW27pLEV72UP_umq3QqoG43TG0cpnpg5HD/exec";
 
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
@@ -1415,13 +1415,15 @@
             });
         }
 
-        // PERBAIKAN POIN 1: MENU SUPER ADMIN KHUSUS NIK 14125034
+      // =================================================================
+        // MENU SIDEBAR HAMBURGER & README LENGKAP PENGGUNAAN APLIKASI
+        // =================================================================
         function openMenuSidebar() {
             triggerAndroidHaptic('medium');
             const isSuperAdminUser = String(currentNik).trim() === "14125034";
 
             const trackingButtonHtml = isSuperAdminUser ? `
-                <div class="modal-card-box" style="border:1px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
+                <div class="modal-card-box" style="border:1px solid var(--gold); background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); margin-bottom:12px;">
                     <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-user-gear"></i> MENU SUPER ADMINISTRATOR</h4>
                     <p style="font-size:0.68rem; color:#b45309; margin-bottom:10px;">Monitor User Online, Status Install PWA, Notifikasi, Hasil Survey & Activity Log Realtime.</p>
                     <button onclick="openUserActivityTrackingModal()" style="width:100%; background:var(--gold); color:#ffffff; font-weight:800; padding:10px; border-radius:10px; border:none; cursor:pointer;">
@@ -1434,25 +1436,89 @@
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     ${trackingButtonHtml}
 
-                    <div class="modal-card-box">
-                        <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;"><i class="fa-solid fa-sliders"></i> PENGATURAN TEMA & TAMPILAN</h4>
+                    <!-- PENGATURAN TEMA -->
+                    <div class="modal-card-box" style="margin-bottom:8px;">
+                        <h4 style="font-size:0.88rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-sliders"></i> PENGATURAN TIK & TAMPILAN</h4>
                         <button class="sub-tab-btn active" onclick="toggleThemeSwitcher()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px;">
                             <i class="fa-solid fa-circle-half-stroke"></i> <span id="themeLabelBtn">Ubah Tema (Terang/Gelap)</span>
                         </button>
                     </div>
 
-                    <div class="modal-card-box">
-                        <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-book-open"></i> README & TATA CARA APLIKASI</h4>
-                        <div style="font-size:0.72rem; color:var(--text-main); line-height:1.5;">
-                            <p><b>1. Sales SPD & MTD:</b> Klik baris Sales di beranda untuk melihat rincian performa harian STD & APC 2026.</p>
-                            <p style="margin-top:4px;"><b>2. Plan Master Shift:</b> Chief/ACOS dapat mengedit pola shift bulanan. Logout akan mengosongkan cache jadwal.</p>
-                            <p style="margin-top:4px;"><b>3. Ceklis Expired:</b> Manajemen rak khusus Chief of Store. Pengerjaan rak wajib lampirkan foto & divalidasi COS (Setujui/Tolak).</p>
-                            <p style="margin-top:4px;"><b>4. Belanja Karyawan:</b> Unggah struk belanja untuk dikonfirmasi COS & disetujui AC secara real-time.</p>
+                    <!-- README / PANDUAN PENGGUNAAN LENGKAP -->
+                    <div class="modal-card-box" style="border:1px solid var(--accent-primary);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid var(--card-border); pb-2; padding-bottom:6px;">
+                            <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-book-open"></i> PANDUAN MANUAL APLIKASI KACIDA</h4>
+                            <span style="font-size:0.6rem; background:var(--accent-green-grad); color:#fff; padding:2px 8px; border-radius:10px; font-weight:bold;">v3.2 PRO</span>
+                        </div>
+
+                        <div style="font-size:0.72rem; color:var(--text-main); line-height:1.6; display:flex; flex-direction:column; gap:10px; max-height:50vh; overflow-y:auto; padding-right:4px;">
+                            
+                            <!-- 1. SALES & PERFORMA -->
+                            <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                                <b style="color:var(--accent-primary); font-size:0.78rem;"><i class="fa-solid fa-chart-line"></i> 1. Sales SPD, MTD & Performance Toko</b>
+                                <p style="margin-top:2px;">• <b>Sales SPD Bar</b>: Menampilkan omset harian. Klik baris ini untuk membuka rincian MTD Sales, STD 2026, APC 2026, dan grafik tren harian.</p>
+                                <p style="margin-top:2px;">• <b>Kartu Performa (Disket)</b>: Menampilkan Rank Penawaran Langsung, Achievement PSM, PWP, Serba Gratis, APC, dan estimasi omset akhir bulan.</p>
+                                <p style="margin-top:2px;">• <b>Download Kartu</b>: Anda dapat mengunduh Kartu Performa dalam format gambar HD.</p>
+                            </div>
+
+                            <!-- 2. JOBDESK HARIAN -->
+                            <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                                <b style="color:var(--accent-primary); font-size:0.78rem;"><i class="fa-solid fa-clipboard-check"></i> 2. Jobdesk Harian & Briefing</b>
+                                <p style="margin-top:2px;">• <b>SOP & Upload Foto</b>: Pengerjaan tugas harian wajib dilampirkan foto bukti pekerjaan.</p>
+                                <p style="margin-top:2px;">• <b>Sistem Approval</b>: Laporan dikirim Crew ➔ Divalidasi COS ➔ Approval Final oleh Area Coordinator (AC).</p>
+                                <p style="margin-top:2px;">• <b>Tab Resume</b>: Menampilkan 3 Kotak Kecil Resume (*Total Tugas/Briefing*, *Sudah*, dan *Belum*). Khusus User AC menampilkan monitoring per-toko.</p>
+                                <p style="margin-top:2px;">• <b>Auto-Reset Mingguan</b>: Setiap hari Senin jam 00:00 WIB, tugas mingguan baru akan terbuka otomatis.</p>
+                            </div>
+
+                            <!-- 3. PLAN MASTER SHIFT -->
+                            <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                                <b style="color:var(--accent-primary); font-size:0.78rem;"><i class="fa-solid fa-calendar-days"></i> 3. Plan Master Shift Bulanan</b>
+                                <p style="margin-top:2px;">• <b>Edit Pola Shift</b>: COS/ACOS dapat mengubah jadwal shift Pagi (P), Siang (S), Malam (M), Add Off (AO), atau Libur (OFF).</p>
+                                <p style="margin-top:2px;">• <b>Tukar Instan & Auto-Generate</b>: Fitur tukar shift antar karyawan secara kilat atau susun jadwal otomatis.</p>
+                                <p style="margin-top:2px;">• <b>Khusus AC</b>: AC memiliki mode *Read-Only* untuk memantau jadwal seluruh toko.</p>
+                            </div>
+
+                            <!-- 4. CEKLIS EXPIRED -->
+                            <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                                <b style="color:var(--accent-primary); font-size:0.78rem;"><i class="fa-solid fa-triangle-exclamation"></i> 4. Ceklis Expired & Manajemen Rak</b>
+                                <p style="margin-top:2px;">• <b>Foto Bukti Wajib</b>: Staff wajib melampirkan foto kondisi rak saat ceklis.</p>
+                                <p style="margin-top:2px;">• <b>Validasi COS</b>: COS dapat menyetujui (*Setujui*) atau menolak (*Tolak beralasan*).</p>
+                                <p style="margin-top:2px;">• <b>Tab Alert Expired</b>: Menampilkan 3 Kotak Resume (*Total Input*, *Sudah*, *Belum Dieksekusi*).</p>
+                            </div>
+
+                            <!-- 5. BELANJA KARYAWAN -->
+                            <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                                <b style="color:var(--accent-primary); font-size:0.78rem;"><i class="fa-solid fa-cart-shopping"></i> 5. Belanja Karyawan & Cutoff</b>
+                                <p style="margin-top:2px;">• <b>Input Struk</b>: Masukkan No. Bon, No. Member, Nominal, dan Foto Struk Belanja.</p>
+                                <p style="margin-top:2px;">• <b>Validasi 2 Tingkat</b>: COS meneruskan ke AC ➔ AC menyetujui final.</p>
+                                <p style="margin-top:2px;">• <b>Siklus Reset</b>: Otomatis terhitung per siklus tanggal 25 s/d 24 bulan berikutnya.</p>
+                            </div>
+
+                            <!-- 6. SERAH TERIMA SHIFT -->
+                            <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                                <b style="color:var(--accent-primary); font-size:0.78rem;"><i class="fa-solid fa-clock-rotate-left"></i> 6. Serah Terima Shift (Handover)</b>
+                                <p style="margin-top:2px;">• Catat sales shift, actual PSM, PWP, Serba Gratis, Member Baru, dan Catatan Kasir.</p>
+                                <p style="margin-top:2px;">• **Pop-up Konfirmasi**: Shift berikutnya wajib mengonfirmasi catatan serah terima shift sebelumnya.</p>
+                            </div>
+
+                            <!-- 7. KACIDA AI -->
+                            <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                                <b style="color:var(--accent-primary); font-size:0.78rem;"><i class="fa-solid fa-robot"></i> 7. Kacida AI Assistant (Llama-3.3-70b)</b>
+                                <p style="margin-top:2px;">• Tanya sales harian dinamis dari Jan 2026 s/d sekarang, Average MTD/SPD, YTD, analisa strategi toko, hingga diajak bercanda dan pantun!</p>
+                            </div>
+
+                            <!-- 8. POIN & LEADERBOARD -->
+                            <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                                <b style="color:var(--accent-primary); font-size:0.78rem;"><i class="fa-solid fa-trophy"></i> 8. Poin Keaktifan & Leaderboard</b>
+                                <p style="margin-top:2px;">• Kumpulkan Poin dari setiap aktivitas (Login, Submit Struk, Jobdesk, Handover, dll) untuk menaikkan peringkat di Leaderboard Area!</p>
+                            </div>
+
                         </div>
                     </div>
 
-                    <div class="modal-card-box">
-                        <h4 style="font-size:0.9rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-star"></i> SURVEY & RATING APLIKASI</h4>
+                    <!-- FORM SURVEY APLIKASI -->
+                    <div class="modal-card-box" style="margin-top:8px;">
+                        <h4 style="font-size:0.88rem; font-weight:800; color:var(--gold); margin-bottom:6px;"><i class="fa-solid fa-star"></i> SURVEY & RATING APLIKASI</h4>
                         <p style="font-size:0.7rem; color:var(--text-sub);">Berikan penilaian dan masukan Anda untuk pengembangan Kacida App:</p>
                         
                         <div class="star-rating-box" id="starRatingContainer">
@@ -1470,7 +1536,8 @@
                         </button>
                     </div>
 
-                    <div class="modal-card-box" style="text-align:center;">
+                    <!-- TOMBOL UTILITY -->
+                    <div class="modal-card-box" style="text-align:center; margin-top:8px;">
                         <button onclick="triggerPWAInstall()" style="background:var(--input-bg); border:1px solid var(--card-border); color:var(--text-main); padding:8px 12px; border-radius:10px; font-weight:700; font-size:0.72rem; cursor:pointer; width:100%; margin-bottom:6px;">
                             📲 Install Aplikasi Ke Home Screen
                         </button>
@@ -1726,7 +1793,7 @@
                 `)
             ];
 
-            container.innerHTML = allUtamaCards.slice(0, 8).join("");
+            container.innerHTML = allUtamaCards.slice(0, 10).join("");
         }
 
         function getSmart3DIcon(menuName, defaultIcon) {
