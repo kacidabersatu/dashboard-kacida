@@ -320,10 +320,10 @@
             </div>
         </header>
 
-        <!-- RUNNING TEXT MARQUEE BERJALAN SMOOTH -->
+        <!-- 🚀 RUNNING TEXT 3D PENGUMUMAN BERJALAN (SMOOTH MARQUEE) -->
         <div id="runningTextHeaderBar" class="running-text-container hidden">
-            <span style="background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap;">🔥 INFO SUPERVISI</span>
-            <marquee id="marqueeTextContent" scrollamount="6" style="flex:1;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
+            <span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap; z-index:2;">🔥 INFO SUPERVISI</span>
+            <marquee id="marqueeTextContent" behavior="scroll" direction="left" scrollamount="5" style="flex:1; font-weight:800; font-size:0.72rem; color:#ffffff;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
         </div>
 
         <main id="tabBeranda" class="container">
@@ -3666,10 +3666,11 @@
         function openAllMenuModal(kategori) {
             if (!dashboardData) return;
             const list = kategori === 'Utama' ? dashboardData.menu.utama : dashboardData.menu.layanan;
+            
             showCustomModal(`Semua ${kategori}`, `
-                <div class="menu-grid-4">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 6px 0; text-align: center;">
                     ${(list || []).map(m => `
-                        <div onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')" style="display:flex; flex-direction:column; align-items:center; cursor:pointer;">
+                        <div onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')" class="menu-3d-item">
                             <div class="icon-box-3d"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}"></div>
                             <span class="menu-label">${escapeHTML(m["Nama Menu"])}</span>
                         </div>
