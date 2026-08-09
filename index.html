@@ -320,10 +320,12 @@
             </div>
         </header>
 
-        <!-- 🚀 RUNNING TEXT 3D PENGUMUMAN BERJALAN (SMOOTH MARQUEE) -->
-        <div id="runningTextHeaderBar" class="running-text-container hidden">
-            <span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap; z-index:2;">🔥 INFO SUPERVISI</span>
-            <marquee id="marqueeTextContent" behavior="scroll" direction="left" scrollamount="5" style="flex:1; font-weight:800; font-size:0.72rem; color:#ffffff;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
+        <!-- 🚀 RUNNING TEXT 3D PENGUMUMAN BERJALAN (HTML BAGIAN 1) -->
+        <div id="runningTextHeaderBar" class="running-text-container hidden" style="display:flex; align-items:center; gap:8px; overflow:hidden; width:100%;">
+            <span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap; z-index:2; flex-shrink:0;">🔥 INFO SUPERVISI</span>
+            <div style="flex:1; overflow:hidden; white-space:nowrap; width:100%;">
+                <marquee id="marqueeTextContent" behavior="scroll" direction="left" scrollamount="5" style="width:100%; font-weight:800; font-size:0.72rem; color:#ffffff; display:block;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
+            </div>
         </div>
 
         <main id="tabBeranda" class="container">
@@ -1012,16 +1014,24 @@
             });
         }
 
+        // 🚀 FUNGSI MERESTART ANIMASI MARQUEE (HTML BAGIAN 2)
         function updateRunningTextAndAnnounceBadges() {
             const bar = document.getElementById("runningTextHeaderBar");
-            const marquee = document.getElementById("marqueeTextContent");
             const countBox = document.getElementById("valAnnounce");
             const dotAnnounce = document.getElementById("dotAnnounce");
 
-            if (activeAnnouncementsList.length > 0) {
+            if (activeAnnouncementsList && activeAnnouncementsList.length > 0) {
                 const fullText = activeAnnouncementsList.map(a => `${a.judul} : ${a.pesan}`).join("  ✦  ");
-                if (marquee) marquee.innerText = fullText;
+                
+                // 1. Tampilkan bar terlebih dahulu agar lebarnya terdeteksi browser
                 if (bar) bar.classList.remove("hidden");
+
+                // 2. Re-inject marquee setelah bar terbuka agar animasi langsung berjalan
+                const marqueeContainer = bar ? bar.querySelector("div") : null;
+                if (marqueeContainer) {
+                    marqueeContainer.innerHTML = `<marquee id="marqueeTextContent" behavior="scroll" direction="left" scrollamount="5" style="width:100%; font-weight:800; font-size:0.72rem; color:#ffffff; display:block;">${fullText}</marquee>`;
+                }
+
                 if (countBox) countBox.innerText = activeAnnouncementsList.length;
                 if (dotAnnounce) dotAnnounce.classList.remove("hidden");
             } else {
