@@ -3993,7 +3993,7 @@
 
                             ${isLocked ? `
                                 <button disabled style="width:100%; background:var(--input-bg); color:var(--text-sub); font-weight:800; padding:8px; border-radius:10px; border:1px solid var(--card-border); opacity:0.7; cursor:not-allowed;">
-                                    🔒 Tugas Sudah Dikirim
+                                    🔒 Tugas Sudah Selesai
                                 </button>
                             ` : `
                                 <button onclick="openJobdeskTaskFormModal('${escapeHTML(task.title)}')" style="width:100%; background:${isRejected ? '#fee2e2' : 'var(--accent-green-grad)'}; color:${isRejected ? '#dc2626' : '#ffffff'}; border:${isRejected ? '1px solid #fca5a5' : 'none'}; font-weight:800; padding:10px; border-radius:10px; cursor:pointer;">
@@ -4023,93 +4023,142 @@
                     </div>
                 `;
             } 
-            // TAB 2: RESUME PROGRESS (3 KOTAK KECIL RESUME)
+            // TAB 2: RESUME PROGRESS (DILENGKAPI RESUME JOBDESK HARIAN + BRIEFING SHIFT 1 & 2)
             else if (activeTab === 'resume') {
-                const tasks = JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || [];
+                const dailyTasks = JOBDESK_MASTER_TASKS["Daily Activity"]?.[selectedJobdeskDay] || [];
+                const briefingTasks = JOBDESK_MASTER_TASKS["Materi Briefing Shift 1 & 2"]?.[selectedJobdeskDay] || [];
 
                 if (userAC && daftarToko.length > 0) {
-                    let totalTasksArea = tasks.length * daftarToko.length;
-                    let doneTasksArea = 0;
+                    // MODE AREA COORDINATOR: REKAP AKUMULASI SELURUH TOKO AREA
+                    let totalDailyArea = dailyTasks.length * daftarToko.length;
+                    let doneDailyArea = 0;
+                    let totalBriefingArea = briefingTasks.length * daftarToko.length;
+                    let doneBriefingArea = 0;
 
                     const storeCards = daftarToko.map(toko => {
-                        let doneCount = 0;
-                        tasks.forEach(t => {
-                            const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === selectedJobdeskCategory && r.kodeToko === toko.kodeToko);
-                            if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneCount++;
+                        let doneDailyCount = 0;
+                        dailyTasks.forEach(t => {
+                            const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === 'Daily Activity' && r.kodeToko === toko.kodeToko);
+                            if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneDailyCount++;
                         });
-                        doneTasksArea += doneCount;
-                        const percent = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
+                        doneDailyArea += doneDailyCount;
+
+                        let doneBriefingCount = 0;
+                        briefingTasks.forEach(t => {
+                            const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === 'Materi Briefing Shift 1 & 2' && r.kodeToko === toko.kodeToko);
+                            if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneBriefingCount++;
+                        });
+                        doneBriefingArea += doneBriefingCount;
+
+                        const dailyPercent = dailyTasks.length > 0 ? Math.round((doneDailyCount / dailyTasks.length) * 100) : 0;
+                        const briefingPercent = briefingTasks.length > 0 ? Math.round((doneBriefingCount / briefingTasks.length) * 100) : 0;
 
                         return `
                             <div class="modal-card-box" onclick="viewStoreJobdeskDetailAC('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid var(--accent-primary);">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div>
                                         <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
-                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">Progres: <b style="color:var(--accent-primary);">${percent}% (${doneCount}/${tasks.length} Jobdesk)</b></p>
+                                        <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">
+                                            🧹 Jobdesk: <b style="color:var(--accent-primary);">${doneDailyCount}/${dailyTasks.length} (${dailyPercent}%)</b> | 
+                                            📢 Briefing: <b style="color:var(--gold);">${doneBriefingCount}/${briefingTasks.length} (${briefingPercent}%)</b>
+                                        </p>
                                     </div>
-                                    <span style="font-size:0.6rem; color:var(--gold); font-weight:800;">Lihat Detail ➔</span>
+                                    <span style="font-size:0.6rem; color:var(--gold); font-weight:800;">Detail ➔</span>
                                 </div>
                             </div>
                         `;
                     }).join("");
 
-                    const pendingTasksArea = Math.max(0, totalTasksArea - doneTasksArea);
+                    const pendingDailyArea = Math.max(0, totalDailyArea - doneDailyArea);
+                    const pendingBriefingArea = Math.max(0, totalBriefingArea - doneBriefingArea);
 
                     tabContentHtml = `
                         <div class="modal-grid-1">
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-broom"></i> RESUME JOBDESK HARIAN AREA (${selectedJobdeskDay})</h5>
                             <div class="modal-grid-3" style="margin-bottom:8px;">
-                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid var(--accent-primary);">
-                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL TUGAS AREA</span>
-                                    <p style="font-size:1.1rem; font-weight:800; color:var(--accent-primary); margin-top:2px;">${totalTasksArea} <small style="font-size:0.65rem;">Tugas</small></p>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid var(--accent-primary);">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL TUGAS</span>
+                                    <p style="font-size:1rem; font-weight:800; color:var(--accent-primary); margin-top:2px;">${totalDailyArea}</p>
                                 </div>
-                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid #10b981;">
-                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH SELESAI</span>
-                                    <p style="font-size:1.1rem; font-weight:800; color:#047857; margin-top:2px;">${doneTasksArea} <small style="font-size:0.65rem;">Tugas</small></p>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid #10b981;">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH SELESAI</span>
+                                    <p style="font-size:1rem; font-weight:800; color:#047857; margin-top:2px;">${doneDailyArea}</p>
                                 </div>
-                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid #ef4444;">
-                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">BELUM SELESAI</span>
-                                    <p style="font-size:1.1rem; font-weight:800; color:#dc2626; margin-top:2px;">${pendingTasksArea} <small style="font-size:0.65rem;">Tugas</small></p>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid #ef4444;">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">BELUM SELESAI</span>
+                                    <p style="font-size:1rem; font-weight:800; color:#dc2626; margin-top:2px;">${pendingDailyArea}</p>
                                 </div>
                             </div>
 
-                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);">🏪 MONITORING RESUME TOKO AREA (${selectedJobdeskDay})</h5>
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--gold);"><i class="fa-solid fa-bullhorn"></i> RESUME BRIEFING SHIFT 1 & 2 AREA (${selectedJobdeskDay})</h5>
+                            <div class="modal-grid-3" style="margin-bottom:12px;">
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid var(--gold);">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL BRIEFING</span>
+                                    <p style="font-size:1rem; font-weight:800; color:var(--gold); margin-top:2px;">${totalBriefingArea}</p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid #10b981;">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH BRIEFING</span>
+                                    <p style="font-size:1rem; font-weight:800; color:#047857; margin-top:2px;">${doneBriefingArea}</p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid #ef4444;">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">BELUM BRIEFING</span>
+                                    <p style="font-size:1rem; font-weight:800; color:#dc2626; margin-top:2px;">${pendingBriefingArea}</p>
+                                </div>
+                            </div>
+
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);">🏪 MONITORING RINCIAN PER-TOKO (${selectedJobdeskDay})</h5>
                             ${storeCards}
                         </div>
                     `;
                 } else {
-                    let totalTasksStore = tasks.length;
-                    let doneCountStore = 0;
-                    
-                    tasks.forEach(t => {
-                        const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === selectedJobdeskCategory && r.kodeToko === userKodeToko);
-                        if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneCountStore++;
+                    // MODE USER TOKO (STAFF & COS)
+                    let totalDailyStore = dailyTasks.length;
+                    let doneDailyStore = 0;
+                    dailyTasks.forEach(t => {
+                        const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === 'Daily Activity' && r.kodeToko === userKodeToko);
+                        if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneDailyStore++;
                     });
+                    let pendingDailyStore = Math.max(0, totalDailyStore - doneDailyStore);
 
-                    let pendingTasksStore = Math.max(0, totalTasksStore - doneCountStore);
-                    const percent = totalTasksStore > 0 ? Math.round((doneCountStore / totalTasksStore) * 100) : 0;
+                    let totalBriefingStore = briefingTasks.length;
+                    let doneBriefingStore = 0;
+                    briefingTasks.forEach(t => {
+                        const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === 'Materi Briefing Shift 1 & 2' && r.kodeToko === userKodeToko);
+                        if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneBriefingStore++;
+                    });
+                    let pendingBriefingStore = Math.max(0, totalBriefingStore - doneBriefingStore);
 
                     tabContentHtml = `
                         <div class="modal-grid-1">
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-broom"></i> RESUME JOBDESK HARIAN TOKO (${userNamaToko})</h5>
                             <div class="modal-grid-3" style="margin-bottom:8px;">
-                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid var(--accent-primary);">
-                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL TUGAS</span>
-                                    <p style="font-size:1.1rem; font-weight:800; color:var(--accent-primary); margin-top:2px;">${totalTasksStore} <small style="font-size:0.65rem;">Tugas</small></p>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid var(--accent-primary);">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL TUGAS</span>
+                                    <p style="font-size:1rem; font-weight:800; color:var(--accent-primary); margin-top:2px;">${totalDailyStore}</p>
                                 </div>
-                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid #10b981;">
-                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH SELESAI</span>
-                                    <p style="font-size:1.1rem; font-weight:800; color:#047857; margin-top:2px;">${doneCountStore} <small style="font-size:0.65rem;">Tugas</small></p>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid #10b981;">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH SELESAI</span>
+                                    <p style="font-size:1rem; font-weight:800; color:#047857; margin-top:2px;">${doneDailyStore}</p>
                                 </div>
-                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid #ef4444;">
-                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">BELUM SELESAI</span>
-                                    <p style="font-size:1.1rem; font-weight:800; color:#dc2626; margin-top:2px;">${pendingTasksStore} <small style="font-size:0.65rem;">Tugas</small></p>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid #ef4444;">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">BELUM SELESAI</span>
+                                    <p style="font-size:1rem; font-weight:800; color:#dc2626; margin-top:2px;">${pendingDailyStore}</p>
                                 </div>
                             </div>
 
-                            <div class="mtd-summary-card">
-                                <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">📊 KETERCAPAIAN JOBDESK TOKO (${userNamaToko})</span>
-                                <div class="mtd-amount-hero">${percent}% <small style="font-size:0.8rem;">(${doneCountStore}/${totalTasksStore} Selesai)</small></div>
-                                <div style="width:100%; background:rgba(0,0,0,0.1); height:8px; border-radius:10px; margin-top:8px; overflow:hidden;">
-                                    <div style="width:${percent}%; background:var(--accent-primary); height:100%; border-radius:10px;"></div>
+                            <h5 style="font-size:0.75rem; font-weight:800; color:var(--gold);"><i class="fa-solid fa-bullhorn"></i> RESUME BRIEFING SHIFT 1 & 2 TOKO (${userNamaToko})</h5>
+                            <div class="modal-grid-3" style="margin-bottom:12px;">
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid var(--gold);">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL BRIEFING</span>
+                                    <p style="font-size:1rem; font-weight:800; color:var(--gold); margin-top:2px;">${totalBriefingStore}</p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid #10b981;">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH BRIEFING</span>
+                                    <p style="font-size:1rem; font-weight:800; color:#047857; margin-top:2px;">${doneBriefingStore}</p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center; padding:8px; border-left:4px solid #ef4444;">
+                                    <span style="font-size:0.55rem; color:var(--text-sub); font-weight:700; display:block;">BELUM BRIEFING</span>
+                                    <p style="font-size:1rem; font-weight:800; color:#dc2626; margin-top:2px;">${pendingBriefingStore}</p>
                                 </div>
                             </div>
                         </div>
@@ -4168,6 +4217,59 @@
                 </div>
             `;
             showCustomModal("📋 JOBDESK HARIAN & BRIEFING", htmlBox);
+        }
+
+        // FUNGSI DETAIL PERTOKO UNTUK USER AC (DAILY + BRIEFING)
+        function viewStoreJobdeskDetailAC(kodeToko, storeName) {
+            triggerAndroidHaptic('light');
+            const dailyTasks = JOBDESK_MASTER_TASKS["Daily Activity"]?.[selectedJobdeskDay] || [];
+            const briefingTasks = JOBDESK_MASTER_TASKS["Materi Briefing Shift 1 & 2"]?.[selectedJobdeskDay] || [];
+
+            let dailyHtml = dailyTasks.map(t => {
+                const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === 'Daily Activity' && r.kodeToko === kodeToko);
+                const statusTxt = sub ? (sub.status === 'APPROVED' ? '✅ Approved' : (sub.status === 'PENDING_AC' ? '⏳ Review AC' : '⏳ Review COS')) : '❌ Belum';
+
+                return `
+                    <div style="background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <b style="font-size:0.75rem; color:var(--text-main);">${escapeHTML(t.title)}</b>
+                            <span style="font-size:0.6rem; font-weight:bold; color:var(--accent-primary);">${statusTxt}</span>
+                        </div>
+                        ${sub ? `<p style="font-size:0.6rem; color:var(--text-sub); margin-top:2px;">Dikirim oleh: ${escapeHTML(sub.submittedBy)} (${sub.submittedAt})</p>` : ''}
+                        ${sub && sub.photoUrl ? `<img src="${sub.photoUrl}" onclick="showFullImageModal('${sub.photoUrl}')" style="width:100%; height:90px; object-fit:cover; border-radius:6px; margin-top:4px; cursor:pointer;">` : ''}
+                    </div>
+                `;
+            }).join("");
+
+            let briefingHtml = briefingTasks.map(t => {
+                const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === 'Materi Briefing Shift 1 & 2' && r.kodeToko === kodeToko);
+                const statusTxt = sub ? (sub.status === 'APPROVED' ? '✅ Approved' : (sub.status === 'PENDING_AC' ? '⏳ Review AC' : '⏳ Review COS')) : '❌ Belum';
+
+                return `
+                    <div style="background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <b style="font-size:0.75rem; color:var(--text-main);">${escapeHTML(t.title)}</b>
+                            <span style="font-size:0.6rem; font-weight:bold; color:var(--gold);">${statusTxt}</span>
+                        </div>
+                        ${sub ? `<p style="font-size:0.6rem; color:var(--text-sub); margin-top:2px;">Briefing oleh: ${escapeHTML(sub.submittedBy)} (${sub.submittedAt})</p>` : ''}
+                        ${sub && sub.photoUrl ? `<img src="${sub.photoUrl}" onclick="showFullImageModal('${sub.photoUrl}')" style="width:100%; height:90px; object-fit:cover; border-radius:6px; margin-top:4px; cursor:pointer;">` : ''}
+                    </div>
+                `;
+            }).join("");
+
+            Swal.fire({
+                title: `Detail Toko: ${storeName} (${selectedJobdeskDay})`,
+                html: `
+                    <div style="text-align:left; font-size:0.75rem; max-height:60vh; overflow-y:auto;">
+                        <h5 style="font-weight:800; color:var(--accent-primary); margin-bottom:6px;">🧹 Daily Activity</h5>
+                        ${dailyHtml || '<p style="color:var(--text-sub);">Belum ada pengerjaan daily.</p>'}
+                        <h5 style="font-weight:800; color:var(--gold); margin-top:10px; margin-bottom:6px;">📢 Briefing Shift 1 & 2</h5>
+                        ${briefingHtml || '<p style="color:var(--text-sub);">Belum ada briefing.</p>'}
+                    </div>
+                `,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
         }
 
         function viewStoreJobdeskDetailAC(kodeToko, storeName) {
