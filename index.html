@@ -1696,9 +1696,16 @@
                 pendingBelanjaCount = belanjaTransactions.filter(t => t.status === "Menunggu COS" && t.kodeToko === userKodeToko).length;
             }
 
+            // ✅ DAFTAR MENU BUILT-IN DENGAN "JOBDESK HARIAN"
             const builtInMenus = [
+                { 
+                    name: "Jobdesk Harian", 
+                    icon: "https://cdn-icons-png.flaticon.com/512/3209/3209265.png", 
+                    action: "openJobdeskHarianModal()", 
+                    numBadge: isUserAC() ? jobdeskReports.filter(j => j.status === 'PENDING_AC').length : (isUserCOS() ? jobdeskReports.filter(j => j.status === 'PENDING_COS' && j.kodeToko === userKodeToko).length : 0) 
+                },
                 { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
-                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: userCOS ? expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length : 0 },
+                { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: isUserCOS() ? expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length : 0 },
                 { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
                 { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()", numBadge: pendingBelanjaCount }
             ];
