@@ -4025,12 +4025,17 @@
                 const tasks = JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || [];
 
                 if (userAC && daftarToko.length > 0) {
+                    // MODE AREA COORDINATOR: REKAP AKUMULASI SELURUH TOKO AREA
+                    let totalTasksArea = tasks.length * daftarToko.length;
+                    let doneTasksArea = 0;
+
                     const storeCards = daftarToko.map(toko => {
                         let doneCount = 0;
                         tasks.forEach(t => {
                             const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === selectedJobdeskCategory && r.kodeToko === toko.kodeToko);
                             if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneCount++;
                         });
+                        doneTasksArea += doneCount;
                         const percent = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
 
                         return `
@@ -4046,25 +4051,64 @@
                         `;
                     }).join("");
 
+                    const pendingTasksArea = Math.max(0, totalTasksArea - doneTasksArea);
+
                     tabContentHtml = `
                         <div class="modal-grid-1">
+                            <!-- 📊 3 KOTAK KECIL RESUME UNTUK USER AC (TOTAL AREA) -->
+                            <div class="modal-grid-3" style="margin-bottom:8px;">
+                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid var(--accent-primary);">
+                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL TUGAS AREA</span>
+                                    <p style="font-size:1.1rem; font-weight:800; color:var(--accent-primary); margin-top:2px;">${totalTasksArea} <small style="font-size:0.65rem;">Tugas</small></p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid #10b981;">
+                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH SELESAI</span>
+                                    <p style="font-size:1.1rem; font-weight:800; color:#047857; margin-top:2px;">${doneTasksArea} <small style="font-size:0.65rem;">Tugas</small></p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid #ef4444;">
+                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">BELUM SELESAI</span>
+                                    <p style="font-size:1.1rem; font-weight:800; color:#dc2626; margin-top:2px;">${pendingTasksArea} <small style="font-size:0.65rem;">Tugas</small></p>
+                                </div>
+                            </div>
+
                             <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);">🏪 MONITORING RESUME TOKO AREA (${selectedJobdeskDay})</h5>
                             ${storeCards}
                         </div>
                     `;
                 } else {
-                    let doneCount = 0;
+                    // MODE USER TOKO (STAFF & COS): KHUSUS TOKONYA SENDIRI
+                    let totalTasksStore = tasks.length;
+                    let doneCountStore = 0;
+                    
                     tasks.forEach(t => {
                         const sub = jobdeskReports.find(r => r.taskTitle === t.title && r.day === selectedJobdeskDay && r.category === selectedJobdeskCategory && r.kodeToko === userKodeToko);
-                        if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneCount++;
+                        if (sub && (sub.status === 'APPROVED' || sub.status === 'PENDING_AC' || sub.status === 'PENDING_COS')) doneCountStore++;
                     });
-                    const percent = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
+
+                    let pendingTasksStore = Math.max(0, totalTasksStore - doneCountStore);
+                    const percent = totalTasksStore > 0 ? Math.round((doneCountStore / totalTasksStore) * 100) : 0;
 
                     tabContentHtml = `
                         <div class="modal-grid-1">
+                            <!-- 📊 3 KOTAK KECIL RESUME UNTUK USER TOKO -->
+                            <div class="modal-grid-3" style="margin-bottom:8px;">
+                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid var(--accent-primary);">
+                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">TOTAL TUGAS</span>
+                                    <p style="font-size:1.1rem; font-weight:800; color:var(--accent-primary); margin-top:2px;">${totalTasksStore} <small style="font-size:0.65rem;">Tugas</small></p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid #10b981;">
+                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">SUDAH SELESAI</span>
+                                    <p style="font-size:1.1rem; font-weight:800; color:#047857; margin-top:2px;">${doneCountStore} <small style="font-size:0.65rem;">Tugas</small></p>
+                                </div>
+                                <div class="modal-card-box" style="text-align:center; padding:10px; border-left:4px solid #ef4444;">
+                                    <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700; display:block;">BELUM SELESAI</span>
+                                    <p style="font-size:1.1rem; font-weight:800; color:#dc2626; margin-top:2px;">${pendingTasksStore} <small style="font-size:0.65rem;">Tugas</small></p>
+                                </div>
+                            </div>
+
                             <div class="mtd-summary-card">
                                 <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">📊 KETERCAPAIAN JOBDESK TOKO (${userNamaToko})</span>
-                                <div class="mtd-amount-hero">${percent}% <small style="font-size:0.8rem;">(${doneCount}/${tasks.length} Selesai)</small></div>
+                                <div class="mtd-amount-hero">${percent}% <small style="font-size:0.8rem;">(${doneCountStore}/${totalTasksStore} Selesai)</small></div>
                                 <div style="width:100%; background:rgba(0,0,0,0.1); height:8px; border-radius:10px; margin-top:8px; overflow:hidden;">
                                     <div style="width:${percent}%; background:var(--accent-primary); height:100%; border-radius:10px;"></div>
                                 </div>
@@ -4072,6 +4116,7 @@
                         </div>
                     `;
                 }
+            }
             } else if (activeTab === 'approval') {
                 let pendingList = [];
                 if (userAC) {
