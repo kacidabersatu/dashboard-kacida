@@ -2108,15 +2108,20 @@
                 reader.readAsDataURL(file);
             }
         }
-        // =================================================================
-        // MODUL CEKLIS EXPIRED & MANAJEMEN RAK (FULL VERSI LENGKAP)
+         // =================================================================
+        // CEKLIS EXPIRED: FIX PENUGASAN MANUAL & SMART AUTO-GENERATE
         // =================================================================
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
             const userKodeToko = dashboardData?.user?.kodeToko || '';
             const daftarToko = dashboardData?.daftarToko || [];
-            const personilList = dashboardData?.struktur?.personilToko || [];
+
+            // Ambil daftar personil toko yang aman & lengkap
+            let personilList = dashboardData?.struktur?.personilToko || [];
+            if (!personilList || personilList.length === 0) {
+                personilList = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
+            }
 
             // Filter data sesuai toko (Kecuali User AC)
             let storeShelves = expShelves;
@@ -2140,7 +2145,6 @@
             // TAB 1: CEKLIS & RAK TOKO
             if (activeTab === 'rak') {
                 if (userAC && daftarToko.length > 0) {
-                    // MODE AREA COORDINATOR: GRID TOKO (READ-ONLY)
                     const storeCards = daftarToko.map(toko => {
                         const tShelves = expShelves.filter(s => s.kodeToko === toko.kodeToko);
                         const tSelesai = tShelves.filter(s => s.status === 'Selesai').length;
@@ -2169,7 +2173,6 @@
                         <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
-                    // MODE STORE USER (STAFF & COS)
                     let rakListCards = storeShelves.map(s => {
                         const isDone = s.status === 'Selesai';
                         const isPendingVal = s.status === 'Menunggu Validasi COS';
@@ -2192,7 +2195,6 @@
                                             ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Menunggu Validasi COS' : (isRejected ? '🚫 Ditolak' : '❌ Belum Ceklis'))}
                                         </span>
                                         
-                                        <!-- TOMBOL EDIT & HAPUS TETAP TERSEDIA UNTUK COS -->
                                         ${userCOS ? `
                                             <div style="display:flex; gap:4px; margin-top:2px;">
                                                 <button onclick="editShelfModalCOS('${s.id}')" style="background:#e0e7ff; color:#3730a3; border:none; padding:3px 8px; border-radius:6px; font-size:0.6rem; cursor:pointer; font-weight:800;">✏️ Edit</button>
@@ -2217,7 +2219,6 @@
                                             ✅ SETUJUI
                                         </button>
                                     ` : (isDone && !userCOS ? `
-                                        <!-- GEMBOK KETAT UNTUK STAFF JIKA SUDAH SELESAI -->
                                         <button disabled style="width:100%; background:var(--input-bg); color:var(--text-sub); border:1px solid var(--card-border); padding:8px; border-radius:10px; font-weight:800; opacity:0.7; cursor:not-allowed;">
                                             🔒 Rak Sudah Selesai Dikerjakan & Divalidasi
                                         </button>
@@ -2234,11 +2235,16 @@
                     let configSectionHtml = '';
                     if (userCOS) {
                         const personilOptsHtml = `<option value="">-- Pilih Penanggung Jawab --</option>` + 
-                            personilList.map(p => `<option value="${p.nik}">👤 ${escapeHTML(p.nama)} (${p.jabatan})</option>`).join("");
+                            personilList.map(p => {
+                                const nikVal = p.nik || p.NIK || '';
+                                const namaVal = p.nama || p.NAMA || 'User';
+                                const jabVal = p.jabatan || p.JABATAN || '';
+                                return `<option value="${nikVal}">👤 ${escapeHTML(namaVal)} (${escapeHTML(jabVal)})</option>`;
+                            }).join("");
 
                         configSectionHtml = `
                             <div class="modal-card-box">
-                                <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK & PENUGASAN </h5>
+                                <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK MANUAL & PENUGASAN (KHUSUS COS)</h5>
                                 <div class="modal-grid-2" style="margin-bottom:8px;">
                                     <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
                                     <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
@@ -2276,7 +2282,6 @@
                     `;
                 }
             } 
-            // TAB 2: INPUT PRODUK (DISEMBUNYIKAN UNTUK AC)
             else if (activeTab === 'input' && !userAC) {
                 const shelfOptionsHtml = storeShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
                 tabContentHtml = `
@@ -2300,7 +2305,6 @@
                     </div>
                 `;
             } 
-            // TAB 3: ALERT EXPIRED (KOTAK RESUME TOTAL)
             else if (activeTab === 'alert') {
                 const targetAlertProducts = userAC ? expProducts : expProducts.filter(p => p.kodeToko === userKodeToko);
 
@@ -2405,174 +2409,24 @@
             showCustomModal("⚠️ CEKLIS EXP & MANAJEMEN RAK", htmlBox);
         }
 
-        function viewStoreShelvesDetailAC(kodeToko, namaToko) {
-            triggerAndroidHaptic('light');
-            const storeShelves = expShelves.filter(s => s.kodeToko === kodeToko);
-
-            let html = storeShelves.map(s => {
-                const isDone = s.status === 'Selesai';
-                const isPendingVal = s.status === 'Menunggu Validasi COS';
-                const isRejected = s.status === 'Ditolak';
-
-                return `
-                    <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <div>
-                                <h5 style="font-weight:800; font-size:0.85rem; color:var(--text-main);">${escapeHTML(s.name)}</h5>
-                                <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">No. Rak: ${escapeHTML(s.noRak||'-')} | PJ: <b>${escapeHTML(s.assignedName||'-')}</b></p>
-                                ${s.lastChecked ? `<p style="font-size:0.6rem; color:var(--text-sub);">Dikerjakan: ${new Date(s.lastChecked).toLocaleString('id-ID')} oleh ${escapeHTML(s.checkedBy||'-')}</p>` : ''}
-                            </div>
-                            <span style="font-size:0.65rem; padding:3px 8px; border-radius:6px; font-weight:800; ${isDone ? 'background:#d1fae5; color:#047857;' : (isPendingVal ? 'background:#fef3c7; color:#b45309;' : 'background:#fee2e2; color:#dc2626;')}">
-                                ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Pending COS' : (isRejected ? '🚫 Ditolak' : '❌ Belum Ceklis'))}
-                            </span>
-                        </div>
-                        ${s.photoUrl ? `
-                            <div style="margin-top:6px;">
-                                <img src="${s.photoUrl}" onclick="showFullImageModal('${s.photoUrl}')" style="width:100%; height:100px; object-fit:cover; border-radius:8px; cursor:pointer;" title="Klik Pratinjau Foto Fullscreen">
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }).join("");
-
-            Swal.fire({
-                title: `Rincian Rak Toko: ${namaToko} (Read-Only)`,
-                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Belum ada data rak di toko ini.</p>`,
-                confirmButtonText: 'Tutup',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            });
-        }
-
-        function viewStoreExpDetailAC(kodeToko, namaToko) {
-            triggerAndroidHaptic('light');
-            const storeItems = expProducts.filter(p => p.kodeToko === kodeToko);
-
-            let html = storeItems.map(p => {
-                const isDone = p.status === 'selesai';
-                return `
-                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(p.name)}</p>
-                            <p style="font-size:0.62rem; color:var(--text-sub);">Exp: <b style="color:#ef4444;">${p.expDate}</b> | Penginput: ${escapeHTML(p.addedBy || 'Staff')}</p>
-                        </div>
-                        <span style="font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:6px; ${isDone ? 'background:#d1fae5; color:#047857;' : 'background:#fee2e2; color:#dc2626;'}">
-                            ${isDone ? '✅ Sudah Dieksekusi' : '⚠️ Belum Dieksekusi'}
-                        </span>
-                    </div>
-                `;
-            }).join("");
-
-            Swal.fire({
-                title: `Detail Expired: ${namaToko} (Read-Only)`,
-                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Tidak ada catatan produk expired di toko ini.</p>`,
-                confirmButtonText: 'Tutup',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            });
-        }
-
-        function promptShelfCompletion(shelfId) {
-            triggerAndroidHaptic('medium');
-            expPhotoPreview = null;
-
-            Swal.fire({
-                title: 'Tandai Rak Selesai',
-                html: `
-                    <div style="text-align:left; font-size:0.75rem;">
-                        <p style="margin-bottom:8px; font-weight:bold; color:#dc2626;">* PILIH / UNGGAH FOTO BUKTI BUKTI PENGERJAAN (WAJIB):</p>
-                        <input type="file" id="expShelfPhotoFile" accept="image/*" onchange="handleExpPhotoChangePreview(event)" style="width:100%; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border);">
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: '📸 Submit Bukti Foto',
-                cancelButtonText: 'Batal',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    if (!expPhotoPreview) {
-                        showSwalWarning('Foto Bukti Wajib ⚠️', 'Anda WAJIB memilih/mengunggah foto bukti kebersihan rak!');
-                        return;
-                    }
-                    markShelfCheckAction(shelfId);
-                }
-            });
-        }
-
-        function markShelfCheckAction(shelfId) {
-            const userCOS = isUserCOS();
-            const statusTarget = userCOS ? 'Selesai' : 'Menunggu Validasi COS';
-            const timestamp = new Date().toISOString();
-            const userName = dashboardData?.user?.NAMA || 'User';
-            const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
-
-            if (rtdb) {
-                rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
-                    status: statusTarget,
-                    lastChecked: timestamp,
-                    checkedBy: userName,
-                    kodeToko: userKodeToko,
-                    photoUrl: expPhotoPreview || ''
-                });
-            }
-
-            expPhotoPreview = null;
-            trackUserActivity(2, "Ceklis Rak Expired");
-            renderCeklisExpiredModal('rak');
-            showSwalSuccess('Ceklis Terkirim!', userCOS ? 'Rak ditandai Selesai!' : 'Foto berhasil dikirim. Menunggu Validasi Chief of Store.');
-        }
-
-        function validateShelfByCOS(shelfId) {
-            if (!isUserCOS()) return;
-
-            if (rtdb) {
-                rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
-                    status: 'Selesai',
-                    validatedByCOS: dashboardData?.user?.NAMA || 'COS'
-                });
-            }
-
-            renderCeklisExpiredModal('rak');
-            showSwalSuccess('Rak Divalidasi ✅', 'Hasil pengerjaan rak berhasil disetujui!');
-        }
-
-        function rejectShelfByCOS(shelfId) {
-            if (!isUserCOS()) return;
-
-            Swal.fire({
-                title: 'Tolak Pengerjaan Rak',
-                input: 'textarea',
-                inputPlaceholder: 'Tuliskan alasan penolakan (misal: Foto kurang jelas, rak masih kotor)...',
-                showCancelButton: true,
-                confirmButtonText: '🚫 Kirim Penolakan',
-                cancelButtonText: 'Batal',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            }).then((res) => {
-                if (res.isConfirmed && res.value) {
-                    if (rtdb) {
-                        rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
-                            status: 'Ditolak',
-                            alasanTolak: res.value,
-                            rejectedByCOS: dashboardData?.user?.NAMA || 'COS'
-                        });
-                    }
-                    renderCeklisExpiredModal('rak');
-                    showSwalSuccess('Penolakan Dikirim', 'Status pengerjaan rak diubah menjadi Ditolak.');
-                }
-            });
-        }
-
+        // FUNGSI TAMBAH RAK MANUAL + AKURAT MEMBACA NIK/NAMA
         function addShelfManualAction() {
             if (!isUserCOS()) { showSwalWarning('Akses Ditolak', 'Hanya Chief of Store yang dapat menambah rak.'); return; }
 
-            const noRak = document.getElementById("addNoRakInput").value.trim();
-            const name = document.getElementById("addNamaRakInput").value.trim();
-            const cat = document.getElementById("addCatRakInput").value;
+            const noRak = document.getElementById("addNoRakInput")?.value.trim() || "";
+            const name = document.getElementById("addNamaRakInput")?.value.trim() || "";
+            const cat = document.getElementById("addCatRakInput")?.value || "Makanan";
             const assignedNik = document.getElementById("addAssignedNikInput")?.value || "";
-            
-            const personilList = dashboardData?.struktur?.personilToko || [];
-            const selectedUser = personilList.find(p => p.nik === assignedNik);
-            const assignedName = selectedUser ? selectedUser.nama : 'Belum Didelegasikan';
-
             const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+
+            let personilList = dashboardData?.struktur?.personilToko || [];
+            if (!personilList || personilList.length === 0) {
+                personilList = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
+            }
+
+            // Pencocokan ketat Dukungan .nik / .NIK dan .nama / .NAMA
+            const selectedUser = personilList.find(p => String(p.nik || p.NIK || '').trim() === String(assignedNik).trim());
+            const assignedName = selectedUser ? (selectedUser.nama || selectedUser.NAMA) : 'Belum Didelegasikan';
 
             if (!name) { showSwalWarning('Form Kosong', 'Mohon masukkan nama rak!'); return; }
 
@@ -2595,17 +2449,29 @@
             }
 
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Rak Ditambahkan 📦', `Rak berhasil dibuat dan ditugaskan ke ${assignedName}!`);
+            showSwalSuccess('Rak Ditambahkan 📦', `Rak "${name}" berhasil dibuat dan ditugaskan ke ${assignedName}!`);
         }
 
+        // FUNGSI EDIT RAK & PENUGASAN COS
         function editShelfModalCOS(shelfId) {
             if (!isUserCOS()) return;
             const shelf = expShelves.find(s => s.id === shelfId);
             if (!shelf) return;
 
-            const personilList = dashboardData?.struktur?.personilToko || [];
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
+            let personilList = dashboardData?.struktur?.personilToko || [];
+            if (!personilList || personilList.length === 0) {
+                personilList = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
+            }
+
             const personilOptsHtml = `<option value="">-- Pilih Penanggung Jawab --</option>` + 
-                personilList.map(p => `<option value="${p.nik}" ${p.nik === shelf.assignedNik ? 'selected' : ''}>👤 ${escapeHTML(p.nama)} (${p.jabatan})</option>`).join("");
+                personilList.map(p => {
+                    const nVal = p.nik || p.NIK || '';
+                    const nmVal = p.nama || p.NAMA || 'User';
+                    const jbVal = p.jabatan || p.JABATAN || '';
+                    const isSelected = String(nVal).trim() === String(shelf.assignedNik).trim() ? 'selected' : '';
+                    return `<option value="${nVal}" ${isSelected}>👤 ${escapeHTML(nmVal)} (${escapeHTML(jbVal)})</option>`;
+                }).join("");
 
             Swal.fire({
                 title: 'Edit Rak & Penugasan COS',
@@ -2631,14 +2497,14 @@
                     const newNo = document.getElementById("editNoRakVal").value.trim();
                     const newName = document.getElementById("editNamaRakVal").value.trim();
                     const newNik = document.getElementById("editAssignedNikVal").value;
-                    const newPerson = personilList.find(p => p.nik === newNik);
+                    const newPerson = personilList.find(p => String(p.nik || p.NIK || '').trim() === String(newNik).trim());
 
                     if (rtdb) {
                         rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
                             noRak: newNo,
                             name: newName,
                             assignedNik: newNik,
-                            assignedName: newPerson ? newPerson.nama : 'Belum Didelegasikan'
+                            assignedName: newPerson ? (newPerson.nama || newPerson.NAMA) : 'Belum Didelegasikan'
                         });
                     }
                     renderCeklisExpiredModal('rak');
@@ -2647,31 +2513,18 @@
             });
         }
 
-        function deleteShelfAction(id) {
-            if (!isUserCOS()) { showSwalWarning('Akses Ditolak', 'Hanya Chief of Store yang dapat menghapus rak.'); return; }
-
-            if (rtdb) {
-                rtdb.ref('ceklis_expired/shelves/' + id).remove();
-            }
-            renderCeklisExpiredModal('rak');
-            showSwalSuccess('Dihapus 🗑️', 'Data rak berhasil dihapus!');
-        }
-
-        function deleteExpProductAction(id) {
-            if (rtdb) {
-                rtdb.ref('ceklis_expired/products/' + id).remove();
-            }
-            renderCeklisExpiredModal('alert');
-            showSwalSuccess('Item Dihapus 🗑️', 'Item alert expired berhasil dihapus!');
-        }
-
+        // AUTO GENERATE PINTAR (TIDAK MENIMPA PENUGASAN MANUAL YANG SUDAH ADA)
         function autoGenerateShelvesByPersonnel() {
             if (!isUserCOS()) { showSwalWarning('Akses Ditolak', 'Hanya Chief of Store yang dapat membagi rak.'); return; }
 
-            const personil = dashboardData?.struktur?.personilToko || [];
+            const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+            let personil = dashboardData?.struktur?.personilToko || [];
+            if (!personil || personil.length === 0) {
+                personil = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
+            }
+
             if (personil.length === 0) { showSwalWarning('Data Kosong', 'Tidak ada personil toko ditemukan.'); return; }
 
-            const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
             let defaultShelves = expShelves.filter(s => s.kodeToko === userKodeToko);
 
             if (defaultShelves.length === 0) {
@@ -2683,57 +2536,31 @@
                 ];
             }
 
-            defaultShelves.forEach((shelf, idx) => {
-                const assignedUser = personil[idx % personil.length];
+            let unassignedIndex = 0;
+
+            defaultShelves.forEach((shelf) => {
+                // ✅ JIKA RAK SUDAH DITUGASKAN MANUAL, JANGAN DITIMPA!
+                if (shelf.assignedNik && shelf.assignedName && shelf.assignedName !== 'Belum Didelegasikan') {
+                    return; // Skip, biarkan penugasan manualnya utuh
+                }
+
+                const assignedUser = personil[unassignedIndex % personil.length];
+                unassignedIndex++;
+
                 const updatedObj = {
                     ...shelf,
-                    assignedNik: assignedUser.nik,
-                    assignedName: assignedUser.nama,
+                    assignedNik: assignedUser.nik || assignedUser.NIK || '',
+                    assignedName: assignedUser.nama || assignedUser.NAMA || 'User',
                     kodeToko: userKodeToko
                 };
+
                 if (rtdb) {
                     rtdb.ref('ceklis_expired/shelves/' + shelf.id).set(updatedObj);
                 }
             });
 
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Delegasi Rak Berhasil ✨', `Berhasil membagi ${defaultShelves.length} Rak kepada ${personil.length} Personil Toko!`);
-        }
-
-        function saveExpProductAction() {
-            const shelfId = document.getElementById("expShelfIdInput").value;
-            const name = document.getElementById("expProductNameInput").value.trim();
-            const expDate = document.getElementById("expDateInput").value;
-
-            if (!shelfId || !name || !expDate) { showSwalWarning('Form Belum Lengkap ⚠️', 'Mohon isi semua data.'); return; }
-
-            const prodId = 'prod_' + Date.now();
-            const prodObj = {
-                id: prodId,
-                name,
-                shelfId,
-                expDate,
-                addedBy: dashboardData?.user?.NAMA || 'User',
-                status: 'pending',
-                kodeToko: dashboardData?.user?.kodeToko || 'TOKO',
-                namaToko: dashboardData?.user?.namaToko || 'Toko'
-            };
-
-            if (rtdb) {
-                rtdb.ref('ceklis_expired/products/' + prodId).set(prodObj);
-            }
-
-            trackUserActivity(2, "Catat Produk Expired");
-            renderCeklisExpiredModal('alert');
-            showSwalSuccess('Tersimpan 📦', 'Produk Expired berhasil dicatat!');
-        }
-
-        function markExpProductHandled(prodId) {
-            if (rtdb) {
-                rtdb.ref('ceklis_expired/products/' + prodId).update({ status: 'selesai' });
-            }
-            renderCeklisExpiredModal('alert');
-            showSwalSuccess('Selesai ✅', 'Penanganan produk expired dicatat!');
+            showSwalSuccess('Auto-Generate Selesai ✨', 'Rak yang belum memiliki penanggung jawab berhasil ditugaskan secara otomatis!');
         }
         
         function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
