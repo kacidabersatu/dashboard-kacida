@@ -2108,12 +2108,15 @@
                 reader.readAsDataURL(file);
             }
         }
-
+        // =================================================================
+        // MODUL CEKLIS EXPIRED & MANAJEMEN RAK (FULL VERSI LENGKAP)
+        // =================================================================
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
             const userKodeToko = dashboardData?.user?.kodeToko || '';
             const daftarToko = dashboardData?.daftarToko || [];
+            const personilList = dashboardData?.struktur?.personilToko || [];
 
             // Filter data sesuai toko (Kecuali User AC)
             let storeShelves = expShelves;
@@ -2189,8 +2192,12 @@
                                             ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Menunggu Validasi COS' : (isRejected ? '🚫 Ditolak' : '❌ Belum Ceklis'))}
                                         </span>
                                         
+                                        <!-- TOMBOL EDIT & HAPUS TETAP TERSEDIA UNTUK COS -->
                                         ${userCOS ? `
-                                            <button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:3px 8px; border-radius:6px; font-size:0.6rem; cursor:pointer; font-weight:800;">🗑️ Hapus</button>
+                                            <div style="display:flex; gap:4px; margin-top:2px;">
+                                                <button onclick="editShelfModalCOS('${s.id}')" style="background:#e0e7ff; color:#3730a3; border:none; padding:3px 8px; border-radius:6px; font-size:0.6rem; cursor:pointer; font-weight:800;">✏️ Edit</button>
+                                                <button onclick="deleteShelfAction('${s.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:3px 8px; border-radius:6px; font-size:0.6rem; cursor:pointer; font-weight:800;">🗑️ Hapus</button>
+                                            </div>
                                         ` : ''}
                                     </div>
                                 </div>
@@ -2209,11 +2216,16 @@
                                         <button onclick="validateShelfByCOS('${s.id}')" style="flex:1; background:var(--accent-green-grad); color:#fff; border:none; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
                                             ✅ SETUJUI
                                         </button>
+                                    ` : (isDone && !userCOS ? `
+                                        <!-- GEMBOK KETAT UNTUK STAFF JIKA SUDAH SELESAI -->
+                                        <button disabled style="width:100%; background:var(--input-bg); color:var(--text-sub); border:1px solid var(--card-border); padding:8px; border-radius:10px; font-weight:800; opacity:0.7; cursor:not-allowed;">
+                                            🔒 Rak Sudah Selesai Dikerjakan & Divalidasi
+                                        </button>
                                     ` : `
                                         <button onclick="promptShelfCompletion('${s.id}')" style="flex:1; background:${isDone ? '#ffffff' : 'var(--accent-green-grad)'}; color:${isDone ? '#047857' : '#ffffff'}; border:${isDone ? '1px solid #10b981' : 'none'}; padding:8px; border-radius:10px; font-weight:800; cursor:pointer;">
                                             ${isDone ? '🔄 Update / Ceklis Ulang' : '📸 Tandai Selesai + Foto Wajib'}
                                         </button>
-                                    `}
+                                    `)}
                                 </div>
                             </div>
                         `;
@@ -2221,9 +2233,12 @@
 
                     let configSectionHtml = '';
                     if (userCOS) {
+                        const personilOptsHtml = `<option value="">-- Pilih Penanggung Jawab --</option>` + 
+                            personilList.map(p => `<option value="${p.nik}">👤 ${escapeHTML(p.nama)} (${p.jabatan})</option>`).join("");
+
                         configSectionHtml = `
                             <div class="modal-card-box">
-                                <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH & MANAJEMEN RAK (KHUSUS COS)</h5>
+                                <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK & PENUGASAN </h5>
                                 <div class="modal-grid-2" style="margin-bottom:8px;">
                                     <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
                                     <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
@@ -2235,12 +2250,15 @@
                                         <option value="Kosmetik">Kosmetik</option>
                                         <option value="Kebutuhan">Non-Food</option>
                                     </select>
-                                    <button onclick="addShelfManualAction()" style="background:var(--accent-green-grad); color:#fff; font-weight:800; padding:8px; border-radius:8px; border:none; cursor:pointer;">+ Tambah Rak</button>
+                                    <select id="addAssignedNikInput" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                        ${personilOptsHtml}
+                                    </select>
                                 </div>
 
-                                <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer; width:100%;">
-                                    ✨ Auto-Generate Delegasi Rak Ke Personil
-                                </button>
+                                <div class="modal-grid-2">
+                                    <button onclick="addShelfManualAction()" style="background:var(--accent-green-grad); color:#fff; font-weight:800; padding:10px; border-radius:8px; border:none; cursor:pointer;">+ Tambah Rak Manual</button>
+                                    <button onclick="autoGenerateShelvesByPersonnel()" style="background:#10b981; color:#ffffff; border:none; padding:10px; border-radius:8px; font-weight:800; cursor:pointer;">✨ Auto-Generate Semua</button>
+                                </div>
                             </div>
                         `;
                     }
@@ -2282,7 +2300,7 @@
                     </div>
                 `;
             } 
-            // TAB 3: ALERT EXPIRED (DILENGKAPI KOTAK RESUME TOTAL)
+            // TAB 3: ALERT EXPIRED (KOTAK RESUME TOTAL)
             else if (activeTab === 'alert') {
                 const targetAlertProducts = userAC ? expProducts : expProducts.filter(p => p.kodeToko === userKodeToko);
 
@@ -2387,7 +2405,6 @@
             showCustomModal("⚠️ CEKLIS EXP & MANAJEMEN RAK", htmlBox);
         }
 
-        // FUNGSI DETAIL RAK KHUSUS AC (READ-ONLY KETAT)
         function viewStoreShelvesDetailAC(kodeToko, namaToko) {
             triggerAndroidHaptic('light');
             const storeShelves = expShelves.filter(s => s.kodeToko === kodeToko);
@@ -2426,7 +2443,6 @@
             });
         }
 
-        // FUNGSI DETAIL ALERT EXP KHUSUS AC (READ-ONLY KETAT)
         function viewStoreExpDetailAC(kodeToko, namaToko) {
             triggerAndroidHaptic('light');
             const storeItems = expProducts.filter(p => p.kodeToko === kodeToko);
@@ -2454,7 +2470,6 @@
             });
         }
 
-        // PERBAIKAN POIN 2: PROMPT BUKTI FOTO CEKLIS EXP WAJIB
         function promptShelfCompletion(shelfId) {
             triggerAndroidHaptic('medium');
             expPhotoPreview = null;
@@ -2519,7 +2534,6 @@
             showSwalSuccess('Rak Divalidasi ✅', 'Hasil pengerjaan rak berhasil disetujui!');
         }
 
-        // PERBAIKAN POIN 2: COS DAPAT MENOLAK BERALASAN
         function rejectShelfByCOS(shelfId) {
             if (!isUserCOS()) return;
 
@@ -2552,6 +2566,12 @@
             const noRak = document.getElementById("addNoRakInput").value.trim();
             const name = document.getElementById("addNamaRakInput").value.trim();
             const cat = document.getElementById("addCatRakInput").value;
+            const assignedNik = document.getElementById("addAssignedNikInput")?.value || "";
+            
+            const personilList = dashboardData?.struktur?.personilToko || [];
+            const selectedUser = personilList.find(p => p.nik === assignedNik);
+            const assignedName = selectedUser ? selectedUser.nama : 'Belum Didelegasikan';
+
             const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
 
             if (!name) { showSwalWarning('Form Kosong', 'Mohon masukkan nama rak!'); return; }
@@ -2562,8 +2582,8 @@
                 noRak: noRak || 'R-0' + (expShelves.length + 1),
                 name: name,
                 category: cat,
-                assignedNik: '',
-                assignedName: 'Belum Didelegasikan',
+                assignedNik: assignedNik,
+                assignedName: assignedName,
                 status: 'Belum Ceklis',
                 kodeToko: userKodeToko,
                 lastChecked: null,
@@ -2575,7 +2595,56 @@
             }
 
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Rak Ditambahkan 📦', 'Rak baru berhasil dibuat!');
+            showSwalSuccess('Rak Ditambahkan 📦', `Rak berhasil dibuat dan ditugaskan ke ${assignedName}!`);
+        }
+
+        function editShelfModalCOS(shelfId) {
+            if (!isUserCOS()) return;
+            const shelf = expShelves.find(s => s.id === shelfId);
+            if (!shelf) return;
+
+            const personilList = dashboardData?.struktur?.personilToko || [];
+            const personilOptsHtml = `<option value="">-- Pilih Penanggung Jawab --</option>` + 
+                personilList.map(p => `<option value="${p.nik}" ${p.nik === shelf.assignedNik ? 'selected' : ''}>👤 ${escapeHTML(p.nama)} (${p.jabatan})</option>`).join("");
+
+            Swal.fire({
+                title: 'Edit Rak & Penugasan COS',
+                html: `
+                    <div style="text-align:left; font-size:0.75rem;">
+                        <label style="font-weight:bold; display:block; margin-bottom:4px;">No. Rak:</label>
+                        <input type="text" id="editNoRakVal" value="${escapeHTML(shelf.noRak||'')}" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; margin-bottom:8px;">
+
+                        <label style="font-weight:bold; display:block; margin-bottom:4px;">Nama Rak:</label>
+                        <input type="text" id="editNamaRakVal" value="${escapeHTML(shelf.name||'')}" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; margin-bottom:8px;">
+
+                        <label style="font-weight:bold; display:block; margin-bottom:4px;">Penanggung Jawab:</label>
+                        <select id="editAssignedNikVal" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px;">
+                            ${personilOptsHtml}
+                        </select>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '💾 Simpan Perubahan',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    const newNo = document.getElementById("editNoRakVal").value.trim();
+                    const newName = document.getElementById("editNamaRakVal").value.trim();
+                    const newNik = document.getElementById("editAssignedNikVal").value;
+                    const newPerson = personilList.find(p => p.nik === newNik);
+
+                    if (rtdb) {
+                        rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
+                            noRak: newNo,
+                            name: newName,
+                            assignedNik: newNik,
+                            assignedName: newPerson ? newPerson.nama : 'Belum Didelegasikan'
+                        });
+                    }
+                    renderCeklisExpiredModal('rak');
+                    showSwalSuccess('Diperbarui ✅', 'Data rak & penugasan berhasil diubah!');
+                }
+            });
         }
 
         function deleteShelfAction(id) {
@@ -2666,7 +2735,7 @@
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Selesai ✅', 'Penanganan produk expired dicatat!');
         }
-
+        
         function openBelanjaKaryawanModal() { renderBelanjaKaryawanModal('input'); }
 
         function getBelanjaCutoffCycle() {
