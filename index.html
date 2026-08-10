@@ -978,17 +978,33 @@
             }
         }
 
-        // ✅ FUNGSI LISTENER DENGAN DUKUNGAN RIWAYAT PERMANEN
+        // =================================================================
+        // INSTANT CACHE & REALTIME LISTENER CEKLIS EXPIRED (KILAT 0.001 DETIK)
+        // =================================================================
         function initFirebaseCeklisExpiredListener() {
+            // 🚀 1. LOAD DATA KILAT DARI CACHE HP SAAT PERTAMA KALI DIBUKA
+            try {
+                const cachedShelves = localStorage.getItem('kacida_cache_exp_shelves');
+                const cachedProducts = localStorage.getItem('kacida_cache_exp_products');
+                const cachedHistory = localStorage.getItem('kacida_cache_exp_history');
+
+                if (cachedShelves) expShelves = JSON.parse(cachedShelves);
+                if (cachedProducts) expProducts = JSON.parse(cachedProducts);
+                if (cachedHistory) expHistoryList = JSON.parse(cachedHistory);
+            } catch(e) {}
+
             if (!rtdb) return;
             
+            // 🚀 2. SINKRONISASI LIVE REALTIME FIREBASE RTDB
             // Listen Shelves
             rtdb.ref('ceklis_expired/shelves').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     expShelves = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+                    localStorage.setItem('kacida_cache_exp_shelves', JSON.stringify(expShelves));
                 } else {
                     expShelves = [];
+                    localStorage.removeItem('kacida_cache_exp_shelves');
                 }
                 updateNotifikasiBadgeCount();
             });
@@ -998,19 +1014,23 @@
                 const data = snapshot.val();
                 if (data) {
                     expProducts = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+                    localStorage.setItem('kacida_cache_exp_products', JSON.stringify(expProducts));
                 } else {
                     expProducts = [];
+                    localStorage.removeItem('kacida_cache_exp_products');
                 }
                 updateNotifikasiBadgeCount();
             });
 
-            // Listen History Masa Lalu (Bulan-Bulan Berlalu)
+            // Listen History Permanen
             rtdb.ref('ceklis_expired/history').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     expHistoryList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    localStorage.setItem('kacida_cache_exp_history', JSON.stringify(expHistoryList));
                 } else {
                     expHistoryList = [];
+                    localStorage.removeItem('kacida_cache_exp_history');
                 }
             });
         }
