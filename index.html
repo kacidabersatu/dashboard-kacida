@@ -975,9 +975,15 @@
             }
         }
 
+        // ✅ DEKLARASI VARIABLE HISTORY
+        let expHistoryList = [];
+        let selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
+
+        // ✅ FUNGSI LISTENER DENGAN DUKUNGAN RIWAYAT PERMANEN
         function initFirebaseCeklisExpiredListener() {
             if (!rtdb) return;
             
+            // Listen Shelves
             rtdb.ref('ceklis_expired/shelves').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -988,6 +994,7 @@
                 updateNotifikasiBadgeCount();
             });
 
+            // Listen Products
             rtdb.ref('ceklis_expired/products').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -996,6 +1003,16 @@
                     expProducts = [];
                 }
                 updateNotifikasiBadgeCount();
+            });
+
+            // Listen History Masa Lalu (Bulan-Bulan Berlalu)
+            rtdb.ref('ceklis_expired/history').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    expHistoryList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                } else {
+                    expHistoryList = [];
+                }
             });
         }
 
@@ -2109,21 +2126,62 @@
             }
         }
          // =================================================================
-        // CEKLIS EXPIRED & MANAJEMEN RAK (FULL VERSI REVISI TUNTAS)
+        // STATE & LISTENER CEKLIS EXPIRED + TRACKING RIWAYAT PERMANEN
+        // =================================================================
+        let expHistoryList = [];
+        let selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
+
+        function initFirebaseCeklisExpiredListener() {
+            if (!rtdb) return;
+            
+            // Listen Shelves
+            rtdb.ref('ceklis_expired/shelves').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    expShelves = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+                } else {
+                    expShelves = [];
+                }
+                updateNotifikasiBadgeCount();
+            });
+
+            // Listen Products
+            rtdb.ref('ceklis_expired/products').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    expProducts = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+                } else {
+                    expProducts = [];
+                }
+                updateNotifikasiBadgeCount();
+            });
+
+            // Listen History Permanen
+            rtdb.ref('ceklis_expired/history').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    expHistoryList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                } else {
+                    expHistoryList = [];
+                }
+            });
+        }
+
+        // =================================================================
+        // CEKLIS EXPIRED & MANAJEMEN RAK (DILENGKAPI TAB TRACKING RIWAYAT)
         // =================================================================
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
             const userKodeToko = dashboardData?.user?.kodeToko || '';
+            const userNamaToko = dashboardData?.user?.namaToko || 'Toko';
             const daftarToko = dashboardData?.daftarToko || [];
             
-            // Ambil daftar personil dari struktur / master users
             let personilList = dashboardData?.struktur?.personilToko || [];
             if (!personilList || personilList.length === 0) {
                 personilList = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
             }
 
-            // Filter data sesuai toko (Kecuali User AC)
             let storeShelves = expShelves;
             let storeProducts = expProducts;
 
@@ -2145,7 +2203,6 @@
             // TAB 1: CEKLIS & RAK TOKO
             if (activeTab === 'rak') {
                 if (userAC && daftarToko.length > 0) {
-                    // MODE AREA COORDINATOR: GRID TOKO (READ-ONLY)
                     const storeCards = daftarToko.map(toko => {
                         const tShelves = expShelves.filter(s => s.kodeToko === toko.kodeToko);
                         const tSelesai = tShelves.filter(s => s.status === 'Selesai').length;
@@ -2174,7 +2231,6 @@
                         <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
-                    // MODE STORE USER (STAFF & COS)
                     let rakListCards = storeShelves.map(s => {
                         const isDone = s.status === 'Selesai';
                         const isPendingVal = s.status === 'Menunggu Validasi COS';
@@ -2197,7 +2253,6 @@
                                             ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Menunggu Validasi COS' : (isRejected ? '🚫 Ditolak' : '❌ Belum Ceklis'))}
                                         </span>
                                         
-                                        <!-- TOMBOL EDIT & HAPUS TETAP AKTIF KHUSUS UNTUK COS -->
                                         ${userCOS ? `
                                             <div style="display:flex; gap:4px; margin-top:2px;">
                                                 <button onclick="editShelfModalCOS('${s.id}')" style="background:#e0e7ff; color:#3730a3; border:none; padding:3px 8px; border-radius:6px; font-size:0.6rem; cursor:pointer; font-weight:800;">✏️ Edit</button>
@@ -2222,7 +2277,6 @@
                                             ✅ SETUJUI
                                         </button>
                                     ` : (isDone && !userCOS ? `
-                                        <!-- GEMBOK UNTUK STAFF JIKA RAK SUDAH SELESAI -->
                                         <button disabled style="width:100%; background:var(--input-bg); color:var(--text-sub); border:1px solid var(--card-border); padding:8px; border-radius:10px; font-weight:800; opacity:0.7; cursor:not-allowed;">
                                             🔒 Rak Sudah Selesai Dikerjakan & Divalidasi
                                         </button>
@@ -2305,7 +2359,7 @@
                     </div>
                 `;
             } 
-            // TAB 3: ALERT EXPIRED (KOTAK RESUME TOTAL)
+            // TAB 3: ALERT EXPIRED
             else if (activeTab === 'alert') {
                 const targetAlertProducts = userAC ? expProducts : expProducts.filter(p => p.kodeToko === userKodeToko);
 
@@ -2394,15 +2448,60 @@
                     `;
                 }
             }
+            // TAB 4: TRACKING RIWAYAT PERMANEN
+            else if (activeTab === 'tracking') {
+                const targetHistory = userAC 
+                    ? expHistoryList.filter(h => h.monthKey === selectedExpHistoryMonth)
+                    : expHistoryList.filter(h => h.kodeToko === userKodeToko && h.monthKey === selectedExpHistoryMonth);
+
+                let historyCardsHtml = targetHistory.map(h => `
+                    <div class="modal-card-box" style="border-left:4px solid #10b981;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <span style="font-size:0.6rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(h.namaToko || h.kodeToko)}</span>
+                                <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-top:2px;">${escapeHTML(h.shelfName)} (${escapeHTML(h.noRak||'-')})</h5>
+                                <p style="font-size:0.65rem; color:var(--text-sub);">
+                                    PJ: <b>${escapeHTML(h.assignedName||'-')}</b> | Dikerjakan oleh: <b style="color:var(--accent-primary);">${escapeHTML(h.checkedBy||'-')}</b><br/>
+                                    Validasi COS: <b style="color:#047857;">${escapeHTML(h.validatedByCOS||'-')}</b>
+                                </p>
+                            </div>
+                            <span style="font-size:0.58rem; color:var(--gold); font-weight:800;">${h.dateStr || ''}</span>
+                        </div>
+                        ${h.photoUrl ? `
+                            <img src="${h.photoUrl}" onclick="showFullImageModal('${h.photoUrl}')" style="width:100%; height:110px; object-fit:cover; border-radius:8px; margin-top:6px; cursor:pointer;" title="Klik Fullscreen Foto Bukti Masa Lalu">
+                        ` : ''}
+                    </div>
+                `).join("");
+
+                tabContentHtml = `
+                    <div class="modal-grid-1">
+                        <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.72rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-calendar-days"></i> PILIH BULAN RIWAYAT:</span>
+                            <input type="month" value="${selectedExpHistoryMonth}" onchange="selectedExpHistoryMonth=this.value; renderCeklisExpiredModal('tracking');" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:6px; border-radius:8px; font-weight:800; font-size:0.75rem; outline:none;">
+                        </div>
+
+                        <div class="mtd-summary-card">
+                            <span style="font-size:0.68rem; color:var(--text-sub); font-weight:700;">📊 TOTAL RIWAYAT CEKLIS SELESAI BULAN INI</span>
+                            <div class="mtd-amount-hero">${targetHistory.length} <small style="font-size:0.8rem;">Pengerjaan Rak</small></div>
+                        </div>
+
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-clock-rotate-left"></i> LOG ARSIP DETAIL RIWAYAT (${selectedExpHistoryMonth})</h5>
+                        <div class="modal-grid-1" style="max-height:50vh; overflow-y:auto;">
+                            ${historyCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada riwayat pengerjaan pada bulan ini.</p>'}
+                        </div>
+                    </div>
+                `;
+            }
 
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
-                    <div style="display:flex; gap:6px;">
-                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Ceklis & Rak Toko</button>
-                        ${!userAC ? `<button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderCeklisExpiredModal('input')">➕ Input Produk</button>` : ''}
+                    <div style="display:flex; gap:6px; overflow-x:auto;">
+                        <button class="sub-tab-btn ${activeTab==='rak'?'active':''}" onclick="renderCeklisExpiredModal('rak')">📂 Rak Toko</button>
+                        ${!userAC ? `<button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderCeklisExpiredModal('input')">➕ Input Exp</button>` : ''}
                         <button class="sub-tab-btn ${activeTab==='alert'?'active':''}" onclick="renderCeklisExpiredModal('alert')">
-                            🔔 Alert Expired ${pendingExpCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem; margin-left:4px;">${pendingExpCount}</span>` : ''}
+                            🔔 Alert ${pendingExpCount > 0 ? `<span style="background:#ef4444; color:#fff; padding:1px 6px; border-radius:10px; font-size:0.62rem;">${pendingExpCount}</span>` : ''}
                         </button>
+                        <button class="sub-tab-btn ${activeTab==='tracking'?'active':''}" onclick="renderCeklisExpiredModal('tracking')">📊 Tracking Riwayat</button>
                     </div>
                     ${tabContentHtml}
                 </div>
@@ -2508,6 +2607,9 @@
             const timestamp = new Date().toISOString();
             const userName = dashboardData?.user?.NAMA || 'User';
             const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+            const userNamaToko = dashboardData?.user?.namaToko || 'Toko';
+
+            const shelf = expShelves.find(s => s.id === shelfId);
 
             if (rtdb) {
                 rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
@@ -2517,6 +2619,27 @@
                     kodeToko: userKodeToko,
                     photoUrl: expPhotoPreview || ''
                 });
+
+                // ✅ JIKA COS LANGSUNG KERJAKAN -> ARSIPKAN KE HISTORY PERMANEN
+                if (userCOS && shelf) {
+                    const historyId = 'hist_' + Date.now();
+                    rtdb.ref('ceklis_expired/history/' + historyId).set({
+                        id: historyId,
+                        shelfId: shelfId,
+                        noRak: shelf.noRak || 'R-01',
+                        shelfName: shelf.name || 'Rak',
+                        category: shelf.category || 'Umum',
+                        assignedName: shelf.assignedName || 'Staff',
+                        checkedBy: userName,
+                        validatedByCOS: userName,
+                        photoUrl: expPhotoPreview || shelf.photoUrl || '',
+                        timestamp: timestamp,
+                        dateStr: new Date().toLocaleDateString('id-ID'),
+                        monthKey: timestamp.substring(0, 7),
+                        kodeToko: userKodeToko,
+                        namaToko: userNamaToko
+                    });
+                }
             }
 
             expPhotoPreview = null;
@@ -2527,16 +2650,42 @@
 
         function validateShelfByCOS(shelfId) {
             if (!isUserCOS()) return;
+            const shelf = expShelves.find(s => s.id === shelfId);
+            const userName = dashboardData?.user?.NAMA || 'COS';
+            const timestamp = new Date().toISOString();
+            const userKodeToko = dashboardData?.user?.kodeToko || 'TOKO';
+            const userNamaToko = dashboardData?.user?.namaToko || 'Toko';
 
             if (rtdb) {
                 rtdb.ref('ceklis_expired/shelves/' + shelfId).update({
                     status: 'Selesai',
-                    validatedByCOS: dashboardData?.user?.NAMA || 'COS'
+                    validatedByCOS: userName
                 });
+
+                // ✅ SIMPAN KE ARSIP HISTORY PERMANEN FIREBASE
+                if (shelf) {
+                    const historyId = 'hist_' + Date.now();
+                    rtdb.ref('ceklis_expired/history/' + historyId).set({
+                        id: historyId,
+                        shelfId: shelfId,
+                        noRak: shelf.noRak || 'R-01',
+                        shelfName: shelf.name || 'Rak',
+                        category: shelf.category || 'Umum',
+                        assignedName: shelf.assignedName || 'Staff',
+                        checkedBy: shelf.checkedBy || 'Staff',
+                        validatedByCOS: userName,
+                        photoUrl: shelf.photoUrl || '',
+                        timestamp: timestamp,
+                        dateStr: new Date().toLocaleDateString('id-ID'),
+                        monthKey: timestamp.substring(0, 7),
+                        kodeToko: userKodeToko,
+                        namaToko: userNamaToko
+                    });
+                }
             }
 
             renderCeklisExpiredModal('rak');
-            showSwalSuccess('Rak Divalidasi ✅', 'Hasil pengerjaan rak berhasil disetujui!');
+            showSwalSuccess('Rak Divalidasi ✅', 'Hasil pengerjaan rak berhasil disetujui & diarsipkan ke Riwayat!');
         }
 
         function rejectShelfByCOS(shelfId) {
@@ -2565,7 +2714,6 @@
             });
         }
 
-        // FUNGSI TAMBAH RAK MANUAL + PENUGASAN DROPDOWN NAMA PERSONIL (PRESISI)
         function addShelfManualAction() {
             if (!isUserCOS()) { showSwalWarning('Akses Ditolak', 'Hanya Chief of Store yang dapat menambah rak.'); return; }
 
@@ -2577,7 +2725,6 @@
             let assignedNik = selectEl?.value || "";
             let assignedName = "Belum Didelegasikan";
 
-            // AMBIL LANGSUNG DARI TEKS OPTION DROPDOWN AGAR TIDAK GAGAL
             if (selectEl && selectEl.selectedIndex > 0) {
                 assignedName = selectEl.options[selectEl.selectedIndex].text.replace(/^[👤\s]+/, '').split('(')[0].trim();
             }
@@ -2608,7 +2755,6 @@
             showSwalSuccess('Rak Ditambahkan 📦', `Rak berhasil dibuat dan ditugaskan ke ${assignedName}!`);
         }
 
-        // FUNGSI EDIT RAK & EDIT PENUGASAN KHUSUS COS
         function editShelfModalCOS(shelfId) {
             if (!isUserCOS()) return;
             const shelf = expShelves.find(s => s.id === shelfId);
@@ -2686,7 +2832,6 @@
             showSwalSuccess('Item Dihapus 🗑️', 'Item alert expired berhasil dihapus!');
         }
 
-        // FUNGSI AUTO-GENERATE YANG TIDAK MENIMPA INPUT MANUAL
         function autoGenerateShelvesByPersonnel() {
             if (!isUserCOS()) { showSwalWarning('Akses Ditolak', 'Hanya Chief of Store yang dapat membagi rak.'); return; }
 
@@ -2713,7 +2858,6 @@
             let unassignedIdx = 0;
 
             defaultShelves.forEach((shelf) => {
-                // ✅ HANYA BERIKAN PENUGASAN JIKA RAK BELUM MEMILIKI PENANGGUNG JAWAB MANUAL
                 if (!shelf.assignedNik || shelf.assignedName === 'Belum Didelegasikan' || shelf.assignedName === '') {
                     const assignedUser = personil[unassignedIdx % personil.length];
                     unassignedIdx++;
