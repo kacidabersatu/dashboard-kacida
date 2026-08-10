@@ -252,6 +252,29 @@
         }
         .swal2-title { color: var(--accent-primary) !important; font-size: 1.1rem !important; font-weight: 800 !important; }
         .swal2-confirm.swal-btn-green { background: var(--accent-green-grad) !important; color: #ffffff !important; font-weight: 800 !important; border-radius: 12px !important; padding: 10px 20px !important; }
+        /* 🚀 ANIMASI CSS TICKER RUNNING TEXT MODERN */
+        @keyframes tickerMove {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .ticker-wrapper {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .ticker-text {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: tickerMove 20s linear infinite;
+            font-weight: 800;
+            font-size: 0.72rem;
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -320,11 +343,11 @@
             </div>
         </header>
 
-        <!-- 🚀 RUNNING TEXT 3D PENGUMUMAN BERJALAN (HTML BAGIAN 1) -->
-        <div id="runningTextHeaderBar" class="running-text-container hidden" style="display:flex; align-items:center; gap:8px; overflow:hidden; width:100%;">
+        <!-- 🚀 RUNNING TEXT 3D PENGUMUMAN (PURE CSS TICKER) -->
+        <div id="runningTextHeaderBar" class="running-text-container hidden" style="display:flex; align-items:center; gap:8px; overflow:hidden; width:100%; height:38px; max-height:38px; min-height:38px; white-space:nowrap;">
             <span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:6px; font-size:0.6rem; font-weight:900; white-space:nowrap; z-index:2; flex-shrink:0;">🔥 INFO SUPERVISI</span>
-            <div style="flex:1; overflow:hidden; white-space:nowrap; width:100%;">
-                <marquee id="marqueeTextContent" behavior="scroll" direction="left" scrollamount="5" style="width:100%; font-weight:800; font-size:0.72rem; color:#ffffff; display:block;">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</marquee>
+            <div class="ticker-wrapper">
+                <span id="marqueeTextContent" class="ticker-text">📢 PUSAT SUPERVISI: Memuat Pengumuman Aktif...</span>
             </div>
         </div>
 
@@ -1014,23 +1037,20 @@
             });
         }
 
-        // 🚀 FUNGSI MERESTART ANIMASI MARQUEE (HTML BAGIAN 2)
         function updateRunningTextAndAnnounceBadges() {
             const bar = document.getElementById("runningTextHeaderBar");
             const countBox = document.getElementById("valAnnounce");
             const dotAnnounce = document.getElementById("dotAnnounce");
+            const marquee = document.getElementById("marqueeTextContent");
 
             if (activeAnnouncementsList && activeAnnouncementsList.length > 0) {
-                const fullText = activeAnnouncementsList.map(a => `${a.judul} : ${a.pesan}`).join("  ✦  ");
+                const fullText = activeAnnouncementsList
+                    .map(a => `${a.judul} : ${a.pesan}`)
+                    .join("  ✦  ")
+                    .replace(/[\r\n]+/g, " ");
                 
-                // 1. Tampilkan bar terlebih dahulu agar lebarnya terdeteksi browser
+                if (marquee) marquee.innerText = fullText;
                 if (bar) bar.classList.remove("hidden");
-
-                // 2. Re-inject marquee setelah bar terbuka agar animasi langsung berjalan
-                const marqueeContainer = bar ? bar.querySelector("div") : null;
-                if (marqueeContainer) {
-                    marqueeContainer.innerHTML = `<marquee id="marqueeTextContent" behavior="scroll" direction="left" scrollamount="5" style="width:100%; font-weight:800; font-size:0.72rem; color:#ffffff; display:block;">${fullText}</marquee>`;
-                }
 
                 if (countBox) countBox.innerText = activeAnnouncementsList.length;
                 if (dotAnnounce) dotAnnounce.classList.remove("hidden");
