@@ -524,6 +524,9 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-PL5UpZoHqPDPBv41gRusH7603ohwD3VtPgVO8G3Z5d-d5sw4gJQcY_pmLSZi13qd/exec";
 
+        var expHistoryList = [];
+        var selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
+        
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
           authDomain: "kacida-bersatu.firebaseapp.com",
@@ -974,10 +977,6 @@
                 }
             }
         }
-
-        // ✅ DEKLARASI VARIABLE HISTORY
-        expHistoryList = [];
-        selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
 
         // ✅ FUNGSI LISTENER DENGAN DUKUNGAN RIWAYAT PERMANEN
         function initFirebaseCeklisExpiredListener() {
