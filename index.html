@@ -2184,27 +2184,50 @@
             });
         }
 
+       // =================================================================
+        // INSTANT OPEN CEKLIS EXPIRED (0.0001 DETIK DARI CACHE LOKAL)
         // =================================================================
-        // CEKLIS EXPIRED & MANAJEMEN RAK (DILENGKAPI TAB TRACKING RIWAYAT)
-        // =================================================================
+        function openCeklisExpiredModal(activeTab = 'rak') {
+            // 🚀 1. PAKSA BACA CACHE DARI HP JIKA MEMORI KOSONG
+            if (!expShelves || expShelves.length === 0) {
+                try {
+                    const cachedShelves = localStorage.getItem('kacida_cache_exp_shelves');
+                    if (cachedShelves) expShelves = JSON.parse(cachedShelves);
+                } catch(e) {}
+            }
+            if (!expProducts || expProducts.length === 0) {
+                try {
+                    const cachedProducts = localStorage.getItem('kacida_cache_exp_products');
+                    if (cachedProducts) expProducts = JSON.parse(cachedProducts);
+                } catch(e) {}
+            }
+
+            renderCeklisExpiredModal(activeTab);
+        }
+
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
-            const userKodeToko = dashboardData?.user?.kodeToko || '';
-            const userNamaToko = dashboardData?.user?.namaToko || 'Toko';
-            const daftarToko = dashboardData?.daftarToko || [];
             
+            // 🚀 2. AMBIL KODE TOKO INSTAN (TIDAK PERLU MENUNGGU API)
+            let userKodeToko = dashboardData?.user?.kodeToko || '';
+            if (!userKodeToko && dashboardData?.user?.["NAMA TOKO"]) {
+                userKodeToko = getKodeToko(dashboardData.user["NAMA TOKO"]);
+            }
+
+            const daftarToko = dashboardData?.daftarToko || [];
             let personilList = dashboardData?.struktur?.personilToko || [];
             if (!personilList || personilList.length === 0) {
                 personilList = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
             }
 
+            // Filter data sesuai toko (Kecuali User AC)
             let storeShelves = expShelves;
             let storeProducts = expProducts;
 
-            if (!userAC) {
-                storeShelves = expShelves.filter(s => s.kodeToko === userKodeToko);
-                storeProducts = expProducts.filter(p => p.kodeToko === userKodeToko);
+            if (!userAC && userKodeToko) {
+                storeShelves = expShelves.filter(s => s.kodeToko === userKodeToko || !s.kodeToko);
+                storeProducts = expProducts.filter(p => p.kodeToko === userKodeToko || !p.kodeToko);
             }
 
             const totalRak = storeShelves.length;
