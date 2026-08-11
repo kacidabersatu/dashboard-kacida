@@ -14,13 +14,15 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-    const title = payload.notification?.title || "Notifikasi Kacida Bersatu";
+    const title = payload.notification?.title || "Pesan Baru Kacida";
     const options = {
-        body: payload.notification?.body || "Ada pembaruan data baru!",
+        body: payload.notification?.body || "Ada pesan baru masuk!",
         icon: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
         badge: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
         sound: "https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3",
-        vibrate: [300, 100, 300, 100, 300]
+        vibrate: [300, 100, 300, 100, 300],
+        tag: 'kacida-chat-' + Date.now(), // Memicu Kategori Notifikasi Android
+        renotify: true
     };
     self.registration.showNotification(title, options);
 });
