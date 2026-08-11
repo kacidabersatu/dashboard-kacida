@@ -3450,6 +3450,18 @@
 
             const totalTokoDin = d.totalTokoArea || dashboardData?.totalTokoAktifArea || 19;
 
+            // ✅ KALKULASI DINAMIS KETERANGAN GAUGE
+            let ketPointDinamis = "SANGAT BAIK 🟢";
+            if (ptNum >= 100) {
+                ketPointDinamis = "SANGAT BAIK 🟢";
+            } else if (ptNum >= 85) {
+                ketPointDinamis = "BAIK 🟡";
+            } else if (ptNum >= 70) {
+                ketPointDinamis = "PERLU TINGKATKAN 🟠";
+            } else {
+                ketPointDinamis = "PERLU TINDAKAN 🔴";
+            }
+
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
                     <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:12px; align-items:center; background:var(--card-bg); border:1px solid var(--card-border); border-radius:18px; padding:12px;">
@@ -3467,7 +3479,7 @@
                                 </defs>
                             </svg>
                             <span style="font-size:1rem; font-weight:900; color:var(--accent-primary); margin-top:-6px;">${d.pointDash || '100%'}</span>
-                            <span style="font-size:0.65rem; font-weight:800; color:var(--gold);">(${d.ketPoint || 'SANGAT BAIK'})</span>
+                            <span style="font-size:0.65rem; font-weight:800; color:var(--gold);">(${d.ketPoint || ketPointDinamis})</span>
                         </div>
 
                         <div style="border-left:1px dashed var(--card-border); padding-left:10px;">
