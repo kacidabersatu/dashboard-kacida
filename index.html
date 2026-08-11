@@ -522,7 +522,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-PL5UpZoHqPDPBv41gRusH7603ohwD3VtPgVO8G3Z5d-d5sw4gJQcY_pmLSZi13qd/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIcOVxv1nf1xjcoTxW2HMeC2lRTnqfa9nAKaYpzRxknjuxyf-Dr3jwSCuoO4J_PtJM/exec";
 
         var expHistoryList = [];
         var selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
@@ -3444,22 +3444,29 @@
         }
 
         function renderPerformaModalView(d) {
-            const ptNum = parseFloat(String(d.pointDash || '100%').replace('%','').replace(',','.')) || 0;
-            const gaugeRotation = Math.min(Math.max((ptNum / 150) * 180, 0), 180);
+            const ptNum = parseFloat(String(d.pointDash || '0%').replace('%','').replace(',','.')) || 0;
+            const realPt = (ptNum <= 1 && ptNum > 0) ? ptNum * 100 : ptNum;
+            const gaugeRotation = Math.min(Math.max((realPt / 150) * 180, 0), 180);
             const isHarianGrowth = d.growthHarian >= 0;
 
             const totalTokoDin = d.totalTokoArea || dashboardData?.totalTokoAktifArea || 19;
 
-            // ✅ KALKULASI DINAMIS KETERANGAN GAUGE
-            let ketPointDinamis = "SANGAT BAIK 🟢";
-            if (ptNum >= 100) {
-                ketPointDinamis = "SANGAT BAIK 🟢";
-            } else if (ptNum >= 85) {
-                ketPointDinamis = "BAIK 🟡";
-            } else if (ptNum >= 70) {
-                ketPointDinamis = "PERLU TINGKATKAN 🟠";
+            // ✅ KALKULASI LANGSUNG DARI ANGKA 38.1% (TIDAK LAGI HARDCODED)
+            let ketPointText = "SANGAT BAIK 🟢";
+            let ketColor = "#10b981";
+
+            if (realPt >= 100) {
+                ketPointText = "SANGAT BAIK 🟢";
+                ketColor = "#10b981";
+            } else if (realPt >= 85) {
+                ketPointText = "BAIK 🟡";
+                ketColor = "#d97706";
+            } else if (realPt >= 70) {
+                ketPointText = "PERLU TINGKATKAN 🟠";
+                ketColor = "#f59e0b";
             } else {
-                ketPointDinamis = "PERLU TINDAKAN 🔴";
+                ketPointText = "PERLU TINDAKAN 🔴";
+                ketColor = "#ef4444";
             }
 
             const htmlBox = `
@@ -3468,7 +3475,7 @@
                         <div class="gauge-container">
                             <svg class="gauge-svg" viewBox="0 0 100 50">
                                 <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(0,0,0,0.1)" stroke-width="12"/>
-                                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#gaugeGradHD)" stroke-width="12" stroke-dasharray="126" stroke-dashoffset="${126 - (ptNum/150)*126}"/>
+                                <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#gaugeGradHD)" stroke-width="12" stroke-dasharray="126" stroke-dashoffset="${126 - (realPt/150)*126}"/>
                                 <line x1="50" y1="50" x2="20" y2="50" stroke="#d97706" stroke-width="3.5" stroke-linecap="round" transform="rotate(${gaugeRotation}, 50, 50)" style="transition: transform 1s ease;"/>
                                 <defs>
                                     <linearGradient id="gaugeGradHD" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -3478,8 +3485,8 @@
                                     </linearGradient>
                                 </defs>
                             </svg>
-                            <span style="font-size:1rem; font-weight:900; color:var(--accent-primary); margin-top:-6px;">${d.pointDash || '100%'}</span>
-                            <span style="font-size:0.65rem; font-weight:800; color:var(--gold);">(${d.ketPoint || ketPointDinamis})</span>
+                            <span style="font-size:1rem; font-weight:900; color:var(--accent-primary); margin-top:-6px;">${realPt.toFixed(1)}%</span>
+                            <span style="font-size:0.65rem; font-weight:800; color:${ketColor};">(${ketPointText})</span>
                         </div>
 
                         <div style="border-left:1px dashed var(--card-border); padding-left:10px;">
@@ -3505,7 +3512,7 @@
                         </div>
 
                         <div style="font-size:0.72rem; color:#92400e; font-weight:700; margin-bottom:8px;">
-                            POINT DASHBOARD: <b style="color:#b45309; font-size:0.85rem;">${d.pointDash || '100%'}</b>
+                            POINT DASHBOARD: <b style="color:#b45309; font-size:0.85rem;">${realPt.toFixed(1)}%</b>
                         </div>
 
                         <div class="modal-grid-4" style="text-align:center;">
