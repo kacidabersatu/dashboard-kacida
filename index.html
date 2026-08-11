@@ -1321,7 +1321,7 @@
             hideLoading();
             if (res && res.status === "success") {
                 localStorage.setItem("NIK_KACIDA", nik);
-                trackUserActivity(2, "Login Aplikasi");
+                trackUserActivity(1, "Login Aplikasi");
                 document.getElementById("loginSection").classList.add("hidden");
                 document.getElementById("appSection").classList.remove("hidden");
                 initDashboard(null, false);
@@ -1356,7 +1356,7 @@
                 document.getElementById("loginSection").classList.add("hidden");
                 document.getElementById("appSection").classList.remove("hidden");
                 renderDashboard(data);
-                trackUserActivity(2, "Akses Dashboard");
+                trackUserActivity(1, "Akses Dashboard");
                 
                 initFirebaseAnnouncementsListener();
                 initFirebaseBelanjaListener();
@@ -2148,7 +2148,7 @@
             const res = await apiCall("saveMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth, shiftDataJson: jsonStr });
             hideLoading();
             if (res && res.status === "success") {
-                trackUserActivity(2, "Simpan Master Shift");
+                trackUserActivity(3, "Simpan Master Shift");
                 showSwalSuccess('Berhasil Disimpan 💾', 'Data Shift Toko Berhasil Disimpan!');
             }
         }
@@ -2330,7 +2330,7 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO (AREA COORDINATOR - HANYA LIHAT)</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO </h5>
                         <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
@@ -2434,7 +2434,7 @@
                         <div class="modal-card-box" style="padding:10px; margin-bottom:10px;">
                             <div style="display:flex; align-items:center; gap:8px;">
                                 <i class="fa-solid fa-magnifying-glass" style="color:var(--accent-primary);"></i>
-                                <input type="text" id="searchAssigneeInput" value="${escapeHTML(searchShelfAssignee)}" oninput="filterShelvesByAssigneeDOM(this.value)" placeholder="Cari nama penanggung jawab / nama rak..." style="flex:1; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:8px 12px; border-radius:10px; font-size:0.75rem; outline:none;">
+                                <input type="text" id="searchAssigneeInput" value="${escapeHTML(searchShelfAssignee)}" oninput="filterShelvesByAssigneeDOM(this.value)" placeholder="Cari Nama Personil / Nama Rak..." style="flex:1; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:8px 12px; border-radius:10px; font-size:0.75rem; outline:none;">
                                 <button id="btnClearShelfSearch" onclick="document.getElementById('searchAssigneeInput').value=''; filterShelvesByAssigneeDOM('');" class="${searchShelfAssignee ? '' : 'hidden'}" style="background:#fee2e2; color:#dc2626; border:none; padding:6px 10px; border-radius:8px; font-size:0.65rem; font-weight:800; cursor:pointer;">Clear</button>
                             </div>
                         </div>
@@ -3285,7 +3285,7 @@
 
             resumeTokoSectionHtml = `
                 ${acSummaryBoxesHtml}
-                <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;">🏪 REKAP SALES PER-TOKO (AREA COORDINATOR)</h5>
+                <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;">🏪 REKAP SALES PER-TOKO </h5>
                 <div class="modal-grid-1">${storeCards}</div>
             `;
         } else {
