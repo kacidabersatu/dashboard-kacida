@@ -2334,10 +2334,16 @@
                         <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
+                    // ✅ TAMBAHKAN PEMBACA SIKLUS BULANAN INI
+                    const currentMonthKey = new Date().toISOString().substring(0, 7); // Contoh: "2026-08"
+
                     let rakListCards = storeShelves.map(s => {
-                        const isDone = s.status === 'Selesai';
-                        const isPendingVal = s.status === 'Menunggu Validasi COS';
-                        const isRejected = s.status === 'Ditolak';
+                        const lastCheckedMonth = s.lastChecked ? new Date(s.lastChecked).toISOString().substring(0, 7) : '';
+                        
+                        // Rak dianggap Selesai / Pending HANYA jika divalidasi PADA BULAN INI
+                        const isDone = (s.status === 'Selesai') && (lastCheckedMonth === currentMonthKey);
+                        const isPendingVal = (s.status === 'Menunggu Validasi COS') && (lastCheckedMonth === currentMonthKey);
+                        const isRejected = (s.status === 'Ditolak') && (lastCheckedMonth === currentMonthKey);
 
                         const dataAssignee = escapeHTML(s.assignedName || '').toLowerCase();
                         const dataName = escapeHTML(s.name || '').toLowerCase();
@@ -2636,14 +2642,19 @@
             }
         }
 
+        // FUNGSI DETAIL RAK KHUSUS AC (IKUT SIKLUS BULAN BERJALAN)
         function viewStoreShelvesDetailAC(kodeToko, namaToko) {
             triggerAndroidHaptic('light');
             const storeShelves = expShelves.filter(s => s.kodeToko === kodeToko);
+            const currentMonthKey = new Date().toISOString().substring(0, 7); // Contoh: "2026-08"
 
             let html = storeShelves.map(s => {
-                const isDone = s.status === 'Selesai';
-                const isPendingVal = s.status === 'Menunggu Validasi COS';
-                const isRejected = s.status === 'Ditolak';
+                const lastCheckedMonth = s.lastChecked ? new Date(s.lastChecked).toISOString().substring(0, 7) : '';
+                
+                // ✅ HANYA DIANGGAP SELESAI/PENDING JIKA DIVALIDASI PADA BULAN INI
+                const isDone = (s.status === 'Selesai') && (lastCheckedMonth === currentMonthKey);
+                const isPendingVal = (s.status === 'Menunggu Validasi COS') && (lastCheckedMonth === currentMonthKey);
+                const isRejected = (s.status === 'Ditolak') && (lastCheckedMonth === currentMonthKey);
 
                 return `
                     <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
@@ -2651,13 +2662,13 @@
                             <div>
                                 <h5 style="font-weight:800; font-size:0.85rem; color:var(--text-main);">${escapeHTML(s.name)}</h5>
                                 <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">No. Rak: ${escapeHTML(s.noRak||'-')} | PJ: <b>${escapeHTML(s.assignedName||'-')}</b></p>
-                                ${s.lastChecked ? `<p style="font-size:0.6rem; color:var(--text-sub);">Dikerjakan: ${new Date(s.lastChecked).toLocaleString('id-ID')} oleh ${escapeHTML(s.checkedBy||'-')}</p>` : ''}
+                                ${s.lastChecked && isDone ? `<p style="font-size:0.6rem; color:var(--text-sub);">Dikerjakan: ${new Date(s.lastChecked).toLocaleString('id-ID')} oleh ${escapeHTML(s.checkedBy||'-')}</p>` : ''}
                             </div>
                             <span style="font-size:0.65rem; padding:3px 8px; border-radius:6px; font-weight:800; ${isDone ? 'background:#d1fae5; color:#047857;' : (isPendingVal ? 'background:#fef3c7; color:#b45309;' : 'background:#fee2e2; color:#dc2626;')}">
                                 ${isDone ? '✅ Selesai' : (isPendingVal ? '⏳ Pending COS' : (isRejected ? '🚫 Ditolak' : '❌ Belum Ceklis'))}
                             </span>
                         </div>
-                        ${s.photoUrl ? `
+                        ${s.photoUrl && isDone ? `
                             <div style="margin-top:6px;">
                                 <img src="${s.photoUrl}" onclick="showFullImageModal('${s.photoUrl}')" style="width:100%; height:100px; object-fit:cover; border-radius:8px; cursor:pointer;" title="Klik Pratinjau Foto Fullscreen">
                             </div>
@@ -2674,9 +2685,15 @@
             });
         }
 
+        // FUNGSI DETAIL ALERT EXP KHUSUS AC (SUDAH 100% BENAR & PRESISI)
         function viewStoreExpDetailAC(kodeToko, namaToko) {
             triggerAndroidHaptic('light');
-            const storeItems = expProducts.filter(p => p.kodeToko === kodeToko);
+            const currentMonthKey = new Date().toISOString().substring(0, 7);
+
+            const storeItems = expProducts.filter(p => 
+                p.kodeToko === kodeToko && 
+                (p.status !== 'selesai' || (p.expDate && p.expDate.substring(0, 7) === currentMonthKey))
+            );
 
             let html = storeItems.map(p => {
                 const isDone = p.status === 'selesai';
@@ -2694,8 +2711,8 @@
             }).join("");
 
             Swal.fire({
-                title: `Detail Expired: ${namaToko} (Read-Only)`,
-                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Tidak ada catatan produk expired di toko ini.</p>`,
+                title: `Detail Expired: ${namaToko} (${currentMonthKey})`,
+                html: html || `<p style="font-size:0.75rem; color:var(--text-sub);">Tidak ada catatan produk expired di bulan ini.</p>`,
                 confirmButtonText: 'Tutup',
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             });
