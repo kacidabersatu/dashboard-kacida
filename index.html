@@ -1306,19 +1306,22 @@
             if (!nik) { showSwalWarning('Form Kosong ⚠️', 'Mohon masukkan NIK Anda!'); return; }
             showLoading("Proses Login...");
             
-            // Clear cache state untuk login baru
-            localShiftMatrix = {};
+            // ✅ BERSIHKAN CACHE & FILTER AC SEBELUM LOGIN USER BARU
+            selectedKodeTokoAC = null;
             selectedShiftKodeToko = null;
+            localShiftMatrix = {};
+            dashboardData = null;
             expShelves = [];
             expProducts = [];
             belanjaTransactions = [];
+            jobdeskReports = [];
             
             currentNik = nik;
             const res = await apiCall("login", { nik: nik });
             hideLoading();
             if (res && res.status === "success") {
                 localStorage.setItem("NIK_KACIDA", nik);
-                trackUserActivity(1, "Login Aplikasi");
+                trackUserActivity(10, "Login Aplikasi");
                 document.getElementById("loginSection").classList.add("hidden");
                 document.getElementById("appSection").classList.remove("hidden");
                 initDashboard(null, false);
@@ -1329,19 +1332,31 @@
 
         async function initDashboard(kodeTokoPilihan = null, isSilent = false) {
             if (!isSilent && !dashboardData) showLoading("Memuat Data...");
-            if (kodeTokoPilihan) selectedKodeTokoAC = kodeTokoPilihan;
+            
+            // Jika user BUKAN AC, paksa filter toko AC menjadi null
+            if (dashboardData && !isUserAC()) {
+                selectedKodeTokoAC = null;
+            }
+
+            if (kodeTokoPilihan && isUserAC()) selectedKodeTokoAC = kodeTokoPilihan;
             
             const data = await apiCall("getDashboard");
             if (!isSilent) hideLoading();
             
             if (data && data.status === "success") {
                 dashboardData = data;
+
+                // ✅ APABILA USER BUKAN AC, KUNCI OTOMATIS KE TOKONYA SENDIRI
+                if (!data.user.isAC) {
+                    selectedKodeTokoAC = null;
+                }
+
                 localStorage.setItem("kacida_cached_dashboard", JSON.stringify(data));
                 
                 document.getElementById("loginSection").classList.add("hidden");
                 document.getElementById("appSection").classList.remove("hidden");
                 renderDashboard(data);
-                trackUserActivity(2, "Akses Dashboard");
+                trackUserActivity(5, "Akses Dashboard");
                 
                 initFirebaseAnnouncementsListener();
                 initFirebaseBelanjaListener();
@@ -4357,7 +4372,6 @@
             }
         }
 
-        // PEMBERSIHAN TOTAL ALL CACHE/STATE PADA LOGOUT
         function handleLogout() {
             Swal.fire({
                 title: 'Konfirmasi Logout',
@@ -4372,21 +4386,22 @@
                     localStorage.clear();
                     currentNik = "";
                     dashboardData = null;
-                    localShiftMatrix = {};
+
+                    // ✅ RESET TOTAL FILTER TOKO AC & MEMORI USER
+                    selectedKodeTokoAC = null;
                     selectedShiftKodeToko = null;
+                    localShiftMatrix = {};
                     cachedChatList = [];
                     belanjaTransactions = [];
                     expProducts = [];
                     expShelves = [];
+                    expHistoryList = [];
                     jobdeskReports = [];
-                    selectedJobdeskDay = getTodayNameIndo();
-                    selectedJobdeskCategory = 'Daily Activity';
-                    jobdeskPhotoPreview = null;
 
                     document.getElementById("appSection").classList.add("hidden");
                     document.getElementById("loginSection").classList.remove("hidden");
                     document.getElementById("nikInput").value = "";
-                    showSwalSuccess('Logout Berhasil', 'Seluruh cache dan data lokal dibersihkan. Silakan masukkan NIK baru.');
+                    showSwalSuccess('Logout Berhasil', 'Seluruh filter toko dan cache dibersihkan.');
                 }
             });
         }
