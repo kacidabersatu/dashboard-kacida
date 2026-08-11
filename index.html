@@ -1260,6 +1260,13 @@
             setupOnlineOfflineListener();
             renderDefaultFallbackMenus();
 
+            // 🚀 LANGSUNG NAIKKAN CACHE DARI DETIK PERTAMA APP DIBUKA (0.0001 DETIK)
+            try {
+                initFirebaseCeklisExpiredListener();
+                initFirebaseBelanjaListener();
+                initFirebaseAnnouncementsListener();
+            } catch(e) {}
+
             setTimeout(() => {
                 const splash = document.getElementById("splashScreen");
                 if (splash) {
