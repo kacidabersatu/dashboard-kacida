@@ -4406,30 +4406,76 @@
             }
         }
 
+        // =================================================================
+        // PERBAIKAN MISI HARI INI (JOBDESK, CEKLIS EXP, SERAH TERIMA + SPREADSHEET)
+        // =================================================================
         function loadMisi() {
             const container = document.getElementById("misiList");
             if (!container) return;
 
-            const misiMenus = dashboardData?.menu?.misi || [];
-            if (misiMenus.length === 0) {
-                container.innerHTML = `<div class="modal-card-box" style="text-align:center; color:var(--text-sub);">Belum ada misi aktif hari ini.</div>`;
-                return;
-            }
+            // 1. DAFTAR MISI UTAMA OPERASIONAL TOKO
+            const builtInMisi = [
+                {
+                    name: "Jobdesk Harian & Briefing",
+                    reward: 10,
+                    icon: "https://cdn-icons-png.flaticon.com/512/3209/3209265.png",
+                    action: "openJobdeskHarianModal()"
+                },
+                {
+                    name: "Ceklis Expired & Rak Toko",
+                    reward: 5,
+                    icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png",
+                    action: "openCeklisExpiredModal()"
+                },
+                {
+                    name: "Serah Terima Shift Kasir",
+                    reward: 10,
+                    icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png",
+                    action: "openSerahTerimaModal()"
+                }
+            ];
 
-            container.innerHTML = misiMenus.map(m => `
-                <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div class="icon-box-3d" style="width:42px; height:42px;"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}" style="width:24px; height:24px;"></div>
-                        <div>
-                            <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(m["Nama Menu"])}</p>
-                            <p style="font-size:0.62rem; color:var(--gold); font-weight:700;">🎁 Reward: +${m.Reward_Poin || 5} Poin</p>
+            // 2. DAFTAR MISI DINAMIS DARI SPREADSHEET
+            const sheetMisi = dashboardData?.menu?.misi || [];
+
+            let allMisiList = [
+                ...builtInMisi.map(m => `
+                    <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="icon-box-3d" style="width:42px; height:42px;"><img src="${m.icon}" style="width:24px; height:24px;"></div>
+                            <div>
+                                <p style="font-weight:800; font-size:0.8rem; color:var(--text-main);">${escapeHTML(m.name)}</p>
+                                <p style="font-size:0.62rem; color:var(--gold); font-weight:700;">🎁 Reward: +${m.reward} Poin</p>
+                            </div>
                         </div>
+                        <button onclick="${m.action}" style="background:var(--accent-green-grad); color:#fff; border:none; padding:8px 14px; border-radius:10px; font-weight:800; font-size:0.7rem; cursor:pointer;">
+                            Kerjakan ➔
+                        </button>
                     </div>
-                    <button onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')" style="background:var(--accent-green-grad); color:#fff; border:none; padding:8px 14px; border-radius:10px; font-weight:800; font-size:0.7rem; cursor:pointer;">
-                        Selesaikan ➔
-                    </button>
-                </div>
-            `).join("");
+                `),
+                ...sheetMisi.map(m => `
+                    <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div class="icon-box-3d" style="width:42px; height:42px;"><img src="${getSmart3DIcon(m["Nama Menu"], m["Icon URL"])}" style="width:24px; height:24px;"></div>
+                            <div>
+                                <p style="font-size:0.8rem; font-weight:800; color:var(--text-main);">${escapeHTML(m["Nama Menu"])}</p>
+                                <p style="font-size:0.62rem; color:var(--gold); font-weight:700;">🎁 Reward: +${m.Reward_Poin || 5} Poin</p>
+                            </div>
+                        </div>
+                        <button onclick="onMenuClick('${escapeHTML(m["Nama Menu"])}', '${m["Link Tujuan"] || '#'}')" style="background:var(--accent-green-grad); color:#fff; border:none; padding:8px 14px; border-radius:10px; font-weight:800; font-size:0.7rem; cursor:pointer;">
+                            Selesaikan ➔
+                        </button>
+                    </div>
+                `)
+            ];
+
+            container.innerHTML = allMisiList.join("");
+
+            // Update Angka Badge "Tugas" di Beranda
+            const valTasksEl = document.getElementById("valTasks");
+            if (valTasksEl) {
+                valTasksEl.innerText = builtInMisi.length + sheetMisi.length;
+            }
         }
 
         function switchTab(tabName) {
