@@ -2227,29 +2227,37 @@
             renderCeklisExpiredModal(activeTab);
         }
 
+        // =================================================================
+        // STATE PENCARIAN PENANGGUNG JAWAB RAK
+        // =================================================================
+        let searchShelfAssignee = "";
+
+        function filterShelvesByAssignee(val) {
+            searchShelfAssignee = val;
+            renderCeklisExpiredModal('rak');
+        }
+
+        // =================================================================
+        // CEKLIS EXPIRED & MANAJEMEN RAK (DILENGKAPI FITUR PENCARIAN STAFF)
+        // =================================================================
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
-            
-            // 🚀 2. AMBIL KODE TOKO INSTAN (TIDAK PERLU MENUNGGU API)
-            let userKodeToko = dashboardData?.user?.kodeToko || '';
-            if (!userKodeToko && dashboardData?.user?.["NAMA TOKO"]) {
-                userKodeToko = getKodeToko(dashboardData.user["NAMA TOKO"]);
-            }
-
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
+            const userNamaToko = dashboardData?.user?.namaToko || 'Toko';
             const daftarToko = dashboardData?.daftarToko || [];
+            
             let personilList = dashboardData?.struktur?.personilToko || [];
             if (!personilList || personilList.length === 0) {
                 personilList = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
             }
 
-            // Filter data sesuai toko (Kecuali User AC)
             let storeShelves = expShelves;
             let storeProducts = expProducts;
 
-            if (!userAC && userKodeToko) {
-                storeShelves = expShelves.filter(s => s.kodeToko === userKodeToko || !s.kodeToko);
-                storeProducts = expProducts.filter(p => p.kodeToko === userKodeToko || !p.kodeToko);
+            if (!userAC) {
+                storeShelves = expShelves.filter(s => s.kodeToko === userKodeToko);
+                storeProducts = expProducts.filter(p => p.kodeToko === userKodeToko);
             }
 
             const totalRak = storeShelves.length;
@@ -2271,7 +2279,7 @@
                         const tPending = tShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
 
                         return `
-                            <div class="modal-card-box" onclick="viewStoreShelvesDetailAC('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid var(--accent-primary);" title="Klik untuk lihat rincian rak toko (Hanya Lihat)">
+                            <div class="modal-card-box" onclick="viewStoreShelvesDetailAC('${toko.kodeToko}', '${escapeHTML(toko.namaToko)}')" style="cursor:pointer; border-left:4px solid var(--accent-primary);" title="Klik untuk lihat rincian rak toko ">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
                                     <div>
                                         <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(toko.namaToko)} (${toko.kodeToko})</h5>
@@ -2289,11 +2297,22 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO (AREA COORDINATOR - HANYA LIHAT)</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO </h5>
                         <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
-                    let rakListCards = storeShelves.map(s => {
+                    // ✅ FILTER PENCARIAN NAMA PENANGGUNG JAWAB / NAMA RAK
+                    let filteredShelves = storeShelves;
+                    if (searchShelfAssignee && searchShelfAssignee.trim() !== '') {
+                        const query = searchShelfAssignee.toLowerCase().trim();
+                        filteredShelves = storeShelves.filter(s => 
+                            (s.assignedName && s.assignedName.toLowerCase().includes(query)) ||
+                            (s.name && s.name.toLowerCase().includes(query)) ||
+                            (s.noRak && s.noRak.toLowerCase().includes(query))
+                        );
+                    }
+
+                    let rakListCards = filteredShelves.map(s => {
                         const isDone = s.status === 'Selesai';
                         const isPendingVal = s.status === 'Menunggu Validasi COS';
                         const isRejected = s.status === 'Ditolak';
@@ -2359,7 +2378,7 @@
 
                         configSectionHtml = `
                             <div class="modal-card-box">
-                                <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH & MANAJEMEN RAK (KHUSUS COS)</h5>
+                                <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK MANUAL & PENUGASAN (KHUSUS COS)</h5>
                                 <div class="modal-grid-2" style="margin-bottom:8px;">
                                     <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
                                     <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
@@ -2384,6 +2403,19 @@
                         `;
                     }
 
+                    // 🔍 KOTAK PENCARIAN NAMA PENANGGUNG JAWAB (TEPAT DI BAWAH MANAJEMEN RAK COS)
+                    const searchBarHtml = `
+                        <div class="modal-card-box" style="padding:10px; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <i class="fa-solid fa-magnifying-glass" style="color:var(--accent-primary);"></i>
+                                <input type="text" id="searchAssigneeInput" value="${escapeHTML(searchShelfAssignee)}" oninput="filterShelvesByAssignee(this.value)" placeholder="Cari nama penanggung jawab / nama rak..." style="flex:1; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:8px 12px; border-radius:10px; font-size:0.75rem; outline:none;">
+                                ${searchShelfAssignee ? `
+                                    <button onclick="filterShelvesByAssignee('')" style="background:#fee2e2; color:#dc2626; border:none; padding:6px 10px; border-radius:8px; font-size:0.65rem; font-weight:800; cursor:pointer;">Clear</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+
                     tabContentHtml = `
                         <div class="modal-grid-3">
                             <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">TOTAL RAK</span><p style="font-size:1.1rem; font-weight:800;">${totalRak}</p></div>
@@ -2392,12 +2424,13 @@
                         </div>
 
                         ${configSectionHtml}
+                        ${searchBarHtml}
 
-                        <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data rak di toko ini.</p>'}</div>
+                        <div class="modal-grid-1">${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Tidak ada rak yang sesuai dengan pencarian.</p>'}</div>
                     `;
                 }
             } 
-            // TAB 2: INPUT PRODUK (DISEMBUNYIKAN UNTUK AC)
+            // TAB 2: INPUT PRODUK
             else if (activeTab === 'input' && !userAC) {
                 const shelfOptionsHtml = storeShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
                 tabContentHtml = `
