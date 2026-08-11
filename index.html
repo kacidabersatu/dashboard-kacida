@@ -535,33 +535,32 @@
 
         function registerBackgroundServiceWorker() {
             if ('serviceWorker' in navigator && 'PushManager' in window) {
-                const swCode = `
-                    importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
-                    importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
-
-                    firebase.initializeApp(${JSON.stringify(firebaseConfig)});
-                    const messaging = firebase.messaging();
-
-                    messaging.onBackgroundMessage((payload) => {
-                        const title = payload.notification?.title || "Notifikasi Kacida Bersatu";
-                        const options = {
-                            body: payload.notification?.body || "Ada pembaruan data baru!",
-                            icon: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
-                            badge: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
-                            sound: "https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3",
-                            vibrate: [300, 100, 300, 100, 300]
-                        };
-                        self.registration.showNotification(title, options);
-                    });
-                `;
-
-                const blob = new Blob([swCode], { type: 'application/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-
-                navigator.serviceWorker.register(swUrl).then((registration) => {
+                // Registrasi Service Worker Fisik
+                navigator.serviceWorker.register('./firebase-messaging-sw.js').then((registration) => {
                     initFCMToken(registration);
                 }).catch(err => {
-                    console.log("Service Worker Registration Error:", err);
+                    // Fallback Blob jika membuka di Google Apps Script langsung
+                    const swCode = `
+                        importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+                        importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
+
+                        firebase.initializeApp(${JSON.stringify(firebaseConfig)});
+                        const messaging = firebase.messaging();
+
+                        messaging.onBackgroundMessage((payload) => {
+                            const title = payload.notification?.title || "Notifikasi Kacida Bersatu";
+                            const options = {
+                                body: payload.notification?.body || "Ada pembaruan data baru!",
+                                icon: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
+                                badge: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
+                                sound: "https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3",
+                                vibrate: [300, 100, 300, 100, 300]
+                            };
+                            self.registration.showNotification(title, options);
+                        });
+                    `;
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    navigator.serviceWorker.register(URL.createObjectURL(blob)).then(reg => initFCMToken(reg));
                 });
             }
         }
