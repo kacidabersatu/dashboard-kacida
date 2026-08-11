@@ -19,9 +19,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- FIREBASE REALTIME DATABASE SDK (COMPAT V9) -->
+    <!-- FIREBASE SDK COMPAT V9 -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- ⬇️ TAMBAHKAN BARIS SDK MESSAGING INI ⬇️ -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
     <style>
         :root, html[data-theme="default"], html[data-theme="light"] {
@@ -526,7 +528,67 @@
 
         var expHistoryList = [];
         var selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
-        
+        // =================================================================
+        // SERVICE WORKER & FCM MESSAGING (SUDAH TERIKAT VAPID KEY)
+        // =================================================================
+        const FIREBASE_VAPID_KEY = "BOe2mPoXWbNfXX-Rx91lERUrbmQ-w7Loi-bXu4xGpIYZF--9rGueeiG1x37siSfQyQfbtMpdqeM7ukrx3oXWDng";
+
+        function registerBackgroundServiceWorker() {
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                const swCode = `
+                    importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+                    importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
+
+                    firebase.initializeApp(${JSON.stringify(firebaseConfig)});
+                    const messaging = firebase.messaging();
+
+                    messaging.onBackgroundMessage((payload) => {
+                        const title = payload.notification?.title || "Notifikasi Kacida Bersatu";
+                        const options = {
+                            body: payload.notification?.body || "Ada pembaruan data baru!",
+                            icon: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
+                            badge: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
+                            sound: "https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3",
+                            vibrate: [300, 100, 300, 100, 300]
+                        };
+                        self.registration.showNotification(title, options);
+                    });
+                `;
+
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+
+                navigator.serviceWorker.register(swUrl).then((registration) => {
+                    initFCMToken(registration);
+                }).catch(err => {
+                    console.log("Service Worker Registration Error:", err);
+                });
+            }
+        }
+
+        function initFCMToken(registration) {
+            if (typeof firebase === "undefined" || !firebase.messaging) return;
+            const messaging = firebase.messaging();
+
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    messaging.getToken({ 
+                        serviceWorkerRegistration: registration,
+                        vapidKey: FIREBASE_VAPID_KEY 
+                    }).then((currentToken) => {
+                        if (currentToken && currentNik && rtdb) {
+                            rtdb.ref('fcm_tokens/' + String(currentNik).trim()).set({
+                                nik: String(currentNik).trim(),
+                                nama: dashboardData?.user?.NAMA || 'User',
+                                toko: dashboardData?.user?.namaToko || '-',
+                                fcmToken: currentToken,
+                                updatedAt: new Date().toISOString()
+                            });
+                        }
+                    });
+                }
+            });
+        }       
         const firebaseConfig = {
           apiKey: "AIzaSyBceAg0_W6NPMG8KPIGp0zf2qUnUE7Ypj8",
           authDomain: "kacida-bersatu.firebaseapp.com",
@@ -600,10 +662,10 @@
         const JOBDESK_MASTER_TASKS = {
             "Daily Activity": {
                 "Senin": [
-                    { title: "KEBERSIHAN TOILET ISI CEKLIS", cara: "Sikat lantai & kloset pakai karbol, bersihkan cermin/wastafel, isi ulang sabun & tisu. Paraf ceklis dinding.", poin: "Bebas bau, kloset tidak berkerak, lantai kering, ceklis terisi." },
+                    { title: "KEBERSIHAN TOILET", cara: "Sikat lantai & kloset pakai karbol, bersihkan cermin/wastafel, isi ulang sabun & tisu. Paraf ceklis dinding.", poin: "Bebas bau, kloset tidak berkerak, lantai kering, ceklis terisi." },
                     { title: "CLEANING BEAN SPOT", cara: "Lap body mesin kopi, cuci portafilter, bersihkan drip tray, serta lap meja bar & grinder dengan kain mikrofiber.", poin: "Area saji steril, bebas noda susu/kopi, peralatan kering higienis." },
                     { title: "KEBERSIHAN KESET MERAH DI CUCI", cara: "Cuci keset merah dengan sikat & detergen, bilas bersih, jemur hingga kering sebelum dipasang di pintu masuk.", poin: "Bebas lumpur, tidak berbau apak, terpasang simetris." },
-                    { title: "UPDATE SEWA", cara: "Cek area sewa tenant (ATM/booth), bersihkan area sekitar, cocokkan status pembayaran di sistem.", poin: "Area sewa bersih, data status sewa terekam akurat di sistem." },
+                    { title: "UPDATE SEWA", cara: "Cek area sewa tenant (ATM/SPACE), bersihkan area sekitar, cocokkan status sewa dengan SKS.", poin: "Area sewa bersih, Visual sewa sesuai dengan sistem." },
                     { title: "KEBERSIHAN GALON", cara: "Lap bagian luar seluruh galon display dan stok gudang menggunakan kain lembab.", poin: "Galon bebas debu distributor & tidak ada air menetes di lantai." },
                     { title: "KEBERSIHAN GENSET", cara: "Lap bodi luar genset, periksa oli & BBM, panaskan mesin genset 5–10 menit.", poin: "Genset siap pakai, bebas genangan oli, area genset bersih." }
                 ],
@@ -611,55 +673,54 @@
                     { title: "KEBERSIHAN KACA LUAR DAN DALAM", cara: "Semprot cairan pembersih kaca, gosok dengan kain halus, tarik air dengan wiper dari atas ke bawah.", poin: "Bebas noda sidik jari, tidak bergaris bekas air, bening." },
                     { title: "KEBERSIHAN TERAS DAN SARANG LABA-LABA AREA SALES", cara: "Sapu teras luar. Gunakan sapu bertangkai panjang untuk sarang laba-laba di sudut plafon sales.", poin: "Plafon bebas jaring debu, teras bebas puntung rokok/sampah." },
                     { title: "KEBERSIHAN KOLONG RAK", cara: "Lepas shelving bawah / gunakan sapu tipis untuk menarik debu & sampah dari kolong rak sales.", poin: "Tidak ada produk jatuh tertinggal, kolong rak bebas debu tebal." },
-                    { title: "MAINTENANCE AC & EXHAUST", cara: "Lap bagian filter luar AC dan pastikan pembuangan air lancar. Bersihkan kipas exhaust fan.", poin: "Suhu toko sejuk optimal, tidak ada bocoran air AC." },
                     { title: "KEBERSIHAN CHILLER & FREEZER", cara: "Lap bagian pintu kaca dan tray dalam chiller, buang bunga es jika menumpuk di freezer.", poin: "Kaca chiller bening, produk dingin merata & higienis." }
                 ],
                 "Rabu": [
-                    { title: "KEBERSIHAN KERANJANG BELANJA (STANDAR 24 PCS)", cara: "Lap luar-dalam keranjang dengan desinfektan. Susun rapi di pintu masuk.", poin: "Jumlah pas 24 pcs, pegangan tidak lengket, dasar bersih." },
-                    { title: "KEBERSIHAN KOLONG RAK GUDANG", cara: "Pindahkan karton bawah jika memungkinkan, sapu dan pel lantai di bawah rak gudang.", poin: "Gudang bebas serangga/hama, karton tidak basah." },
+                    { title: "KEBERSIHAN KERANJANG BELANJA (STANDAR 24 PCS)", cara: "Lap luar-dalam keranjang dengan kanebo/serbet. Susun rapi di pintu masuk.", poin: "Jumlah pas 24 pcs, pegangan tidak lengket, dasar bersih." },
+                    { title: "KEBERSIHAN KOLONG RAK GUDANG", cara: "Pindahkan karton bawah jika memungkinkan, sapu dan pel lantai di bawah rak gudang.", poin: "Gudang bebas serangga/hama, karton tidak basah dan memakai pallet." },
                     { title: "KEBERSIHAN MEJA KASIR & PERANGKAT POS", cara: "Lap permukaan meja kasir, layar komputer, keyboard, mesin EDC, dan pemindai barcode.", poin: "Meja kasir rapi, area bebas debu/minyak, perangkat siap pakai." },
-                    { title: "CEK EXPIRED PRODUK SNACK & BISKUIT", cara: "Pemeriksaan tanggal kedaluwarsa pada seluruh item kategori snack dan biskuit rak sales.", poin: "FEFO berjalan baik, produk expired terpisah dari rak sales." }
+                    { title: "GENERAL CEK EXP ALL ITEM BKL ICE CREAM", cara: "Pemeriksaan tanggal kedaluwarsa pada seluruh item kategori Ice Cream.", poin: "FEFO berjalan baik, produk expired terpisah dari rak sales." }
                 ],
                 "Kamis": [
-                    { title: "CLEANING BEAN SPOT DEEP CLEANING", cara: "Bersihkan hopper biji kopi, pipa pembuangan, tempat sirup, serta sanitasi cup dispenser.", poin: "Bebas endapan sisa produk cair, higienitas terjaga." },
-                    { title: "GENERAL CEK EXP ALL ITEM INPUT TAB", cara: "Sisir seluruh rak sales, cek tanggal exp tiap item, scan dan input item mendekati exp ke TAB.", poin: "Data exp ter-input 100% akurat, tidak ada barang exp lolos." },
-                    { title: "KEBERSIHAN AREA FAST FOOD & GORENGAN", cara: "Cuci kuali/pemanas makanan, ganti minyak jika keruh, lap rak etalase kaca saji.", poin: "Makanan higienis, etalase bebas noda minyak/jelantah." },
-                    { title: "PENATAAN & SANITASI TEMPAT SAMPAH", cara: "Cuci tempat sampah luar & dalam, ganti kantong plastik hitam baru.", poin: "Tidak berbau busuk, tidak berlalat, plastik terpasang rapi." }
+                    { title: "CLEANING BEAN SPOT BASIC & MEDIUM", cara: "Bersihkan seluruh utensil dan cek Expnya, Untuk Basic WB Berfungsi", poin: "Planogram dan Harga Update, higienitas terjaga." },
+                    { title: "GENERAL CEK EXP ALL ITEM BKL DC FRESH", cara: "Sisir seluruh Item BKL DC FRESH rawan Exp, cek tanggal exp tiap item, Input item mendekati exp di Menu CEKLIS EXP.", poin: "Data exp ter-input 100% akurat, tidak ada barang exp lolos." },
+                    { title: "KEBERSIHAN AREA SELASAR", cara: "Box return steril dari BKE/BR Ajukan OTP untuk dilakukan return, Selasar tidak berantakan.", poin: "Box return steril dan bebas noda minyak/jelantah." },
+                    { title: "KEBERSIHAN AREA GUDANG DAN KANTOR", cara: "Sapu dan pel, buang sampah yang sudah tidak terpakai.", poin: "Gudang dan kantor rapih." }
                 ],
                 "Jumat": [
-                    { title: "KEBERSIHAN TOILET DEEP CLEANING", cara: "Deep cleaning pembuangan air, sikat keramik dinding toilet, lengkapi paraf ceklis.", poin: "Bebas bau tidak sedap, tidak ada genangan air." },
+                    { title: "KEBERSIHAN TOILET DEEP CLEANING", cara: "Deep cleaning pembuangan air, sikat keramik dinding toilet, Tempat sampah bersih dan tersedia pewangi.", poin: "Bebas bau tidak sedap, tidak ada genangan air." },
                     { title: "SO RPC MATERIAL BEANSPOT", cara: "Hitung fisik bahan baku Bean Spot (kopi, susu, sirup, cup), cocokkan dengan data RPC.", poin: "Selisih stok fisik dan sistem adalah 0 (pasti & akurat)." },
-                    { title: "KEBERSIHAN GUDANG & RAPRAPAN PALET", cara: "Rapikan susunan karton stok di atas palet sesuai kategori, beri jarak dari dinding.", poin: "Gudang tertata rapi, jalur evakuasi/akses barang lancar." },
+                    { title: "GROUPING RAK ATK , Z51 DAN 979", cara: "Rapihkan Dan Grouping Kartonan dan Receh di rak gudang.", poin: "Gudang tertata rapi, proses SO mudah dan cepat." },
                     { title: "PENGECEKAN ALAT PEMADAM (APAR)", cara: "Periksa tekanan jarum indikator APAR, lap tabung, pastikan segel utuh dan akses tidak terhalang.", poin: "APAR siap pakai, kondisi fisik bersih dan aman." }
                 ],
                 "Sabtu": [
                     { title: "KEBERSIHAN AREA KASIR DAN SERVER", cara: "Lap meja kasir, monitor POS, EDC, serta bersihkan debu halus CPU server & UPS dengan kain kering.", poin: "Bebas debu, kabel tertata rapi, perangkat tidak overheat." },
-                    { title: "KEBERSIHAN FACADE & NEON BOX", cara: "Lap tiang & kaca neon box depan toko, bersihkan debu spanduk promo luar.", poin: "Tampilan toko terang jernih, promosi terlihat jelas." },
+                    { title: "KEBERSIHAN BACKWALL KASIR", cara: "Lap seluruh backwal kasir.", poin: "Tampilan Area kasir rapih dan bersih, produk rokok terdisplay dengan rapih." },
+                    { title: "PEMASANGAN LABEL EXP KARTON", cara: "Cetak label exp, catat tanggal exp memakai spidol daan tempel di kartonan.", poin: "Memudahkan proses FEFO agar terdisplay lebih dulu,dan memudahkan monitor EXP In carton." },
                     { title: "PERSIAPAN STOCK REFILL FAST MOVING", cara: "Pindahkan produk fast-moving (air mineral, minyak, gula) dari gudang ke area kasir/sales.", poin: "Rak sales selalu terisi penuh menjelang jam ramai weekend." }
                 ],
                 "Minggu": [
                     { title: "PENGECEKAN LINGKUNGAN HALAMAN PARKIR", cara: "Sapu area parkir dari sampah plastik & daun. Rapikan posisi marka parkir.", poin: "Halaman bersih, rapi, menyambut kedatangan pelanggan." },
-                    { title: "DEEP CLEANING AREA SALES & MEJA MAKAN", cara: "Sapu dan pel lantai sales hingga mengkilap, bersihkan meja & kursi makan indoor/outdoor.", poin: "Lantai bersih bebas lengket, meja makan siap pakai." },
+                    { title: "PENATAAN & SANITASI TEMPAT SAMPAH", cara: "Kosongkan dan Cuci tempat sampah luar & dalam.", poin: "Tidak berbau busuk, tidak berlalat dan terpasang rapi." },
                     { title: "CEK BANNER & POP PROMOSI", cara: "Pastikan seluruh POP harga & banner promo terpasang simetris dan tidak ada yang sobek.", poin: "Informasi promo akurat dan menarik perhatian konsumen." }
                 ]
             },
             "Materi Briefing Shift 1 & 2": {
                 "Senin": [
-                    { title: "[SHIFT 1] MATERI BSP & TARGET MINGGUAN", cara: "Sampaikan materi Basic Store Performance & target sales pekan baru kepada seluruh tim.", poin: "Tim paham target nominal sales & fokus produk pekan ini." },
-                    { title: "[SHIFT 1] REMINDER TARGET FOKUS DAN SALES SHIFT 1", cara: "Ingatkan kembali breakdown target penjualan shift 1 di awal kerja.", poin: "Fokus penawaran di kasir berjalan sejak jam awal." },
-                    { title: "[SHIFT 2] ISI LINK SERAH TERIMA & KAS", cara: "Input data fisik uang kasir, sisa modal, dan kondisi toko di link serah terima.", poin: "Data serah terima valid dan 100% akurat." }
+                    { title: "[SHIFT 1] MATERI BSP & TARGET MINGGUAN", cara: "Sampaikan materi BSP Dan Basic Store Performance & target sales pekan baru kepada seluruh tim.", poin: "Tim paham target nominal sales & fokus produk pekan ini." },
+                    { title: "[SHIFT 2] MATERI BSP & CEK PENCAPAIAN IKT", cara: "Sampaikan materi BSP Dan Basic Store Performance & target sales pekan baru kepada seluruh tim.", poin: "Tim paham target nominal sales & fokus produk pekan ini." }
                 ],
                 "Selasa": [
                     { title: "[SHIFT 1] EVALUASI PROMO & TARGET SHIFT 1", cara: "Briefing pencapaian promo mingguan dan breakdown target sales Shift 1 hari Selasa.", poin: "Tim memahami item promo utama dan fokus penawaran kasir." },
-                    { title: "[SHIFT 2] SERAH TERIMA KASIR & DRAFT SO", cara: "Cek selisih kasir Shift 1 ke Shift 2 dan update data kelengkapan di link serah terima.", poin: "Uang kasir klop dan laporan serah terima terisi." }
+                    { title: "[SHIFT 2] SERAH TERIMA KASIR & DRAFT SO", cara: "Cek selisih kasir Shift 1 ke Shift 2, Evaluasi pencapaian Shift 1.", poin: "Tim memahami item promo utama dan fokus penawaran kasir." }
                 ],
                 "Rabu": [
                     { title: "[SHIFT 1] REVIEW ITEM FOCUS & CEK EXPIRED", cara: "Briefing penawaran item fokus minggu ini dan sosialisasi pencegahan produk mendekati expired.", poin: "Peningkatan transaksi item fokus dan nol barang expired terlewat." },
-                    { title: "[SHIFT 2] SERAH TERIMA & KEBERSIHAN AREA SALES", cara: "Briefing pergantian shift, serah terima fisik uang modal, serta kerapihan area kasir.", poin: "Serah terima lancar & area sales teratur rapi." }
+                    { title: "[SHIFT 2] SERAH TERIMA & KEBERSIHAN AREA SALES", cara: "Briefing pergantian shift, serah terima Pending meter, serta kerapihan area kasir.", poin: "Tidak miss komunikasi dan area sales teratur rapi." }
                 ],
                 "Kamis": [
-                    { title: "[SHIFT 1] STANDAR PELAYANAN & GREETING", cara: "Ingatkan kembali penerapan 5S (Senyum, Salam, Sapa, Sopan, Santun) dan kecepatan transaksi kasir.", poin: "Pelayanan ramah, standar greeting konsisten, antrean terkendali." },
-                    { title: "[SHIFT 2] SERAH TERIMA & PERSIAPAN PROMO JUMAT", cara: "Update tag harga bila ada promo esok hari dan pastikan link serah terima diisi lengkap.", poin: "Label harga akurat dan pencatatan serah terima selesai." }
+                    { title: "[SHIFT 1] STANDAR PELAYANAN & GREETING", cara: "Ingatkan kembali penerapan TSS (Tatap,Senyum,Sapa) dan kecepatan transaksi kasir.", poin: "Pelayanan ramah, standar greeting konsisten, antrean terkendali." },
+                    { title: "[SHIFT 2] SERAH TERIMA & PERSIAPAN PROMO JUMAT", cara: "Update tag harga bila ada promo esok hari.", poin: "Label harga akurat dan pencatatan serah terima selesai." }
                 ],
                 "Jumat": [
                     { title: "[SHIFT 1] BRIEFING JUMAT BERKAH & TARGET WEEKEND", cara: "Briefing kesiapan stok produk fast-moving dan strategi peningkatan sales menyambut weekend.", poin: "Stok produk siap & target penjualan Jumat tercapai." },
@@ -670,8 +731,8 @@
                     { title: "[SHIFT 2] BRIEFING PEAK TIME WEEKEND SHIFT 2", cara: "Briefing kelengkapan display produk saat ramai dan pencatatan kasir di link serah terima.", poin: "Display rak tetap terisi rapi & data serah terima valid." }
                 ],
                 "Minggu": [
-                    { title: "[SHIFT 1] REVIEW TARGET MINGGUAN & CLOSING MINGGU", cara: "Evaluasi ketercapaian sales mingguan dan dorong penyelesaian target akhir pekan.", poin: "Tim termotivasi mencapai target mingguan toko." },
-                    { title: "[SHIFT 2] SERAH TERIMA SHIFT & PREPARASI OPERASIONAL SENIN", cara: "Input link serah terima, cek kebersihan area toko, dan persiapan pergantian modal kerja pekan baru.", poin: "Toko siap 100% untuk operasional awal pekan." }
+                    { title: "[SHIFT 1] REVIEW IKT & CLOSING MINGGU", cara: "Evaluasi ketercapaian sales mingguan dan dorong penyelesaian target akhir pekan.", poin: "Tim termotivasi mencapai target mingguan toko." },
+                    { title: "[SHIFT 2] SERAH TERIMA SHIFT & PREPARASI OPERASIONAL SENIN", cara: "Cek kebersihan area toko, dan persiapan pergantian modal kerja pekan baru.", poin: "Toko siap 100% untuk operasional awal pekan." }
                 ]
             }
         };
@@ -1231,7 +1292,7 @@
                 { name: "Jobdesk Harian", icon: "https://cdn-icons-png.flaticon.com/512/3209/3209265.png", action: "openJobdeskHarianModal()", numBadge: isUserAC() ? jobdeskReports.filter(j => j.status === 'PENDING_AC').length : (isUserCOS() ? jobdeskReports.filter(j => j.status === 'PENDING_COS' && j.kodeToko === userKodeToko).length : 0) },
                 { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
                 { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: isUserCOS() ? expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length : 0 },
-                { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
+                { name: "Serah Terima", icon: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/128/Handshake-3d-icon.png", action: "openSerahTerimaModal()" },
                 { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()", numBadge: pendingBelanjaCount }
             ];
 
@@ -1259,6 +1320,7 @@
             applyTheme(currentTheme);
             setupOnlineOfflineListener();
             renderDefaultFallbackMenus();
+            registerBackgroundServiceWorker();
 
             // 🚀 LANGSUNG NAIKKAN CACHE DARI DETIK PERTAMA APP DIBUKA (0.0001 DETIK)
             try {
@@ -1861,7 +1923,7 @@
                 },
                 { name: "Plan Master Shift", icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png", action: "openPlanMasterShiftModal()" },
                 { name: "Ceklis Expired", icon: "https://cdn-icons-png.flaticon.com/512/7518/7518748.png", action: "openCeklisExpiredModal()", numBadge: isUserCOS() ? expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length : 0 },
-                { name: "Serah Terima", icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png", action: "openSerahTerimaModal()" },
+                { name: "Serah Terima", icon: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/128/Handshake-3d-icon.png", action: "openSerahTerimaModal()" },
                 { name: "Belanja Karyawan", icon: "https://cdn-icons-png.flaticon.com/512/3081/3081559.png", action: "openBelanjaKaryawanModal()", numBadge: pendingBelanjaCount }
             ];
 
@@ -4434,7 +4496,7 @@
             const builtInMisi = [
                 {
                     name: "Jobdesk Harian & Briefing",
-                    reward: 10,
+                    reward: 5,
                     icon: "https://cdn-icons-png.flaticon.com/512/3209/3209265.png",
                     action: "openJobdeskHarianModal()"
                 },
@@ -4446,8 +4508,8 @@
                 },
                 {
                     name: "Serah Terima Shift Kasir",
-                    reward: 10,
-                    icon: "https://cdn-icons-png.flaticon.com/512/3767/3767084.png",
+                    reward: 5,
+                    icon: "https://icons.iconarchive.com/icons/microsoft/fluentui-emoji-3d/128/Handshake-3d-icon.png",
                     action: "openSerahTerimaModal()"
                 }
             ];
