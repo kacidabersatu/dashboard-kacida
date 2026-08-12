@@ -1100,18 +1100,16 @@
         function initFirebaseRealtimeChat() {
             if (!rtdb) return;
 
-            // 🚀 1. LOAD PESAN INSTAN DARI CACHE HP SAAT PERTAMA KALI APP DIBUKA
+            // 🚀 1. BACA INSTANT DARI MEMORI HP (PESAN LANGSUNG MUNCUL 0.0001 DETIK)
             try {
                 const localChatCache = localStorage.getItem('kacida_cache_chats');
                 if (localChatCache && cachedChatList.length === 0) {
                     cachedChatList = JSON.parse(localChatCache);
+                    if (chatRoomMode === 'team') renderChatList(cachedChatList, false);
                 }
             } catch(e) {}
 
-            if (isChatListenerAttached) return;
-            isChatListenerAttached = true;
-
-            // 💬 CHAT REALTIME (ANTI-SPAM)
+            // 💬 2. CHAT REALTIME (ANTI-SPAM)
             rtdb.ref('chats').limitToLast(1).on('child_added', (snapshot) => {
                 if (isChatInitialLoad) {
                     isChatInitialLoad = false;
@@ -1126,14 +1124,14 @@
                 }
             });
 
-            // ⚡ LISTEN REALTIME VALUE DENGAN PENYIMPANAN CACHE
+            // ⚡ 3. SINKRONISASI REALTIME FIREBASE RTDB DENGAN PENYIMPANAN CACHE
             rtdb.ref('chats').limitToLast(50).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     const entries = Object.entries(data);
                     cachedChatList = entries.map(([id, val]) => ({ id, ...val }));
                     
-                    // Simpan ke Cache HP untuk Akses Instan Berikutnya
+                    // Simpan ke Cache HP agar saat buka app berikutnya LANGSUNG MUNCUL INSTAN!
                     localStorage.setItem('kacida_cache_chats', JSON.stringify(cachedChatList));
 
                     let unreadCount = 0;
@@ -1145,11 +1143,11 @@
                     });
 
                     updateChatBadgeUI(unreadCount);
-                    if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
+                    if (chatRoomMode === 'team') renderChatList(cachedChatList, false);
                 } else {
                     cachedChatList = [];
                     updateChatBadgeUI(0);
-                    if (chatRoomMode === 'team') renderChatList([], true);
+                    if (chatRoomMode === 'team') renderChatList([], false);
                 }
             });
 
@@ -1157,7 +1155,7 @@
                 const deletedId = snapshot.key;
                 cachedChatList = cachedChatList.filter(c => c.id !== deletedId);
                 localStorage.setItem('kacida_cache_chats', JSON.stringify(cachedChatList));
-                if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
+                if (chatRoomMode === 'team') renderChatList(cachedChatList, false);
             });
         }
         
