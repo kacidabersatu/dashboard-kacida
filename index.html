@@ -524,7 +524,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxYEHbZ7o8MFHArVrKzfsza9BBoxKVNvIStSivhZnA6RbLqx16wb02rjUpfYMUMSuQF/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5XnXm_4BHFfn6TwWbbyH9FXzSfWvX6PgUj7figskjWfCi2yk4jEmKuf3pygJZww/exec";
 
         var expHistoryList = [];
         var selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
@@ -993,10 +993,21 @@
             }
         }
         // =================================================================
-        // SYSTEM NOTIFIKASI REALTIME TARGETED (ANTI-SPAM & 100% AKURAT)
+        // SYSTEM NOTIFIKASI REALTIME TARGETED & SERVER PUSH (ANTI-SPAM)
         // =================================================================
         let isChatInitialLoad = true;
         let isSystemNotifInitialLoad = true;
+
+        // HELPER PEMICU NOTIFIKASI SERVER KE HP USER LAIN (MESKIPUN APP DITUTUP)
+        function sendServerPushTrigger(type, title, body, targetKodeToko = '', targetNik = '') {
+            apiCall("sendServerPush", {
+                type: type,
+                title: title,
+                body: body,
+                targetKodeToko: targetKodeToko || dashboardData?.user?.kodeToko || '',
+                targetNik: targetNik
+            }).catch(()=>{});
+        }
 
         function triggerLocalPushNotification(title, body, targetUrl = '') {
             if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
@@ -1080,22 +1091,24 @@
                 }
             });
 
-            // Bebaskan flag initial load setelah 2 detik pertama aplikasi berjalan
             setTimeout(() => { isSystemNotifInitialLoad = false; }, 2000);
         }
 
         function initFirebaseRealtimeChat() {
             if (!rtdb) return;
 
-            // 💬 CHAT REALTIME (SINGLE LISTENER DENGAN FLAG ANTI-SPAM)
+            // 💬 CHAT REALTIME (ANTI-SPAM: ABAIKAN PESAN LAMA SAAT DIBUKA)
             rtdb.ref('chats').limitToLast(1).on('child_added', (snapshot) => {
                 if (isChatInitialLoad) {
-                    isChatInitialLoad = false; // Abaikan pesan lama saat aplikasi dibuka!
+                    isChatInitialLoad = false;
                     return;
                 }
                 const c = snapshot.val();
                 if (c && String(c.nik_pengirim).trim() !== String(currentNik).trim()) {
-                    triggerLocalPushNotification(`💬 Pesan dari ${c.nama_pengirim || 'Teman Toko'}`, c.isi_pesan || '');
+                    const isChatTabActive = !document.getElementById("tabChat")?.classList.contains("hidden");
+                    if (!isChatTabActive) {
+                        triggerLocalPushNotification(`💬 Pesan dari ${c.nama_pengirim || 'Teman Toko'}`, c.isi_pesan || '');
+                    }
                 }
             });
 
@@ -2929,7 +2942,6 @@
                     photoUrl: expPhotoPreview || ''
                 });
 
-                // ✅ JIKA COS LANGSUNG KERJAKAN -> ARSIPKAN KE HISTORY PERMANEN
                 if (userCOS && shelf) {
                     const historyId = 'hist_' + Date.now();
                     rtdb.ref('ceklis_expired/history/' + historyId).set({
@@ -2951,12 +2963,17 @@
                 }
             }
 
+            // 🚀 PEMICU PUSH NOTIFIKASI SERVER UNTUK COS
+            if (!userCOS) {
+                sendServerPushTrigger("cos", "📂 Validasi Rak Ceklis Expired", `Rak dikerjakan oleh ${userName}. Mohon periksa & validasi!`);
+            }
+
             expPhotoPreview = null;
             trackUserActivity(3, "Ceklis Rak Expired");
             renderCeklisExpiredModal('rak');
             showSwalSuccess('Ceklis Terkirim!', userCOS ? 'Rak ditandai Selesai!' : 'Foto berhasil dikirim. Menunggu Validasi Chief of Store.');
         }
-
+        
         function validateShelfByCOS(shelfId) {
             if (!isUserCOS()) return;
             const shelf = expShelves.find(s => s.id === shelfId);
@@ -3211,11 +3228,14 @@
                 rtdb.ref('ceklis_expired/products/' + prodId).set(prodObj);
             }
 
+            // 🚀 PEMICU PUSH NOTIFIKASI SERVER
+            sendServerPushTrigger("all", "⚠️ Alert Expired Baru!", `${name} akan expired pada tanggal ${expDate}`);
+
             trackUserActivity(3, "Catat Produk Expired");
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Tersimpan 📦', 'Produk Expired berhasil dicatat!');
         }
-
+        
         function markExpProductHandled(prodId) {
             if (rtdb) {
                 rtdb.ref('ceklis_expired/products/' + prodId).update({ status: 'selesai' });
@@ -3660,12 +3680,15 @@
                 rtdb.ref('belanja_karyawan/' + txId).set(newTx);
             }
 
+            // 🚀 PEMICU PUSH NOTIFIKASI SERVER (APP DITUTUP BISA MASUK)
+            sendServerPushTrigger(isCOS ? "ac" : "cos", "🧾 Validasi Struk Belanja", `Struk dari ${dashboardData?.user?.NAMA || 'Staff'} sebesar Rp ${Number(nominal).toLocaleString('id-ID')}`);
+
             belanjaPhotoPreview = null;
             trackUserActivity(2, "Submit Struk Belanja");
             renderBelanjaKaryawanModal(isCOS ? 'resume' : 'input');
             showSwalSuccess('Data Terkirim 🚀', 'Struk belanja karyawan berhasil dikirimkan!');
         }
-
+        
         function updateBelanjaStatus(id, newStatus) {
             const nowStr = new Date().toLocaleString('id-ID');
             const approverName = `${dashboardData?.user?.NAMA || 'User'} (${dashboardData?.user?.JABATAN || 'Atasan'})`;
@@ -4372,14 +4395,18 @@
                     pesan: pesan,
                     deadline: deadline,
                     author: dashboardData?.user?.NAMA || 'Supervisi',
-                    authorNik: String(currentNik).trim(), // ✅ CATAT NIK PEMBUAT
+                    authorNik: String(currentNik).trim(),
                     createdAt: new Date().toLocaleString('id-ID')
                 });
-                closeCustomModal();
-                showSwalSuccess('Diterbitkan 🚀', 'Pengumuman baru berhasil dipublikasikan!');
             }
-        }
 
+            // 🚀 PEMICU PUSH NOTIFIKASI BROADCAST SERVER
+            sendServerPushTrigger("all", `📢 Pengumuman Baru: ${judul}`, pesan);
+
+            closeCustomModal();
+            showSwalSuccess('Diterbitkan 🚀', 'Pengumuman baru berhasil dipublikasikan!');
+        }
+        
         // 2. MODAL PENGUMUMAN (TOMBOL HAPUS HANYA UNTUK USER PEMBUAT)
         function openPengumumanModal() {
             const canManage = isUserCOS() || isUserAC();
@@ -4680,7 +4707,7 @@
                 lastChatReadTimestamp = Date.now();
                 localStorage.setItem("LAST_CHAT_READ_TS", lastChatReadTimestamp.toString());
                 updateChatBadgeUI(0);
-                initFirebaseRealtimeChat();
+                // ✅ TIDAK LAGI MEMANGGIL RE-ATTACH LISTENER AGAR BEBAS SPAM
             }
         }
 
@@ -5167,12 +5194,15 @@
                 rtdb.ref('jobdesk_reports/' + reportId).set(newReport);
             }
 
+            // 🚀 PEMICU PUSH NOTIFIKASI SERVER (APP DITUTUP BISA MASUK)
+            sendServerPushTrigger(isCOS ? "ac" : "cos", "📋 Approval Jobdesk Baru", `${taskTitle} dikirim oleh ${dashboardData?.user?.NAMA || 'Staff'}`);
+
             jobdeskPhotoPreview = null;
             trackUserActivity(4, "Submit Jobdesk " + taskTitle);
             renderJobdeskModalView('input');
             showSwalSuccess('Laporan Terkirim 🚀', 'Pekerjaan berhasil dilaporkan!');
         }
-
+        
         function approveJobdeskReport(reportId) {
             const userAC = isUserAC();
             const nextStatus = userAC ? 'APPROVED' : 'PENDING_AC';
