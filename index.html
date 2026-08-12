@@ -993,8 +993,40 @@
             }
         }
 
+        // =================================================================
+        // PEMICU NOTIFIKASI SUARA & GETAR REALTIME UNTUK CHAT MASUK
+        // =================================================================
+        function triggerLocalPushNotification(title, body) {
+            if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification(title, {
+                        body: body,
+                        icon: 'https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ',
+                        badge: 'https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ',
+                        sound: 'https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3',
+                        vibrate: [300, 100, 300, 100, 300],
+                        tag: 'kacida-chat-' + Date.now(),
+                        renotify: true
+                    });
+                });
+            }
+        }
+
         function initFirebaseRealtimeChat() {
             if (!rtdb) return;
+
+            // 💬 PEMICU CHAT MASUK REALTIME DARI TEMAN TOKO
+            rtdb.ref('chats').limitToLast(1).on('child_added', (snapshot) => {
+                const c = snapshot.val();
+                if (c && String(c.nik_pengirim).trim() !== String(currentNik).trim()) {
+                    const msgTime = new Date(c.timestamp || 0).getTime();
+                    // Jika pesan baru dikirim dalam 15 detik terakhir
+                    if (Date.now() - msgTime < 15000) {
+                        triggerLocalPushNotification(`💬 Pesan dari ${c.nama_pengirim || 'Teman Toko'}`, c.isi_pesan || '');
+                    }
+                }
+            });
+
             rtdb.ref('chats').limitToLast(50).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -1010,7 +1042,6 @@
                     });
 
                     updateChatBadgeUI(unreadCount);
-
                     if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
                 } else {
                     cachedChatList = [];
