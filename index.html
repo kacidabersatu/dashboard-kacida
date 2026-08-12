@@ -1094,10 +1094,24 @@
             setTimeout(() => { isSystemNotifInitialLoad = false; }, 2000);
         }
 
+        // =================================================================
+        // REALTIME CHAT (INSTANT CACHE LOKAL 0 DETIK)
+        // =================================================================
         function initFirebaseRealtimeChat() {
             if (!rtdb) return;
 
-            // 💬 CHAT REALTIME (ANTI-SPAM: ABAIKAN PESAN LAMA SAAT DIBUKA)
+            // 🚀 1. LOAD PESAN INSTAN DARI CACHE HP SAAT PERTAMA KALI APP DIBUKA
+            try {
+                const localChatCache = localStorage.getItem('kacida_cache_chats');
+                if (localChatCache && cachedChatList.length === 0) {
+                    cachedChatList = JSON.parse(localChatCache);
+                }
+            } catch(e) {}
+
+            if (isChatListenerAttached) return;
+            isChatListenerAttached = true;
+
+            // 💬 CHAT REALTIME (ANTI-SPAM)
             rtdb.ref('chats').limitToLast(1).on('child_added', (snapshot) => {
                 if (isChatInitialLoad) {
                     isChatInitialLoad = false;
@@ -1112,12 +1126,16 @@
                 }
             });
 
+            // ⚡ LISTEN REALTIME VALUE DENGAN PENYIMPANAN CACHE
             rtdb.ref('chats').limitToLast(50).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     const entries = Object.entries(data);
                     cachedChatList = entries.map(([id, val]) => ({ id, ...val }));
                     
+                    // Simpan ke Cache HP untuk Akses Instan Berikutnya
+                    localStorage.setItem('kacida_cache_chats', JSON.stringify(cachedChatList));
+
                     let unreadCount = 0;
                     cachedChatList.forEach(c => {
                         const ts = new Date(c.timestamp || 0).getTime();
@@ -1138,10 +1156,11 @@
             rtdb.ref('chats').on('child_removed', (snapshot) => {
                 const deletedId = snapshot.key;
                 cachedChatList = cachedChatList.filter(c => c.id !== deletedId);
+                localStorage.setItem('kacida_cache_chats', JSON.stringify(cachedChatList));
                 if (chatRoomMode === 'team') renderChatList(cachedChatList, true);
             });
         }
-
+        
         function updateChatBadgeUI(count) {
             const badge = document.getElementById("chatNavBadge");
             if (badge) {
@@ -1439,6 +1458,7 @@
 
             // 🚀 LANGSUNG NAIKKAN CACHE DARI DETIK PERTAMA APP DIBUKA (0.0001 DETIK)
             try {
+                initFirebaseRealtimeChat();
                 initFirebaseCeklisExpiredListener();
                 initFirebaseBelanjaListener();
                 initFirebaseAnnouncementsListener();
