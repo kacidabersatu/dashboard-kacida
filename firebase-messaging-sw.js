@@ -17,20 +17,20 @@ messaging.onBackgroundMessage((payload) => {
     const title = payload.notification?.title || "Notifikasi Kacida Bersatu";
     const options = {
         body: payload.notification?.body || "Ada pembaruan data baru!",
-        icon: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
-        badge: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ",
+        icon: "https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ", // Foto Logo 3D Berwarna (Kanan)
+        
+        // 📌 SILUET PUTIH TRANSPARAN KACIDA REBORN ANDA (STATUS BAR DEKAT JAM)
+        badge: "https://lh3.googleusercontent.com/d/1w9wSJmNCzsIjj_5fm_5MJdaOANr7wC3E", 
+        
         sound: "https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3",
         vibrate: [300, 100, 300, 100, 300],
         tag: 'kacida-notif-' + Date.now(),
         renotify: true,
-        data: {
-            url: self.location.origin + self.location.pathname
-        }
+        data: { url: self.location.origin + self.location.pathname }
     };
     self.registration.showNotification(title, options);
 });
 
-// 🚀 BILA NOTIFIKASI DIKLIK -> LANGSUNG BUKA/FOKUS KE APLIKASI KACIDA
 self.addEventListener('notificationclick', function(event) {
     event.notification.close();
     event.waitUntil(
