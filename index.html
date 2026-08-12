@@ -994,9 +994,11 @@
         }
 
         // =================================================================
-        // PEMICU NOTIFIKASI SUARA & GETAR REALTIME UNTUK CHAT MASUK
+        // SISTEM PEMICU PUSH NOTIFIKASI REALTIME TARGETED (ANTI-SPAM)
         // =================================================================
-        function triggerLocalPushNotification(title, body) {
+        let chatListenerStartTime = Date.now();
+
+        function triggerLocalPushNotification(title, body, targetUrl = '') {
             if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
                 navigator.serviceWorker.ready.then(registration => {
                     registration.showNotification(title, {
@@ -1005,11 +1007,93 @@
                         badge: 'https://lh3.googleusercontent.com/d/10-ZwZ0NXA55yPuLXfd1KlJjDU-mNPSyQ',
                         sound: 'https://cdn.freesound.org/previews/536/536108_11861866-lq.mp3',
                         vibrate: [300, 100, 300, 100, 300],
-                        tag: 'kacida-chat-' + Date.now(),
-                        renotify: true
+                        tag: 'kacida-notif-' + Date.now(),
+                        renotify: true,
+                        data: { url: targetUrl || window.location.href }
                     });
                 });
             }
+        }
+
+        // SISTEM LISTENER SEKALIGUS UNTUK CHAT, VALIDASI, ALERT EXP & PENGUMUMAN
+        function initFirebaseAllSystemNotificationsListener() {
+            if (!rtdb) return;
+
+            const userCOS = isUserCOS();
+            const userAC = isUserAC();
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
+
+            // 1. 💬 CHAT REALTIME (HANYA PESAN BARU - ANTI SPAM)
+            rtdb.ref('chats').limitToLast(1).on('child_added', (snapshot) => {
+                const c = snapshot.val();
+                if (c && String(c.nik_pengirim).trim() !== String(currentNik).trim()) {
+                    const msgTime = new Date(c.timestamp || 0).getTime();
+                    if (msgTime > chatListenerStartTime) {
+                        triggerLocalPushNotification(`💬 Chat dari ${c.nama_pengirim || 'Teman Toko'}`, c.isi_pesan || '');
+                    }
+                }
+            });
+
+            // 2. 📢 PENGUMUMAN BARU SUPERVISI
+            rtdb.ref('announcements').limitToLast(1).on('child_added', (snapshot) => {
+                const a = snapshot.val();
+                if (a) {
+                    const aTime = new Date(a.createdAt || 0).getTime();
+                    if (Date.now() - aTime < 15000 && String(a.authorNik).trim() !== String(currentNik).trim()) {
+                        triggerLocalPushNotification(`📢 Pengumuman Baru: ${a.judul}`, a.pesan || '');
+                    }
+                }
+            });
+
+            // 3. 📂 VALIDASI RAK CEKLIS EXPIRED (KHUSUS COS)
+            if (userCOS) {
+                rtdb.ref('ceklis_expired/shelves').on('child_changed', (snapshot) => {
+                    const s = snapshot.val();
+                    if (s && s.kodeToko === userKodeToko && s.status === 'Menunggu Validasi COS') {
+                        triggerLocalPushNotification(`📂 Validasi Rak: ${s.name}`, `Dikerjakan oleh ${s.checkedBy || 'Staff'}. Mohon periksa & validasi!`);
+                    }
+                });
+            }
+
+            // 4. 🧾 VALIDASI BELANJA KARYAWAN (COS & AC)
+            rtdb.ref('belanja_karyawan').on('child_added', (snapshot) => {
+                const b = snapshot.val();
+                if (b) {
+                    const bTime = new Date(b.timestamp || 0).getTime();
+                    if (Date.now() - bTime < 15000) {
+                        if (userCOS && b.status === 'Menunggu COS' && b.kodeToko === userKodeToko) {
+                            triggerLocalPushNotification(`🧾 Validasi Struk Belanja`, `Struk dari ${b.penginputNama} sebesar Rp ${Number(b.nominal).toLocaleString('id-ID')}`);
+                        } else if (userAC && b.status === 'Menunggu AC') {
+                            triggerLocalPushNotification(`🧾 Validasi Struk Belanja Area`, `Struk dari toko ${b.namaToko || b.kodeToko}`);
+                        }
+                    }
+                }
+            });
+
+            // 5. 📋 APPROVAL JOBDESK HARIAN (COS & AC)
+            rtdb.ref('jobdesk_reports').on('child_added', (snapshot) => {
+                const j = snapshot.val();
+                if (j) {
+                    const jTime = new Date(j.timestamp || 0).getTime();
+                    if (Date.now() - jTime < 15000) {
+                        if (userCOS && j.status === 'PENDING_COS' && j.kodeToko === userKodeToko) {
+                            triggerLocalPushNotification(`📋 Approval Jobdesk Baru`, `${j.taskTitle} dikirim oleh ${j.submittedBy}`);
+                        } else if (userAC && j.status === 'PENDING_AC') {
+                            triggerLocalPushNotification(`📋 Approval Jobdesk Area`, `${j.taskTitle} dari toko ${j.namaToko || j.kodeToko}`);
+                        }
+                    }
+                }
+            });
+
+            // 6. ⚠️ ALERT EXPIRED PRODUK BARU
+            rtdb.ref('ceklis_expired/products').on('child_added', (snapshot) => {
+                const p = snapshot.val();
+                if (p && (userAC || p.kodeToko === userKodeToko)) {
+                    if (p.status === 'pending') {
+                        triggerLocalPushNotification(`⚠️ Alert Expired Produk!`, `${p.name} akan expired pada tanggal ${p.expDate}`);
+                    }
+                }
+            });
         }
 
         function initFirebaseRealtimeChat() {
@@ -1456,6 +1540,7 @@
                 initFirebaseShiftHandoverListener();
                 initFirebaseRealtimeChat();
                 initFirebaseJobdeskListener();
+                initFirebaseAllSystemNotificationsListener();
             }
         }
 
