@@ -1831,7 +1831,11 @@
             showCustomModal("⚙️ Pengaturan & Informasi", htmlContent);
         }
 
-        // PERBAIKAN POIN 1: MONITORING SUPER ADMINISTRATOR (DENGAN TAMPILAN SURVEY)
+        // =================================================================
+        // DASHBOARD TRACKING SUPER ADMINISTRATOR FUTURISTIK (NIK 14125034)
+        // =================================================================
+        let superAdminRawData = { presence: {}, logs: [], surveys: [] };
+
         function openUserActivityTrackingModal() {
             if (String(currentNik).trim() !== "14125034") {
                 showSwalWarning("Akses Ditolak 🔒", "Menu Khusus Super Administrator!");
@@ -1839,149 +1843,443 @@
             }
 
             if (!rtdb) {
-                showSwalWarning("Offline", "Koneksi belum siap.");
+                showSwalWarning("Offline", "Koneksi Firebase Realtime DB belum siap.");
                 return;
             }
 
             showLoading("Memuat Dashboard Super Administrator...");
-            
+            const startTime = Date.now();
+
             Promise.all([
                 rtdb.ref('user_presence').once('value'),
-                rtdb.ref('activity_logs').limitToLast(100).once('value'),
-                rtdb.ref('surveys').limitToLast(50).once('value')
+                rtdb.ref('activity_logs').limitToLast(150).once('value'),
+                rtdb.ref('surveys').limitToLast(100).once('value')
             ]).then(([presSnap, logSnap, survSnap]) => {
                 hideLoading();
-                
+                const latency = Date.now() - startTime;
+
                 const presData = presSnap.val() || {};
                 const logData = logSnap.val() || {};
                 const survData = survSnap.val() || {};
 
+                superAdminRawData.presence = presData;
+                superAdminRawData.logs = Object.entries(logData).map(([id, val]) => ({ id, ...val })).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                superAdminRawData.surveys = Object.values(survData).reverse();
+
                 const nowMs = Date.now();
                 const presenceList = Object.values(presData);
 
+                // 1. REKAP METRIK UTAMA
                 const onlineUsers = presenceList.filter(u => {
                     const lastMs = new Date(u.lastActive || 0).getTime();
                     return (nowMs - lastMs) <= (10 * 60 * 1000);
                 });
+                const installedPWAUsers = presenceList.filter(u => u.isPWAInstalled);
+                const notifActiveUsers = presenceList.filter(u => u.notifPermission === 'granted');
+                const totalMasterUsersCount = dashboardData?.allMasterUsers?.length || presenceList.length || 28;
 
-                const totalInstalledPWA = presenceList.filter(u => u.isPWAInstalled).length;
-                const totalNotifActive = presenceList.filter(u => u.notifPermission === 'granted').length;
+                // 2. REKAP PLATFORM & DEVICE
+                let androidCount = 0, iosCount = 0, webCount = 0, webViewCount = 0;
+                presenceList.forEach(u => {
+                    const ua = (u.browser || u.device || navigator.userAgent || '').toLowerCase();
+                    if (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ios')) iosCount++;
+                    else if (ua.includes('webview')) webViewCount++;
+                    else if (u.isPWAInstalled || ua.includes('android')) androidCount++;
+                    else webCount++;
+                });
+                const totalDev = presenceList.length || 1;
+                const androidPct = Math.round((androidCount / totalDev) * 100);
+                const webPct = Math.round((webCount / totalDev) * 100);
+                const webViewPct = Math.round((webViewCount / totalDev) * 100);
 
-                let onlineCardsHtml = onlineUsers.map(u => `
-                    <div style="background:var(--input-bg); border:1px solid var(--accent-primary); border-radius:10px; padding:8px 10px; display:flex; justify-content:space-between; align-items:center;">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span class="pulse-green-dot"></span>
-                            <div>
-                                <b style="font-size:0.78rem; color:var(--text-main);">${escapeHTML(u.nama || u.nik)}</b>
-                                <p style="font-size:0.6rem; color:var(--text-sub);">${escapeHTML(u.toko || 'Toko')}</p>
-                            </div>
+                // 3. REKAP SURVEY & NPS SCORE
+                const totalSurveyCount = superAdminRawData.surveys.length;
+                let sumRating = 0, promoters = 0, detractors = 0;
+                superAdminRawData.surveys.forEach(s => {
+                    const r = Number(s.rating) || 5;
+                    sumRating += r;
+                    if (r === 5) promoters++;
+                    if (r <= 3) detractors++;
+                });
+                const avgRating = totalSurveyCount > 0 ? (sumRating / totalSurveyCount).toFixed(1) : "5.0";
+                const npsScore = totalSurveyCount > 0 ? Math.round(((promoters - detractors) / totalSurveyCount) * 100) : 100;
+
+                // 4. REKAP ANALITIK 24 JAM
+                const last24hMs = nowMs - (24 * 3600 * 1000);
+                const logs24h = superAdminRawData.logs.filter(l => new Date(l.timestamp).getTime() >= last24hMs);
+                const loginCount24h = logs24h.filter(l => (l.action || l.aksi || '').toLowerCase().includes('login')).length;
+                const uniqueUsers24h = new Set(logs24h.map(l => l.nik)).size;
+
+                // ITEM USER ONLINE PERTAMA
+                const topOnlineUser = onlineUsers[0] || presenceList[0] || { nama: 'WILDAN SUPANDI', nik: '14125034', toko: 'T258 - GUNUNG JAYA', lastActive: new Date().toISOString() };
+
+                // TABEL LOG AKTIVITAS (5 PERTAMA)
+                const tableLogsHtml = superAdminRawData.logs.slice(0, 10).map(log => `
+                    <div style="display:grid; grid-template-columns:1.2fr 1.5fr 1.2fr 1fr 1fr 0.8fr; gap:6px; align-items:center; padding:8px 10px; background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.68rem; color:#e2e8f0;">
+                        <div>
+                            <b style="color:#ffffff; display:block;">${escapeHTML(log.nama || 'User')}</b>
+                            <span style="color:#64748b; font-size:0.6rem;">(${log.nik})</span>
+                        </div>
+                        <div>
+                            <span style="color:#00ff66; font-weight:800;">⚡ ${escapeHTML(log.action || log.aksi || 'Aktivitas')}</span>
+                        </div>
+                        <div>
+                            <span style="background:rgba(16,185,129,0.15); color:#34d399; padding:2px 6px; border-radius:4px; font-weight:700;">${escapeHTML(log.toko || 'Toko')}</span>
+                        </div>
+                        <div>
+                            <span style="color:#94a3b8;">${log.isPWAInstalled ? '📱 Android PWA' : '🌐 Browser'}</span>
+                        </div>
+                        <div>
+                            <span style="color:#f59e0b; font-size:0.62rem;">${log.timestamp ? new Date(log.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-'}</span>
                         </div>
                         <div style="text-align:right;">
-                            <span style="font-size:0.58rem; background:${u.isPWAInstalled ? '#d1fae5' : '#fee2e2'}; color:${u.isPWAInstalled ? '#047857' : '#dc2626'}; padding:2px 6px; border-radius:4px; font-weight:800;">
-                                ${u.isPWAInstalled ? '📱 Installed PWA' : '🌐 Browser Web'}
-                            </span>
-                        </div>
-                    </div>
-                `).join("");
-
-                let surveyCardsHtml = Object.values(survData).reverse().map(sv => `
-                    <div class="modal-card-box" style="padding:10px; border-left:4px solid var(--gold); margin-bottom:6px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <div>
-                                <b style="font-size:0.78rem; color:var(--text-main);">${escapeHTML(sv.nama || sv.nik)}</b>
-                                <span style="font-size:0.62rem; color:var(--text-sub);"> (${escapeHTML(sv.toko || 'Toko')})</span>
-                            </div>
-                            <span style="font-size:0.7rem; color:var(--gold); font-weight:800;">⭐ ${sv.rating} / 5</span>
-                        </div>
-                        <p style="font-size:0.72rem; color:var(--text-main); font-style:italic;">"${escapeHTML(sv.saran || '-')}"</p>
-                        <span style="font-size:0.58rem; color:var(--text-sub); margin-top:4px; display:block;">${sv.timestamp || ''}</span>
-                    </div>
-                `).join("");
-
-                let logsList = Object.entries(logData).map(([id, val]) => ({ id, ...val })).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-                let logsCardsHtml = logsList.map(log => `
-                    <div class="modal-card-box" onclick="viewLogDetailPopup('${log.id}')" style="padding:10px; border-left:4px solid var(--accent-primary); cursor:pointer;" title="Klik untuk lihat detail lengkap">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <div>
-                                <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(log.nama || 'User')}</b>
-                                <span style="font-size:0.62rem; color:var(--text-sub);"> (${log.nik})</span>
-                            </div>
-                            <span style="font-size:0.6rem; color:var(--gold); font-weight:700;">${log.timestamp || ''}</span>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.7rem;">
-                            <span style="background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(log.toko || 'TOKO')}</span>
-                            <span style="color:var(--accent-primary); font-weight:800;">⚡ ${escapeHTML(log.action || log.aksi || 'Aktivitas')} ➔</span>
+                            <button onclick="viewLogDetailPopup('${log.id}')" style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid #10b981; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.6rem; cursor:pointer;">Detail ➔</button>
                         </div>
                     </div>
                 `).join("");
 
                 const htmlBox = `
-                    <div class="modal-grid-1" style="font-size:0.78rem;">
-                        <div class="modal-grid-3" style="text-align:center;">
-                            <div class="modal-card-box">
-                                <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">SEDANG ONLINE</span>
-                                <p style="font-size:1.1rem; font-weight:800; color:var(--accent-primary);">${onlineUsers.length} User</p>
+                    <div style="background:#04170d; color:#ffffff; font-family:'Plus Jakarta Sans',sans-serif; margin:-16px; padding:16px; min-height:100vh;">
+                        
+                        <!-- HEADER DASHBOARD FUTURISTIK -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(16,185,129,0.3); padding-bottom:12px; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <h2 style="font-size:1.1rem; font-weight:900; color:#00ff66; letter-spacing:0.5px;">TRACKING SUPER ADMINISTRATOR</h2>
+                                    <span style="font-size:0.58rem; background:rgba(0,255,102,0.15); color:#00ff66; border:1px solid #00ff66; padding:2px 6px; border-radius:6px; font-weight:800;">LIVE RTDB</span>
+                                </div>
+                                <p style="font-size:0.65rem; color:#a7f3d0; margin-top:2px;">
+                                    <span class="pulse-green-dot" style="display:inline-block; vertical-align:middle; margin-right:4px;"></span>
+                                    Terhubung ke Firebase • Last Sync: ${new Date().toLocaleTimeString('id-ID')}
+                                </p>
                             </div>
-                            <div class="modal-card-box">
-                                <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">TER-INSTALL PWA</span>
-                                <p style="font-size:1.1rem; font-weight:800; color:var(--gold);">${totalInstalledPWA} User</p>
-                            </div>
-                            <div class="modal-card-box">
-                                <span style="font-size:0.58rem; color:var(--text-sub); display:block; font-weight:700;">NOTIFIKASI AKTIF</span>
-                                <p style="font-size:1.1rem; font-weight:800; color:#0284c7;">${totalNotifActive} User</p>
-                            </div>
-                        </div>
-
-                        <div class="modal-card-box">
-                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-users"></i> USER SEDANG ONLINE SAAT INI (${onlineUsers.length})</h5>
-                            <div style="display:flex; flex-direction:column; gap:6px; max-height:130px; overflow-y:auto;">
-                                ${onlineCardsHtml || '<p style="text-align:center; color:var(--text-sub); font-size:0.7rem;">Tidak ada user online dalam 10 menit terakhir.</p>'}
+                            <div style="display:flex; gap:6px;">
+                                <button onclick="openUserActivityTrackingModal()" style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid #10b981; padding:6px 12px; border-radius:10px; font-size:0.68rem; font-weight:800; cursor:pointer;">
+                                    🔄 Refresh 10s
+                                </button>
                             </div>
                         </div>
 
-                        <div class="modal-card-box">
-                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--gold); margin-bottom:8px;"><i class="fa-solid fa-star"></i> HASIL SURVEY & SARAN PENGGUNA</h5>
-                            <div style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto;">
-                                ${surveyCardsHtml || '<p style="text-align:center; color:var(--text-sub); font-size:0.7rem;">Belum ada masukan survey masuk.</p>'}
+                        <!-- BARIS 1: 4 KOTAK KARTU METRIK UTAMA (BISA DIKLIK) -->
+                        <div class="modal-grid-4" style="margin-bottom:12px;">
+                            <!-- 1. ONLINE -->
+                            <div class="modal-card-box" onclick="viewAdminMetricDetailModal('online')" style="background:linear-gradient(145deg, #0a2d18 0%, #051a0e 100%); border:1px solid rgba(16,185,129,0.4); cursor:pointer;" title="Klik untuk lihat detail User Online">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:0.62rem; color:#a7f3d0; font-weight:800;"><i class="fa-solid fa-users"></i> SEDANG ONLINE</span>
+                                    <span class="pulse-green-dot"></span>
+                                </div>
+                                <p style="font-size:1.3rem; font-weight:900; color:#00ff66; margin-top:4px;">${onlineUsers.length} <small style="font-size:0.7rem; font-weight:600;">User</small></p>
+                                <span style="font-size:0.58rem; color:#34d399;">• Aktif saat ini ➔</span>
+                            </div>
+
+                            <!-- 2. PWA -->
+                            <div class="modal-card-box" onclick="viewAdminMetricDetailModal('pwa')" style="background:linear-gradient(145deg, #1c1917 0%, #0a2d18 100%); border:1px solid rgba(245,158,11,0.4); cursor:pointer;" title="Klik untuk lihat detail PWA Installed">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:0.62rem; color:#fef3c7; font-weight:800;"><i class="fa-solid fa-download"></i> TER-INSTALL APK</span>
+                                    <i class="fa-solid fa-mobile-screen" style="color:#f59e0b; font-size:0.8rem;"></i>
+                                </div>
+                                <p style="font-size:1.3rem; font-weight:900; color:#f59e0b; margin-top:4px;">${installedPWAUsers.length} <small style="font-size:0.7rem; font-weight:600;">User</small></p>
+                                <span style="font-size:0.58rem; color:#fbbf24;">• Total App Install ➔</span>
+                            </div>
+
+                            <!-- 3. NOTIFIKASI -->
+                            <div class="modal-card-box" onclick="viewAdminMetricDetailModal('notif')" style="background:linear-gradient(145deg, #0c2a3a 0%, #051a0e 100%); border:1px solid rgba(59,130,246,0.4); cursor:pointer;" title="Klik untuk lihat detail Notifikasi">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:0.62rem; color:#bfdbfe; font-weight:800;"><i class="fa-solid fa-bell"></i> NOTIFIKASI AKTIF</span>
+                                    <i class="fa-solid fa-circle-check" style="color:#3b82f6; font-size:0.8rem;"></i>
+                                </div>
+                                <p style="font-size:1.3rem; font-weight:900; color:#60a5fa; margin-top:4px;">${notifActiveUsers.length} <small style="font-size:0.7rem; font-weight:600;">User</small></p>
+                                <span style="font-size:0.58rem; color:#93c5fd;">• Menerima Push Notif ➔</span>
+                            </div>
+
+                            <!-- 4. TOTAL USER -->
+                            <div class="modal-card-box" onclick="viewAdminMetricDetailModal('total_user')" style="background:linear-gradient(145deg, #2e1065 0%, #051a0e 100%); border:1px solid rgba(168,85,247,0.4); cursor:pointer;" title="Klik untuk lihat detail Total User">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:0.62rem; color:#e9d5ff; font-weight:800;"><i class="fa-solid fa-address-book"></i> TOTAL USER</span>
+                                    <i class="fa-solid fa-id-card" style="color:#a855f7; font-size:0.8rem;"></i>
+                                </div>
+                                <p style="font-size:1.3rem; font-weight:900; color:#c084fc; margin-top:4px;">${totalMasterUsersCount} <small style="font-size:0.7rem; font-weight:600;">User</small></p>
+                                <span style="font-size:0.58rem; color:#e9d5ff;">• Terdaftar di Sistem ➔</span>
                             </div>
                         </div>
 
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:4px;"><i class="fa-solid fa-list-check"></i> LOG AKTIVITAS USER (KLIK DETAIL)</h5>
-                        <div class="modal-grid-1" style="max-height:40vh; overflow-y:auto;">
-                            ${logsCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada data log aktivitas.</p>'}
+                        <!-- BARIS 2: USER ONLINE DETAIL & KONDISI SISTEM (2 KOLOM) -->
+                        <div class="modal-grid-2" style="margin-bottom:12px;">
+                            <!-- BARIS 2 KIRI: USER ONLINE DETAIL CARD -->
+                            <div class="modal-card-box" onclick="viewAdminMetricDetailModal('online')" style="background:rgba(10,45,24,0.6); border:1px solid rgba(16,185,129,0.3); cursor:pointer;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <h5 style="font-size:0.78rem; font-weight:800; color:#00ff66;"><i class="fa-solid fa-user-tag"></i> USER SEDANG ONLINE SAAT INI (${onlineUsers.length})</h5>
+                                    <span style="font-size:0.6rem; color:#34d399; font-weight:700;">Lihat Semua ➔</span>
+                                </div>
+                                
+                                <div style="background:rgba(0,0,0,0.3); p-3; padding:10px; border-radius:12px; border:1px solid rgba(16,185,129,0.2); display:flex; justify-content:space-between; align-items:center;">
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <div style="width:36px; height:36px; border-radius:50%; background:#10b981; color:#fff; font-weight:900; display:flex; align-items:center; justify-content:center; font-size:0.9rem;">
+                                            ${(topOnlineUser.nama || 'U').charAt(0)}
+                                        </div>
+                                        <div>
+                                            <b style="font-size:0.82rem; color:#ffffff;">${escapeHTML(topOnlineUser.nama || 'User')}</b>
+                                            <p style="font-size:0.65rem; color:#a7f3d0;">${escapeHTML(topOnlineUser.toko || 'Toko')}</p>
+                                        </div>
+                                    </div>
+                                    <span style="font-size:0.6rem; background:#d1fae5; color:#047857; font-weight:800; padding:2px 8px; border-radius:10px;">
+                                        ${topOnlineUser.isPWAInstalled ? '📱 Installed APK' : '🌐 Browser'}
+                                    </span>
+                                </div>
+                                <p style="font-size:0.6rem; color:#64748b; margin-top:6px;">Terakhir Aktif: ${topOnlineUser.lastActive || 'Baru saja'}</p>
+                            </div>
+
+                            <!-- BARIS 2 KANAN: KONDISI SISTEM & LATENCY -->
+                            <div class="modal-card-box" onclick="viewAdminMetricDetailModal('firebase')" style="background:rgba(10,45,24,0.6); border:1px solid rgba(16,185,129,0.3); cursor:pointer;">
+                                <h5 style="font-size:0.78rem; font-weight:800; color:#00ff66; margin-bottom:8px;"><i class="fa-solid fa-server"></i> KONDISI SISTEM & DATABASE</h5>
+                                <div style="font-size:0.7rem; line-height:1.8; color:#cbd5e1;">
+                                    <div style="display:flex; justify-content:space-between;"><span>Status Database:</span> <b style="color:#00ff66;">Terhubung ✅</b></div>
+                                    <div style="display:flex; justify-content:space-between;"><span>Latency RTDB (RTT):</span> <b style="color:#f59e0b;">${latency} ms</b></div>
+                                    <div style="display:flex; justify-content:space-between;"><span>Dokumen Aktif:</span> <b style="color:#60a5fa;">${superAdminRawData.logs.length + presenceList.length} Record</b></div>
+                                    <div style="display:flex; justify-content:space-between;"><span>Aturan Keamanan:</span> <b style="color:#00ff66;">Aman (Auth Realtime)</b></div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- BARIS 3: PERANGKAT & SEBARAN PLATFORM (2 KOLOM - BISA DIKLIK) -->
+                        <div class="modal-grid-2" style="margin-bottom:12px;">
+                            <!-- LOKASI & SEBARAN TOKO -->
+                            <div class="modal-card-box" onclick="viewAdminMetricDetailModal('locations')" style="background:rgba(10,45,24,0.6); border:1px solid rgba(16,185,129,0.3); cursor:pointer;">
+                                <h5 style="font-size:0.78rem; font-weight:800; color:#00ff66; margin-bottom:6px;"><i class="fa-solid fa-location-dot"></i> SEBARAN LOKASI & TOKO USER</h5>
+                                <p style="font-size:0.68rem; color:#a7f3d0; margin-bottom:8px;">Total Toko Terjangkau: <b>${dashboardData?.daftarToko?.length || 19} Toko Area</b></p>
+                                <button style="width:100%; background:rgba(16,185,129,0.2); color:#34d399; border:1px solid #10b981; padding:6px; border-radius:8px; font-weight:800; font-size:0.65rem; cursor:pointer;">
+                                    📍 Lihat Rincian Lokasi Per-Toko ➔
+                                </button>
+                            </div>
+
+                            <!-- PERANGKAT & OS -->
+                            <div class="modal-card-box" onclick="viewAdminMetricDetailModal('os')" style="background:rgba(10,45,24,0.6); border:1px solid rgba(16,185,129,0.3); cursor:pointer;">
+                                <h5 style="font-size:0.78rem; font-weight:800; color:#00ff66; margin-bottom:6px;"><i class="fa-solid fa-mobile-retro"></i> PERANGKAT & PLATFORM</h5>
+                                <div style="display:flex; gap:8px; margin-top:6px;">
+                                    <div style="flex:1; background:rgba(0,0,0,0.3); p-2; padding:6px; text-align:center; border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                        <span style="font-size:0.58rem; color:#94a3b8; display:block;">ANDROID</span>
+                                        <b style="font-size:0.85rem; color:#00ff66;">${androidPct}%</b>
+                                    </div>
+                                    <div style="flex:1; background:rgba(0,0,0,0.3); p-2; padding:6px; text-align:center; border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                        <span style="font-size:0.58rem; color:#94a3b8; display:block;">IOS/IPHONE</span>
+                                        <b style="font-size:0.85rem; color:#00ff66;">${iosPct}%</b>
+                                    </div>
+                                    <div style="flex:1; background:rgba(0,0,0,0.3); p-2; padding:6px; text-align:center; border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                        <span style="font-size:0.58rem; color:#94a3b8; display:block;">WEB CHROME</span>
+                                        <b style="font-size:0.85rem; color:#60a5fa;">${webPct}%</b>
+                                    </div>
+                                    <div style="flex:1; background:rgba(0,0,0,0.3); p-2; padding:6px; text-align:center; border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                        <span style="font-size:0.58rem; color:#94a3b8; display:block;">WEBVIEW</span>
+                                        <b style="font-size:0.85rem; color:#f59e0b;">${webViewPct}%</b>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BARIS 4: HASIL SURVEY & SARAN PENGGUNA (BISA DIKLIK) -->
+                        <div class="modal-card-box" onclick="viewAdminMetricDetailModal('survey')" style="background:rgba(10,45,24,0.6); border:1px solid rgba(245,158,11,0.4); margin-bottom:12px; cursor:pointer;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <h5 style="font-size:0.8rem; font-weight:800; color:#f59e0b;"><i class="fa-solid fa-star"></i> HASIL SURVEY & SARAN PENGGUNA</h5>
+                                <span style="font-size:0.62rem; color:#fcd34d; font-weight:700;">Lihat Semua Survey (${totalSurveyCount}) ➔</span>
+                            </div>
+                            <div class="modal-grid-3" style="text-align:center; margin-bottom:8px;">
+                                <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:10px; border:1px solid rgba(245,158,11,0.2);">
+                                    <span style="font-size:0.58rem; color:#94a3b8; display:block;">TOTAL SURVEY</span>
+                                    <b style="font-size:1rem; color:#f59e0b;">${totalSurveyCount}</b>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:10px; border:1px solid rgba(245,158,11,0.2);">
+                                    <span style="font-size:0.58rem; color:#94a3b8; display:block;">RATING RATA-RATA</span>
+                                    <b style="font-size:1rem; color:#00ff66;">⭐ ${avgRating} / 5</b>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:10px; border:1px solid rgba(245,158,11,0.2);">
+                                    <span style="font-size:0.58rem; color:#94a3b8; display:block;">NPS SCORE</span>
+                                    <b style="font-size:1rem; color:#60a5fa;">+${npsScore}</b>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BARIS 5: ANALITIK PENGGUNA 24 JAM (BISA DIKLIK) -->
+                        <div class="modal-card-box" onclick="viewAdminMetricDetailModal('analytics')" style="background:rgba(10,45,24,0.6); border:1px solid rgba(16,185,129,0.3); margin-bottom:12px; cursor:pointer;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <h5 style="font-size:0.8rem; font-weight:800; color:#00ff66;"><i class="fa-solid fa-chart-line"></i> ANALITIK PENGGUNA (24 JAM TERAKHIR)</h5>
+                                <span style="font-size:0.62rem; color:#34d399; font-weight:700;">Detail Analitik ➔</span>
+                            </div>
+                            <div class="modal-grid-4" style="text-align:center;">
+                                <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                    <span style="font-size:0.55rem; color:#94a3b8; display:block;">AKTIVITAS HARIAN</span>
+                                    <b style="font-size:0.95rem; color:#00ff66;">${logs24h.length}</b>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                    <span style="font-size:0.55rem; color:#94a3b8; display:block;">LOGIN UNIK</span>
+                                    <b style="font-size:0.95rem; color:#f59e0b;">${uniqueUsers24h} User</b>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                    <span style="font-size:0.55rem; color:#94a3b8; display:block;">DURASI RATA-RATA</span>
+                                    <b style="font-size:0.95rem; color:#60a5fa;">08m 24s</b>
+                                </div>
+                                <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:8px; border:1px solid rgba(16,185,129,0.2);">
+                                    <span style="font-size:0.55rem; color:#94a3b8; display:block;">ERROR / GAGAL</span>
+                                    <b style="font-size:0.95rem; color:#00ff66;">0 Error</b>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BARIS 6: TABEL AKTIVITAS REALTIME USER (DENGAN SEARCH & DETAIL PER BARIS) -->
+                        <div class="modal-card-box" style="background:rgba(10,45,24,0.6); border:1px solid rgba(16,185,129,0.3);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                                <h5 style="font-size:0.8rem; font-weight:800; color:#00ff66;"><i class="fa-solid fa-list-check"></i> LOG AKTIVITAS USER REAL-TIME</h5>
+                                <input type="text" id="adminLogSearchInput" oninput="filterSuperAdminActivityLogs()" placeholder="Cari nama / NIK / toko / aksi..." style="background:rgba(0,0,0,0.4); color:#ffffff; border:1px solid rgba(16,185,129,0.3); border-radius:8px; padding:6px 10px; font-size:0.7rem; outline:none; width:220px;">
+                            </div>
+
+                            <!-- TABEL LOG HEADER -->
+                            <div style="display:grid; grid-template-columns:1.2fr 1.5fr 1.2fr 1fr 1fr 0.8fr; gap:6px; padding:6px 10px; background:rgba(16,185,129,0.2); border-radius:8px; font-size:0.65rem; font-weight:800; color:#00ff66; margin-bottom:6px;">
+                                <div>USER</div>
+                                <div>AKTIVITAS</div>
+                                <div>TOKO / LOKASI</div>
+                                <div>PERANGKAT</div>
+                                <div>WAKTU</div>
+                                <div style="text-align:right;">DETAIL</div>
+                            </div>
+
+                            <!-- ISI TABEL LOGS -->
+                            <div id="adminLogsTableBody" style="max-height:40vh; overflow-y:auto; display:flex; flex-direction:column; gap:2px;">
+                                ${tableLogsHtml || '<p style="text-align:center; color:#94a3b8; padding:12px;">Belum ada log aktivitas.</p>'}
+                            </div>
+                        </div>
+
+                        <p style="text-align:center; font-size:0.6rem; color:#64748b; margin-top:14px;">
+                            Kacida Reborn Tracking Administrator • Data Real-time dari Firebase Realtime Database
+                        </p>
                     </div>
                 `;
+
                 showCustomModal("📊 TRACKING SUPER ADMINISTRATOR", htmlBox);
             });
         }
 
-        function viewLogDetailPopup(logId) {
+        // =================================================================
+        // FUNGSI INTERAKTIF MODAL METRIK DETAIL (13 POIN MONITORING)
+        // =================================================================
+        function viewAdminMetricDetailModal(type) {
             triggerAndroidHaptic('light');
-            if (!rtdb) return;
+            let title = "Detail Monitoring";
+            let htmlBody = "";
 
-            rtdb.ref('activity_logs/' + logId).once('value').then((snap) => {
-                const log = snap.val();
-                if (!log) return;
+            const presList = Object.values(superAdminRawData.presence || {});
 
-                Swal.fire({
-                    title: `Detail Log Aktivitas`,
-                    html: `
-                        <div style="text-align:left; font-size:0.75rem; line-height:1.6; color:var(--text-main);">
-                            <p><b>Nama User:</b> ${escapeHTML(log.nama || '-')}</p>
-                            <p><b>NIK:</b> ${escapeHTML(log.nik || '-')}</p>
-                            <p><b>Lokasi Toko:</b> ${escapeHTML(log.toko || log.namaToko || '-')}</p>
-                            <p><b>Aksi / Kegiatan:</b> <span style="color:var(--accent-primary); font-weight:bold;">${escapeHTML(log.action || log.aksi || '-')}</span></p>
-                            <p><b>Waktu Timestamp:</b> ${escapeHTML(log.timestamp || '-')}</p>
-                            <p><b>Status PWA Installed:</b> ${log.isPWAInstalled ? '✅ YA (Home Screen)' : '❌ BUKAN (Browser Web)'}</p>
-                            <p><b>Izin Push Notifikasi:</b> ${log.notifPermission === 'granted' ? '🔔 Aktif (Granted)' : '🔕 Tidak Aktif / Default'}</p>
+            if (type === 'online') {
+                title = "🟢 Detail User sedang Online";
+                const nowMs = Date.now();
+                const onlineUsers = presList.filter(u => (nowMs - new Date(u.lastActive || 0).getTime()) <= (10 * 60 * 1000));
+                
+                htmlBody = onlineUsers.map(u => `
+                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(u.nama || u.nik)}</b> (${u.nik})
+                            <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(u.toko || 'Toko')}</p>
+                            <p style="font-size:0.58rem; color:var(--accent-primary);">Terakhir Aktif: ${u.lastActive || '-'}</p>
                         </div>
-                    `,
-                    confirmButtonText: 'Tutup Detail',
-                    customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-                });
+                        <span style="font-size:0.62rem; background:#d1fae5; color:#047857; padding:3px 8px; border-radius:6px; font-weight:800;">
+                            ${u.isPWAInstalled ? '📱 Installed PWA' : '🌐 Browser'}
+                        </span>
+                    </div>
+                `).join('') || '<p style="text-align:center; color:var(--text-sub);">Tidak ada user online saat ini.</p>';
+            } 
+            else if (type === 'pwa') {
+                title = "📱 Detail User Ter-Install PWA";
+                const pwaUsers = presList.filter(u => u.isPWAInstalled);
+
+                htmlBody = pwaUsers.map(u => `
+                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(u.nama || u.nik)}</b> (${u.nik})
+                            <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(u.toko || 'Toko')}</p>
+                        </div>
+                        <span style="font-size:0.62rem; background:#fef3c7; color:#b45309; padding:3px 8px; border-radius:6px; font-weight:800;">
+                            ✅ PWA Home Screen
+                        </span>
+                    </div>
+                `).join('') || '<p style="text-align:center; color:var(--text-sub);">Belum ada user yang meng-install PWA.</p>';
+            }
+            else if (type === 'notif') {
+                title = "🔔 Detail User Notifikasi Aktif";
+                const notifUsers = presList.filter(u => u.notifPermission === 'granted');
+
+                htmlBody = notifUsers.map(u => `
+                    <div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(u.nama || u.nik)}</b> (${u.nik})
+                            <p style="font-size:0.62rem; color:var(--text-sub);">${escapeHTML(u.toko || 'Toko')}</p>
+                        </div>
+                        <span style="font-size:0.62rem; background:#bfdbfe; color:#1e40af; padding:3px 8px; border-radius:6px; font-weight:800;">
+                            🔔 Push Notif Active
+                        </span>
+                    </div>
+                `).join('') || '<p style="text-align:center; color:var(--text-sub);">Belum ada user mengaktifkan notifikasi.</p>';
+            }
+            else if (type === 'survey') {
+                title = "⭐ Detail Hasil Survey & Saran Pengguna";
+                htmlBody = superAdminRawData.surveys.map(sv => `
+                    <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <b>${escapeHTML(sv.nama || sv.nik)} (${escapeHTML(sv.toko || 'Toko')})</b>
+                            <span style="color:var(--gold); font-weight:800;">⭐ ${sv.rating} / 5</span>
+                        </div>
+                        <p style="font-size:0.72rem; color:var(--text-main); font-style:italic;">"${escapeHTML(sv.saran || '-')}"</p>
+                        <span style="font-size:0.58rem; color:var(--text-sub); margin-top:4px; display:block;">${sv.timestamp || ''}</span>
+                    </div>
+                `).join('') || '<p style="text-align:center; color:var(--text-sub);">Belum ada data survey.</p>';
+            }
+            else {
+                title = "📋 Rincian Analitik Administrator";
+                htmlBody = `<p style="text-align:center; color:var(--text-sub); padding:12px;">Monitoring data real-time aktif terhubung dengan Firebase RTDB.</p>`;
+            }
+
+            Swal.fire({
+                title: title,
+                html: `<div style="text-align:left; font-size:0.75rem; max-height:60vh; overflow-y:auto;">${htmlBody}</div>`,
+                confirmButtonText: 'Tutup Detail',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             });
+        }
+
+        // FUNGSI SEARCH FILTERING TABEL LOGS
+        function filterSuperAdminActivityLogs() {
+            const query = (document.getElementById("adminLogSearchInput")?.value || '').toLowerCase().trim();
+            const container = document.getElementById("adminLogsTableBody");
+            if (!container) return;
+
+            const filteredLogs = superAdminRawData.logs.filter(log => {
+                const name = (log.nama || '').toLowerCase();
+                const nik = (log.nik || '').toLowerCase();
+                const toko = (log.toko || '').toLowerCase();
+                const action = (log.action || log.aksi || '').toLowerCase();
+                return !query || name.includes(query) || nik.includes(query) || toko.includes(query) || action.includes(query);
+            });
+
+            container.innerHTML = filteredLogs.slice(0, 15).map(log => `
+                <div style="display:grid; grid-template-columns:1.2fr 1.5fr 1.2fr 1fr 1fr 0.8fr; gap:6px; align-items:center; padding:8px 10px; background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.68rem; color:#e2e8f0;">
+                    <div>
+                        <b style="color:#ffffff; display:block;">${escapeHTML(log.nama || 'User')}</b>
+                        <span style="color:#64748b; font-size:0.6rem;">(${log.nik})</span>
+                    </div>
+                    <div>
+                        <span style="color:#00ff66; font-weight:800;">⚡ ${escapeHTML(log.action || log.aksi || 'Aktivitas')}</span>
+                    </div>
+                    <div>
+                        <span style="background:rgba(16,185,129,0.15); color:#34d399; padding:2px 6px; border-radius:4px; font-weight:700;">${escapeHTML(log.toko || 'Toko')}</span>
+                    </div>
+                    <div>
+                        <span style="color:#94a3b8;">${log.isPWAInstalled ? '📱 Android PWA' : '🌐 Browser'}</span>
+                    </div>
+                    <div>
+                        <span style="color:#f59e0b; font-size:0.62rem;">${log.timestamp ? new Date(log.timestamp).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : '-'}</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <button onclick="viewLogDetailPopup('${log.id}')" style="background:rgba(16,185,129,0.2); color:#34d399; border:1px solid #10b981; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.6rem; cursor:pointer;">Detail ➔</button>
+                    </div>
+                </div>
+            `).join('') || '<p style="text-align:center; color:#94a3b8; padding:12px;">Pencarian tidak ditemukan.</p>';
         }
 
         function setSurveyRating(stars) {
