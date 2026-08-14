@@ -4576,6 +4576,9 @@
         }
 
         // FUNGSI UTAMA RENDER MODAL MTD (DENGAN KLIK DETAIL HARIAN)
+        // =================================================================
+        // PERBAIKAN RENDER MODAL MTD (PENYARINGAN GROWTH & DECLINE PRESISI)
+        // =================================================================
         function renderMtdModalView(filterType = 'semua') {
             const d = currentMtdDetailData;
             if (!d) return;
@@ -4584,8 +4587,25 @@
             const daftarToko = dashboardData?.daftarToko || [];
 
             let filteredList = d.listHarian || [];
-            if (filterType === 'growth') filteredList = filteredList.filter(item => item.isGrowth);
-            else if (filterType === 'Disgrowth') filteredList = filteredList.filter(item => !item.isGrowth);
+
+            // ✅ PENYARINGAN STRICT BERDASARKAN ANGKAN PERSEN GROWTH REAL
+            if (filterType === 'growth') {
+                filteredList = filteredList.filter(item => {
+                    if (item.sales2025Num > 0) {
+                        return item.growthPct > 0;
+                    } else {
+                        return item.sales2026Num > 0; // Jika 2025 = 0 tapi 2026 ada sales
+                    }
+                });
+            } else if (filterType === 'decline') {
+                filteredList = filteredList.filter(item => {
+                    if (item.sales2025Num > 0) {
+                        return item.growthPct < 0;
+                    } else {
+                        return item.sales2026Num === 0 && item.sales2025Num > 0; // Jika sales 2026 drop/0
+                    }
+                });
+            }
 
             let labels = [], dataCurr = [];
             const chartDataList = [...(d.listHarian || [])].sort((a,b) => a.day - b.day);
@@ -4612,7 +4632,6 @@
                 `;
             }
 
-            // ✅ KARTU HARIAN MTD DENGAN ONCLICK POPUP DETAIL KOMPARASI
             let rincianCardsHtml = `
                 <div class="modal-grid-1">
                     ${filteredList.map(item => `
@@ -4621,7 +4640,7 @@
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--text-main);">Tgl ${item.day}</span>
                                 <div style="display:flex; align-items:center; gap:6px;">
                                     <span class="growth-badge-pill ${item.isGrowth ? 'up' : 'down'}" style="font-size:0.62rem; padding:2px 8px;">
-                                        ${item.isGrowth ? '▲ Growth' : '▼ Disgrowth'} ${item.growthPct?.toFixed(1)}%
+                                        ${item.isGrowth ? '▲ Growth' : '▼ Decline'} ${item.growthPct?.toFixed(1)}%
                                     </span>
                                     <span style="font-size:0.6rem; color:var(--gold); font-weight:800;">Detail ➔</span>
                                 </div>
@@ -4684,15 +4703,16 @@
                         </div>
                     </div>
 
+                    <!-- 🔘 TOMBOL FILTER INTERAKTIF -->
                     <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                        <button class="sub-tab-btn ${filterType==='semua'?'active':''}" onclick="renderMtdModalView('semua')"><i class="fa-solid fa-filter"></i> Semua</button>
+                        <button class="sub-tab-btn ${filterType==='semua'?'active':''}" onclick="renderMtdModalView('semua')"><i class="fa-solid fa-filter"></i> Semua (${d.listHarian.length})</button>
                         <button class="sub-tab-btn ${filterType==='growth'?'active':''}" onclick="renderMtdModalView('growth')"><i class="fa-solid fa-arrow-trend-up"></i> Achieved</button>
-                        <button class="sub-tab-btn ${filterType==='disgrowth'?'active':''}" onclick="renderMtdModalView('disgrowth')"><i class="fa-solid fa-arrow-trend-down"></i> Disgrowth</button>
+                        <button class="sub-tab-btn ${filterType==='decline'?'active':''}" onclick="renderMtdModalView('decline')"><i class="fa-solid fa-arrow-trend-down"></i> Decline</button>
                     </div>
 
                     <div>
-                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN</h4>
-                        ${rincianCardsHtml}
+                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN (${filteredList.length} Tanggal)</h4>
+                        ${rincianCardsHtml || '<p style="text-align:center; color:var(--text-sub); padding:12px;">Tidak ada tanggal pada filter ini.</p>'}
                     </div>
                 </div>
             `;
