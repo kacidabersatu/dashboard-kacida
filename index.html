@@ -2728,8 +2728,8 @@
         // =================================================================
         // STATE & LISTENER CEKLIS EXPIRED + TRACKING RIWAYAT PERMANEN
         // =================================================================
-        let selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
-        let searchShelfAssignee = "";
+        selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
+        if (typeof searchShelfAssignee === 'undefined') var searchShelfAssignee = "";
 
         function initFirebaseCeklisExpiredListener() {
             // Load cache lokal instan 0.0001 detik
