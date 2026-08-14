@@ -2786,25 +2786,65 @@
         }
 
         // =================================================================
-        // INSTANT OPEN & DOM FILTERING PENCARIAN STAFF (TANPA TUTUP KEYBOARD)
+        // CEKLIS EXPIRED & MANAJEMEN RAK (FAIL-SAFE - TANPA SYNTAX ERROR)
         // =================================================================
-        function openCeklisExpiredModal(activeTab = 'rak') {
-            if (!expShelves || expShelves.length === 0) {
-                try {
-                    const cachedShelves = localStorage.getItem('kacida_cache_exp_shelves');
-                    if (cachedShelves) expShelves = JSON.parse(cachedShelves);
-                } catch(e) {}
-            }
-            if (!expProducts || expProducts.length === 0) {
-                try {
-                    const cachedProducts = localStorage.getItem('kacida_cache_exp_products');
-                    if (cachedProducts) expProducts = JSON.parse(cachedProducts);
-                } catch(e) {}
-            }
-
-            renderCeklisExpiredModal(activeTab);
+        if (typeof searchShelfAssignee === 'undefined') {
+            var searchShelfAssignee = "";
         }
 
+        // RUMUS ALERT EXPIRED DINAMIS (RH + 10 HARI SPARE WAKTU)
+        function isProductInAlertWindow(expDateStr, rhDaysVal) {
+            if (!expDateStr) return false;
+            try {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const expDate = new Date(expDateStr);
+                expDate.setHours(0, 0, 0, 0);
+
+                const rhDays = Number(rhDaysVal) || 30; // Default 30 hari jika kosong
+                const spareDays = 10; // Spare waktu otomatis 10 hari
+                const totalLeadDays = rhDays + spareDays;
+
+                const alertDate = new Date(expDate);
+                alertDate.setDate(alertDate.getDate() - totalLeadDays);
+
+                return today >= alertDate;
+            } catch(e) {
+                return true;
+            }
+        }
+
+        // POPUP DETAIL KLIK KOTAK SELESAI / PENDING VAL
+        function viewCeklisDetailPopup(type) {
+            triggerAndroidHaptic('light');
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
+            const storeShelves = isUserAC() ? (expShelves || []) : (expShelves || []).filter(s => s.kodeToko === userKodeToko);
+
+            let title = type === 'selesai' ? '✅ Rincian Rak Selesai' : '⏳ Rincian Rak Pending Validasi';
+            let targetShelves = storeShelves.filter(s => type === 'selesai' ? s.status === 'Selesai' : s.status === 'Menunggu Validasi COS');
+
+            let htmlBody = targetShelves.map(s => `
+                <div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(s.name)}</b> (${escapeHTML(s.noRak||'-')})
+                        <p style="font-size:0.62rem; color:var(--text-sub);">PJ: ${escapeHTML(s.assignedName||'-')} | Dikerjakan: ${s.checkedBy||'-'}</p>
+                    </div>
+                    <span style="font-size:0.62rem; font-weight:800; padding:3px 8px; border-radius:6px; ${type==='selesai'?'background:#d1fae5; color:#047857;':'background:#fef3c7; color:#b45309;'}">
+                        ${type==='selesai'?'✅ Selesai':'⏳ Pending COS'}
+                    </span>
+                </div>
+            `).join('') || `<p style="text-align:center; color:var(--text-sub);">Tidak ada rak ${type}.</p>`;
+
+            Swal.fire({
+                title: title,
+                html: `<div style="text-align:left; font-size:0.75rem; max-height:60vh; overflow-y:auto;">${htmlBody}</div>`,
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
+        }
+
+        // PENCARIAN DOM INSTAN TANPA MENUTUP KEYBOARD HP
         function filterShelvesByAssigneeDOM(query) {
             searchShelfAssignee = query;
             const q = query.toLowerCase().trim();
@@ -2840,60 +2880,7 @@
             }
         }
 
-        // =================================================================
-        // HELPER RUMUS ALERT EXPIRED DINAMIS (RH + 10 HARI SPARE WAKTU)
-        // =================================================================
-        function isProductInAlertWindow(expDateStr, rhDaysVal) {
-            if (!expDateStr) return false;
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const expDate = new Date(expDateStr);
-            expDate.setHours(0, 0, 0, 0);
-
-            const rhDays = Number(rhDaysVal) || 30; // Default 30 hari jika kosong
-            const spareDays = 10; // Spare waktu otomatis 10 hari dari sistem
-            const totalLeadDays = rhDays + spareDays; // Total Lead Time (Misal: 30 + 10 = 40 Hari)
-
-            const alertDate = new Date(expDate);
-            alertDate.setDate(alertDate.getDate() - totalLeadDays);
-
-            return today >= alertDate;
-        }
-
-        // POPUP DETAIL KLIK KOTAK SELESAI / PENDING VAL
-        function viewCeklisDetailPopup(type) {
-            triggerAndroidHaptic('light');
-            const userKodeToko = dashboardData?.user?.kodeToko || '';
-            const storeShelves = isUserAC() ? expShelves : expShelves.filter(s => s.kodeToko === userKodeToko);
-
-            let title = type === 'selesai' ? '✅ Rincian Rak Selesai' : '⏳ Rincian Rak Pending Validasi';
-            let targetShelves = storeShelves.filter(s => type === 'selesai' ? s.status === 'Selesai' : s.status === 'Menunggu Validasi COS');
-
-            let htmlBody = targetShelves.map(s => `
-                <div style="background:var(--input-bg); padding:8px 12px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <b style="font-size:0.8rem; color:var(--text-main);">${escapeHTML(s.name)}</b> (${escapeHTML(s.noRak||'-')})
-                        <p style="font-size:0.62rem; color:var(--text-sub);">PJ: ${escapeHTML(s.assignedName||'-')} | Dikerjakan: ${s.checkedBy||'-'}</p>
-                    </div>
-                    <span style="font-size:0.62rem; font-weight:800; padding:3px 8px; border-radius:6px; ${type==='selesai'?'background:#d1fae5; color:#047857;':'background:#fef3c7; color:#b45309;'}">
-                        ${type==='selesai'?'✅ Selesai':'⏳ Pending COS'}
-                    </span>
-                </div>
-            `).join('') || `<p style="text-align:center; color:var(--text-sub);">Tidak ada rak ${type}.</p>`;
-
-            Swal.fire({
-                title: title,
-                html: `<div style="text-align:left; font-size:0.75rem; max-height:60vh; overflow-y:auto;">${htmlBody}</div>`,
-                confirmButtonText: 'Tutup',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            });
-        }
-
-        // =================================================================
-        // CEKLIS EXPIRED & MANAJEMEN RAK (FULL VERSI LENGKAP & DINAMIS)
-        // =================================================================
+        // TAMPILAN UTAMA MODAL CEKLIS EXPIRED
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
@@ -2909,12 +2896,12 @@
                 personilList = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
             }
 
-            let storeShelves = expShelves;
-            let storeProducts = expProducts;
+            let storeShelves = expShelves || [];
+            let storeProducts = expProducts || [];
 
             if (!userAC && userKodeToko) {
-                storeShelves = expShelves.filter(s => s.kodeToko === userKodeToko || !s.kodeToko);
-                storeProducts = expProducts.filter(p => p.kodeToko === userKodeToko || !p.kodeToko);
+                storeShelves = storeShelves.filter(s => s.kodeToko === userKodeToko || !s.kodeToko);
+                storeProducts = storeProducts.filter(p => p.kodeToko === userKodeToko || !p.kodeToko);
             }
 
             const totalRak = storeShelves.length;
@@ -2923,7 +2910,7 @@
             const selesaiRak = storeShelves.filter(s => s.lastChecked && new Date(s.lastChecked).toISOString().substring(0, 7) === currentMonthKey && s.status === 'Selesai').length;
             const pendingValidasiRak = storeShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
 
-            // SIKLUS DINAMIS RH + 10 HARI SPARE UNTUK BADGE ALERT EXP
+            // BADGE ALERT EXPIRED DENGAN SPARE 10 HARI + RH
             const pendingExpCount = storeProducts.filter(p => p.status !== 'selesai' && isProductInAlertWindow(p.expDate, p.rhDays)).length;
 
             let tabContentHtml = '';
@@ -2932,7 +2919,7 @@
             if (activeTab === 'rak') {
                 if (userAC && daftarToko.length > 0) {
                     const storeCards = daftarToko.map(toko => {
-                        const tShelves = expShelves.filter(s => s.kodeToko === toko.kodeToko);
+                        const tShelves = (expShelves || []).filter(s => s.kodeToko === toko.kodeToko);
                         const tSelesai = tShelves.filter(s => s.status === 'Selesai').length;
                         const tPending = tShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
 
@@ -3098,7 +3085,7 @@
                     `;
                 }
             } 
-            // TAB 2: INPUT PRODUK (DENGAN KOLOM INPUT RH RETURN HARI)
+            // TAB 2: INPUT PRODUK
             else if (activeTab === 'input' && !userAC) {
                 const shelfOptionsHtml = storeShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
                 tabContentHtml = `
@@ -3231,8 +3218,8 @@
             // TAB 4: TRACKING RIWAYAT (GROUPING TANGGAL KEMUDIAN TOKO)
             else if (activeTab === 'tracking') {
                 const targetHistory = userAC 
-                    ? expHistoryList.filter(h => h.monthKey === selectedExpHistoryMonth)
-                    : expHistoryList.filter(h => h.kodeToko === userKodeToko && h.monthKey === selectedExpHistoryMonth);
+                    ? (expHistoryList || []).filter(h => h.monthKey === selectedExpHistoryMonth)
+                    : (expHistoryList || []).filter(h => h.kodeToko === userKodeToko && h.monthKey === selectedExpHistoryMonth);
 
                 const groupedByDate = {};
                 targetHistory.forEach(h => {
@@ -3327,7 +3314,7 @@
                 filterShelvesByAssigneeDOM(searchShelfAssignee);
             }
         }
-
+        
         // FUNGSI DETAIL RAK KHUSUS AC (READ-ONLY KETAT)
         function viewStoreShelvesDetailAC(kodeToko, namaToko) {
             triggerAndroidHaptic('light');
