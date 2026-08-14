@@ -2731,55 +2731,63 @@
         selectedExpHistoryMonth = new Date().toISOString().substring(0, 7);
         if (typeof searchShelfAssignee === 'undefined') var searchShelfAssignee = "";
 
+        // =================================================================
+        // CEKLIS EXPIRED LISTENER AMAN (KEBAL DOMEXCEPTION QUOTA EXCEEDED)
+        // =================================================================
         function initFirebaseCeklisExpiredListener() {
-            // Load cache lokal instan 0.0001 detik
+            // 🚀 1. LOAD INSTANT CACHE LOKAL AMAN
             try {
                 const cachedShelves = localStorage.getItem('kacida_cache_exp_shelves');
                 const cachedProducts = localStorage.getItem('kacida_cache_exp_products');
                 const cachedHistory = localStorage.getItem('kacida_cache_exp_history');
 
-                if (cachedShelves && expShelves.length === 0) expShelves = JSON.parse(cachedShelves);
-                if (cachedProducts && expProducts.length === 0) expProducts = JSON.parse(cachedProducts);
-                if (cachedHistory && expHistoryList.length === 0) expHistoryList = JSON.parse(cachedHistory);
+                if (cachedShelves) expShelves = JSON.parse(cachedShelves);
+                if (cachedProducts) expProducts = JSON.parse(cachedProducts);
+                if (cachedHistory) expHistoryList = JSON.parse(cachedHistory);
             } catch(e) {}
 
             if (!rtdb) return;
             
-            // Listen Shelves
+            // 🚀 2. LISTEN SHELVES WITH SAFE STORAGE
             rtdb.ref('ceklis_expired/shelves').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     expShelves = Object.entries(data).map(([id, val]) => ({ id, ...val }));
-                    localStorage.setItem('kacida_cache_exp_shelves', JSON.stringify(expShelves));
+                    try {
+                        localStorage.setItem('kacida_cache_exp_shelves', JSON.stringify(expShelves));
+                    } catch(e) {}
                 } else {
                     expShelves = [];
-                    localStorage.removeItem('kacida_cache_exp_shelves');
                 }
                 updateNotifikasiBadgeCount();
             });
 
-            // Listen Products
+            // 🚀 3. LISTEN PRODUCTS WITH SAFE STORAGE
             rtdb.ref('ceklis_expired/products').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     expProducts = Object.entries(data).map(([id, val]) => ({ id, ...val }));
-                    localStorage.setItem('kacida_cache_exp_products', JSON.stringify(expProducts));
+                    try {
+                        localStorage.setItem('kacida_cache_exp_products', JSON.stringify(expProducts));
+                    } catch(e) {}
                 } else {
                     expProducts = [];
-                    localStorage.removeItem('kacida_cache_exp_products');
                 }
                 updateNotifikasiBadgeCount();
             });
 
-            // Listen History Permanen
+            // 🚀 4. LISTEN HISTORY PERMANEN WITH SAFE TRUNCATED CACHE
             rtdb.ref('ceklis_expired/history').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     expHistoryList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    localStorage.setItem('kacida_cache_exp_history', JSON.stringify(expHistoryList));
+                    try {
+                        // Simpan 20 riwayat teratas tanpa foto berat agar memori HP tidak penuh
+                        const lightHistory = expHistoryList.slice(0, 20).map(item => ({ ...item, photoUrl: '' }));
+                        localStorage.setItem('kacida_cache_exp_history', JSON.stringify(lightHistory));
+                    } catch(e) {}
                 } else {
                     expHistoryList = [];
-                    localStorage.removeItem('kacida_cache_exp_history');
                 }
             });
         }
