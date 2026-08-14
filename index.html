@@ -1492,13 +1492,16 @@
             }
         });
 
+        // =================================================================
+        // LOGIKAN LOGIN PRESISI (MEMISAHKAN NIK TIDAK TERDAFTAR VS ERROR SERVER)
+        // =================================================================
         async function handleLogin() {
             triggerAndroidHaptic('medium');
             const nik = document.getElementById("nikInput").value.trim();
             if (!nik) { showSwalWarning('Form Kosong ⚠️', 'Mohon masukkan NIK Anda!'); return; }
-            showLoading("Proses Login...");
+            showLoading("Proses Login Kilat...");
             
-            // ✅ BERSIHKAN CACHE & FILTER AC SEBELUM LOGIN USER BARU
+            // Reset filter & cache sebelum login user baru
             selectedKodeTokoAC = null;
             selectedShiftKodeToko = null;
             localShiftMatrix = {};
@@ -1509,16 +1512,36 @@
             jobdeskReports = [];
             
             currentNik = nik;
-            const res = await apiCall("login", { nik: nik });
-            hideLoading();
-            if (res && res.status === "success") {
-                localStorage.setItem("NIK_KACIDA", nik);
-                trackUserActivity(1, "Login Aplikasi");
-                document.getElementById("loginSection").classList.add("hidden");
-                document.getElementById("appSection").classList.remove("hidden");
-                initDashboard(null, false);
-            } else {
-                showSwalWarning('Login Gagal ⚠️', res?.message || 'NIK Tidak Terdaftar di Sistem.');
+
+            try {
+                const res = await apiCall("login", { nik: nik });
+                hideLoading();
+                if (res && res.status === "success") {
+                    localStorage.setItem("NIK_KACIDA", nik);
+                    trackUserActivity(10, "Login Aplikasi");
+                    document.getElementById("loginSection").classList.add("hidden");
+                    document.getElementById("appSection").classList.remove("hidden");
+                    initDashboard(null, false);
+                } else {
+                    const errorMsg = res?.message || '';
+                    // 1. JIKA NIK TIDAK TERDAFTAR -> TETAP TAMPILKAN PESAN "NIK TIDAK TERDAFTAR"
+                    if (errorMsg.toLowerCase().includes("nik") || errorMsg.toLowerCase().includes("terdaftar")) {
+                        showSwalWarning('Login Gagal! ⚠️', errorMsg || 'NIK Tidak Terdaftar di Sistem.');
+                    } else {
+                        // 2. JIKA GANGGUAN SERVER -> TAMPILKAN PESAN RAMAH
+                        showSwalWarning(
+                            'Login Gagal! ⚠️', 
+                            'Hmm 🤔 ada yang tidak beres, Tenang Saya Coba Bereskan Dulu Sambil Dicoba Terus Proses Loginnya ya'
+                        );
+                    }
+                }
+            } catch (err) {
+                hideLoading();
+                // 3. JIKA KONEKSI PUTUS / ERROR PARSING -> TAMPILKAN PESAN RAMAH
+                showSwalWarning(
+                    'Login Gagal! ⚠️', 
+                    'Hmm 🤔 ada yang tidak beres, Pastikan Koneksi Internet Terhubung'
+                );
             }
         }
 
