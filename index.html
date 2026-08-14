@@ -2887,7 +2887,26 @@
             }
         }
 
-        // TAMPILAN UTAMA MODAL CEKLIS EXPIRED
+        // =================================================================
+        // FUNGSI UTAMA BUKA MODAL CEKLIS EXPIRED (TOP-LEVEL FUNCTION)
+        // =================================================================
+        function openCeklisExpiredModal(activeTab = 'rak') {
+            if (!expShelves || expShelves.length === 0) {
+                try {
+                    const cachedShelves = localStorage.getItem('kacida_cache_exp_shelves');
+                    if (cachedShelves) expShelves = JSON.parse(cachedShelves);
+                } catch(e) {}
+            }
+            if (!expProducts || expProducts.length === 0) {
+                try {
+                    const cachedProducts = localStorage.getItem('kacida_cache_exp_products');
+                    if (cachedProducts) expProducts = JSON.parse(cachedProducts);
+                } catch(e) {}
+            }
+
+            renderCeklisExpiredModal(activeTab);
+        }
+        
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
