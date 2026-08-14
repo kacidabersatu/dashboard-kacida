@@ -2906,7 +2906,19 @@
 
             renderCeklisExpiredModal(activeTab);
         }
-        
+                                        
+
+       // =================================================================
+        // STATE NAVIGASI TRACKING & FILTER RAK
+        // =================================================================
+        let trackingViewMode = 'date_list'; // 'date_list' | 'store_list' | 'detail_list'
+        let selectedTrackingDate = '';
+        let selectedTrackingStoreKode = '';
+        let selectedRakStatusFilter = 'ALL'; // 'ALL' | 'SELESAI' | 'PENDING' | 'BELUM'
+
+        // =================================================================
+        // CEKLIS EXPIRED & MANAJEMEN RAK (DILENGKAPI NAVIGASI HALAMAN & FILTER)
+        // =================================================================
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
@@ -2935,8 +2947,8 @@
 
             const selesaiRak = storeShelves.filter(s => s.lastChecked && new Date(s.lastChecked).toISOString().substring(0, 7) === currentMonthKey && s.status === 'Selesai').length;
             const pendingValidasiRak = storeShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
+            const belumCeklisRak = Math.max(0, totalRak - (selesaiRak + pendingValidasiRak));
 
-            // BADGE ALERT EXPIRED DENGAN SPARE 10 HARI + RH
             const pendingExpCount = storeProducts.filter(p => p.status !== 'selesai' && isProductInAlertWindow(p.expDate, p.rhDays)).length;
 
             let tabContentHtml = '';
@@ -2968,18 +2980,36 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO (AREA COORDINATOR - HANYA LIHAT)</h5>
                         <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
                     let filteredShelves = storeShelves;
+
+                    // 1. FILTER PENCARIAN TULISAN
                     if (searchShelfAssignee && searchShelfAssignee.trim() !== '') {
                         const query = searchShelfAssignee.toLowerCase().trim();
-                        filteredShelves = storeShelves.filter(s => 
+                        filteredShelves = filteredShelves.filter(s => 
                             (s.assignedName && s.assignedName.toLowerCase().includes(query)) ||
                             (s.name && s.name.toLowerCase().includes(query)) ||
                             (s.noRak && s.noRak.toLowerCase().includes(query))
                         );
+                    }
+
+                    // 2. FILTER STATUS KOTAK KARTU (ALL / SELESAI / PENDING / BELUM)
+                    if (selectedRakStatusFilter === 'SELESAI') {
+                        filteredShelves = filteredShelves.filter(s => {
+                            const lastM = s.lastChecked ? new Date(s.lastChecked).toISOString().substring(0, 7) : '';
+                            return s.status === 'Selesai' && lastM === currentMonthKey;
+                        });
+                    } else if (selectedRakStatusFilter === 'PENDING') {
+                        filteredShelves = filteredShelves.filter(s => s.status === 'Menunggu Validasi COS');
+                    } else if (selectedRakStatusFilter === 'BELUM') {
+                        filteredShelves = filteredShelves.filter(s => {
+                            const lastM = s.lastChecked ? new Date(s.lastChecked).toISOString().substring(0, 7) : '';
+                            const isDone = s.status === 'Selesai' && lastM === currentMonthKey;
+                            return !isDone && s.status !== 'Menunggu Validasi COS';
+                        });
                     }
 
                     let rakListCards = filteredShelves.map(s => {
@@ -3088,16 +3118,35 @@
                         </div>
                     `;
 
+                    // 4 KOTAK METRIK RAK DENGAN RENDER KARTU LENGKAP SAAT DIKLIK
                     tabContentHtml = `
-                        <div class="modal-grid-3">
-                            <div class="modal-card-box" style="text-align:center;"><span style="font-size:0.6rem; color:var(--text-sub);">TOTAL RAK</span><p style="font-size:1.1rem; font-weight:800;">${totalRak}</p></div>
-                            <div class="modal-card-box" onclick="viewCeklisDetailPopup('selesai')" style="text-align:center; cursor:pointer;" title="Klik untuk lihat rincian Rak Selesai">
-                                <span style="font-size:0.6rem; color:var(--text-sub); font-weight:700;">SELESAI ➔</span>
-                                <p style="font-size:1.1rem; font-weight:800; color:#10b981;">${selesaiRak}</p>
+                        <div class="modal-grid-4" style="margin-bottom:12px;">
+                            <!-- 1. TOTAL RAK -->
+                            <div class="modal-card-box" onclick="selectedRakStatusFilter='ALL'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='ALL'?'border:2px solid var(--accent-primary); background:rgba(16,185,129,0.1);':''}">
+                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">TOTAL RAK</span>
+                                <p style="font-size:1.1rem; font-weight:800; color:var(--text-main);">${totalRak}</p>
+                                <span style="font-size:0.52rem; color:var(--accent-primary);">Semua ➔</span>
                             </div>
-                            <div class="modal-card-box" onclick="viewCeklisDetailPopup('pending')" style="text-align:center; cursor:pointer;" title="Klik untuk lihat rincian Rak Pending">
-                                <span style="font-size:0.6rem; color:var(--text-sub); font-weight:700;">PENDING VAL ➔</span>
+
+                            <!-- 2. SELESAI -->
+                            <div class="modal-card-box" onclick="selectedRakStatusFilter='SELESAI'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='SELESAI'?'border:2px solid #10b981; background:rgba(16,185,129,0.15);':''}">
+                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">SELESAI</span>
+                                <p style="font-size:1.1rem; font-weight:800; color:#10b981;">${selesaiRak}</p>
+                                <span style="font-size:0.52rem; color:#047857;">Detail ➔</span>
+                            </div>
+
+                            <!-- 3. PENDING VAL -->
+                            <div class="modal-card-box" onclick="selectedRakStatusFilter='PENDING'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='PENDING'?'border:2px solid #f59e0b; background:rgba(245,158,11,0.15);':''}">
+                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">PENDING VAL</span>
                                 <p style="font-size:1.1rem; font-weight:800; color:#f59e0b;">${pendingValidasiRak}</p>
+                                <span style="font-size:0.52rem; color:#b45309;">Detail ➔</span>
+                            </div>
+
+                            <!-- 4. BELUM CEKLIS -->
+                            <div class="modal-card-box" onclick="selectedRakStatusFilter='BELUM'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='BELUM'?'border:2px solid #ef4444; background:rgba(239,68,68,0.15);':''}">
+                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">BELUM CEKLIS</span>
+                                <p style="font-size:1.1rem; font-weight:800; color:#ef4444;">${belumCeklisRak}</p>
+                                <span style="font-size:0.52rem; color:#dc2626;">Detail ➔</span>
                             </div>
                         </div>
 
@@ -3105,7 +3154,7 @@
                         ${searchBarHtml}
 
                         <div id="shelvesCardContainer" class="modal-grid-1">
-                            ${rakListCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data rak di toko ini.</p>'}
+                            ${rakListCards || '<p style="text-align:center; color:var(--text-sub); padding:12px;">Tidak ada rak pada kategori filter ini.</p>'}
                             <p id="noShelvesMatchMsg" class="hidden" style="text-align:center; color:var(--text-sub); padding:10px;">Tidak ada rak yang cocok dengan pencarian.</p>
                         </div>
                     `;
@@ -3149,7 +3198,7 @@
                     </div>
                 `;
             } 
-            // TAB 3: ALERT EXPIRED (FILTER DINAMIS RH + 10 HARI SPARE)
+            // TAB 3: ALERT EXPIRED
             else if (activeTab === 'alert') {
                 const targetAlertProducts = (userAC ? expProducts : expProducts.filter(p => p.kodeToko === userKodeToko))
                     .filter(p => isProductInAlertWindow(p.expDate, p.rhDays));
@@ -3241,71 +3290,121 @@
                     `;
                 }
             }
-            // TAB 4: TRACKING RIWAYAT (GROUPING TANGGAL KEMUDIAN TOKO)
+            // TAB 4: TRACKING RIWAYAT (NAVIGASI BISA DIKLIK DETAIL DALAM MODAL - NO POPUP SWEETALERT)
             else if (activeTab === 'tracking') {
                 const targetHistory = userAC 
                     ? (expHistoryList || []).filter(h => h.monthKey === selectedExpHistoryMonth)
                     : (expHistoryList || []).filter(h => h.kodeToko === userKodeToko && h.monthKey === selectedExpHistoryMonth);
 
-                const groupedByDate = {};
-                targetHistory.forEach(h => {
-                    const d = h.dateStr || 'Tanggal Lain';
-                    if (!groupedByDate[d]) groupedByDate[d] = [];
-                    groupedByDate[d].push(h);
-                });
+                let trackingBodyContent = '';
 
-                let historyHtml = Object.entries(groupedByDate).map(([dateLabel, itemsOnDate]) => {
-                    if (userAC) {
-                        const groupedByStore = {};
-                        itemsOnDate.forEach(item => {
-                            const stName = item.namaToko || item.kodeToko || 'Toko';
-                            if (!groupedByStore[stName]) groupedByStore[stName] = [];
-                            groupedByStore[stName].push(item);
-                        });
+                // LEVEL 1: TAMPILAN KOTAK DAFTAR TANGGAL (JIKA BELUM MEMILIH TANGGAL)
+                if (trackingViewMode === 'date_list' || !selectedTrackingDate) {
+                    const groupedByDate = {};
+                    targetHistory.forEach(h => {
+                        const d = h.dateStr || 'Tanggal Lain';
+                        if (!groupedByDate[d]) groupedByDate[d] = [];
+                        groupedByDate[d].push(h);
+                    });
 
-                        const storeGroupHtml = Object.entries(groupedByStore).map(([storeName, storeItems]) => `
-                            <div style="background:rgba(0,0,0,0.03); padding:8px; border-radius:10px; border:1px dashed var(--card-border); margin-top:6px;">
-                                <b style="font-size:0.75rem; color:var(--accent-primary);">🏪 ${escapeHTML(storeName)} (${storeItems.length} Rak)</b>
-                                <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
-                                    ${storeItems.map(h => `
-                                        <div style="background:var(--header-bg); padding:6px 8px; border-radius:8px; border:1px solid var(--card-border); font-size:0.68rem;">
-                                            <b>${escapeHTML(h.shelfName)} (${escapeHTML(h.noRak||'-')})</b>
-                                            <p style="color:var(--text-sub); font-size:0.6rem;">PJ: ${escapeHTML(h.assignedName||'-')} | Dikerjakan: ${escapeHTML(h.checkedBy||'-')} | COS: ${escapeHTML(h.validatedByCOS||'-')}</p>
-                                        </div>
-                                    `).join('')}
+                    const dateCardsHtml = Object.entries(groupedByDate).map(([dateLabel, itemsOnDate]) => `
+                        <div class="modal-card-box" onclick="selectedTrackingDate='${dateLabel}'; trackingViewMode='${userAC ? 'store_list' : 'detail_list'}'; renderCeklisExpiredModal('tracking');" style="cursor:pointer; border-left:4px solid var(--gold);" title="Klik untuk lihat detail pengerjaan tanggal ini">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h5 style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-calendar-day"></i> Tanggal: ${dateLabel}</h5>
+                                    <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">Total Selesai: <b>${itemsOnDate.length} Pengerjaan Rak</b></p>
                                 </div>
+                                <span style="font-size:0.65rem; color:var(--gold); font-weight:800;">Buka Detail ➔</span>
                             </div>
-                        `).join('');
+                        </div>
+                    `).join("");
 
-                        return `
-                            <div class="modal-card-box" style="border-left:4px solid var(--gold); margin-bottom:10px;">
-                                <h5 style="font-size:0.85rem; font-weight:800; color:var(--gold);"><i class="fa-solid fa-calendar-day"></i> Tanggal: ${dateLabel} (${itemsOnDate.length} Pengerjaan)</h5>
-                                ${storeGroupHtml}
-                            </div>
-                        `;
-                    } else {
-                        const itemsHtml = itemsOnDate.map(h => `
-                            <div style="background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border); margin-top:4px;">
-                                <b style="font-size:0.78rem; color:var(--text-main);">${escapeHTML(h.shelfName)} (${escapeHTML(h.noRak||'-')})</b>
-                                <p style="font-size:0.62rem; color:var(--text-sub);">PJ: ${escapeHTML(h.assignedName||'-')} | Dikerjakan oleh: ${escapeHTML(h.checkedBy||'-')} | COS: ${escapeHTML(h.validatedByCOS||'-')}</p>
-                                ${h.photoUrl ? `<img src="${h.photoUrl}" onclick="showFullImageModal('${h.photoUrl}')" style="width:100%; height:90px; object-fit:cover; border-radius:6px; margin-top:4px; cursor:pointer;" title="Klik Fullscreen">` : ''}
-                            </div>
-                        `).join('');
+                    trackingBodyContent = `
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-calendar-days"></i> DAFTAR TANGGAL RIWAYAT (${selectedExpHistoryMonth})</h5>
+                        <div class="modal-grid-1">${dateCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada riwayat pengerjaan pada bulan ini.</p>'}</div>
+                    `;
+                } 
+                // LEVEL 2 (KHUSUS AC): TAMPILAN DAFTAR TOKO PADA TANGGAL YANG DIKLIK
+                else if (trackingViewMode === 'store_list' && userAC) {
+                    const itemsOnDate = targetHistory.filter(h => (h.dateStr || 'Tanggal Lain') === selectedTrackingDate);
+                    const groupedByStore = {};
+                    itemsOnDate.forEach(item => {
+                        const stKode = item.kodeToko || 'TOKO';
+                        const stName = item.namaToko || item.kodeToko || 'Toko';
+                        if (!groupedByStore[stKode]) groupedByStore[stKode] = { name: stName, items: [] };
+                        groupedByStore[stKode].items.push(item);
+                    });
 
-                        return `
-                            <div class="modal-card-box" style="border-left:4px solid #10b981; margin-bottom:10px;">
-                                <h5 style="font-size:0.85rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-calendar-day"></i> Tanggal: ${dateLabel}</h5>
-                                ${itemsHtml}
+                    const storeCardsHtml = Object.entries(groupedByStore).map(([stKode, storeObj]) => `
+                        <div class="modal-card-box" onclick="selectedTrackingStoreKode='${stKode}'; trackingViewMode='detail_list'; renderCeklisExpiredModal('tracking');" style="cursor:pointer; border-left:4px solid var(--accent-primary);" title="Klik untuk lihat detail pengerjaan toko ini">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main);">${escapeHTML(storeObj.name)} (${stKode})</h5>
+                                    <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">Ceklis Selesai: <b style="color:#047857;">${storeObj.items.length} Rak</b></p>
+                                </div>
+                                <span style="font-size:0.65rem; color:var(--gold); font-weight:800;">Lihat Rak ➔</span>
                             </div>
-                        `;
+                        </div>
+                    `).join("");
+
+                    trackingBodyContent = `
+                        <div style="margin-bottom:8px;">
+                            <button onclick="trackingViewMode='date_list'; renderCeklisExpiredModal('tracking');" style="background:var(--input-bg); border:1px solid var(--card-border); color:var(--text-main); padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                ⬅️ Kembali Ke Daftar Tanggal
+                            </button>
+                        </div>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 RINCIAN TOKO PADA TANGGAL: ${selectedTrackingDate}</h5>
+                        <div class="modal-grid-1">${storeCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada pengerjaan toko pada tanggal ini.</p>'}</div>
+                    `;
+                }
+                // LEVEL 3: HALAMAN DETAIL LENGKAP PENGERJAAN RAK (DENGAN FOTO FULLSCREEN PREVIEW)
+                else if (trackingViewMode === 'detail_list') {
+                    let itemsToRender = targetHistory.filter(h => (h.dateStr || 'Tanggal Lain') === selectedTrackingDate);
+                    if (userAC && selectedTrackingStoreKode) {
+                        itemsToRender = itemsToRender.filter(h => h.kodeToko === selectedTrackingStoreKode);
                     }
-                }).join('');
+
+                    const detailCardsHtml = itemsToRender.map(h => `
+                        <div class="modal-card-box" style="border-left:4px solid #10b981; margin-bottom:8px;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <span style="font-size:0.6rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(h.namaToko || h.kodeToko)}</span>
+                                    <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-top:2px;">${escapeHTML(h.shelfName)} (${escapeHTML(h.noRak||'-')})</h5>
+                                    <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">
+                                        Kategori: <b>${escapeHTML(h.category||'Umum')}</b> | PJ: <b>${escapeHTML(h.assignedName||'-')}</b><br/>
+                                        Dikerjakan oleh: <b style="color:var(--accent-primary);">${escapeHTML(h.checkedBy||'-')}</b> | Validasi COS: <b style="color:#047857;">${escapeHTML(h.validatedByCOS||'-')}</b>
+                                    </p>
+                                </div>
+                                <span style="font-size:0.58rem; color:var(--gold); font-weight:800;">${h.dateStr || ''}</span>
+                            </div>
+                            ${h.photoUrl ? `
+                                <div style="margin-top:8px;">
+                                    <img src="${h.photoUrl}" onclick="showFullImageModal('${h.photoUrl}')" style="width:100%; height:120px; object-fit:cover; border-radius:8px; cursor:pointer;" title="Klik Pratinjau Foto Fullscreen">
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join("");
+
+                    const backTargetMode = userAC ? 'store_list' : 'date_list';
+
+                    trackingBodyContent = `
+                        <div style="margin-bottom:8px;">
+                            <button onclick="trackingViewMode='${backTargetMode}'; renderCeklisExpiredModal('tracking');" style="background:var(--input-bg); border:1px solid var(--card-border); color:var(--text-main); padding:6px 12px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                ⬅️ Kembali Ke Halaman Sebelumnya
+                            </button>
+                        </div>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">📋 DETAIL LENGKAP PENGERJAAN (${selectedTrackingDate})</h5>
+                        <div class="modal-grid-1" style="max-height:50vh; overflow-y:auto;">
+                            ${detailCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada detail pengerjaan.</p>'}
+                        </div>
+                    `;
+                }
 
                 tabContentHtml = `
                     <div class="modal-grid-1">
                         <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center;">
                             <span style="font-size:0.72rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-calendar-days"></i> PILIH BULAN RIWAYAT:</span>
-                            <input type="month" value="${selectedExpHistoryMonth}" onchange="selectedExpHistoryMonth=this.value; renderCeklisExpiredModal('tracking');" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:6px; border-radius:8px; font-weight:800; font-size:0.75rem; outline:none;">
+                            <input type="month" value="${selectedExpHistoryMonth}" onchange="selectedExpHistoryMonth=this.value; trackingViewMode='date_list'; renderCeklisExpiredModal('tracking');" style="background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:6px; border-radius:8px; font-weight:800; font-size:0.75rem; outline:none;">
                         </div>
 
                         <div class="mtd-summary-card">
@@ -3313,10 +3412,7 @@
                             <div class="mtd-amount-hero">${targetHistory.length} <small style="font-size:0.8rem;">Pengerjaan Rak</small></div>
                         </div>
 
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-clock-rotate-left"></i> LOG ARSIP DETAIL RIWAYAT (${selectedExpHistoryMonth})</h5>
-                        <div class="modal-grid-1" style="max-height:50vh; overflow-y:auto;">
-                            ${historyHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada riwayat pengerjaan pada bulan ini.</p>'}
-                        </div>
+                        ${trackingBodyContent}
                     </div>
                 `;
             }
@@ -3339,7 +3435,7 @@
             if (searchShelfAssignee && activeTab === 'rak' && !userAC) {
                 filterShelvesByAssigneeDOM(searchShelfAssignee);
             }
-        }
+        } 
         
         // FUNGSI DETAIL RAK KHUSUS AC (READ-ONLY KETAT)
         function viewStoreShelvesDetailAC(kodeToko, namaToko) {
