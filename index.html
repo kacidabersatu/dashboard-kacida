@@ -4492,6 +4492,90 @@
             openSalesMTDModal(currentMtdDetailData?.selectedMonthVal);
         }
 
+        // =================================================================
+        // POPUP DETAIL HARIAN SALES MTD (KOMPARASI 2025 VS 2026)
+        // =================================================================
+        function viewDailySalesDetailPopup(dayNum) {
+            triggerAndroidHaptic('light');
+            if (!currentMtdDetailData || !currentMtdDetailData.listHarian) return;
+
+            const item = currentMtdDetailData.listHarian.find(x => x.day === dayNum);
+            if (!item) return;
+
+            const s26 = item.sales2026Num || 0;
+            const s25 = item.sales2025Num || 0;
+            const sGrowth = s25 > 0 ? ((s26 - s25) / s25) * 100 : 0;
+
+            const std26 = item.std2026 || 0;
+            const std25 = item.std2025 || 0;
+            const stdGrowth = std25 > 0 ? ((std26 - std25) / std25) * 100 : 0;
+
+            const apc26 = item.apc2026 || 0;
+            const apc25 = item.apc2025 || 0;
+            const apcGrowth = apc25 > 0 ? ((apc26 - apc25) / apc25) * 100 : 0;
+
+            const storeName = currentMtdDetailData.namaToko || 'Toko';
+
+            const htmlBody = `
+                <div style="font-size:0.75rem; text-align:left; line-height:1.6; color:var(--text-main);">
+                    <div style="background:var(--card-bg); padding:10px; border-radius:12px; border:1px solid var(--card-border); margin-bottom:10px;">
+                        <b style="font-size:0.85rem; color:var(--accent-primary);">🏪 ${escapeHTML(storeName)}</b>
+                        <p style="font-size:0.68rem; color:var(--text-sub);">Rincian Komparasi Performa Tanggal ${item.tanggalFormatted || dayNum}</p>
+                    </div>
+
+                    <!-- 1. KOMPARASI SALES -->
+                    <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <b style="color:var(--accent-primary);"><i class="fa-solid fa-money-bill-trend-up"></i> SALES HARIAN (SPD)</b>
+                            <span style="font-weight:800; font-size:0.65rem; padding:2px 8px; border-radius:10px; ${sGrowth>=0?'background:#d1fae5; color:#047857;':'background:#fee2e2; color:#dc2626;'}">
+                                ${sGrowth>=0?'▲':'▼'} ${sGrowth.toFixed(1)}%
+                            </span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.72rem;">
+                            <span>Sales 2026: <strong style="color:var(--accent-primary);">Rp ${s26.toLocaleString('id-ID')}</strong></span>
+                            <span style="color:var(--text-sub);">Sales 2025: Rp ${s25.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. KOMPARASI STD (STRUK) -->
+                    <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <b style="color:var(--gold);"><i class="fa-solid fa-receipt"></i> TRANSAKSI STRUK (STD)</b>
+                            <span style="font-weight:800; font-size:0.65rem; padding:2px 8px; border-radius:10px; ${stdGrowth>=0?'background:#d1fae5; color:#047857;':'background:#fee2e2; color:#dc2626;'}">
+                                ${stdGrowth>=0?'▲':'▼'} ${stdGrowth.toFixed(1)}%
+                            </span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.72rem;">
+                            <span>STD 2026: <strong style="color:var(--gold);">${std26.toLocaleString('id-ID')} Struk</strong></span>
+                            <span style="color:var(--text-sub);">STD 2025: ${std25.toLocaleString('id-ID')} Struk</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. KOMPARASI APC (BELANJA RATA-RATA) -->
+                    <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <b style="color:#0284c7;"><i class="fa-solid fa-cart-shopping"></i> BELANJA RATA-RATA (APC)</b>
+                            <span style="font-weight:800; font-size:0.65rem; padding:2px 8px; border-radius:10px; ${apcGrowth>=0?'background:#d1fae5; color:#047857;':'background:#fee2e2; color:#dc2626;'}">
+                                ${apcGrowth>=0?'▲':'▼'} ${apcGrowth.toFixed(1)}%
+                            </span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.72rem;">
+                            <span>APC 2026: <strong style="color:#0284c7;">Rp ${apc26.toLocaleString('id-ID')}</strong></span>
+                            <span style="color:var(--text-sub);">APC 2025: Rp ${apc25.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            Swal.fire({
+                title: `Detail Performa Tanggal ${dayNum}`,
+                html: htmlBody,
+                confirmButtonText: 'Tutup Detail',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            });
+        }
+
+        // FUNGSI UTAMA RENDER MODAL MTD (DENGAN KLIK DETAIL HARIAN)
         function renderMtdModalView(filterType = 'semua') {
             const d = currentMtdDetailData;
             if (!d) return;
@@ -4501,7 +4585,7 @@
 
             let filteredList = d.listHarian || [];
             if (filterType === 'growth') filteredList = filteredList.filter(item => item.isGrowth);
-            else if (filterType === 'decline') filteredList = filteredList.filter(item => !item.isGrowth);
+            else if (filterType === 'Disgrowth') filteredList = filteredList.filter(item => !item.isGrowth);
 
             let labels = [], dataCurr = [];
             const chartDataList = [...(d.listHarian || [])].sort((a,b) => a.day - b.day);
@@ -4528,15 +4612,19 @@
                 `;
             }
 
+            // ✅ KARTU HARIAN MTD DENGAN ONCLICK POPUP DETAIL KOMPARASI
             let rincianCardsHtml = `
                 <div class="modal-grid-1">
                     ${filteredList.map(item => `
-                        <div class="modal-card-box" style="padding:10px; border-left:4px solid ${item.isGrowth ? '#10b981' : '#ef4444'};">
+                        <div class="modal-card-box" onclick="viewDailySalesDetailPopup(${item.day})" style="padding:10px; border-left:4px solid ${item.isGrowth ? '#10b981' : '#ef4444'}; cursor:pointer;" title="Klik untuk lihat rincian komparasi 2025 vs 2026">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                                 <span style="font-size:0.85rem; font-weight:800; color:var(--text-main);">Tgl ${item.day}</span>
-                                <span class="growth-badge-pill ${item.isGrowth ? 'up' : 'down'}" style="font-size:0.62rem; padding:2px 8px;">
-                                    ${item.isGrowth ? '▲ Growth' : '▼ Decline'} ${item.growthPct?.toFixed(1)}%
-                                </span>
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <span class="growth-badge-pill ${item.isGrowth ? 'up' : 'down'}" style="font-size:0.62rem; padding:2px 8px;">
+                                        ${item.isGrowth ? '▲ Growth' : '▼ Disgrowth'} ${item.growthPct?.toFixed(1)}%
+                                    </span>
+                                    <span style="font-size:0.6rem; color:var(--gold); font-weight:800;">Detail ➔</span>
+                                </div>
                             </div>
 
                             <div class="modal-grid-3" style="text-align:left; background:var(--input-bg); padding:8px; border-radius:10px; border:1px solid var(--card-border);">
@@ -4598,12 +4686,12 @@
 
                     <div style="display:flex; gap:6px; flex-wrap:wrap;">
                         <button class="sub-tab-btn ${filterType==='semua'?'active':''}" onclick="renderMtdModalView('semua')"><i class="fa-solid fa-filter"></i> Semua</button>
-                        <button class="sub-tab-btn ${filterType==='growth'?'active':''}" onclick="renderMtdModalView('growth')">▲ Achieved</button>
-                        <button class="sub-tab-btn ${filterType==='decline'?'active':''}" onclick="renderMtdModalView('decline')">▼ Decline</button>
+                        <button class="sub-tab-btn ${filterType==='growth'?'active':''}" onclick="renderMtdModalView('growth')"><i class="fa-solid fa-arrow-trend-up"></i> Achieved</button>
+                        <button class="sub-tab-btn ${filterType==='disgrowth'?'active':''}" onclick="renderMtdModalView('disgrowth')"><i class="fa-solid fa-arrow-trend-down"></i> Disgrowth</button>
                     </div>
 
                     <div>
-                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN (SALES, STD, & APC 2026)</h4>
+                        <h4 style="font-size:0.75rem; font-weight:800; color:var(--text-sub); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> RINCIAN HARIAN</h4>
                         ${rincianCardsHtml}
                     </div>
                 </div>
@@ -4639,7 +4727,7 @@
                 }
             }, 100);
         }
-
+        
         function openSerahTerimaModal() {
             showCustomModal("🔄 SERAH TERIMA SHIFT KERJA", `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
