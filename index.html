@@ -1499,7 +1499,7 @@
             triggerAndroidHaptic('medium');
             const nik = document.getElementById("nikInput").value.trim();
             if (!nik) { showSwalWarning('Form Kosong ⚠️', 'Mohon masukkan NIK Anda!'); return; }
-            showLoading("Proses Login Kilat...");
+            showLoading("Proses Login...");
             
             // Reset filter & cache sebelum login user baru
             selectedKodeTokoAC = null;
@@ -1518,7 +1518,7 @@
                 hideLoading();
                 if (res && res.status === "success") {
                     localStorage.setItem("NIK_KACIDA", nik);
-                    trackUserActivity(10, "Login Aplikasi");
+                    trackUserActivity(1, "Login Aplikasi");
                     document.getElementById("loginSection").classList.add("hidden");
                     document.getElementById("appSection").classList.remove("hidden");
                     initDashboard(null, false);
@@ -3108,15 +3108,15 @@
                             <div class="modal-card-box">
                                 <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">➕ TAMBAH RAK MANUAL & PENUGASAN (KHUSUS COS)</h5>
                                 <div class="modal-grid-2" style="margin-bottom:8px;">
-                                    <input type="text" id="addNoRakInput" placeholder="No. Rak (R-01)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
-                                    <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Snack A)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                    <input type="text" id="addNoRakInput" placeholder="No. Rak (AA1)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
+                                    <input type="text" id="addNamaRakInput" placeholder="Nama Rak (Rak Minuman 1)" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
                                 </div>
                                 <div class="modal-grid-2" style="margin-bottom:10px;">
                                     <select id="addCatRakInput" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
                                         <option value="Makanan">Makanan</option>
                                         <option value="Minuman">Minuman</option>
                                         <option value="Kosmetik">Kosmetik</option>
-                                        <option value="Kebutuhan">Non-Food</option>
+                                        <option value="Non-Food">Non-Food</option>
                                     </select>
                                     <select id="addAssignedNikInput" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; font-size:0.75rem;">
                                         ${personilOptsHtml}
@@ -3160,14 +3160,14 @@
 
                             <!-- 3. PENDING VAL -->
                             <div class="modal-card-box" onclick="selectedRakStatusFilter='PENDING'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='PENDING'?'border:2px solid #f59e0b; background:rgba(245,158,11,0.15);':''}">
-                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">PENDING VAL</span>
+                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">PENDING VALIDASI</span>
                                 <p style="font-size:1.1rem; font-weight:800; color:#f59e0b;">${pendingValidasiRak}</p>
                                 <span style="font-size:0.52rem; color:#b45309;">Detail ➔</span>
                             </div>
 
                             <!-- 4. BELUM CEKLIS -->
                             <div class="modal-card-box" onclick="selectedRakStatusFilter='BELUM'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='BELUM'?'border:2px solid #ef4444; background:rgba(239,68,68,0.15);':''}">
-                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">BELUM CEKLIS</span>
+                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">BELUM SELESAI</span>
                                 <p style="font-size:1.1rem; font-weight:800; color:#ef4444;">${belumCeklisRak}</p>
                                 <span style="font-size:0.52rem; color:#dc2626;">Detail ➔</span>
                             </div>
