@@ -3002,7 +3002,7 @@
                     }).join("");
 
                     tabContentHtml = `
-                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO (AREA COORDINATOR - HANYA LIHAT)</h5>
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;">🏪 STATUS RAK PER-TOKO</h5>
                         <div class="modal-grid-1">${storeCards || '<p style="text-align:center; color:var(--text-sub);">Belum ada data toko.</p>'}</div>
                     `;
                 } else {
@@ -3167,7 +3167,7 @@
 
                             <!-- 4. BELUM CEKLIS -->
                             <div class="modal-card-box" onclick="selectedRakStatusFilter='BELUM'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='BELUM'?'border:2px solid #ef4444; background:rgba(239,68,68,0.15);':''}">
-                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">BELUM CEKLIS</span>
+                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">BELUM SELESAI</span>
                                 <p style="font-size:1.1rem; font-weight:800; color:#ef4444;">${belumCeklisRak}</p>
                                 <span style="font-size:0.52rem; color:#dc2626;">Detail ➔</span>
                             </div>
@@ -3309,7 +3309,7 @@
 
                     tabContentHtml = `
                         ${summaryBoxesHtml}
-                        <div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada alert expired pada periode window saat ini.</p>'}</div>
+                        <div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada alert expired pada periode saat ini.</p>'}</div>
                     `;
                 }
             }
