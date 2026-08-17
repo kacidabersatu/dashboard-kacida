@@ -1077,12 +1077,13 @@
                 }
             });
 
-            // 5. ⚠️ ALERT EXPIRED PRODUK BARU
+            // 5. ⚠️ ALERT EXPIRED PRODUK BARU (HANYA JIKA MASUK PERIOD WINDOW ALERT RH)
             rtdb.ref('ceklis_expired/products').limitToLast(1).on('child_added', (snapshot) => {
                 if (isSystemNotifInitialLoad) return;
                 const p = snapshot.val();
                 if (p && (userAC || p.kodeToko === userKodeToko)) {
-                    if (p.status === 'pending') {
+                    // ✅ PUSH NOTIFIKASI HANYA BUNYI JIKA AKTIF DI WINDOW ALERT
+                    if (p.status === 'pending' && isProductInAlertWindow(p.expDate, p.rhDays)) {
                         triggerLocalPushNotification(`⚠️ Alert Expired Produk!`, `${p.name} akan expired pada tanggal ${p.expDate}`);
                     }
                 }
@@ -1369,7 +1370,9 @@
             showSwalSuccess('Shift Dikonfirmasi! 🤝', 'Terima kasih, konfirmasi serah terima shift berhasil dicatat.');
         }
 
-        // PERBAIKAN POIN 4 & 6: BADGE REALTIME HANYA MUNCUL DI USER YANG MEMILIKI HAK VALIDASI
+        // =================================================================
+        // PERBAIKAN BADGE NOTIFIKASI (HANYA HITUNG ALERT EXP YANG AKTIF)
+        // =================================================================
         function updateNotifikasiBadgeCount() {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
@@ -1387,10 +1390,11 @@
                 pendingExpValidasiCount = expShelves.filter(s => s.status === 'Menunggu Validasi COS' && s.kodeToko === userKodeToko).length;
             }
 
-            const userExpPendingProducts = expProducts.filter(p => p.status !== 'selesai' && (userAC || p.kodeToko === userKodeToko)).length;
+            // ✅ HANYA MENGHITUNG PRODUK YANG SANGAT AKTIF MASUK DI WINDOW ALERT (RH + 10 HARI SPARE)
+            const userExpPendingProducts = expProducts.filter(p => p.status !== 'selesai' && (userAC || p.kodeToko === userKodeToko) && isProductInAlertWindow(p.expDate, p.rhDays)).length;
+
             const announceCount = activeAnnouncementsList.length;
 
-            // ✅ PERHITUNGAN BADGE PENDING JOBDESK HARIAN
             let pendingJobdeskCount = 0;
             if (userAC) {
                 pendingJobdeskCount = jobdeskReports.filter(j => j.status === 'PENDING_AC').length;
@@ -2937,30 +2941,111 @@
         let selectedTrackingStoreKode = '';
         let selectedRakStatusFilter = 'ALL'; // 'ALL' | 'SELESAI' | 'PENDING' | 'BELUM'
 
+       // =================================================================
+        // KONFIRMASI SWEETALERT EDIT & HAPUS EXP ITEM
         // =================================================================
-        // CEKLIS EXPIRED & MANAJEMEN RAK (FULL VERSI SANGAT LENGKAP)
+        function confirmEditExpProduct(prodId) {
+            triggerAndroidHaptic('medium');
+            const p = expProducts.find(item => item.id === prodId);
+            if (!p) return;
+
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
+            const storeShelves = expShelves.filter(s => s.kodeToko === userKodeToko);
+            const shelfOptionsHtml = storeShelves.map(s => `<option value="${s.id}" ${s.id === p.shelfId ? 'selected' : ''}>${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
+
+            Swal.fire({
+                title: 'Konfirmasi Edit Item',
+                text: 'Apakah Anda yakin mau Edit Exp Item ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Edit Item',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    Swal.fire({
+                        title: 'Edit Produk Expired',
+                        html: `
+                            <div style="text-align:left; font-size:0.75rem;">
+                                <label style="font-weight:bold; display:block; margin-bottom:4px;">Pilih Rak Penempatan:</label>
+                                <select id="editExpShelfId" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; margin-bottom:8px;">
+                                    ${shelfOptionsHtml}
+                                </select>
+
+                                <label style="font-weight:bold; display:block; margin-bottom:4px;">Nama Produk:</label>
+                                <input type="text" id="editExpName" value="${escapeHTML(p.name||'')}" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; margin-bottom:8px;">
+
+                                <label style="font-weight:bold; display:block; margin-bottom:4px;">Tanggal Expired:</label>
+                                <input type="date" id="editExpDate" value="${p.expDate||''}" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px; margin-bottom:8px;">
+
+                                <label style="font-weight:bold; display:block; margin-bottom:4px;">RH (Return Hari):</label>
+                                <input type="number" id="editExpRh" value="${p.rhDays||30}" style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); padding:8px; border-radius:8px;">
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: '💾 Simpan Perubahan',
+                        customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+                    }).then((editRes) => {
+                        if (editRes.isConfirmed) {
+                            const newShelfId = document.getElementById("editExpShelfId").value;
+                            const newName = document.getElementById("editExpName").value.trim();
+                            const newDate = document.getElementById("editExpDate").value;
+                            const newRh = parseInt(document.getElementById("editExpRh").value, 10) || 30;
+
+                            if (rtdb) {
+                                rtdb.ref('ceklis_expired/products/' + prodId).update({
+                                    shelfId: newShelfId,
+                                    name: newName,
+                                    expDate: newDate,
+                                    rhDays: newRh
+                                });
+                            }
+                            renderCeklisExpiredModal('input');
+                            showSwalSuccess('Diperbarui ✅', 'Data produk expired berhasil diubah!');
+                        }
+                    });
+                }
+            });
+        }
+
+        function confirmDeleteExpProduct(prodId) {
+            triggerAndroidHaptic('medium');
+            Swal.fire({
+                title: 'Konfirmasi Hapus Item',
+                text: 'Apakah Anda yakin mau Hapus Exp Item ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus Item',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    deleteExpProductAction(prodId);
+                }
+            });
+        }
+
+        // =================================================================
+        // CEKLIS EXPIRED & MANAJEMEN RAK (FULL DENGAN RIWAYAT INPUT EXP)
         // =================================================================
         function renderCeklisExpiredModal(activeTab = 'rak') {
             const userCOS = isUserCOS();
             const userAC = isUserAC();
-            
-            let userKodeToko = dashboardData?.user?.kodeToko || '';
-            if (!userKodeToko && dashboardData?.user?.["NAMA TOKO"]) {
-                userKodeToko = getKodeToko(dashboardData.user["NAMA TOKO"]);
-            }
-
+            const userKodeToko = dashboardData?.user?.kodeToko || '';
+            const userNamaToko = dashboardData?.user?.namaToko || 'Toko';
             const daftarToko = dashboardData?.daftarToko || [];
+            
             let personilList = dashboardData?.struktur?.personilToko || [];
             if (!personilList || personilList.length === 0) {
                 personilList = (dashboardData?.allMasterUsers || []).filter(u => u.kodeToko === userKodeToko);
             }
 
-            let storeShelves = expShelves || [];
-            let storeProducts = expProducts || [];
+            let storeShelves = expShelves;
+            let storeProducts = expProducts;
 
-            if (!userAC && userKodeToko) {
-                storeShelves = storeShelves.filter(s => s.kodeToko === userKodeToko || !s.kodeToko);
-                storeProducts = storeProducts.filter(p => p.kodeToko === userKodeToko || !p.kodeToko);
+            if (!userAC) {
+                storeShelves = expShelves.filter(s => s.kodeToko === userKodeToko);
+                storeProducts = expProducts.filter(p => p.kodeToko === userKodeToko);
             }
 
             const totalRak = storeShelves.length;
@@ -2970,7 +3055,7 @@
             const pendingValidasiRak = storeShelves.filter(s => s.status === 'Menunggu Validasi COS').length;
             const belumCeklisRak = Math.max(0, totalRak - (selesaiRak + pendingValidasiRak));
 
-            // BADGE ALERT EXPIRED DENGAN SPARE 10 HARI + RH
+            // ✅ NOTIFIKASI BADGE HANYA MENGHITUNG ALERT EXP AKTIF WINDOW
             const pendingExpCount = storeProducts.filter(p => p.status !== 'selesai' && isProductInAlertWindow(p.expDate, p.rhDays)).length;
 
             let tabContentHtml = '';
@@ -3008,7 +3093,6 @@
                 } else {
                     let filteredShelves = storeShelves;
 
-                    // 1. FILTER PENCARIAN TULISAN
                     if (searchShelfAssignee && searchShelfAssignee.trim() !== '') {
                         const query = searchShelfAssignee.toLowerCase().trim();
                         filteredShelves = filteredShelves.filter(s => 
@@ -3018,7 +3102,6 @@
                         );
                     }
 
-                    // 2. FILTER STATUS KOTAK KARTU (ALL / SELESAI / PENDING / BELUM)
                     if (selectedRakStatusFilter === 'SELESAI') {
                         filteredShelves = filteredShelves.filter(s => {
                             const lastM = s.lastChecked ? new Date(s.lastChecked).toISOString().substring(0, 7) : '';
@@ -3141,31 +3224,26 @@
                         </div>
                     `;
 
-                    // 4 KOTAK METRIK RAK INTERAKTIF
                     tabContentHtml = `
                         <div class="modal-grid-4" style="margin-bottom:12px;">
-                            <!-- 1. TOTAL RAK -->
                             <div class="modal-card-box" onclick="selectedRakStatusFilter='ALL'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='ALL'?'border:2px solid var(--accent-primary); background:rgba(16,185,129,0.1);':''}">
                                 <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">TOTAL RAK</span>
                                 <p style="font-size:1.1rem; font-weight:800; color:var(--text-main);">${totalRak}</p>
                                 <span style="font-size:0.52rem; color:var(--accent-primary);">Semua ➔</span>
                             </div>
 
-                            <!-- 2. SELESAI -->
                             <div class="modal-card-box" onclick="selectedRakStatusFilter='SELESAI'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='SELESAI'?'border:2px solid #10b981; background:rgba(16,185,129,0.15);':''}">
                                 <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">SELESAI</span>
                                 <p style="font-size:1.1rem; font-weight:800; color:#10b981;">${selesaiRak}</p>
                                 <span style="font-size:0.52rem; color:#047857;">Detail ➔</span>
                             </div>
 
-                            <!-- 3. PENDING VAL -->
                             <div class="modal-card-box" onclick="selectedRakStatusFilter='PENDING'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='PENDING'?'border:2px solid #f59e0b; background:rgba(245,158,11,0.15);':''}">
-                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">BELUM APPROVE</span>
+                                <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">VALIDASI</span>
                                 <p style="font-size:1.1rem; font-weight:800; color:#f59e0b;">${pendingValidasiRak}</p>
                                 <span style="font-size:0.52rem; color:#b45309;">Detail ➔</span>
                             </div>
 
-                            <!-- 4. BELUM CEKLIS -->
                             <div class="modal-card-box" onclick="selectedRakStatusFilter='BELUM'; renderCeklisExpiredModal('rak');" style="text-align:center; cursor:pointer; ${selectedRakStatusFilter==='BELUM'?'border:2px solid #ef4444; background:rgba(239,68,68,0.15);':''}">
                                 <span style="font-size:0.58rem; color:var(--text-sub); font-weight:700;">BELUM SELESAI</span>
                                 <p style="font-size:1.1rem; font-weight:800; color:#ef4444;">${belumCeklisRak}</p>
@@ -3183,11 +3261,35 @@
                     `;
                 }
             } 
-            // TAB 2: INPUT PRODUK
+            // TAB 2: INPUT PRODUK (DENGAN TABEL HASIL RIWAYAT INPUT)
             else if (activeTab === 'input' && !userAC) {
                 const shelfOptionsHtml = storeShelves.map(s => `<option value="${s.id}">${escapeHTML(s.name)} (No: ${escapeHTML(s.noRak||'-')})</option>`).join("");
+                
+                // ✅ TABEL RIWAYAT HASIL INPUT EXP
+                const myInputProducts = storeProducts;
+                const inputHistoryCardsHtml = myInputProducts.map(p => {
+                    const shelf = storeShelves.find(s => s.id === p.shelfId);
+                    return `
+                        <div class="modal-card-box" style="padding:10px; margin-bottom:8px; border-left:4px solid var(--accent-primary);">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <b style="font-size:0.82rem; color:var(--text-main);">${escapeHTML(p.name)}</b>
+                                    <p style="font-size:0.65rem; color:var(--text-sub); margin-top:2px;">
+                                        Rak: <b>${escapeHTML(shelf?.name || 'Umum')}</b> | Exp: <b style="color:#ef4444;">${p.expDate}</b> | RH: <b>${p.rhDays || 30} Hari</b><br/>
+                                        Penginput: <b style="color:var(--accent-primary);">${escapeHTML(p.addedBy || 'Staff')}</b>
+                                    </p>
+                                </div>
+                                <div style="display:flex; gap:4px;">
+                                    <button onclick="confirmEditExpProduct('${p.id}')" style="background:#e0e7ff; color:#3730a3; border:none; padding:4px 8px; border-radius:6px; font-size:0.62rem; font-weight:800; cursor:pointer;">✏️ Edit</button>
+                                    <button onclick="confirmDeleteExpProduct('${p.id}')" style="background:#fee2e2; color:#dc2626; border:none; padding:4px 8px; border-radius:6px; font-size:0.62rem; font-weight:800; cursor:pointer;">🗑️ Hapus</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
                 tabContentHtml = `
-                    <div class="modal-card-box">
+                    <div class="modal-card-box" style="margin-bottom:12px;">
                         <h4 style="font-size:0.9rem; font-weight:800; color:var(--accent-primary); margin-bottom:10px;">➕ INPUT PRODUK EXPIRED & SETTING RH</h4>
                         
                         <div style="margin-bottom:10px;">
@@ -3218,6 +3320,14 @@
                         </p>
 
                         <button onclick="saveExpProductAction()" style="width:100%; background:var(--accent-green-grad); color:#ffffff; font-weight:800; padding:12px; border-radius:12px; border:none; cursor:pointer;">💾 SIMPAN PRODUK EXP & SETTING RH</button>
+                    </div>
+
+                    <!-- 📦 DAFTAR RIWAYAT INPUT EXP DENGAN EDIT & HAPUS -->
+                    <div class="modal-card-box">
+                        <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-bottom:8px;"><i class="fa-solid fa-list-check"></i> DAFTAR INPUT PRODUK EXP TOKO INI (${myInputProducts.length})</h5>
+                        <div style="max-height:40vh; overflow-y:auto; display:flex; flex-direction:column; gap:2px;">
+                            ${inputHistoryCardsHtml || '<p style="text-align:center; color:var(--text-sub); padding:12px;">Belum ada inputan produk expired.</p>'}
+                        </div>
                     </div>
                 `;
             } 
@@ -3298,7 +3408,7 @@
                                         </button>
                                     ` : `
                                         <span style="font-size:0.65rem; background:#d1fae5; color:#047857; padding:4px 8px; border-radius:6px; font-weight:800; align-self:center;">Selesai</span>
-                                        <button onclick="deleteExpProductAction('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
+                                        <button onclick="confirmDeleteExpProduct('${p.id}')" style="background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; padding:6px 10px; border-radius:8px; font-weight:800; font-size:0.68rem; cursor:pointer;">
                                             🗑️ Hapus
                                         </button>
                                     `}
@@ -3309,11 +3419,11 @@
 
                     tabContentHtml = `
                         ${summaryBoxesHtml}
-                        <div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada alert expired pada periode saat ini.</p>'}</div>
+                        <div class="modal-grid-1">${alertListHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada alert expired pada periode window saat ini.</p>'}</div>
                     `;
                 }
             }
-            // TAB 4: TRACKING RIWAYAT (PAGE VIEW DALAM MODAL - TANGGAL ➔ TOKO ➔ DETAIL RAK + CATATAN)
+            // TAB 4: TRACKING RIWAYAT
             else if (activeTab === 'tracking') {
                 const targetHistory = userAC 
                     ? (expHistoryList || []).filter(h => h.monthKey === selectedExpHistoryMonth)
@@ -3321,7 +3431,6 @@
 
                 let trackingBodyContent = '';
 
-                // LEVEL 1: DAFTAR KOTAK TANGGAL
                 if (trackingViewMode === 'date_list' || !selectedTrackingDate) {
                     const groupedByDate = {};
                     targetHistory.forEach(h => {
@@ -3347,7 +3456,6 @@
                         <div class="modal-grid-1">${dateCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Belum ada riwayat pengerjaan pada bulan ini.</p>'}</div>
                     `;
                 } 
-                // LEVEL 2 (KHUSUS AC): DAFTAR TOKO PADA TANGGAL YANG DIKLIK
                 else if (trackingViewMode === 'store_list' && userAC) {
                     const itemsOnDate = targetHistory.filter(h => (h.dateStr || 'Tanggal Lain') === selectedTrackingDate);
                     const groupedByStore = {};
@@ -3380,7 +3488,6 @@
                         <div class="modal-grid-1">${storeCardsHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada pengerjaan toko pada tanggal ini.</p>'}</div>
                     `;
                 }
-                // LEVEL 3: PAGE VIEW DETAIL LENGKAP PENGERJAAN RAK + CATATAN
                 else if (trackingViewMode === 'detail_list') {
                     let itemsToRender = targetHistory.filter(h => (h.dateStr || 'Tanggal Lain') === selectedTrackingDate);
                     if (userAC && selectedTrackingStoreKode) {
@@ -3403,7 +3510,7 @@
                             </div>
                             ${h.photoUrl ? `
                                 <div style="margin-top:8px;">
-                                    <img src="${h.photoUrl}" onclick="showFullImageModal('${h.photoUrl}')" style="width:100%; height:110px; object-fit:cover; border-radius:8px; cursor:pointer;" title="Klik Pratinjau Foto Fullscreen">
+                                    <img src="${h.photoUrl}" onclick="showFullImageModal('${h.photoUrl}')" style="width:100%; height:110px; object-fit:cover; border-radius:8px; cursor:pointer;" title="Klik Fullscreen">
                                 </div>
                             ` : ''}
                         </div>
