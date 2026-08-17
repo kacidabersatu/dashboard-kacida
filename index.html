@@ -2755,29 +2755,28 @@
         if (typeof searchShelfAssignee === 'undefined') var searchShelfAssignee = "";
 
         // =================================================================
-        // CEKLIS EXPIRED LISTENER AMAN (KEBAL DOMEXCEPTION QUOTA EXCEEDED)
+        // CEKLIS EXPIRED: LIGHTWEIGHT CACHE (BACA INSTAN 0 DETIK & BEBAS ERROR)
         // =================================================================
         function initFirebaseCeklisExpiredListener() {
-            // 🚀 1. LOAD INSTANT CACHE LOKAL AMAN
+            // 🚀 1. BACA CACHE RINGAN DALAM 0.0001 DETIK SAAT APP DIBUKA
             try {
                 const cachedShelves = localStorage.getItem('kacida_cache_exp_shelves');
                 const cachedProducts = localStorage.getItem('kacida_cache_exp_products');
-                const cachedHistory = localStorage.getItem('kacida_cache_exp_history');
-
-                if (cachedShelves) expShelves = JSON.parse(cachedShelves);
-                if (cachedProducts) expProducts = JSON.parse(cachedProducts);
-                if (cachedHistory) expHistoryList = JSON.parse(cachedHistory);
+                if (cachedShelves && expShelves.length === 0) expShelves = JSON.parse(cachedShelves);
+                if (cachedProducts && expProducts.length === 0) expProducts = JSON.parse(cachedProducts);
             } catch(e) {}
 
             if (!rtdb) return;
-            
-            // 🚀 2. LISTEN SHELVES WITH SAFE STORAGE
+
+            // 🚀 2. LISTEN SHELVES REALTIME FIREBASE (SIMPAN CACHE RINGAN TANPA FOTO BERAT)
             rtdb.ref('ceklis_expired/shelves').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     expShelves = Object.entries(data).map(([id, val]) => ({ id, ...val }));
                     try {
-                        localStorage.setItem('kacida_cache_exp_shelves', JSON.stringify(expShelves));
+                        // Hapus string foto berat khusus untuk cache lokal agar memori HP tidak penuh
+                        const lightShelves = expShelves.map(s => ({ ...s, photoUrl: '' }));
+                        localStorage.setItem('kacida_cache_exp_shelves', JSON.stringify(lightShelves));
                     } catch(e) {}
                 } else {
                     expShelves = [];
@@ -2785,7 +2784,7 @@
                 updateNotifikasiBadgeCount();
             });
 
-            // 🚀 3. LISTEN PRODUCTS WITH SAFE STORAGE
+            // 🚀 3. LISTEN PRODUCTS REALTIME FIREBASE
             rtdb.ref('ceklis_expired/products').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -2799,13 +2798,12 @@
                 updateNotifikasiBadgeCount();
             });
 
-            // 🚀 4. LISTEN HISTORY PERMANEN WITH SAFE TRUNCATED CACHE
+            // 🚀 4. LISTEN HISTORY PERMANEN
             rtdb.ref('ceklis_expired/history').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     expHistoryList = Object.values(data).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
                     try {
-                        // Simpan 20 riwayat teratas tanpa foto berat agar memori HP tidak penuh
                         const lightHistory = expHistoryList.slice(0, 20).map(item => ({ ...item, photoUrl: '' }));
                         localStorage.setItem('kacida_cache_exp_history', JSON.stringify(lightHistory));
                     } catch(e) {}
@@ -3535,6 +3533,27 @@
             });
         }
 
+        // =================================================================
+        // PERBAIKAN PRATINJAU FOTO & SUBMIT CATATAN OPSIONAL
+        // =================================================================
+        function handleExpPhotoChangePreview(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    expPhotoPreview = evt.target.result;
+                    // ✅ TAMBAHAN PENAMPIL FOTO PRATINJAU DILAYAR POPUP
+                    const imgPreview = document.getElementById("imgExpPhotoPreview");
+                    const boxPreview = document.getElementById("boxExpPhotoPreview");
+                    if (imgPreview && boxPreview) {
+                        imgPreview.src = expPhotoPreview;
+                        boxPreview.classList.remove("hidden");
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function promptShelfCompletion(shelfId) {
             triggerAndroidHaptic('medium');
             expPhotoPreview = null;
@@ -3542,27 +3561,42 @@
             Swal.fire({
                 title: 'Tandai Rak Selesai',
                 html: `
-                    <div style="text-align:left; font-size:0.75rem;">
-                        <p style="margin-bottom:8px; font-weight:bold; color:#dc2626;">* PILIH / UNGGAH FOTO BUKTI BUKTI PENGERJAAN (WAJIB):</p>
-                        <input type="file" id="expShelfPhotoFile" accept="image/*" onchange="handleExpPhotoChangePreview(event)" style="width:100%; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border);">
+                    <div style="text-align:left; font-size:0.75rem; color:var(--text-main);">
+                        <label style="font-weight:bold; display:block; margin-bottom:4px; color:#dc2626;">* PILIH / UNGGAH FOTO BUKTI PEKERJAAN (WAJIB):</label>
+                        <input type="file" id="expShelfPhotoFile" accept="image/*" onchange="handleExpPhotoChangePreview(event)" style="width:100%; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:8px;">
+
+                        <!-- 📸 BOX PRATINJAU FOTO BEFORE SUBMIT -->
+                        <div id="boxExpPhotoPreview" class="hidden" style="margin-bottom:10px; text-align:center;">
+                            <p style="font-size:0.62rem; color:var(--accent-primary); font-weight:bold; margin-bottom:4px;">📸 Pratinjau Foto Bukti Pengerjaan:</p>
+                            <img id="imgExpPhotoPreview" src="" style="width:100%; height:130px; object-fit:cover; border-radius:10px; border:1px solid var(--card-border);">
+                        </div>
+
+                        <label style="font-weight:bold; display:block; margin-bottom:4px;">Catatan / Kondisi Rak (Opsional):</label>
+                        <input type="text" id="expShelfNotesInput" placeholder="Contoh: Rak bersih, produk rapi..." style="width:100%; background:var(--input-bg); color:var(--text-main); border:1px solid var(--card-border); padding:8px; border-radius:8px;">
                     </div>
                 `,
                 showCancelButton: true,
                 confirmButtonText: '📸 Submit Bukti Foto',
                 cancelButtonText: 'Batal',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' },
+                preConfirm: () => {
+                    const fileInput = document.getElementById("expShelfPhotoFile");
+                    if (!expPhotoPreview && (!fileInput || !fileInput.files || fileInput.files.length === 0)) {
+                        Swal.showValidationMessage('Anda WAJIB memilih/mengunggah foto bukti kebersihan rak!');
+                        return false;
+                    }
+                    const notesVal = document.getElementById("expShelfNotesInput")?.value || '';
+                    return { notes: notesVal };
+                }
             }).then((res) => {
                 if (res.isConfirmed) {
-                    if (!expPhotoPreview) {
-                        showSwalWarning('Foto Bukti Wajib ⚠️', 'Anda WAJIB memilih/mengunggah foto bukti kebersihan rak!');
-                        return;
-                    }
-                    markShelfCheckAction(shelfId);
+                    const notes = res.value?.notes || '';
+                    markShelfCheckAction(shelfId, notes);
                 }
             });
         }
 
-        function markShelfCheckAction(shelfId) {
+        function markShelfCheckAction(shelfId, notes = '') {
             const userCOS = isUserCOS();
             const statusTarget = userCOS ? 'Selesai' : 'Menunggu Validasi COS';
             const timestamp = new Date().toISOString();
@@ -3578,6 +3612,7 @@
                     lastChecked: timestamp,
                     checkedBy: userName,
                     kodeToko: userKodeToko,
+                    notes: notes,
                     photoUrl: expPhotoPreview || ''
                 });
 
@@ -3592,6 +3627,7 @@
                         assignedName: shelf.assignedName || 'Staff',
                         checkedBy: userName,
                         validatedByCOS: userName,
+                        notes: notes,
                         photoUrl: expPhotoPreview || shelf.photoUrl || '',
                         timestamp: timestamp,
                         dateStr: new Date().toLocaleDateString('id-ID'),
@@ -3607,10 +3643,11 @@
             }
 
             expPhotoPreview = null;
-            trackUserActivity(3, "Ceklis Rak Expired");
+            trackUserActivity(2, "Ceklis Rak Expired");
             renderCeklisExpiredModal('rak');
             showSwalSuccess('Ceklis Terkirim!', userCOS ? 'Rak ditandai Selesai!' : 'Foto berhasil dikirim. Menunggu Validasi Chief of Store.');
         }
+
 
         function validateShelfByCOS(shelfId) {
             if (!isUserCOS()) return;
