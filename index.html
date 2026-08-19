@@ -5718,7 +5718,7 @@
         }
 
         // =================================================================
-        // TAMPILAN UTAMA MODAL JOBDESK HARIAN & BRIEFING
+        // JOBDESK HARIAN: LAYOUT HARI DI PALING ATAS (ALL TABS & AC SUPPORT)
         // =================================================================
         function renderJobdeskModalView(activeTab = 'input') {
             const userCOS = isUserCOS();
@@ -5732,7 +5732,7 @@
 
             let tabContentHtml = '';
 
-            // TAB 1: FORM INPUT JOBDESK
+            // TAB 1: FORM INPUT JOBDESK (CREW & COS)
             if (activeTab === 'input' && !userAC) {
                 const tasks = JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || [];
 
@@ -5791,15 +5791,7 @@
 
                 tabContentHtml = `
                     <div class="modal-grid-1">
-                        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;">
-                            ${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'].map(d => `
-                                <button onclick="selectedJobdeskDay='${d}'; renderJobdeskModalView('input');" class="sub-tab-btn ${selectedJobdeskDay === d ? 'active' : ''}" style="white-space:nowrap; padding:6px 12px; font-size:0.7rem;">
-                                    ${d} ${d === getTodayNameIndo() ? '📍' : ''}
-                                </button>
-                            `).join('')}
-                        </div>
-
-                        <div class="modal-grid-2">
+                        <div class="modal-grid-2" style="margin-bottom:8px;">
                             <button onclick="selectedJobdeskCategory='Daily Activity'; renderJobdeskModalView('input');" class="sub-tab-btn ${selectedJobdeskCategory==='Daily Activity'?'active':''}" style="font-size:0.68rem;">Daily Activity</button>
                             <button onclick="selectedJobdeskCategory='Materi Briefing Shift 1 & 2'; renderJobdeskModalView('input');" class="sub-tab-btn ${selectedJobdeskCategory==='Materi Briefing Shift 1 & 2'?'active':''}" style="font-size:0.68rem;">Briefing Shift 1 & 2</button>
                         </div>
@@ -5808,15 +5800,16 @@
                     </div>
                 `;
             } 
-            // TAB 2: RESUME PROGRESS & RIWAYAT LOG DETAIL INTERAKTIF
+            // TAB 2: RESUME PROGRESS & LOG PENGERJAAN
             else if (activeTab === 'resume') {
                 const dailyTasks = JOBDESK_MASTER_TASKS["Daily Activity"]?.[selectedJobdeskDay] || [];
                 const briefingTasks = JOBDESK_MASTER_TASKS["Materi Briefing Shift 1 & 2"]?.[selectedJobdeskDay] || [];
 
-                // 1. FILTER TER-FILTER KETAT SESUAI TOKO (USER TOKO VS AC)
                 let myStoreReports = userAC ? jobdeskReports : jobdeskReports.filter(r => r.kodeToko === userKodeToko);
 
-                // 2. FILTER STATUS KOTAK KLIK SUMMARY (DAILY DONE / DAILY PENDING / BRIEFING DONE / BRIEFING PENDING)
+                // Filter berdasarkan hari & kategori yang dipilih
+                myStoreReports = myStoreReports.filter(r => r.day === selectedJobdeskDay);
+
                 if (selectedJobdeskResumeFilter === 'DAILY_DONE') {
                     myStoreReports = myStoreReports.filter(r => r.category === 'Daily Activity' && (r.status === 'APPROVED' || r.status === 'PENDING_AC' || r.status === 'PENDING_COS'));
                 } else if (selectedJobdeskResumeFilter === 'DAILY_PENDING') {
@@ -5827,7 +5820,6 @@
                     myStoreReports = myStoreReports.filter(r => r.category === 'Materi Briefing Shift 1 & 2' && r.status !== 'APPROVED');
                 }
 
-                // 📋 DAFTAR KARTU LOG HASIL PENGERJAAN
                 const historyCardsHtml = myStoreReports.map(item => {
                     let statusBadge = '';
                     if (item.status === 'APPROVED') {
@@ -5847,7 +5839,7 @@
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
                                 <div>
                                     <span style="font-size:0.6rem; background:var(--input-bg); color:var(--text-sub); border:1px solid var(--card-border); padding:2px 6px; border-radius:4px; font-weight:800;">
-                                        📅 Minggu Ke-${escapeHTML(item.weekKey||'1')} • Hari ${escapeHTML(item.day)} • ${escapeHTML(item.namaToko || item.kodeToko)}
+                                        📅 Hari ${escapeHTML(item.day)} • ${escapeHTML(item.namaToko || item.kodeToko)}
                                     </span>
                                     <h5 style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-top:4px;">${escapeHTML(item.taskTitle)}</h5>
                                 </div>
@@ -5870,7 +5862,6 @@
                     `;
                 }).join("");
 
-                // 🔍 KOTAK PENCARIAN INSTAN (NO KEYBOARD DISMISS)
                 const searchBarHtml = `
                     <div class="modal-card-box" style="padding:10px; margin-bottom:10px;">
                         <div style="display:flex; align-items:center; gap:8px;">
@@ -5961,10 +5952,10 @@
                             <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);">🏪 MONITORING RINCIAN PER-TOKO (${selectedJobdeskDay})</h5>
                             ${storeCards}
 
-                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:10px;"><i class="fa-solid fa-clock-rotate-left"></i> RIWAYAT LOG HASIL PENGERJAAN</h5>
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary); margin-top:10px;"><i class="fa-solid fa-clock-rotate-left"></i> RIWAYAT LOG HASIL PENGERJAAN (${selectedJobdeskDay})</h5>
                             ${searchBarHtml}
                             <div id="jobdeskLogCardContainer" class="modal-grid-1">
-                                ${historyCardsHtml || '<p style="text-align:center; color:var(--text-sub); padding:10px;">Belum ada log pengerjaan.</p>'}
+                                ${historyCardsHtml || '<p style="text-align:center; color:var(--text-sub); padding:10px;">Belum ada log pengerjaan hari ' + selectedJobdeskDay + '.</p>'}
                                 <p id="noJobdeskMatchMsg" class="hidden" style="text-align:center; color:var(--text-sub); padding:10px;">Tidak ada log yang cocok dengan pencarian.</p>
                             </div>
                         </div>
@@ -6021,10 +6012,10 @@
                                 </div>
                             </div>
 
-                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-clock-rotate-left"></i> RIWAYAT LOG HASIL PENGERJAAN</h5>
+                            <h5 style="font-size:0.8rem; font-weight:800; color:var(--accent-primary);"><i class="fa-solid fa-clock-rotate-left"></i> RIWAYAT LOG HASIL PENGERJAAN (${selectedJobdeskDay})</h5>
                             ${searchBarHtml}
                             <div id="jobdeskLogCardContainer" class="modal-grid-1">
-                                ${historyCardsHtml || '<p style="text-align:center; color:var(--text-sub); padding:10px;">Belum ada log pengerjaan.</p>'}
+                                ${historyCardsHtml || '<p style="text-align:center; color:var(--text-sub); padding:10px;">Belum ada log pengerjaan hari ' + selectedJobdeskDay + '.</p>'}
                                 <p id="noJobdeskMatchMsg" class="hidden" style="text-align:center; color:var(--text-sub); padding:10px;">Tidak ada log yang cocok dengan pencarian.</p>
                             </div>
                         </div>
@@ -6040,11 +6031,14 @@
                     pendingList = jobdeskReports.filter(r => r.status === 'PENDING_COS' && r.kodeToko === userKodeToko);
                 }
 
+                // Saring antrean berdasarkan Hari yang sedang aktif di Pilihan Hari Atas
+                pendingList = pendingList.filter(r => r.day === selectedJobdeskDay);
+
                 let cardsHtml = pendingList.map(item => `
                     <div class="modal-card-box">
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
                             <div>
-                                <span style="font-size:0.62rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(item.namaToko || item.kodeToko)} • ${item.day}</span>
+                                <span style="font-size:0.62rem; background:#d1fae5; color:#047857; padding:2px 6px; border-radius:4px; font-weight:800;">${escapeHTML(item.namaToko || item.kodeToko)} • Hari ${item.day}</span>
                                 <h4 style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-top:4px;">${escapeHTML(item.taskTitle)}</h4>
                             </div>
                             <span style="font-size:0.6rem; color:var(--text-sub);">${item.submittedAt || ''}</span>
@@ -6065,12 +6059,23 @@
                     </div>
                 `).join("");
 
-                tabContentHtml = `<div class="modal-grid-1">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada antrean approval jobdesk saat ini.</p>'}</div>`;
+                tabContentHtml = `<div class="modal-grid-1">${cardsHtml || '<p style="text-align:center; color:var(--text-sub);">Tidak ada antrean approval untuk hari ' + selectedJobdeskDay + '.</p>'}</div>`;
             }
 
+            // 🚀 BINGKAI UTAMA: TOMBOL HARI BERADA DI PALING ATAS MODAL
             const htmlBox = `
                 <div class="modal-grid-1" style="font-size:0.78rem;">
-                    <div style="display:flex; gap:6px; overflow-x:auto;">
+                    <!-- 1. TOMBOL HARI DI PALING ATAS (MEMPENGARUHI SELURUH TAB & SEMUA USER) -->
+                    <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:4px;">
+                        ${['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'].map(d => `
+                            <button onclick="selectedJobdeskDay='${d}'; renderJobdeskModalView('${activeTab}');" class="sub-tab-btn ${selectedJobdeskDay === d ? 'active' : ''}" style="white-space:nowrap; padding:6px 12px; font-size:0.7rem;">
+                                ${d} ${d === getTodayNameIndo() ? '📍' : ''}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- 2. TOMBOL TAB NAVIGASI -->
+                    <div style="display:flex; gap:6px; overflow-x:auto; margin-bottom:6px;">
                         ${!userAC ? `<button class="sub-tab-btn ${activeTab==='input'?'active':''}" onclick="renderJobdeskModalView('input')">📝 Jobdesk</button>` : ''}
                         <button class="sub-tab-btn ${activeTab==='resume'?'active':''}" onclick="renderJobdeskModalView('resume')">📊 Resume</button>
                         ${(userCOS || userAC) ? `
@@ -6079,6 +6084,8 @@
                             </button>
                         ` : ''}
                     </div>
+
+                    <!-- 3. KONTEN TAB ACTIVE -->
                     ${tabContentHtml}
                 </div>
             `;
@@ -6087,118 +6094,7 @@
             if (searchJobdeskQuery && activeTab === 'resume') {
                 filterJobdeskByDOM(searchJobdeskQuery);
             }
-        }
-
-        // FUNGSI SUBMIT DENGAN KONFIRMASI SWEETALERT (YA / TIDAK)
-        function openJobdeskTaskFormModal(taskTitle) {
-            const task = (JOBDESK_MASTER_TASKS[selectedJobdeskCategory]?.[selectedJobdeskDay] || []).find(t => t.title === taskTitle);
-            if (!task) return;
-
-            jobdeskPhotoPreview = null;
-
-            Swal.fire({
-                title: `Detail SOP & Upload Foto`,
-                html: `
-                    <div style="text-align:left; font-size:0.75rem; color:var(--text-main);">
-                        <div style="background:var(--input-bg); padding:10px; border-radius:10px; border:1px solid var(--card-border); margin-bottom:10px;">
-                            <b style="color:var(--accent-primary);">📋 Cara Kerja (SOP):</b>
-                            <p style="margin-top:2px; margin-bottom:6px;">${escapeHTML(task.cara)}</p>
-                            <b style="color:var(--gold);">🎯 Poin Evaluasi / Hasil:</b>
-                            <p style="margin-top:2px;">${escapeHTML(task.poin)}</p>
-                        </div>
-
-                        <label style="font-weight:bold; display:block; margin-bottom:4px;">Catatan Tambahan (Opsional):</label>
-                        <input type="text" id="jobdeskNotesInput" placeholder="Kondisi / keterangan..." style="width:100%; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; padding:8px; margin-bottom:10px;">
-
-                        <label style="font-weight:bold; display:block; margin-bottom:4px; color:#dc2626;">* Foto Bukti Pekerjaan (Wajib):</label>
-                        <input type="file" accept="image/*" onchange="handleJobdeskPhotoChangePreview(event)" style="width:100%; background:var(--input-bg); padding:6px; border-radius:8px; border:1px solid var(--card-border);">
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: '🚀 Kirim Laporan',
-                cancelButtonText: 'Batal',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    if (!jobdeskPhotoPreview) {
-                        showSwalWarning('Foto Wajib ⚠️', 'Mohon lampirkan foto bukti pekerjaan!');
-                        return;
-                    }
-                    const notes = document.getElementById("jobdeskNotesInput")?.value || '';
-                    
-                    // ✅ KONFIRMASI PENEGASAN SWEETALERT YA / TIDAK
-                    confirmJobdeskAction(
-                        'Konfirmasi Pengiriman',
-                        'Apakah Anda yakin ingin mengirim laporan pengerjaan jobdesk ini?',
-                        'question',
-                        'Ya, Kirim Laporan',
-                        () => submitJobdeskReportAction(taskTitle, notes)
-                    );
-                }
-            });
-        }
-
-        function approveJobdeskReport(reportId) {
-            const userAC = isUserAC();
-            const nextStatus = userAC ? 'APPROVED' : 'PENDING_AC';
-            const approverName = `${dashboardData?.user?.NAMA || 'User'} (${dashboardData?.user?.JABATAN || 'Atasan'})`;
-
-            // ✅ KONFIRMASI PENEGASAN SWEETALERT YA / TIDAK
-            confirmJobdeskAction(
-                'Konfirmasi Approval',
-                'Apakah Anda yakin ingin menyetujui laporan pengerjaan jobdesk ini?',
-                'question',
-                'Ya, Setujui',
-                () => {
-                    if (rtdb) {
-                        rtdb.ref('jobdesk_reports/' + reportId).update({
-                            status: nextStatus,
-                            approvedBy: approverName,
-                            approvedAt: new Date().toLocaleString('id-ID')
-                        });
-                    }
-
-                    trackUserActivity(2, "Approve Jobdesk");
-                    renderJobdeskModalView('approval');
-                    showSwalSuccess('Approved ✅', userAC ? 'Persetujuan Final berhasil!' : 'Diteruskan ke Area Coordinator (AC).');
-                }
-            );
-        }
-
-        function rejectJobdeskReport(reportId) {
-            const userAC = isUserAC();
-            const rejectStatus = userAC ? 'REJECTED_AC' : 'REJECTED_COS';
-
-            // ✅ KONFIRMASI PENEGASAN SWEETALERT YA / TIDAK SEBELUM REJECT
-            confirmJobdeskAction(
-                'Konfirmasi Penolakan',
-                'Apakah Anda yakin ingin menolak laporan pengerjaan jobdesk ini?',
-                'warning',
-                'Ya, Tolak',
-                () => {
-                    Swal.fire({
-                        title: 'Alasan Penolakan Jobdesk',
-                        input: 'textarea',
-                        inputPlaceholder: 'Tuliskan instruksi perbaikan...',
-                        showCancelButton: true,
-                        confirmButtonText: '🚫 Kirim Penolakan',
-                        customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-                    }).then((res) => {
-                        if (res.isConfirmed && res.value) {
-                            if (rtdb) {
-                                rtdb.ref('jobdesk_reports/' + reportId).update({
-                                    status: rejectStatus,
-                                    rejectReason: res.value,
-                                    rejectedBy: dashboardData?.user?.NAMA || 'User'
-                                });
-                            }
-                            renderJobdeskModalView('approval');
-                            showSwalSuccess('Ditolak', 'Status pekerjaan diubah menjadi Ditolak.');
-                        }
-                    });
-                }
-            );
-         }
+        }                    
 
         // FUNGSI DETAIL PERTOKO UNTUK USER AC (DAILY + BRIEFING)
         function viewStoreJobdeskDetailAC(kodeToko, storeName) {
@@ -6316,7 +6212,15 @@
                         return;
                     }
                     const notes = document.getElementById("jobdeskNotesInput")?.value || '';
-                    submitJobdeskReportAction(taskTitle, notes);
+                    
+                    // ✅ KONFIRMASI PENEGASAN SWEETALERT YA / TIDAK
+                    confirmJobdeskAction(
+                        'Konfirmasi Pengiriman',
+                        'Apakah Anda yakin ingin mengirim laporan pengerjaan jobdesk ini?',
+                        'question',
+                        'Ya, Kirim Laporan',
+                        () => submitJobdeskReportAction(taskTitle, notes)
+                    );
                 }
             });
         }
@@ -6363,44 +6267,63 @@
             const nextStatus = userAC ? 'APPROVED' : 'PENDING_AC';
             const approverName = `${dashboardData?.user?.NAMA || 'User'} (${dashboardData?.user?.JABATAN || 'Atasan'})`;
 
-            if (rtdb) {
-                rtdb.ref('jobdesk_reports/' + reportId).update({
-                    status: nextStatus,
-                    approvedBy: approverName,
-                    approvedAt: new Date().toLocaleString('id-ID')
-                });
-            }
+            // ✅ KONFIRMASI PENEGASAN SWEETALERT YA / TIDAK
+            confirmJobdeskAction(
+                'Konfirmasi Approval',
+                'Apakah Anda yakin ingin menyetujui laporan pengerjaan jobdesk ini?',
+                'question',
+                'Ya, Setujui',
+                () => {
+                    if (rtdb) {
+                        rtdb.ref('jobdesk_reports/' + reportId).update({
+                            status: nextStatus,
+                            approvedBy: approverName,
+                            approvedAt: new Date().toLocaleString('id-ID')
+                        });
+                    }
 
-            trackUserActivity(2, "Approve Jobdesk");
-            renderJobdeskModalView('approval');
-            showSwalSuccess('Approved ✅', userAC ? 'Persetujuan Final berhasil!' : 'Diteruskan ke Area Coordinator (AC).');
+                    trackUserActivity(1, "Approve Jobdesk");
+                    renderJobdeskModalView('approval');
+                    showSwalSuccess('Approved ✅', userAC ? 'Persetujuan Final berhasil!' : 'Diteruskan ke Area Coordinator (AC).');
+                }
+            );
         }
 
         function rejectJobdeskReport(reportId) {
             const userAC = isUserAC();
             const rejectStatus = userAC ? 'REJECTED_AC' : 'REJECTED_COS';
 
-            Swal.fire({
-                title: 'Alasan Penolakan Jobdesk',
-                input: 'textarea',
-                inputPlaceholder: 'Tuliskan instruksi perbaikan...',
-                showCancelButton: true,
-                confirmButtonText: '🚫 Tolak Pekerjaan',
-                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
-            }).then((res) => {
-                if (res.isConfirmed && res.value) {
-                    if (rtdb) {
-                        rtdb.ref('jobdesk_reports/' + reportId).update({
-                            status: rejectStatus,
-                            rejectReason: res.value,
-                            rejectedBy: dashboardData?.user?.NAMA || 'User'
-                        });
-                    }
-                    renderJobdeskModalView('approval');
-                    showSwalSuccess('Ditolak', 'Status pekerjaan diubah menjadi Ditolak.');
+            // ✅ KONFIRMASI PENEGASAN SWEETALERT YA / TIDAK SEBELUM REJECT
+            confirmJobdeskAction(
+                'Konfirmasi Penolakan',
+                'Apakah Anda yakin ingin menolak laporan pengerjaan jobdesk ini?',
+                'warning',
+                'Ya, Tolak',
+                () => {
+                    Swal.fire({
+                        title: 'Alasan Penolakan Jobdesk',
+                        input: 'textarea',
+                        inputPlaceholder: 'Tuliskan instruksi perbaikan...',
+                        showCancelButton: true,
+                        confirmButtonText: '🚫 Kirim Penolakan',
+                        customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+                    }).then((res) => {
+                        if (res.isConfirmed && res.value) {
+                            if (rtdb) {
+                                rtdb.ref('jobdesk_reports/' + reportId).update({
+                                    status: rejectStatus,
+                                    rejectReason: res.value,
+                                    rejectedBy: dashboardData?.user?.NAMA || 'User'
+                                });
+                            }
+                            renderJobdeskModalView('approval');
+                            showSwalSuccess('Ditolak', 'Status pekerjaan diubah menjadi Ditolak.');
+                        }
+                    });
                 }
-            });
-        }
+            );
+         }
+        
         function downloadPerformaCardHD() {
             const cardElement = document.getElementById("customModalCard");
             if (!cardElement || typeof html2canvas === "undefined") return;
