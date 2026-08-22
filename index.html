@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
-    <title>Kacida Bersatu - Dashboard PWA Pro Android</title>
+    <title>Kacida Bersatu - Aplikasi Pro Android</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -493,14 +493,22 @@
 
         <!-- TAB PROFIL -->
         <div id="tabProfil" class="hidden container" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- TAB PROFIL (DILENGKAPI TOMBOL GANTI FOTO PROFIL) -->
             <div class="menu-section-card" style="text-align: center; padding: 20px;">
-                <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-primary); object-fit: cover; margin: 0 auto 8px auto;">
+                <div style="position:relative; display:inline-block; margin-bottom:8px;">
+                    <img id="profilFoto" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" style="width: 75px; height: 75px; border-radius: 50%; border: 2.5px solid var(--accent-primary); object-fit: cover; cursor:pointer;" title="Klik untuk perbesar foto">
+                    <button onclick="promptUploadProfilPhoto()" style="position:absolute; bottom:0; right:-4px; background:var(--accent-green-grad); color:#fff; border:2px solid #fff; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.65rem; cursor:pointer;" title="Ganti Foto Profil">📷</button>
+                </div>
                 <h2 id="profilNama" style="font-size: 1.1rem; font-weight: 800;">Nama</h2>
                 <p id="profilJabatan" style="font-size: 0.75rem; color: var(--accent-primary); font-weight: 700;">Jabatan</p>
                 <p id="profilToko" style="font-size: 0.72rem; color: var(--text-sub);">Toko</p>
                 <p id="profilNik" style="font-size: 0.65rem; color: var(--text-sub); margin-top: 2px;">NIK: -</p>
-                <button onclick="handleLogout()" style="margin-top: 12px; background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 18px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">LOGOUT / GANTI NIK</button>
-            </div>
+                
+                <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+                    <button onclick="promptUploadProfilPhoto()" style="background:var(--input-bg); color:var(--accent-primary); border:1px solid var(--card-border); padding:8px 14px; border-radius:10px; font-size:0.72rem; font-weight:800; cursor:pointer;">📷 Ganti Foto Profil</button>
+                    <button onclick="handleLogout()" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding:8px 14px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">Logout / Ganti NIK</button>
+                </div>
+            </div>>
 
             <div class="menu-section-card">
                 <h3 class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-users" style="color: var(--accent-primary);"></i> Bagan Struktur Toko Saya</h3>
@@ -1628,6 +1636,111 @@
                 allowOutsideClick: true,
                 customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
             });
+        }
+
+        // =================================================================
+        // LOGIKA UPLOAD & PEMBARUAN FOTO PROFIL DARI PERANGKAT HP
+        // =================================================================
+        let customProfilPhotoPreview = null;
+
+        function getRealisticHumanAvatar(nama, fotoUrl, userNik = "") {
+            const nikToCheck = userNik || currentNik;
+            
+            // 1. Prioritas Utama: Foto Upload Sendiri dari HP (Firebase / LocalStorage)
+            try {
+                const customLocal = localStorage.getItem('kacida_custom_foto_' + nikToCheck);
+                if (customLocal && customLocal.trim().length > 10) {
+                    return customLocal;
+                }
+            } catch(e) {}
+
+            // 2. Prioritas Kedua: Foto Resmi dari Spreadsheet
+            if (fotoUrl && String(fotoUrl).trim().length > 10) {
+                return fotoUrl;
+            }
+
+            // 3. Fallback Default
+            return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80";
+        }
+
+        function handleProfilPhotoUploadPreview(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    customProfilPhotoPreview = evt.target.result;
+                    const imgPreview = document.getElementById("imgProfilPhotoPreview");
+                    const boxPreview = document.getElementById("boxProfilPhotoPreview");
+                    if (imgPreview && boxPreview) {
+                        imgPreview.src = customProfilPhotoPreview;
+                        boxPreview.classList.remove("hidden");
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function promptUploadProfilPhoto() {
+            triggerAndroidHaptic('medium');
+            customProfilPhotoPreview = null;
+
+            Swal.fire({
+                title: 'Ganti Foto Profil',
+                html: `
+                    <div style="text-align:left; font-size:0.75rem; color:var(--text-main);">
+                        <p style="margin-bottom:8px; font-weight:bold;">Pilih foto dari Galeri HP / Kamera Anda:</p>
+                        <input type="file" id="uploadProfilPhotoFile" accept="image/*" onchange="handleProfilPhotoUploadPreview(event)" style="width:100%; background:var(--input-bg); padding:8px; border-radius:8px; border:1px solid var(--card-border); margin-bottom:8px;">
+
+                        <!-- BOX PRATINJAU FOTO -->
+                        <div id="boxProfilPhotoPreview" class="hidden" style="margin-bottom:10px; text-align:center;">
+                            <p style="font-size:0.62rem; color:var(--accent-primary); font-weight:bold; margin-bottom:4px;">📸 Pratinjau Foto Baru:</p>
+                            <img id="imgProfilPhotoPreview" src="" style="width:110px; height:110px; object-fit:cover; border-radius:50%; border:2px solid var(--accent-primary);">
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '💾 Simpan Foto Profil',
+                cancelButtonText: 'Batal',
+                customClass: { popup: 'swal-light-custom', confirmButton: 'swal-btn-green' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    if (!customProfilPhotoPreview) {
+                        showSwalWarning('Foto Belum Dipilih ⚠️', 'Mohon pilih file foto dari Galeri HP Anda!');
+                        return;
+                    }
+                    saveProfilPhotoUploadAction();
+                }
+            });
+        }
+
+        function saveProfilPhotoUploadAction() {
+            if (!customProfilPhotoPreview || !currentNik) return;
+
+            showLoading("Menyimpan Foto Profil...");
+
+            // 1. Simpan ke LocalStorage HP untuk Akses Instan 0 Detik
+            try {
+                localStorage.setItem('kacida_custom_foto_' + currentNik, customProfilPhotoPreview);
+            } catch(e) {}
+
+            // 2. Simpan ke Firebase Realtime Database
+            if (rtdb) {
+                rtdb.ref('user_custom_profiles/' + currentNik).set({
+                    nik: currentNik,
+                    foto: customProfilPhotoPreview,
+                    updatedAt: new Date().toISOString()
+                });
+            }
+
+            hideLoading();
+            
+            // 3. Update Foto di Layar (Header, Profil, Leaderboard)
+            if (dashboardData) {
+                renderDashboard(dashboardData);
+            }
+
+            trackUserActivity(5, "Ganti Foto Profil");
+            showSwalSuccess('Foto Diperbarui! 📸', 'Foto profil Anda berhasil diganti!');
         }
 
         function renderDashboard(data) {
