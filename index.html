@@ -1862,7 +1862,7 @@
             triggerAndroidHaptic('medium');
             Swal.fire({
                 title: 'Reset Foto Profil?',
-                text: 'Apakah Anda yakin mau menghapus foto custom dan kembali menggunakan foto resmi Spreadsheet / Default?',
+                text: 'Apakah Anda yakin mau menghapus foto custom dan kembali menggunakan foto Default?',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: '🔄 Ya, Terapkan Default',
@@ -1885,16 +1885,16 @@
                             hideLoading();
                             if (dashboardData) renderDashboard(dashboardData);
                             trackUserActivity(1, "Reset Foto Profil");
-                            showSwalSuccess('Foto Direset! 🔄', 'Foto profil kembali menggunakan foto default/Spreadsheet.');
+                            showSwalSuccess('Foto Direset! 🔄', 'Foto profil kembali menggunakan foto default.');
                         }).catch(() => {
                             hideLoading();
                             if (dashboardData) renderDashboard(dashboardData);
-                            showSwalSuccess('Foto Direset! 🔄', 'Foto profil kembali menggunakan foto default/Spreadsheet.');
+                            showSwalSuccess('Foto Direset! 🔄', 'Foto profil kembali menggunakan foto default.');
                         });
                     } else {
                         hideLoading();
                         if (dashboardData) renderDashboard(dashboardData);
-                        showSwalSuccess('Foto Direset! 🔄', 'Foto profil kembali menggunakan foto default/Spreadsheet.');
+                        showSwalSuccess('Foto Direset! 🔄', 'Foto profil kembali menggunakan foto default.');
                     }
                 }
             });
