@@ -960,7 +960,7 @@
             Notification.requestPermission().then(perm => {
                 if (perm === 'granted') {
                     showSwalSuccess('Notifikasi Aktif 🔔', 'Izin notifikasi aplikasi berhasil diaktifkan!');
-                    trackUserActivity(5, "Mengaktifkan Notifikasi");
+                    trackUserActivity(3, "Mengaktifkan Notifikasi");
                 }
             });
         }
@@ -1596,6 +1596,7 @@
                 initFirebaseRealtimeChat();
                 initFirebaseJobdeskListener();
                 initFirebaseAllSystemNotificationsListener();
+                initFirebaseCustomProfilesListener();
             }
         }
 
@@ -1645,18 +1646,37 @@
         // =================================================================
         // DOKUMEN FOTO PROFIL DINAMIS (3 PRIORITAS: UPLOAD HP ➔ SPREADSHEET ➔ DEFAULT)
         // =================================================================
+        let userCustomProfilesMap = {};
         let customProfilPhotoPreview = null;
 
-        function getRealisticHumanAvatar(nama, fotoUrl, userNik = "") {
-            const nikToCheck = userNik || currentNik;
-            
-            // 1. PRIORITAS 1: Foto Upload Sendiri dari HP (Firebase / LocalStorage)
-            try {
-                const customLocal = localStorage.getItem('kacida_custom_foto_' + nikToCheck);
-                if (customLocal && customLocal.trim().length > 10) {
-                    return customLocal;
+        function initFirebaseCustomProfilesListener() {
+            if (!rtdb) return;
+            rtdb.ref('user_custom_profiles').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    userCustomProfilesMap = {};
+                    Object.entries(data).forEach(([nikKey, val]) => {
+                        if (val && val.foto) {
+                            userCustomProfilesMap[String(nikKey).trim()] = val.foto;
+                        }
+                    });
                 }
-            } catch(e) {}
+            });
+        }
+
+        function getRealisticHumanAvatar(nama, fotoUrl, userNik = "") {
+            const targetNikStr = String(userNik || currentNik || "").trim();
+            
+            // 1. PRIORITAS 1: Foto Upload Custom Milik NIK Spesifik Ini
+            if (targetNikStr && userCustomProfilesMap[targetNikStr]) {
+                return userCustomProfilesMap[targetNikStr];
+            }
+            if (targetNikStr && targetNikStr === String(currentNik).trim()) {
+                try {
+                    const myLocal = localStorage.getItem('kacida_custom_foto_' + targetNikStr);
+                    if (myLocal && myLocal.length > 10) return myLocal;
+                } catch(e) {}
+            }
 
             // 2. PRIORITAS 2: Foto Resmi dari Spreadsheet
             if (fotoUrl && String(fotoUrl).trim().length > 10) {
@@ -1794,10 +1814,10 @@
             document.getElementById("lblUserName").innerText = (escapeHTML(data.user.NAMA) || "USER") + "! 👋";
             document.getElementById("hdrStoreOnlineName").innerText = data.user.namaToko || "ONLINE";
             
-            // ✅ BACA FOTO DINAMIS DARI SPREADSHEET
-            const userPhotoUrl = getRealisticHumanAvatar(data.user.NAMA, data.user["FOTO PROFIL"] || data.user.foto);
+            // ✅ SANGAT PRESISI MENGIRIMKAN NIK USER LOGIN
+            const myNikStr = String(data.user.NIK || currentNik).trim();
+            const userPhotoUrl = getRealisticHumanAvatar(data.user.NAMA, data.user["FOTO PROFIL"] || data.user.foto, myNikStr);
             
-            // Update Foto Header
             const hdrAvatar = document.getElementById("userAvatarHeader");
             if (hdrAvatar) {
                 hdrAvatar.src = userPhotoUrl;
@@ -1805,7 +1825,6 @@
                 hdrAvatar.style.cursor = "pointer";
             }
 
-            // Update Tab Profil
             document.getElementById("profilNama").innerText = data.user.NAMA || "-";
             document.getElementById("profilJabatan").innerText = data.user.jabatan || data.user.JABATAN || "-";
             document.getElementById("profilToko").innerText = data.user.namaToko || "-";
@@ -1851,7 +1870,7 @@
             renderProfilBaganStruktur(data);
             updateNotifikasiBadgeCount();
         }
-
+        
         function renderProfilBaganStruktur(data) {
             const container = document.getElementById("timTokoContainer");
             if (!container) return;
@@ -1878,7 +1897,10 @@
             } else {
                 const personil = data?.struktur?.personilToko || [];
                 container.innerHTML = personil.map(p => {
-                    const personilImgUrl = getRealisticHumanAvatar(p.nama, p.foto);
+                    const thisPersonilNik = String(p.nik || p.NIK || "").trim();
+                    // ✅ MENGIRIM NIK UNIK MASING-MASING PERSONIL
+                    const personilImgUrl = getRealisticHumanAvatar(p.nama, p.foto, thisPersonilNik);
+                    
                     return `
                         <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px;">
                             <div style="display:flex; align-items:center; gap:8px;">
@@ -2945,7 +2967,7 @@
             const res = await apiCall("saveMonthlyShift", { kodeToko: targetKode, bulanYear: currentShiftMonth, shiftDataJson: jsonStr });
             hideLoading();
             if (res && res.status === "success") {
-                trackUserActivity(3, "Simpan Master Shift");
+                trackUserActivity(1, "Simpan Master Shift");
                 showSwalSuccess('Berhasil Disimpan 💾', 'Data Shift Toko Berhasil Disimpan!');
             }
         }
@@ -3951,7 +3973,7 @@
             }
 
             expPhotoPreview = null;
-            trackUserActivity(2, "Ceklis Rak Expired");
+            trackUserActivity(1, "Ceklis Rak Expired");
             renderCeklisExpiredModal('rak');
             showSwalSuccess('Ceklis Terkirim!', userCOS ? 'Rak ditandai Selesai!' : 'Foto berhasil dikirim. Menunggu Validasi Chief of Store.');
         }
@@ -4216,7 +4238,7 @@
             // 🚀 PEMICU SERVER PUSH NOTIFIKASI LATAR BELAKANG
             sendServerPushTrigger("all", "⚠️ Alert Expired Baru!", `${name} akan expired tanggal ${expDate}`);
 
-            trackUserActivity(2, "Catat Produk Expired");
+            trackUserActivity(1, "Catat Produk Expired");
             renderCeklisExpiredModal('alert');
             showSwalSuccess('Tersimpan 📦', `Produk Expired berhasil dicatat dengan RH ${rhDays} Hari!`);
         }
@@ -4669,7 +4691,7 @@
             sendServerPushTrigger(isCOS ? "ac" : "cos", "🧾 Validasi Struk Belanja", `Struk dari ${dashboardData?.user?.NAMA || 'Staff'} sebesar Rp ${Number(nominal).toLocaleString('id-ID')}`);
 
             belanjaPhotoPreview = null;
-            trackUserActivity(2, "Submit Struk Belanja");
+            trackUserActivity(1, "Submit Struk Belanja");
             renderBelanjaKaryawanModal(isCOS ? 'resume' : 'input');
             showSwalSuccess('Data Terkirim 🚀', 'Struk belanja karyawan berhasil dikirimkan!');
         }
@@ -5213,7 +5235,7 @@
             hideLoading();
 
             closeCustomModal();
-            trackUserActivity(2, "Serah Terima Shift");
+            trackUserActivity(1, "Serah Terima Shift");
             showSwalSuccess('Serah Terima Berhasil 🤝', 'Laporan Shift Kasir Berhasil Dicatat!');
         }
 
@@ -5691,7 +5713,10 @@
             if (users && Array.isArray(users) && users.length > 0) {
                 users.sort((a,b) => cleanNum(b.poin) - cleanNum(a.poin));
                 listEl.innerHTML = users.map((u, idx) => {
-                    const userImgUrl = getRealisticHumanAvatar(u.NAMA || u.nama, u["FOTO PROFIL"] || u.foto);
+                    const thisUserNik = String(u.NIK || u.nik || "").trim();
+                    // ✅ MENGIRIM NIK UNIK MASING-MASING KARYAWAN
+                    const userImgUrl = getRealisticHumanAvatar(u.NAMA || u.nama, u["FOTO PROFIL"] || u.foto, thisUserNik);
+                    
                     return `
                         <div class="modal-card-box" style="display:flex; justify-content:space-between; align-items:center; border-left:4px solid ${idx===0 ? 'var(--gold)' : 'var(--card-border)'};">
                             <div style="display:flex; align-items:center; gap:10px;">
@@ -5710,7 +5735,6 @@
                 listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-sub);">Belum ada data leaderboard.</div>`;
             }
         }
-
         // =================================================================
         // PERBAIKAN MISI HARI INI (JOBDESK, CEKLIS EXP, SERAH TERIMA + SPREADSHEET)
         // =================================================================
@@ -6450,7 +6474,7 @@
             sendServerPushTrigger(isCOS ? "ac" : "cos", "📋 Approval Jobdesk Baru", `${taskTitle} dikirim oleh ${dashboardData?.user?.NAMA || 'Staff'}`);
 
             jobdeskPhotoPreview = null;
-            trackUserActivity(4, "Submit Jobdesk " + taskTitle);
+            trackUserActivity(1, "Submit Jobdesk " + taskTitle);
             renderJobdeskModalView('input');
             showSwalSuccess('Laporan Terkirim 🚀', 'Pekerjaan berhasil dilaporkan!');
         }
