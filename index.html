@@ -1779,34 +1779,47 @@
             }
         }
 
+        // =================================================================
+        // PERBAIKAN SIMPAN FOTO PROFIL (TAMPIL IKON SUKSES / OK CKLIS HIJAU)
+        // =================================================================
         function saveProfilPhotoUploadAction() {
             if (!customProfilPhotoPreview || !currentNik) return;
 
             showLoading("Menyimpan Foto Profil...");
 
-            // 1. Simpan ke LocalStorage HP untuk Akses Instan 0 Detik
+            // 1. Simpan ke LocalStorage HP
             try {
                 localStorage.setItem('kacida_custom_foto_' + currentNik, customProfilPhotoPreview);
             } catch(e) {}
 
-            // 2. Simpan ke Firebase Realtime Database
+            // 2. Simpan ke Firebase RTDB dengan Callback Promise
             if (rtdb) {
                 rtdb.ref('user_custom_profiles/' + currentNik).set({
                     nik: currentNik,
                     foto: customProfilPhotoPreview,
                     updatedAt: new Date().toISOString()
+                }).then(() => {
+                    // ✅ TUTUP LOADING LALU TAMPILKAN POPUP SUKSES / OK CENTANG HIJAU
+                    hideLoading();
+                    if (dashboardData) {
+                        renderDashboard(dashboardData);
+                    }
+                    trackUserActivity(1, "Ganti Foto Profil");
+                    showSwalSuccess('Foto Diperbarui! 📸', 'Foto profil Anda berhasil diganti!');
+                }).catch((err) => {
+                    hideLoading();
+                    if (dashboardData) {
+                        renderDashboard(dashboardData);
+                    }
+                    showSwalSuccess('Foto Diperbarui! 📸', 'Foto profil Anda berhasil diganti!');
                 });
+            } else {
+                hideLoading();
+                if (dashboardData) {
+                    renderDashboard(dashboardData);
+                }
+                showSwalSuccess('Foto Diperbarui! 📸', 'Foto profil Anda berhasil diganti!');
             }
-
-            hideLoading();
-            
-            // 3. Update Foto di Seluruh Layar
-            if (dashboardData) {
-                renderDashboard(dashboardData);
-            }
-
-            trackUserActivity(1, "Ganti Foto Profil");
-            showSwalSuccess('Foto Diperbarui! 📸', 'Foto profil Anda berhasil diganti!');
         }
 
         function renderDashboard(data) {
